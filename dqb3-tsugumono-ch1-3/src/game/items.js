@@ -1,5 +1,5 @@
 import { B, drawTileIcon } from "../world/blocks.js";
-import ICON_ATLAS from "../../assets/items/item_icons_16.json";
+import ICON_ATLAS from "../../assets/items/item_icons_16.json" with { type: "json" };
 
 // kind: block | tool | weapon | armor | food | material
 // tool: { tier, speed } hammers. weapon: { atk }. food: { heal }.
@@ -122,14 +122,17 @@ let iconAtlas = null;
 const iconReadyListeners = [];
 const iconCache = new Map();
 
-const atlasImage = new Image();
-atlasImage.onload = () => {
-  iconAtlas = atlasImage;
-  iconCache.clear();
-  for (const fn of iconReadyListeners) fn();
-};
-atlasImage.onerror = () => console.warn("item icon atlas failed to load; using fallback icons");
-atlasImage.src = ICON_ATLAS_URL;
+// Node.js (tests that import RECIPES etc.) has no Image; the icons are browser-only.
+if (typeof Image !== "undefined") {
+  const atlasImage = new Image();
+  atlasImage.onload = () => {
+    iconAtlas = atlasImage;
+    iconCache.clear();
+    for (const fn of iconReadyListeners) fn();
+  };
+  atlasImage.onerror = () => console.warn("item icon atlas failed to load; using fallback icons");
+  atlasImage.src = ICON_ATLAS_URL;
+}
 
 // Called once the atlas has loaded, so already shown icons can be redrawn.
 export function onItemIconsReady(fn) {

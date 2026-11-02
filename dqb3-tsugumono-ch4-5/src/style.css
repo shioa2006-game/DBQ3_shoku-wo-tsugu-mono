@@ -314,8 +314,8 @@ body {
 }
 
 .bp-row img {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   image-rendering: pixelated;
 }
 
@@ -489,9 +489,9 @@ button:disabled {
 
 .inv-cell img {
   position: absolute;
-  inset: 5px;
-  width: 30px;
-  height: 30px;
+  inset: 2px;
+  width: 36px;
+  height: 36px;
   image-rendering: pixelated;
 }
 
@@ -538,8 +538,8 @@ button:disabled {
 }
 
 .craft-row img {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   image-rendering: pixelated;
 }
 

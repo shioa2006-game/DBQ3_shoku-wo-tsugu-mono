@@ -1,10 +1,10 @@
 {
   "source": "Storybook_Character_Studio/prototypes/item-icons/icons.mjs",
-  "version": 1,
+  "version": 2,
   "image": "item_icons_16.png",
   "cellSize": 16,
   "columns": 8,
-  "rows": 7,
+  "rows": 10,
   "cells": {
     "dirt": [
       0,

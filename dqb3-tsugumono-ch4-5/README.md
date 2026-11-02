@@ -31,7 +31,7 @@ npm run dev      # http://localhost:5173/dqb3-tsugumono-ch4-5/
 
 ```sh
 npm run build    # dist/ へビルド（base: /dqb3-tsugumono-ch4-5/）
-npm run test:ci  # 高速サブセット（sheets + smoke + HUDハート + 水中描画）
+npm run test:ci  # 高速サブセット（sheets + smoke + HUDハート + 水中描画 + 水からの脱出 + アイテムアイコン）
 npm run test:e2e # 全テスト（第4章の通し・ロード復元を含む）
 ```
 
@@ -39,6 +39,12 @@ Git管理は[親リポジトリ](../README.md)に統合しました。GitHubへ�
 
 テストは playwright-core + ヘッドレス Chromium を使う。ブラウザは
 `PW_CHROMIUM_PATH` で明示指定できる（`tests/helpers.mjs` 参照）。
+
+## アイテムアイコン
+
+インベントリ・ホットバー・クラフト一覧・設計図・地面のドロップのアイコンは、Studioの [item-icons](../Storybook_Character_Studio/prototypes/item-icons/README.md) でコードから描いた16×16のドット絵です。本島編と同じ `assets/items/item_icons_16.png`（全編のアイコンを並べた1枚）と、この編のアイテムの位置だけを書いた `item_icons_16.json` を読み込み、2倍の32pxで表示します。画像が読めないときだけ、従来のブロックの模様・emoji（`items.js` の `tile`・`icon`）で表示します。
+
+アイコンを直すときはStudioの `icons.mjs` を編集し、Studioで `npm.cmd run export:items -- --preview-game` を実行します（第1～3章と第4～5章の両方へ書き出します）。ゲーム側の画像を直接編集しないでください。
 
 ## 主要な技術メモ
 

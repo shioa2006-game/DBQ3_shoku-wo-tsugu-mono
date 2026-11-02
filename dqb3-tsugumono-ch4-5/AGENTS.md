@@ -78,6 +78,7 @@ node tools/normalize_sheet.mjs art_src/<name>_body_8dir.src.png assets/humanoids
 
 - 生画像を`assets/humanoids/`へ直接置いて個別補正で回避しない。
 - `tests/e2e/sheets.test.mjs`の検査を通す。
+- アイテムアイコンの原本はStudioの `prototypes/item-icons/`。`assets/items/` はStudioの `npm.cmd run export:items -- --preview-game` で更新し、直接編集しない。`tests/e2e/item-icons.test.mjs`（`test:ci` に含む）で全アイテムが画像のアイコンを使うことを確認する。
 
 ## 親リポジトリのGitHub運用
 

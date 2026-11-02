@@ -1,0 +1,262 @@
+{
+  "source": "Storybook_Character_Studio/prototypes/item-icons/icons.mjs",
+  "version": 2,
+  "image": "item_icons_16.png",
+  "cellSize": 16,
+  "columns": 8,
+  "rows": 10,
+  "cells": {
+    "dirt": [
+      0,
+      0
+    ],
+    "stone": [
+      1,
+      0
+    ],
+    "sand": [
+      2,
+      0
+    ],
+    "log": [
+      3,
+      0
+    ],
+    "plank": [
+      4,
+      0
+    ],
+    "wall": [
+      5,
+      0
+    ],
+    "thatch": [
+      6,
+      0
+    ],
+    "farmland": [
+      7,
+      0
+    ],
+    "fence": [
+      0,
+      1
+    ],
+    "spikes": [
+      1,
+      1
+    ],
+    "torch": [
+      2,
+      1
+    ],
+    "door": [
+      3,
+      1
+    ],
+    "workbench": [
+      4,
+      1
+    ],
+    "chest": [
+      5,
+      1
+    ],
+    "bed": [
+      6,
+      1
+    ],
+    "altar": [
+      7,
+      1
+    ],
+    "torii": [
+      0,
+      2
+    ],
+    "kamado": [
+      3,
+      2
+    ],
+    "table": [
+      4,
+      2
+    ],
+    "sail": [
+      5,
+      2
+    ],
+    "shipwall": [
+      6,
+      2
+    ],
+    "helm": [
+      7,
+      2
+    ],
+    "straw": [
+      0,
+      3
+    ],
+    "wing": [
+      3,
+      3
+    ],
+    "clay": [
+      6,
+      3
+    ],
+    "hide": [
+      7,
+      3
+    ],
+    "fish": [
+      0,
+      4
+    ],
+    "mushroom": [
+      1,
+      4
+    ],
+    "hammer_wood": [
+      6,
+      4
+    ],
+    "hammer_stone": [
+      7,
+      4
+    ],
+    "club": [
+      0,
+      5
+    ],
+    "sword_stone": [
+      1,
+      5
+    ],
+    "sword_copper": [
+      2,
+      5
+    ],
+    "herb": [
+      4,
+      5
+    ],
+    "onigiri": [
+      5,
+      5
+    ],
+    "grilled_fish": [
+      6,
+      5
+    ],
+    "mushroom_soup": [
+      7,
+      5
+    ],
+    "black_sand": [
+      2,
+      6
+    ],
+    "bamboo": [
+      3,
+      6
+    ],
+    "bamboo_channel": [
+      4,
+      6
+    ],
+    "mine_lamp": [
+      5,
+      6
+    ],
+    "kiln": [
+      6,
+      6
+    ],
+    "forge": [
+      7,
+      6
+    ],
+    "anvil": [
+      0,
+      7
+    ],
+    "trough": [
+      1,
+      7
+    ],
+    "iron_pot": [
+      2,
+      7
+    ],
+    "iron_ore": [
+      3,
+      7
+    ],
+    "charcoal": [
+      4,
+      7
+    ],
+    "iron": [
+      5,
+      7
+    ],
+    "iron_fitting": [
+      6,
+      7
+    ],
+    "wisp_ember": [
+      7,
+      7
+    ],
+    "volcano_grain": [
+      0,
+      8
+    ],
+    "volcano_grain_seed": [
+      1,
+      8
+    ],
+    "incense_herb": [
+      2,
+      8
+    ],
+    "black_scale": [
+      3,
+      8
+    ],
+    "hammer_iron": [
+      4,
+      8
+    ],
+    "machete": [
+      5,
+      8
+    ],
+    "sword_iron": [
+      6,
+      8
+    ],
+    "iron_armor": [
+      7,
+      8
+    ],
+    "grain_meal": [
+      0,
+      9
+    ],
+    "miner_feast": [
+      1,
+      9
+    ],
+    "herb_tea": [
+      2,
+      9
+    ],
+    "porridge": [
+      3,
+      9
+    ]
+  }
+}

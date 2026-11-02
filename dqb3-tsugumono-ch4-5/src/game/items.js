@@ -1,4 +1,5 @@
 import { B, drawTileIcon } from "../world/blocks.js";
+import ICON_ATLAS from "../../assets/items/item_icons_16.json" with { type: "json" };
 
 // kind: block | tool | weapon | armor | food | material | seed
 // tool: { tier, speed } hammers. weapon: { atk }. food: { heal }.
@@ -141,9 +142,47 @@ export function itemForBlock(blockId) {
   return null;
 }
 
+// --- item icons -------------------------------------------------------------------
+// 16px pixel-art icons drawn in Storybook_Character_Studio/prototypes/item-icons/ and
+// exported with `npm.cmd run export:items -- --preview-game`. Until the atlas has
+// loaded (or for an id without a cell), icons fall back to the block tile / emoji.
+const ICON_ATLAS_URL = new URL("../../assets/items/item_icons_16.png", import.meta.url).href;
+let iconAtlas = null;
+const iconReadyListeners = [];
 const iconCache = new Map();
 
-// 36px icon as a data URL: atlas tile for textured blocks, emoji otherwise.
+// Node.js (tests that import RECIPES etc.) has no Image; the icons are browser-only.
+if (typeof Image !== "undefined") {
+  const atlasImage = new Image();
+  atlasImage.onload = () => {
+    iconAtlas = atlasImage;
+    iconCache.clear();
+    for (const fn of iconReadyListeners) fn();
+  };
+  atlasImage.onerror = () => console.warn("item icon atlas failed to load; using fallback icons");
+  atlasImage.src = ICON_ATLAS_URL;
+}
+
+// Called once the atlas has loaded, so already shown icons can be redrawn.
+export function onItemIconsReady(fn) {
+  if (iconAtlas) fn();
+  else iconReadyListeners.push(fn);
+}
+
+// "atlas" | "tile" | "emoji": which source itemIcon() uses for an id right now.
+export function itemIconSource(itemId) {
+  if (iconAtlas && ICON_ATLAS.cells[itemId]) return "atlas";
+  return ITEMS[itemId].tile ? "tile" : "emoji";
+}
+
+// Which items still use a fallback icon (for tests and debugging).
+export function itemIconReport() {
+  const ids = Object.keys(ITEMS);
+  return { loaded: !!iconAtlas, total: ids.length, fallback: ids.filter((id) => itemIconSource(id) !== "atlas") };
+}
+
+// 36px icon as a data URL. Atlas icons are drawn at 2x (32px) with a 2px margin,
+// the same footprint as the old block tile icons, so pixels stay square.
 export function itemIcon(itemId) {
   if (iconCache.has(itemId)) return iconCache.get(itemId);
   const def = ITEMS[itemId];
@@ -151,7 +190,13 @@ export function itemIcon(itemId) {
   canvas.width = 36;
   canvas.height = 36;
   const ctx = canvas.getContext("2d");
-  if (def.tile) {
+  const source = itemIconSource(itemId);
+  if (source === "atlas") {
+    const size = ICON_ATLAS.cellSize;
+    const [col, row] = ICON_ATLAS.cells[itemId];
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(iconAtlas, col * size, row * size, size, size, 2, 2, size * 2, size * 2);
+  } else if (def.tile) {
     drawTileIcon(ctx, def.tile, 2, 2, 32);
     ctx.strokeStyle = "rgba(0,0,0,0.4)";
     ctx.strokeRect(2.5, 2.5, 31, 31);

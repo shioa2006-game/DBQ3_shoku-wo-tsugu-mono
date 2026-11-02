@@ -1,6 +1,11 @@
-// 第1～3章のアイテム一覧（ゲーム `dqb3-tsugumono-ch1-3/src/game/items.js` の ITEMS と同じ順・同じID）。
+// 各編のアイテム一覧（ゲームの `src/game/items.js` の ITEMS と同じ順・同じID）。
 // current は移植前の表示（tile:… はブロックの模様、それ以外はemoji）。比較ページで使う。
-export const CH1_3_ITEMS = Object.freeze([
+// 同じIDは両編で同じアイコンを使う。
+
+const entries = (rows) => rows.map(([id, name, kind, current]) => Object.freeze({ id, name, kind, current }));
+
+// 第1～3章（dqb3-tsugumono-ch1-3）
+export const CH1_3_ITEMS = Object.freeze(entries([
   ['dirt', '土', 'block', 'tile:dirt'],
   ['stone', '石', 'block', 'tile:stone'],
   ['sand', 'すな', 'block', 'tile:sand'],
@@ -51,4 +56,81 @@ export const CH1_3_ITEMS = Object.freeze([
   ['mushroom_soup', 'きのこ汁', 'food', '🍲'],
   ['feast', 'ごちそう膳', 'food', '🍱'],
   ['squid_soup', 'イカスミ汁', 'food', '🍜'],
-].map(([id, name, kind, current]) => Object.freeze({ id, name, kind, current })));
+]));
+
+// 第4～5章（dqb3-tsugumono-ch4-5）
+export const CH4_5_ITEMS = Object.freeze(entries([
+  ['dirt', '土', 'block', 'tile:dirt'],
+  ['stone', '石', 'block', 'tile:stone'],
+  ['sand', 'すな', 'block', 'tile:sand'],
+  ['black_sand', '黒砂', 'block', 'tile:black_sand'],
+  ['log', '木材', 'block', 'tile:log_side'],
+  ['plank', '板材', 'block', 'tile:plank'],
+  ['wall', '白かべ', 'block', 'tile:wall'],
+  ['thatch', 'かやぶき', 'block', 'tile:thatch'],
+  ['farmland', '耕した土', 'block', 'tile:farmland'],
+  ['bamboo', '竹材', 'block', 'tile:bamboo_side'],
+  ['bamboo_channel', '竹の導水路', 'block', 'tile:channel_top'],
+  ['fence', '柵', 'block', '🪵'],
+  ['spikes', 'とげ罠', 'block', '📌'],
+  ['torch', 'たいまつ', 'block', '🔥'],
+  ['mine_lamp', '坑道灯', 'block', '🏮'],
+  ['door', '木の扉', 'block', '🚪'],
+  ['workbench', '作業台', 'block', '🛠️'],
+  ['chest', '収納箱', 'block', '📦'],
+  ['bed', 'わらのベッド', 'block', '🛏️'],
+  ['altar', '職業の祭壇', 'block', '🔮'],
+  ['torii', '鳥居', 'block', '⛩️'],
+  ['kamado', 'かまど', 'block', '🍳'],
+  ['table', 'ちゃぶ台', 'block', '🪑'],
+  ['kiln', '炭焼き窯', 'block', '🏭'],
+  ['forge', '炉', 'block', '🔥'],
+  ['anvil', '金床', 'block', '🧱'],
+  ['trough', '水桶', 'block', '🪣'],
+  ['iron_pot', '鉄鍋', 'block', '🍲'],
+  ['sail', '帆', 'block', 'tile:sail'],
+  ['shipwall', '船の外板', 'block', 'tile:shipwall'],
+  ['helm', '舵輪', 'block', '☸'],
+  ['straw', 'わら', 'material', '🌾'],
+  ['clay', 'ねん土', 'material', '🟤'],
+  ['hide', 'けもの皮', 'material', '🐾'],
+  ['fish', 'さかな', 'material', '🐟'],
+  ['mushroom', 'きのこ', 'material', '🍄'],
+  ['wing', 'こうもりのはね', 'material', '🦇'],
+  ['iron_ore', '鉄鉱石', 'material', '🪨'],
+  ['charcoal', '木炭', 'material', '⬛'],
+  ['iron', '鉄', 'material', '🔩'],
+  ['iron_fitting', '鉄の金具', 'material', '⚙️'],
+  ['wisp_ember', '鬼火のかけら', 'material', '🔥'],
+  ['volcano_grain', '火山穀物', 'material', '🌾'],
+  ['volcano_grain_seed', '火山穀物の種', 'seed', '🌱'],
+  ['herb', 'やくそう', 'food', '🌿'],
+  ['incense_herb', '清めの香草', 'material', '🌸'],
+  ['black_scale', '無銘の黒鱗', 'material', '🖤'],
+  ['hammer_wood', '木のハンマー', 'tool', '🔨'],
+  ['hammer_stone', '石のハンマー', 'tool', '⚒️'],
+  ['hammer_iron', '鉄のハンマー', 'tool', '⛏️'],
+  ['machete', '鉄の山刀', 'tool', '🔪'],
+  ['club', 'こん棒', 'weapon', '🏏'],
+  ['sword_stone', '石の剣', 'weapon', '🗡️'],
+  ['sword_copper', '銅の剣', 'weapon', '⚔️'],
+  ['sword_iron', '鉄の剣', 'weapon', '⚔️'],
+  ['iron_armor', '鉄の胸あて', 'armor', '🛡️'],
+  ['onigiri', 'おにぎり', 'food', '🍙'],
+  ['grilled_fish', '焼き魚', 'food', '🍢'],
+  ['mushroom_soup', 'きのこ汁', 'food', '🍲'],
+  ['grain_meal', '火山穀物の飯', 'food', '🍚'],
+  ['miner_feast', '山の衆の膳', 'food', '🍱'],
+  ['herb_tea', '薬草の煎じ湯', 'food', '🍵'],
+  ['porridge', '火山穀物の粥', 'food', '🥣'],
+]));
+
+// アトラスに並べる順: 第1～3章の順のあと、第4～5章だけのアイテム。
+// 既存のセル位置を変えないよう、新しい編のアイテムは末尾に足す。
+export const ALL_ITEMS = Object.freeze([...CH1_3_ITEMS, ...CH4_5_ITEMS.filter((item) => !CH1_3_ITEMS.some((old) => old.id === item.id))]);
+
+// 書き出し先のゲームと、そのアイテム一覧。
+export const GAMES = Object.freeze({
+  'ch1-3': { folder: 'dqb3-tsugumono-ch1-3', items: CH1_3_ITEMS },
+  'ch4-5': { folder: 'dqb3-tsugumono-ch4-5', items: CH4_5_ITEMS },
+});

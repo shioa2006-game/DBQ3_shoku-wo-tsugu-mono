@@ -1,42 +1,49 @@
 // アイテムアイコンをPNGへ書き出す。ブラウザ不要（ドット絵を直接PNGにする）。
-//   output/item_icons_16.png   ゲームへ渡すアトラス（16pxセル、作画済みだけ）
-//   output/manifest.json       id → セル位置、未作画の一覧
+//   output/item_icons_16.png   ゲームへ渡すアトラス（16pxセル、全編共通）
+//   output/manifest.json       id → セル位置、編ごとのアイテムと未作画の一覧
 //   output/preview.png         確認用（全アイテムを4倍、作画済みは実寸2倍も）
+// --preview-game で、各ゲームの assets/items/ へ同じアトラスとその編の位置情報を書き出す。
 import { writeFile, mkdir } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
 import { ICONS, renderIcon } from './icons.mjs';
 import { ICON_SIZE } from './pixel.mjs';
-import { CH1_3_ITEMS } from './catalog.mjs';
+import { ALL_ITEMS, GAMES } from './catalog.mjs';
 
 const require = createRequire(new URL('../../../dqb3-tsugumono-ch1-3/package.json', import.meta.url));
 const { PNG } = require('pngjs');
 const here = (p) => new URL(p, import.meta.url);
-const game = (p) => new URL(`../../../dqb3-tsugumono-ch1-3/${p}`, import.meta.url);
+const gameFile = (folder, p) => new URL(`../../../${folder}/${p}`, import.meta.url);
 
 export const ATLAS_COLUMNS = 8;
 
+// セル位置は ALL_ITEMS の並び順で決まる（未作画でも位置は空けておく）。
+// 新しい編のアイテムを末尾に足しても、既存のセル位置は変わらない。
 export function buildAtlas() {
-  const drawn = CH1_3_ITEMS.filter((item) => ICONS[item.id]);
-  const unknown = Object.keys(ICONS).filter((id) => !CH1_3_ITEMS.some((item) => item.id === id));
+  const unknown = Object.keys(ICONS).filter((id) => !ALL_ITEMS.some((item) => item.id === id));
   if (unknown.length) throw Error(`Icons without a catalog entry: ${unknown.join(', ')}`);
-  const rows = Math.max(1, Math.ceil(drawn.length / ATLAS_COLUMNS));
+  const rows = Math.max(1, Math.ceil(ALL_ITEMS.length / ATLAS_COLUMNS));
   const png = new PNG({ width: ATLAS_COLUMNS * ICON_SIZE, height: rows * ICON_SIZE });
   png.data.fill(0);
   const cells = {};
-  drawn.forEach((item, i) => {
+  ALL_ITEMS.forEach((item, i) => {
+    if (!ICONS[item.id]) return;
     const col = i % ATLAS_COLUMNS, row = Math.floor(i / ATLAS_COLUMNS);
     blit(png, renderIcon(item.id), col * ICON_SIZE, row * ICON_SIZE, 1);
     cells[item.id] = [col, row];
   });
+  const games = Object.fromEntries(Object.entries(GAMES).map(([key, { folder, items }]) => [key, {
+    folder,
+    items: items.length,
+    pending: items.filter((item) => !ICONS[item.id]).map((item) => item.id),
+  }]));
   return {
     png,
     manifest: {
       id: 'item-icons',
-      version: 1,
+      version: 2,
       status: 'prototype',
       source: '../icons.mjs',
-      chapter: 'ch1-3',
       image: 'item_icons_16.png',
       cellSize: ICON_SIZE,
       columns: ATLAS_COLUMNS,
@@ -44,7 +51,8 @@ export function buildAtlas() {
       outline: true,
       display: { scale: 2, imageRendering: 'pixelated', note: '16px icons are shown at 32px in the 36px slot; keep integer scaling' },
       cells,
-      pending: CH1_3_ITEMS.filter((item) => !ICONS[item.id]).map((item) => item.id),
+      games,
+      pending: ALL_ITEMS.filter((item) => !ICONS[item.id]).map((item) => item.id),
     },
   };
 }
@@ -68,16 +76,16 @@ function fill(png, x, y, w, h, [r, g, b]) {
   for (let j = y; j < y + h; j += 1) for (let i = x; i < x + w; i += 1) png.data.set([r, g, b, 255], (j * png.width + i) * 4);
 }
 
-// 確認用: 上段は全50件を4倍（未作画は空き枠）、下段は作画済みを本編のスロット・草地の上に実寸2倍で。
+// 確認用: 上段は全アイテムを4倍（未作画は空き枠）、下段は作画済みを本編のスロット・草地の上に実寸2倍で。
 function buildPreview() {
   const cols = 10, cell = 76, pad = 12;
-  const gridRows = Math.ceil(CH1_3_ITEMS.length / cols);
-  const drawn = CH1_3_ITEMS.filter((item) => ICONS[item.id]);
+  const gridRows = Math.ceil(ALL_ITEMS.length / cols);
+  const drawn = ALL_ITEMS.filter((item) => ICONS[item.id]);
   const small = 40, smallRows = Math.ceil(drawn.length / 16);
   const width = pad * 2 + cols * cell, height = pad * 3 + gridRows * cell + smallRows * small * 2;
   const png = new PNG({ width, height });
   fill(png, 0, 0, width, height, [0xef, 0xee, 0xe6]);
-  CH1_3_ITEMS.forEach((item, i) => {
+  ALL_ITEMS.forEach((item, i) => {
     const x = pad + (i % cols) * cell, y = pad + Math.floor(i / cols) * cell;
     fill(png, x + 2, y + 2, cell - 4, cell - 4, ICONS[item.id] ? [0x16, 0x1c, 0x30] : [0xc9, 0xcd, 0xc8]);
     if (ICONS[item.id]) blit(png, renderIcon(item.id), x + 6, y + 6, 4);
@@ -93,10 +101,12 @@ function buildPreview() {
   return png;
 }
 
-// ゲームが読む位置情報。ゲームで使わない制作用の項目は省く。
-export function gameManifest(manifest) {
+// ゲームが読む位置情報。その編のアイテムのセルだけを入れ、制作用の項目は省く。
+export function gameManifest(manifest, gameKey) {
   const { version, image, cellSize, columns, rows, cells } = manifest;
-  return { source: 'Storybook_Character_Studio/prototypes/item-icons/icons.mjs', version, image, cellSize, columns, rows, cells };
+  const ids = new Set(GAMES[gameKey].items.map((item) => item.id));
+  const own = Object.fromEntries(Object.entries(cells).filter(([id]) => ids.has(id)));
+  return { source: 'Storybook_Character_Studio/prototypes/item-icons/icons.mjs', version, image, cellSize, columns, rows, cells: own };
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
@@ -110,9 +120,12 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   await writeFile(here('output/preview.png'), PNG.sync.write(buildPreview()));
   if (toGame) {
     // 16pxの完成画像なので正規化はなく、art_src/ を経ずに読込用の assets/items/ へ置く。
-    await mkdir(game('assets/items/'), { recursive: true });
-    await writeFile(game('assets/items/item_icons_16.png'), bytes);
-    await writeFile(game('assets/items/item_icons_16.json'), JSON.stringify(gameManifest(manifest), null, 2) + '\n');
+    for (const [key, { folder }] of Object.entries(GAMES)) {
+      await mkdir(gameFile(folder, 'assets/items/'), { recursive: true });
+      await writeFile(gameFile(folder, 'assets/items/item_icons_16.png'), bytes);
+      await writeFile(gameFile(folder, 'assets/items/item_icons_16.json'), JSON.stringify(gameManifest(manifest, key), null, 2) + '\n');
+    }
   }
-  console.log(`Item icons exported: ${Object.keys(manifest.cells).length} drawn / ${CH1_3_ITEMS.length} items; ${toGame ? 'copied to dqb3-tsugumono-ch1-3/assets/items/' : 'game assets unchanged'}.`);
+  const status = Object.entries(manifest.games).map(([key, g]) => `${key} ${g.items - g.pending.length}/${g.items}`).join(', ');
+  console.log(`Item icons exported (${status}); ${toGame ? 'copied to each game assets/items/' : 'game assets unchanged'}.`);
 }

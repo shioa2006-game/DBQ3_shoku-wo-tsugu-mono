@@ -1,13 +1,12 @@
 {
   "id": "item-icons",
-  "version": 1,
+  "version": 2,
   "status": "prototype",
   "source": "../icons.mjs",
-  "chapter": "ch1-3",
   "image": "item_icons_16.png",
   "cellSize": 16,
   "columns": 8,
-  "rows": 7,
+  "rows": 10,
   "outline": true,
   "display": {
     "scale": 2,
@@ -214,7 +213,123 @@
     "squid_soup": [
       1,
       6
+    ],
+    "black_sand": [
+      2,
+      6
+    ],
+    "bamboo": [
+      3,
+      6
+    ],
+    "bamboo_channel": [
+      4,
+      6
+    ],
+    "mine_lamp": [
+      5,
+      6
+    ],
+    "kiln": [
+      6,
+      6
+    ],
+    "forge": [
+      7,
+      6
+    ],
+    "anvil": [
+      0,
+      7
+    ],
+    "trough": [
+      1,
+      7
+    ],
+    "iron_pot": [
+      2,
+      7
+    ],
+    "iron_ore": [
+      3,
+      7
+    ],
+    "charcoal": [
+      4,
+      7
+    ],
+    "iron": [
+      5,
+      7
+    ],
+    "iron_fitting": [
+      6,
+      7
+    ],
+    "wisp_ember": [
+      7,
+      7
+    ],
+    "volcano_grain": [
+      0,
+      8
+    ],
+    "volcano_grain_seed": [
+      1,
+      8
+    ],
+    "incense_herb": [
+      2,
+      8
+    ],
+    "black_scale": [
+      3,
+      8
+    ],
+    "hammer_iron": [
+      4,
+      8
+    ],
+    "machete": [
+      5,
+      8
+    ],
+    "sword_iron": [
+      6,
+      8
+    ],
+    "iron_armor": [
+      7,
+      8
+    ],
+    "grain_meal": [
+      0,
+      9
+    ],
+    "miner_feast": [
+      1,
+      9
+    ],
+    "herb_tea": [
+      2,
+      9
+    ],
+    "porridge": [
+      3,
+      9
     ]
+  },
+  "games": {
+    "ch1-3": {
+      "folder": "dqb3-tsugumono-ch1-3",
+      "items": 50,
+      "pending": []
+    },
+    "ch4-5": {
+      "folder": "dqb3-tsugumono-ch4-5",
+      "items": 63,
+      "pending": []
+    }
   },
   "pending": []
 }

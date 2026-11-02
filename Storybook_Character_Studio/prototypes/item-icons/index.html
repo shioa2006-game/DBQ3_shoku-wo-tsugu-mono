@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>アイテムアイコン比較 — 第1～3章</title>
+<title>アイテムアイコン比較</title>
 <link rel="icon" href="data:,">
 <style>
 :root{font-family:"Yu Gothic UI",Meiryo,sans-serif;color:#263f4e;background:#efeee6}*{box-sizing:border-box}body{margin:0}main{max-width:1160px;margin:auto;padding:28px 20px}h1{font-size:26px;margin:6px 0}p{line-height:1.7;color:#526b75}a{color:#245b72}
@@ -15,13 +15,14 @@ table{width:100%;border-collapse:collapse;background:#fafbf6;border:1px solid #c
 </head>
 <body><main>
 <small>STORYBOOK STUDIO / ITEM ICONS</small>
-<h1>アイテムアイコン（第1～3章）</h1>
+<h1>アイテムアイコン（第1～5章）</h1>
 <p>左が今のゲームの表示（emojiまたはブロックの模様名）、右がこのフォルダのコードで描いた16×16のドット絵です。スロットは本編のホットバーと同じ見た目で、ドット絵を2倍（32px）で表示します。緑の枠は地面に落ちたときの見え方の目安です。</p>
 <nav class="bar"><a href="README.md">制作・書き出し手順</a><a href="output/preview.png">書き出し確認画像</a><a href="output/item_icons_16.png" download>アトラスPNGを保存</a><a href="output/manifest.json">マニフェスト</a>
+<label>編 <select id="game"><option value="ch1-3">第1～3章</option><option value="ch4-5">第4～5章</option></select></label>
 <label><input type="checkbox" id="onlyDrawn"> 作画済みだけ表示</label></nav>
 <table><thead><tr><th>名前</th><th>ID</th><th>種類</th><th>今の表示</th><th>新しいアイコン</th><th>4倍</th></tr></thead><tbody id="rows"></tbody></table>
 <script type="module">
-import { CH1_3_ITEMS } from './catalog.mjs';
+import { GAMES } from './catalog.mjs';
 const manifest = await (await fetch('output/manifest.json', { cache: 'no-store' })).json();
 const atlas = new Image();
 atlas.src = `output/${manifest.image}?v=${Date.now()}`;
@@ -34,7 +35,11 @@ const cellCanvas = (id) => {
   return c;
 };
 const rows = document.getElementById('rows');
-for (const item of CH1_3_ITEMS) {
+const gameSelect = document.getElementById('game');
+const toggle = document.getElementById('onlyDrawn');
+function render() {
+rows.innerHTML = '';
+for (const item of GAMES[gameSelect.value].items) {
   const tr = document.createElement('tr');
   const drawn = !!manifest.cells[item.id];
   tr.className = drawn ? 'drawn' : 'todo';
@@ -51,11 +56,12 @@ for (const item of CH1_3_ITEMS) {
   } else {
     tr.querySelector('.new').innerHTML = '<span class="pending">未作画</span>';
   }
+  tr.hidden = toggle.checked && !drawn;
   rows.append(tr);
 }
-const toggle = document.getElementById('onlyDrawn');
-toggle.addEventListener('change', () => {
-  for (const tr of rows.querySelectorAll('tr.todo')) tr.hidden = toggle.checked;
-});
+}
+render();
+gameSelect.addEventListener('change', render);
+toggle.addEventListener('change', render);
 </script>
 </main></body></html>

@@ -82,4 +82,17 @@ export const CUBES = {
     if (hash(x, y, seed) < 0.06) return '#c97b3f';
     return speckle('#5a3f24', ['#4c3520', '#66482a'], 0.3)(f, x, y, seed);
   }, 12),
+  // --- 第4～5章 ---
+  black_sand: cube((f, x, y, a, b, seed) => speckle('#3c3a3d', ['#46444a', '#333136', '#524e52', '#2b292d'], 0.5)(f, x, y, seed), 13),
+  bamboo: cube((f, x, y, a, b, seed) => bambooFace(f, x, y, a, b, seed), 14),
+  bamboo_channel: cube((f, x, y, a, b, seed) => f === 'top' && b > 0.24 && b < 0.76
+    ? (hash(x, y, seed) < 0.3 ? '#5b9be6' : '#3f7fd0')
+    : bambooFace(f, x, y, a, b, seed), 15),
 };
+
+// 竹: 横の面は節の線と縦の筋、上面は切り口の輪。
+function bambooFace(f, x, y, a, b, seed) {
+  if (f === 'top') return Math.abs(Math.max(Math.abs(a - 0.5), Math.abs(b - 0.5)) - 0.3) < 0.07 ? '#5a7d34' : '#8fbe5c';
+  if (near(b, 0.28) || near(b, 0.72) || near(a, 0.28, 0.06) || near(a, 0.7, 0.06)) return '#5a7d34';
+  return speckle('#7fae4e', ['#8fbe5c', '#6f9e42', '#95c464'], 0.3)(f, x, y, seed);
+}
