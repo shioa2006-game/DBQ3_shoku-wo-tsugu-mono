@@ -1,5 +1,6 @@
 # 親リポジトリの共通作業ルール
 
+- ユーザーへの返答・質問・作業報告・終了時の要約や選択ボタン・コミットメッセージ・PRの説明は日本語で書く。コード中の識別子やコマンドはそのままでよい。
 - Gitの管理単位はこの親ディレクトリ1つ。接続先は `https://github.com/shioa2006-game/DBQ3_shoku-wo-tsugu-mono.git` のみ。
 - CH1～3、CH4～5、Character Studioは通常の子フォルダ。子に `.git` を作らず、旧GitLab・Studio単体リポジトリへpull/pushしない。
 - 最初にルートREADMEと対象フォルダの `AGENTS.md`・READMEを読む。過去のarchive・品質記録にある個別リポジトリ/GitLab手順は現行の運用指示ではない。
