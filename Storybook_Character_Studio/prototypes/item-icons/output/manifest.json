@@ -1,0 +1,220 @@
+{
+  "id": "item-icons",
+  "version": 1,
+  "status": "prototype",
+  "source": "../icons.mjs",
+  "chapter": "ch1-3",
+  "image": "item_icons_16.png",
+  "cellSize": 16,
+  "columns": 8,
+  "rows": 7,
+  "outline": true,
+  "display": {
+    "scale": 2,
+    "imageRendering": "pixelated",
+    "note": "16px icons are shown at 32px in the 36px slot; keep integer scaling"
+  },
+  "cells": {
+    "dirt": [
+      0,
+      0
+    ],
+    "stone": [
+      1,
+      0
+    ],
+    "sand": [
+      2,
+      0
+    ],
+    "log": [
+      3,
+      0
+    ],
+    "plank": [
+      4,
+      0
+    ],
+    "wall": [
+      5,
+      0
+    ],
+    "thatch": [
+      6,
+      0
+    ],
+    "farmland": [
+      7,
+      0
+    ],
+    "fence": [
+      0,
+      1
+    ],
+    "spikes": [
+      1,
+      1
+    ],
+    "torch": [
+      2,
+      1
+    ],
+    "door": [
+      3,
+      1
+    ],
+    "workbench": [
+      4,
+      1
+    ],
+    "chest": [
+      5,
+      1
+    ],
+    "bed": [
+      6,
+      1
+    ],
+    "altar": [
+      7,
+      1
+    ],
+    "torii": [
+      0,
+      2
+    ],
+    "scarecrow": [
+      1,
+      2
+    ],
+    "waterway": [
+      2,
+      2
+    ],
+    "kamado": [
+      3,
+      2
+    ],
+    "table": [
+      4,
+      2
+    ],
+    "sail": [
+      5,
+      2
+    ],
+    "shipwall": [
+      6,
+      2
+    ],
+    "helm": [
+      7,
+      2
+    ],
+    "straw": [
+      0,
+      3
+    ],
+    "copper": [
+      1,
+      3
+    ],
+    "jelly": [
+      2,
+      3
+    ],
+    "wing": [
+      3,
+      3
+    ],
+    "rice": [
+      4,
+      3
+    ],
+    "seed": [
+      5,
+      3
+    ],
+    "clay": [
+      6,
+      3
+    ],
+    "hide": [
+      7,
+      3
+    ],
+    "fish": [
+      0,
+      4
+    ],
+    "mushroom": [
+      1,
+      4
+    ],
+    "rope": [
+      2,
+      4
+    ],
+    "sailcloth": [
+      3,
+      4
+    ],
+    "squid_ink": [
+      4,
+      4
+    ],
+    "fitting": [
+      5,
+      4
+    ],
+    "hammer_wood": [
+      6,
+      4
+    ],
+    "hammer_stone": [
+      7,
+      4
+    ],
+    "club": [
+      0,
+      5
+    ],
+    "sword_stone": [
+      1,
+      5
+    ],
+    "sword_copper": [
+      2,
+      5
+    ],
+    "cape": [
+      3,
+      5
+    ],
+    "herb": [
+      4,
+      5
+    ],
+    "onigiri": [
+      5,
+      5
+    ],
+    "grilled_fish": [
+      6,
+      5
+    ],
+    "mushroom_soup": [
+      7,
+      5
+    ],
+    "feast": [
+      0,
+      6
+    ],
+    "squid_soup": [
+      1,
+      6
+    ]
+  },
+  "pending": []
+}

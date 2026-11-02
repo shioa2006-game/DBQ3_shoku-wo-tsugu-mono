@@ -114,18 +114,22 @@ export class Entity {
 
 const dropTextureCache = new Map();
 
+// Keyed by the icon image, so a drop made before the icon atlas loaded does not
+// pin the fallback icon for later drops of the same item.
 function dropTexture(itemId) {
-  if (!dropTextureCache.has(itemId)) {
+  const url = itemIcon(itemId);
+  if (!dropTextureCache.has(url)) {
     const img = new Image();
-    img.src = itemIcon(itemId);
+    img.src = url;
     const texture = new THREE.Texture(img);
     img.onload = () => {
       texture.needsUpdate = true;
     };
     texture.colorSpace = THREE.SRGBColorSpace;
-    dropTextureCache.set(itemId, texture);
+    texture.magFilter = THREE.NearestFilter; // keep the pixel-art edges when enlarged
+    dropTextureCache.set(url, texture);
   }
-  return dropTextureCache.get(itemId);
+  return dropTextureCache.get(url);
 }
 
 export class ItemDrop {

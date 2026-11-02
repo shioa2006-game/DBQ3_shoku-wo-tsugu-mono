@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>アイテムアイコン比較 — 第1～3章</title>
+<link rel="icon" href="data:,">
+<style>
+:root{font-family:"Yu Gothic UI",Meiryo,sans-serif;color:#263f4e;background:#efeee6}*{box-sizing:border-box}body{margin:0}main{max-width:1160px;margin:auto;padding:28px 20px}h1{font-size:26px;margin:6px 0}p{line-height:1.7;color:#526b75}a{color:#245b72}
+.bar{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin:14px 0}label{font-size:14px}
+table{width:100%;border-collapse:collapse;background:#fafbf6;border:1px solid #c1cdca}th,td{padding:6px 10px;border-bottom:1px solid #dde3df;text-align:left;font-size:14px}th{background:#e0e7dd}
+.slot{position:relative;width:52px;height:52px;background:rgba(10,16,38,.8);border:2px solid rgba(242,236,220,.55);border-radius:8px}.slot>*{position:absolute;inset:6px;width:36px;height:36px;display:flex;align-items:center;justify-content:center}
+.slot canvas{image-rendering:pixelated;width:32px;height:32px;inset:8px}.emoji{font:26px serif;color:#fff}.tile{font-size:10px;line-height:1.2;color:#f2ecdc;text-align:center;word-break:break-all}
+.big{image-rendering:pixelated;width:64px;height:64px;background:#5fa53f;border-radius:6px}.pending{color:#9aa3a0}tr.drawn td:first-child{font-weight:700}
+</style>
+</head>
+<body><main>
+<small>STORYBOOK STUDIO / ITEM ICONS</small>
+<h1>アイテムアイコン（第1～3章）</h1>
+<p>左が今のゲームの表示（emojiまたはブロックの模様名）、右がこのフォルダのコードで描いた16×16のドット絵です。スロットは本編のホットバーと同じ見た目で、ドット絵を2倍（32px）で表示します。緑の枠は地面に落ちたときの見え方の目安です。</p>
+<nav class="bar"><a href="README.md">制作・書き出し手順</a><a href="output/preview.png">書き出し確認画像</a><a href="output/item_icons_16.png" download>アトラスPNGを保存</a><a href="output/manifest.json">マニフェスト</a>
+<label><input type="checkbox" id="onlyDrawn"> 作画済みだけ表示</label></nav>
+<table><thead><tr><th>名前</th><th>ID</th><th>種類</th><th>今の表示</th><th>新しいアイコン</th><th>4倍</th></tr></thead><tbody id="rows"></tbody></table>
+<script type="module">
+import { CH1_3_ITEMS } from './catalog.mjs';
+const manifest = await (await fetch('output/manifest.json', { cache: 'no-store' })).json();
+const atlas = new Image();
+atlas.src = `output/${manifest.image}?v=${Date.now()}`;
+await atlas.decode();
+const cellCanvas = (id) => {
+  const c = document.createElement('canvas');
+  c.width = c.height = manifest.cellSize;
+  const [col, row] = manifest.cells[id];
+  c.getContext('2d').drawImage(atlas, col * manifest.cellSize, row * manifest.cellSize, manifest.cellSize, manifest.cellSize, 0, 0, manifest.cellSize, manifest.cellSize);
+  return c;
+};
+const rows = document.getElementById('rows');
+for (const item of CH1_3_ITEMS) {
+  const tr = document.createElement('tr');
+  const drawn = !!manifest.cells[item.id];
+  tr.className = drawn ? 'drawn' : 'todo';
+  const current = item.current.startsWith('tile:') ? `<span class="tile">模様<br>${item.current.slice(5)}</span>` : `<span class="emoji">${item.current}</span>`;
+  tr.innerHTML = `<td>${item.name}</td><td><code>${item.id}</code></td><td>${item.kind}</td><td><div class="slot">${current}</div></td><td class="new"></td><td class="zoom"></td>`;
+  if (drawn) {
+    const slot = document.createElement('div');
+    slot.className = 'slot';
+    slot.append(cellCanvas(item.id));
+    tr.querySelector('.new').append(slot);
+    const big = cellCanvas(item.id);
+    big.className = 'big';
+    tr.querySelector('.zoom').append(big);
+  } else {
+    tr.querySelector('.new').innerHTML = '<span class="pending">未作画</span>';
+  }
+  rows.append(tr);
+}
+const toggle = document.getElementById('onlyDrawn');
+toggle.addEventListener('change', () => {
+  for (const tr of rows.querySelectorAll('tr.todo')) tr.hidden = toggle.checked;
+});
+</script>
+</main></body></html>

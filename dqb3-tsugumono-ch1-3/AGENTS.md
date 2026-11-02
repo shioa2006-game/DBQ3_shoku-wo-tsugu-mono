@@ -59,6 +59,7 @@ npm.cmd run test:e2e
 - `tests/e2e/pause.test.mjs`：会話・メニュー中の世界停止と、閉じた直後の被弾猶予。
 - `tests/e2e/smoke.test.mjs`：サブシステム、ワールド寸法、ニューゲームの起動スモーク。
 - `tests/e2e/sheets.test.mjs`：8方向スプライトシートの境界と中心位置。
+- `tests/e2e/item-icons.test.mjs`：全アイテムがStudio製アイコン画像を使い、ホットバーとドロップに表示されること。
 
 ### ヘッドレステストの注意
 
@@ -66,7 +67,7 @@ npm.cmd run test:e2e
   ランナー負荷で不安定になりやすい。
 - 固定`waitForTimeout`の直後に判定せず、`tests/helpers.mjs`の`advanceToStage`、
   `waitForStage`、`waitForCond`で状態変化をポーリングする。
-- 高速確認は`npm.cmd run test:ci`（sheets + smoke）、全回帰は
+- 高速確認は`npm.cmd run test:ci`（sheets・smoke・underwater-visuals・item-icons）、全回帰は
   `npm.cmd run test:e2e`とする。新しい重い通しテストは全回帰へ追加し、
   常に守るべき不変条件だけを`tests/run.mjs`の`FAST`セットへ追加する。
 

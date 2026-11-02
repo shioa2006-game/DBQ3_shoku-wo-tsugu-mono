@@ -46,6 +46,14 @@
 
 [イカの比較ページ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/squid/)で腕の2ポーズと浮遊を確認できます。共用画像のクラーケンも本編の拡大・着色で表示を確認しました。
 
+## アイテムアイコン
+
+| 対象 | 原本・手順 | 出力 | 今の表示 |
+|---|---|---|---|
+| 第1～3章のアイテム50件 | [item-icons](item-icons/README.md) | [アトラス](item-icons/output/item_icons_16.png)・[確認画像](item-icons/output/preview.png)・[マニフェスト](item-icons/output/manifest.json) | ゲームの `itemIcon()` がブロックの模様かemojiを描画 |
+
+試作02で全50件を作画しました。[比較ページ](item-icons/index.html)で今のemojiと並べて確認できます。2026-11-03に第1～3章へ移植しました（`--preview-game` の出力を本編が読み込みます）。第4～5章は未移植です。
+
 ## CH1～3を優先する制作順と残り
 
 ユーザーの方針により、CH4以降へ進む前にCH1～3のキャラクターを完成させます。下表はゲームの `src/entities/monsters.js` の定義と、現在の本編への反映状況です。

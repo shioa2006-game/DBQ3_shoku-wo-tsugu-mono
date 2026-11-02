@@ -5,7 +5,7 @@ import { B, BLOCK_DEFS } from "./world/blocks.js";
 import { VoxelWorld, WORLD, PLACES, FISH_SPOTS } from "./world/world.js";
 import { ChunkRenderer } from "./world/mesher.js";
 import { PropRenderer } from "./world/props.js";
-import { ITEMS, Inventory, itemForBlock } from "./game/items.js";
+import { ITEMS, Inventory, itemForBlock, onItemIconsReady, itemIconReport, itemIcon } from "./game/items.js";
 import { QuestManager, stageIndex } from "./game/quests.js";
 import { paddyDefenseConfig } from "./game/quests2.js";
 import { krakenDefenseConfig } from "./game/quests3.js";
@@ -139,6 +139,11 @@ class Game {
       this.ui.setHotbar(this.inventory);
       this.player.updateEquipmentBonuses(this.inventory);
     });
+    // Redraw icons shown with the fallback before the icon atlas finished loading.
+    onItemIconsReady(() => {
+      this.ui.setHotbar(this.inventory);
+      if (this.ui.menuOpen) this.ui.renderMenu();
+    });
     this.ui.hooks = {
       selectHotbar: (i) => {
         this.inventory.selected = i;
@@ -174,6 +179,7 @@ class Game {
     this.renderer.setAnimationLoop(() => this.frame(Math.min(0.05, this.clock.getDelta())));
 
     // Debug / automation hook.
+    this.itemIcons = { report: itemIconReport, icon: itemIcon };
     window.__game = this;
     console.info(`職をつぐ者 build ${BUILD_ID}`);
   }
@@ -783,7 +789,7 @@ class Game {
         this.player.hp = Math.min(this.player.maxHp, this.player.hp + def.heal);
         this.inventory.removeFromSlot(this.inventory.selected, 1);
         SFX.eat();
-        this.ui.toast(`${def.icon} ${def.name}を食べた（HP+${def.heal}）`);
+        this.ui.toast(`🍽️ ${def.name}を食べた（HP+${def.heal}）`);
         this.cooking.applyFood(def);
       } else {
         this.throttledToast("full", "おなかは すいていない");

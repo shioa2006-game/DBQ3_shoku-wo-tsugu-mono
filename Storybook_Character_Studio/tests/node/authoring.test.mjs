@@ -87,7 +87,7 @@ test('retained modules and documentation have no missing local imports or links'
     }
   }
   const dirs=(await readdir(path.join(root,'prototypes'),{withFileTypes:true})).filter(e=>e.isDirectory()).map(e=>e.name).sort();
-  assert.deepEqual(dirs,['adventurer-8dir','dorotabo-8dir','field-rat-8dir','gonta-8dir','inaho-8dir','jinbei-8dir','mina-8dir','night-bat-8dir','pino-8dir','shared','slime-8dir','squid-8dir','watari-8dir']);
+  assert.deepEqual(dirs,['adventurer-8dir','dorotabo-8dir','field-rat-8dir','gonta-8dir','inaho-8dir','item-icons','jinbei-8dir','mina-8dir','night-bat-8dir','pino-8dir','shared','slime-8dir','squid-8dir','watari-8dir']);
 });
 
 test('Pino separates neck cloth from face and validates authoring inputs',()=>{
