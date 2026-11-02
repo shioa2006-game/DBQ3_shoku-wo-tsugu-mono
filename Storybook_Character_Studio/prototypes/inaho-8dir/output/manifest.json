@@ -1,0 +1,143 @@
+{
+  "id": "inaho",
+  "name": "イナホ",
+  "role": "料理見習い",
+  "version": 1,
+  "status": "prototype",
+  "source": "../character.mjs",
+  "reference": "dqb3-tsugumono-ch1-3/assets/humanoids/cook_body_8dir.png",
+  "format": "game-humanoid-bust",
+  "cellSize": 128,
+  "columns": 4,
+  "rows": 2,
+  "directions": [
+    "front",
+    "front_left",
+    "left",
+    "back_left",
+    "back",
+    "back_right",
+    "right",
+    "front_right"
+  ],
+  "labels": [
+    "正面",
+    "左斜め前",
+    "左",
+    "左斜め後",
+    "背面",
+    "右斜め後",
+    "右",
+    "右斜め前"
+  ],
+  "anchor": {
+    "centerU": 0.494,
+    "bottomFromTop": 0.945
+  },
+  "normalization": [
+    {
+      "row": 0,
+      "col": 0,
+      "dx": 0,
+      "dy": 1,
+      "before": "0.488",
+      "after": "0.492"
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "dx": -1,
+      "dy": 1,
+      "before": "0.500",
+      "after": "0.492"
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "dx": -1,
+      "dy": 1,
+      "before": "0.500",
+      "after": "0.492"
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "dx": -1,
+      "dy": 1,
+      "before": "0.500",
+      "after": "0.492"
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "dx": -1,
+      "dy": 1,
+      "before": "0.496",
+      "after": "0.492"
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "dx": 2,
+      "dy": 1,
+      "before": "0.477",
+      "after": "0.492"
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "dx": 2,
+      "dy": 1,
+      "before": "0.477",
+      "after": "0.492"
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "dx": 2,
+      "dy": 1,
+      "before": "0.477",
+      "after": "0.492"
+    }
+  ],
+  "output": "inaho_code_body_8dir.png",
+  "runtime": "HumanoidRig with separate headSheetUrl/bodySheetUrl; limbs and equipment supplied by the game",
+  "runtimeSheets": {
+    "headSheetUrl": "inaho_code_head_layer_8dir.png",
+    "bodySheetUrl": "inaho_code_torso_layer_8dir.png"
+  },
+  "rigColors": {
+    "sleeve": 15918800,
+    "hand": 15647642,
+    "pants": 9062954,
+    "boot": 5913124,
+    "headBack": 1841688,
+    "bodyBack": 11895598
+  },
+  "rigTuning": {
+    "bodyTopV": 0.54,
+    "armSep": 0.142,
+    "armRestTilt": 0.23,
+    "shoulderLift": 0.017,
+    "sleeveY": -0.096,
+    "headForward": 0.022,
+    "headDepth": 0.024,
+    "headOffsetY": 0,
+    "headLiftByDirection": {
+      "front": 0.018,
+      "front_left": 0.028,
+      "left": 0.02,
+      "back_left": 0.024,
+      "back": 0.022,
+      "back_right": 0.024,
+      "right": 0.02,
+      "front_right": 0.028
+    },
+    "bodyDepth": -0.008
+  },
+  "rigProfile": "../rig-profile.mjs",
+  "futureTarget": {
+    "npcId": "inaho",
+    "sheet": "assets/humanoids/cook_body_8dir.png"
+  }
+}

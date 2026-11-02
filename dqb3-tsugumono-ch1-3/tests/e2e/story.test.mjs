@@ -1,0 +1,200 @@
+// 第1章ストーリー全体の回帰テスト。
+// イントロ → 採取 → 作業台 → 小屋 → 畑 → 稲作 → 農民の書 → 防衛戦 → 社 → エンディング
+// までを状態注入で進め、各節目のステージ・住民・戦闘・夜スポーンを検証する。
+// 進行の早送りはデバッグフック(window.__game)を使うが、判定は必ずゲーム側の
+// 正規のイベント経路(onCrafted/onBlockPlaced/世界変更コールバック等)を通す。
+
+import { launchBrowser, openGame, newGame, dlg, stage, expect, advanceToStage, advanceToChoice, waitForStage, waitForCond } from "../helpers.mjs";
+
+const errors = [];
+const browser = await launchBrowser();
+try {
+  const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+  await openGame(page, { collectErrors: errors });
+  await newGame(page);
+  expect((await stage(page)) === "GATHER_WOOD", "イントロ後は GATHER_WOOD");
+
+  // --- 木材集め → 作業台 -------------------------------------------------------
+  await page.evaluate(() => {
+    const g = window.__game;
+    g.inventory.add("log", 30);
+    g.inventory.add("dirt", 60);
+    g.inventory.add("stone", 40);
+    g.inventory.add("straw", 40);
+    g.inventory.add("copper", 6);
+  });
+  await advanceToStage(page, "CRAFT_BENCH");
+  expect((await stage(page)) === "CRAFT_BENCH", "木材5でCRAFT_BENCHへ");
+
+  await page.evaluate(() => {
+    const g = window.__game;
+    g.inventory.add("workbench", 1);
+    g.quests.onCrafted("workbench");
+  });
+  await page.evaluate(() => {
+    const g = window.__game;
+    const px = Math.floor(g.player.pos.x) + 2;
+    const pz = Math.floor(g.player.pos.z);
+    g.world.set(px, g.world.groundY(px, pz), pz, 17); // B.WORKBENCH
+    g.quests.onBlockPlaced("workbench");
+  });
+  await advanceToStage(page, "BUILD_HUT");
+  expect((await stage(page)) === "BUILD_HUT", "作業台設置でBUILD_HUTへ");
+
+  // --- 小屋 → ピノ/ミナ加入 ----------------------------------------------------
+  await page.evaluate(() => {
+    const g = window.__game;
+    for (const c of [...g.blueprints.active.cells]) g.world.set(c.x, c.y, c.z, c.block);
+  });
+  await advanceToStage(page, "MEET_MINA");
+  expect((await stage(page)) === "MEET_MINA", "小屋完成でMEET_MINAへ");
+  const roster1 = await page.evaluate(() => window.__game.villagers.map((v) => v.id));
+  expect(roster1.includes("pino") && roster1.includes("mina"), `ピノとミナが加入 (${roster1})`);
+
+  // --- ミナと会話 → 畑 ---------------------------------------------------------
+  await page.evaluate(() => {
+    const g = window.__game;
+    const mina = g.villager("mina");
+    g.player.pos.set(mina.pos.x + 1, mina.pos.y, mina.pos.z);
+  });
+  await page.waitForTimeout(200);
+  await page.keyboard.press("f");
+  await advanceToStage(page, "BUILD_FARM");
+  expect((await stage(page)) === "BUILD_FARM", "ミナ会話でBUILD_FARMへ");
+
+  await page.evaluate(() => {
+    const g = window.__game;
+    for (const c of [...g.blueprints.active.cells]) g.world.set(c.x, c.y, c.z, c.block);
+  });
+  await advanceToStage(page, "FARMING");
+  expect((await stage(page)) === "FARMING", "畑完成でFARMINGへ");
+  const seeds = await page.evaluate(() => window.__game.inventory.count("seed"));
+  expect(seeds === 10, `種もみを10個入手 (${seeds})`);
+
+  // --- 章進行の準備: 種まきの実入力は quality-input.test.mjs で必須検証する ---
+  await page.evaluate(() => {
+    const g = window.__game;
+    let n = g.quests.counters.planted;
+    for (const key of [...g.farmland]) {
+      if (n >= 8) break;
+      const [x, y, z] = key.split(",").map(Number);
+      if (g.world.get(x, y + 1, z) === 0) {
+        g.world.set(x, y + 1, z, 19); // B.CROP1
+        n += 1;
+      }
+    }
+    g.quests.counters.planted = n;
+  });
+  await advanceToStage(page, "HARVEST");
+  expect((await stage(page)) === "HARVEST", "8株植えてHARVESTへ");
+
+  // --- 収穫 → 農民の書復活 → ゴンタ加入 -----------------------------------------
+  await page.evaluate(() => {
+    const g = window.__game;
+    for (const key of [...g.cropGrowth.keys()]) {
+      const [x, y, z] = key.split(",").map(Number);
+      g.world.set(x, y, z, 21); // B.CROP3
+    }
+  });
+  await page.evaluate(() => {
+    const g = window.__game;
+    for (let z = 0; z < 64; z += 1) for (let x = 0; x < 64; x += 1) for (let y = 0; y < 24; y += 1) {
+      if (g.world.get(x, y, z) === 21) {
+        g.world.set(x, y, z, 0);
+        g.harvestCrop(x + 0.5, y + 0.4, z + 0.5);
+      }
+    }
+  });
+  const harvested = await waitForCond(
+    page,
+    () => (window.__game.quests.counters.harvested >= 8 ? window.__game.quests.counters.harvested : 0),
+    undefined,
+    { label: "harvested>=8", timeout: 8000 },
+  );
+  expect(harvested >= 8, `8株収穫 (${harvested})`);
+  // 書の復活演出（数秒）→ PREPARE。固定待ちでなくステージ到達を待つ。
+  await advanceToStage(page, "PREPARE", { timeout: 30000 });
+  expect((await stage(page)) === "PREPARE", "農民の書復活でPREPAREへ");
+  const roster2 = await page.evaluate(() => window.__game.villagers.map((v) => v.id));
+  expect(roster2.includes("gonta"), `ゴンタが加入 (${roster2})`);
+
+  // 攻撃の実入力・対象HP差分は quality-input.test.mjs で検証する。
+
+  // --- 防衛戦 --------------------------------------------------------------------
+  await page.evaluate(() => {
+    const g = window.__game;
+    const gonta = g.villager("gonta");
+    g.player.pos.set(gonta.pos.x + 1, gonta.pos.y, gonta.pos.z);
+  });
+  await page.keyboard.press("f");
+  await advanceToChoice(page); // 会話を進めて選択肢が出るまで待つ
+  await page.click(".choice-panel button");
+  await waitForStage(page, "DEFENSE", { timeout: 15000 });
+  expect((await stage(page)) === "DEFENSE", "防衛戦開始でDEFENSEへ");
+  expect(await page.evaluate(() => window.__game.defense.active), "defense.active が true");
+  // ヘッドレス(ソフトレンダリング)ではゲーム内時間が実時間より遅く進むため、
+  // 固定待ちではなく湧きをポーリングで待つ。
+  const raiders = await waitForCond(
+    page,
+    () => window.__game.monsters.count(true),
+    undefined,
+    { label: "第1波の湧き", timeout: 20000, interval: 400 },
+  );
+  expect(raiders > 0, `第1波が湧く (${raiders}体)`);
+
+  for (let round = 0; round < 80; round += 1) {
+    const st = await page.evaluate(() => {
+      const g = window.__game;
+      for (const m of [...g.monsters.monsters]) if (m.raid && !m.dead) g.hurtMonster(m, 50, null);
+      return g.defense.active;
+    });
+    if (!st) break;
+    await page.waitForTimeout(700);
+  }
+  await advanceToStage(page, "BUILD_SHRINE");
+  expect((await stage(page)) === "BUILD_SHRINE", "防衛勝利でBUILD_SHRINEへ");
+  const roster3 = await page.evaluate(() => window.__game.villagers.map((v) => v.id));
+  expect(roster3.includes("jinbei"), `ジンベエが加入 (${roster3})`);
+
+  // --- 社 → 祈り → エンディング → POSTGAME ---------------------------------------
+  await page.evaluate(() => {
+    const g = window.__game;
+    for (const c of [...g.blueprints.active.cells]) g.world.set(c.x, c.y, c.z, c.block);
+  });
+  await advanceToStage(page, "SHRINE_DONE");
+  expect((await stage(page)) === "SHRINE_DONE", "社完成でSHRINE_DONEへ");
+
+  await page.evaluate(() => window.__game.quests.onAltarPrayed());
+  await page.waitForTimeout(300);
+  await dlg(page, 20);
+  // エンディング演出はクリック用リスナが 4秒後に付く（ui.playEnding の setTimeout）。
+  // 早すぎるクリックは無視されるので、POSTGAME になるまでクリックし続ける。
+  await waitForCond(
+    page,
+    () => {
+      if (window.__game.quests.stage === "POSTGAME") return true;
+      document.querySelector(".ending")?.click();
+      return false;
+    },
+    undefined,
+    { label: "エンディング→POSTGAME", timeout: 15000, interval: 500 },
+  );
+  expect((await stage(page)) === "POSTGAME", "エンディング後はPOSTGAME");
+
+  // --- 夜間の常時スポーン ----------------------------------------------------------
+  await page.evaluate(() => {
+    window.__game.daynight.hour = 21;
+  });
+  const night = await waitForCond(
+    page,
+    () => window.__game.monsters.monsters.length,
+    undefined,
+    { label: "夜間スポーン", timeout: 20000, interval: 400 },
+  );
+  expect(night > 0, `夜間モンスターが湧く (${night}体)`);
+
+  expect(errors.length === 0, `コンソールエラーゼロ (${JSON.stringify(errors.slice(0, 5))})`);
+  console.log("story.test: PASS");
+} finally {
+  await browser.close();
+}

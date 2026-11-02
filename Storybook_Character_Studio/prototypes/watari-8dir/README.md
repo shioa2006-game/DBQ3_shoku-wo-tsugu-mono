@@ -1,0 +1,52 @@
+# ワタリの8方向コード生成・試作01
+
+元ゲームの船乗り「ワタリ」（NPC ID `watari`）を、`assets/humanoids/sailor_body_8dir.png` を参照して制作しました。紺の船員帽、短い白髪と口ひげ、金色で縁取った紺の上着、生成りのシャツと赤い首布を方向別に描いています。
+
+[制作ガイド](../../docs/CHARACTER_AUTHORING.md)の目・SVG部品・出力方式を利用し、帽子・髪・口ひげ・衣装は個別に作画しました。元画像の画素は比較用だけに使用します。
+
+## 原本と出力
+
+- `character.mjs`: 方向別の顔・耳・髪・帽子・口ひげ、首・襟・上着・ベルト。
+- `rig-profile.mjs`: 肩・袖の接続、頭の前後位置と方向別高さ。
+- `export.mjs`: SVG、原画PNG、正規化PNG、比較画像とマニフェストの再生成。
+- `output/watari_code_head_layer_8dir.png`: 顔・耳・髪・帽子・口ひげ。首布と襟は含めません。
+- `output/watari_code_torso_layer_8dir.png`: 首・首布・襟・上着・ベルト。
+- `output/watari_code_body_8dir.png`: 比較用合成。リグ用2枚の代用にはしません。
+- `output/comparison.png`: 元画像との同倍率比較。
+- `output/manifest.json`: NPC ID、参照元、方向、正規化量、色、リグ設定と移植先候補。
+
+512×256px、4列×2行、1セル128px。5方向を描き、対称な3方向を反転します。頭と胴は合成シートと同じ正規化量を使用します。手足・道具・影は焼き込みません。
+
+## 再生成と比較
+
+Studioと同じ親フォルダにゲームとインストール済み依存関係が必要です。PNG出力にはゲームの公式ブラウザヘルパーを使用します。
+
+```powershell
+npm.cmd run export:watari
+npm.cmd run export:watari -- --preview-game
+npm.cmd test
+```
+
+`--preview-game` はゲーム側の `art_src/watari_code_*.src.png`、`assets/humanoids/watari_code_*.png`、`prototypes/watari/rig-profile.mjs` を更新します。本編の画像・NPC設定は変更しません。
+
+[ワタリの3D比較](http://127.0.0.1:5175/builder_sprite_lab/prototypes/watari/)は左が元画像・従来配置、右が生成画像・専用配置です。ゲームの開発サーバーを起動して使用します。ゲームのルートで検証:
+
+```powershell
+$env:PROTOTYPE_URL='http://127.0.0.1:5175/builder_sprite_lab/prototypes/watari/'
+node tests/authoring/watari.test.mjs
+node tests/authoring/head-spacing.test.mjs
+node tests/authoring/sword-edge.test.mjs
+npm.cmd run test:ci
+```
+
+専用テストは頭胴分離、正規化による画素欠落、8方向の待機・歩行・攻撃、道具の手への追従、肩と胴の接続、水中色、狭い画面を検証します。別の配置・剣のテストは7人共通です。
+
+## 比較で調整した点と残る差
+
+横向きで帽子が平たく見えないよう傾きと後部のふくらみを作り、つばは狭くしています。元画像との同倍率比較で横と斜め前の顔を個別に調整し、顎を基準に接続を保ちました。耳前と襟足の髪は一つの輪郭から描き、短い毛流れを輪郭内に収めています。赤い首布は結び目と左右の垂れ布で描き、襟と一緒に胴にだけ配置しました。
+
+初版の試作です。細かな毛束、顔の陰影、上着の厚みには元画像との差が残ります。本編の地形・実際のNPCとしての表示は最終移植時に別途検証します。移植には頭・胴のPNG2枚、配置設定、対応するリグ読込処理を揃えてください。
+
+## 左右斜め後ろの頭サイズ
+
+左斜め後ろ・右斜め後ろだけ、帽子・髪・耳をまとめた頭の倍率を幅0.96→0.83、高さ0.98→0.90へ変更しました（修正前比で幅約86%、高さ約92%）。首側の基準点 `(63, 73)` を維持し、胴・リグ・残る6方向は変更していません。公式テストの `prototypes/watari/back-quarter-comparison.png` で元画像と同倍率で比較できます。

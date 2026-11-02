@@ -1,0 +1,401 @@
+
+> dqb3-tsugumono-ch4-5@0.1.0 test:ci
+> npm run build && node tests/run.mjs --fast
+
+
+> dqb3-tsugumono-ch4-5@0.1.0 build
+> vite build
+
+vite v8.1.4 building client environment for production...
+[2K
+transforming...✓ 57 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                   0.50 kB │ gzip:   0.35 kB
+dist/assets/night_bat_idle_a_8dir-BKFLQ9d4.png                   65.48 kB
+dist/assets/night_bat_idle_b_8dir-B8rMMiE5.png                   66.60 kB
+dist/assets/volcano_lizard_idle_a_8dir-BBLS7yOX.png              91.37 kB
+dist/assets/volcano_lizard_idle_b_8dir-CAHdhqaZ.png              92.21 kB
+dist/assets/sailor_body_8dir-Xp0utF8t.png                        93.05 kB
+dist/assets/village_apprentice_body_8dir-DNSkd2RI.png            99.04 kB
+dist/assets/armored_scorpion_idle_a_8dir-CIejhbiG.png           112.48 kB
+dist/assets/cook_body_8dir-Bi0-yF8_.png                         112.65 kB
+dist/assets/adult_male_villager_body_8dir-BUxdZf2p.png          119.54 kB
+dist/assets/will_o_wisp_idle_a_8dir-Bvjibvw5.png                120.05 kB
+dist/assets/shrine_keeper_body_8dir-KYjW8LDG.png                122.01 kB
+dist/assets/volcano_villager_body_8dir-DB6jNvkM.png             122.34 kB
+dist/assets/miner_body_8dir-CkFhQOqL.png                        125.19 kB
+dist/assets/village_girl_body_8dir-Aj-9mdXj.png                 133.77 kB
+dist/assets/herbalist_body_8dir-hsUdRGKm.png                    136.67 kB
+dist/assets/dorotabo_idle_a_8dir-CN3AehTe.png                   142.11 kB
+dist/assets/dorotabo_idle_b_8dir-BD5IRmqK.png                   142.94 kB
+dist/assets/will_o_wisp_idle_b_8dir-BIfidA4j.png                144.45 kB
+dist/assets/middle_aged_male_villager_body_8dir-BVcWgFz0.png    145.90 kB
+dist/assets/armored_scorpion_idle_b_8dir-B1sjfGT5.png           149.45 kB
+dist/assets/grom_body_8dir-C1aCibmn.png                         155.64 kB
+dist/assets/blacksmith_body_8dir-BPj0nmIr.png                   157.72 kB
+dist/assets/grom_head_8dir-CAiw6a1C.png                         162.09 kB
+dist/assets/adventurer_boy_body_8dir-O4njgrGz.png               166.90 kB
+dist/assets/bgm_field-C2Hg042e.mp3                            1,399.23 kB
+dist/assets/bgm_boss-BwHdVnRR.mp3                             1,432.20 kB
+dist/assets/index-DPDjG3Yn.css                                    8.93 kB │ gzip:   2.65 kB
+dist/assets/index-K54giSoY.js                                   778.63 kB │ gzip: 214.74 kB
+
+✓ built in 262ms
+[plugin builtin:vite-reporter]
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+e2e (fast): 5 本を同時実行数 2 で実行
+=== sheets.test.mjs (0.2s) ===
+sheets: 12 枚を検査（humanoids/ は中心ズレもFAIL）
+  ok - adult_male_villager_body_8dir.png front: 絵がセル境界をはみ出さない (u[0.23,0.77])
+  ok - adult_male_villager_body_8dir.png front: 縦がセル内に収まる (v[0.07,0.93])
+  ok - adult_male_villager_body_8dir.png front: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - adult_male_villager_body_8dir.png front_left: 絵がセル境界をはみ出さない (u[0.24,0.77])
+  ok - adult_male_villager_body_8dir.png front_left: 縦がセル内に収まる (v[0.09,0.93])
+  ok - adult_male_villager_body_8dir.png front_left: 中心がセル中央にある=正規化済み (u=0.500) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - adult_male_villager_body_8dir.png left: 絵がセル境界をはみ出さない (u[0.25,0.77])
+  ok - adult_male_villager_body_8dir.png left: 縦がセル内に収まる (v[0.09,0.93])
+  ok - adult_male_villager_body_8dir.png left: 中心がセル中央にある=正規化済み (u=0.508) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - adult_male_villager_body_8dir.png back_left: 絵がセル境界をはみ出さない (u[0.25,0.77])
+  ok - adult_male_villager_body_8dir.png back_left: 縦がセル内に収まる (v[0.09,0.94])
+  ok - adult_male_villager_body_8dir.png back_left: 中心がセル中央にある=正規化済み (u=0.504) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - adult_male_villager_body_8dir.png back: 絵がセル境界をはみ出さない (u[0.25,0.76])
+  ok - adult_male_villager_body_8dir.png back: 縦がセル内に収まる (v[0.08,0.93])
+  ok - adult_male_villager_body_8dir.png back: 中心がセル中央にある=正規化済み (u=0.500) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - adult_male_villager_body_8dir.png back_right: 絵がセル境界をはみ出さない (u[0.24,0.76])
+  ok - adult_male_villager_body_8dir.png back_right: 縦がセル内に収まる (v[0.09,0.93])
+  ok - adult_male_villager_body_8dir.png back_right: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - adult_male_villager_body_8dir.png right: 絵がセル境界をはみ出さない (u[0.24,0.75])
+  ok - adult_male_villager_body_8dir.png right: 縦がセル内に収まる (v[0.09,0.94])
+  ok - adult_male_villager_body_8dir.png right: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - adult_male_villager_body_8dir.png front_right: 絵がセル境界をはみ出さない (u[0.23,0.77])
+  ok - adult_male_villager_body_8dir.png front_right: 縦がセル内に収まる (v[0.09,0.94])
+  ok - adult_male_villager_body_8dir.png front_right: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - adventurer_boy_body_8dir.png front: 絵がセル境界をはみ出さない (u[0.16,0.83])
+  ok - adventurer_boy_body_8dir.png front: 縦がセル内に収まる (v[0.05,0.95])
+  ok - adventurer_boy_body_8dir.png front: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - adventurer_boy_body_8dir.png front_left: 絵がセル境界をはみ出さない (u[0.16,0.84])
+  ok - adventurer_boy_body_8dir.png front_left: 縦がセル内に収まる (v[0.05,0.95])
+  ok - adventurer_boy_body_8dir.png front_left: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - adventurer_boy_body_8dir.png left: 絵がセル境界をはみ出さない (u[0.18,0.81])
+  ok - adventurer_boy_body_8dir.png left: 縦がセル内に収まる (v[0.05,0.95])
+  ok - adventurer_boy_body_8dir.png left: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - adventurer_boy_body_8dir.png back_left: 絵がセル境界をはみ出さない (u[0.21,0.79])
+  ok - adventurer_boy_body_8dir.png back_left: 縦がセル内に収まる (v[0.05,0.95])
+  ok - adventurer_boy_body_8dir.png back_left: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - adventurer_boy_body_8dir.png back: 絵がセル境界をはみ出さない (u[0.18,0.81])
+  ok - adventurer_boy_body_8dir.png back: 縦がセル内に収まる (v[0.05,0.95])
+  ok - adventurer_boy_body_8dir.png back: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - adventurer_boy_body_8dir.png back_right: 絵がセル境界をはみ出さない (u[0.21,0.78])
+  ok - adventurer_boy_body_8dir.png back_right: 縦がセル内に収まる (v[0.05,0.95])
+  ok - adventurer_boy_body_8dir.png back_right: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - adventurer_boy_body_8dir.png right: 絵がセル境界をはみ出さない (u[0.19,0.81])
+  ok - adventurer_boy_body_8dir.png right: 縦がセル内に収まる (v[0.05,0.95])
+  ok - adventurer_boy_body_8dir.png right: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - adventurer_boy_body_8dir.png front_right: 絵がセル境界をはみ出さない (u[0.19,0.82])
+  ok - adventurer_boy_body_8dir.png front_right: 縦がセル内に収まる (v[0.05,0.95])
+  ok - adventurer_boy_body_8dir.png front_right: 中心がセル中央にある=正規化済み (u=0.500) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - blacksmith_body_8dir.png front: 絵がセル境界をはみ出さない (u[0.13,0.86])
+  ok - blacksmith_body_8dir.png front: 縦がセル内に収まる (v[0.01,0.95])
+  ok - blacksmith_body_8dir.png front: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - blacksmith_body_8dir.png front_left: 絵がセル境界をはみ出さない (u[0.15,0.84])
+  ok - blacksmith_body_8dir.png front_left: 縦がセル内に収まる (v[0.00,0.95])
+  ok - blacksmith_body_8dir.png front_left: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - blacksmith_body_8dir.png left: 絵がセル境界をはみ出さない (u[0.20,0.78])
+  ok - blacksmith_body_8dir.png left: 縦がセル内に収まる (v[0.00,0.95])
+  ok - blacksmith_body_8dir.png left: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - blacksmith_body_8dir.png back_left: 絵がセル境界をはみ出さない (u[0.18,0.80])
+  ok - blacksmith_body_8dir.png back_left: 縦がセル内に収まる (v[0.01,0.95])
+  ok - blacksmith_body_8dir.png back_left: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - blacksmith_body_8dir.png back: 絵がセル境界をはみ出さない (u[0.16,0.84])
+  ok - blacksmith_body_8dir.png back: 縦がセル内に収まる (v[0.03,0.95])
+  ok - blacksmith_body_8dir.png back: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - blacksmith_body_8dir.png back_right: 絵がセル境界をはみ出さない (u[0.19,0.80])
+  ok - blacksmith_body_8dir.png back_right: 縦がセル内に収まる (v[0.04,0.95])
+  ok - blacksmith_body_8dir.png back_right: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - blacksmith_body_8dir.png right: 絵がセル境界をはみ出さない (u[0.21,0.78])
+  ok - blacksmith_body_8dir.png right: 縦がセル内に収まる (v[0.03,0.95])
+  ok - blacksmith_body_8dir.png right: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - blacksmith_body_8dir.png front_right: 絵がセル境界をはみ出さない (u[0.16,0.83])
+  ok - blacksmith_body_8dir.png front_right: 縦がセル内に収まる (v[0.04,0.95])
+  ok - blacksmith_body_8dir.png front_right: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - cook_body_8dir.png front: 絵がセル境界をはみ出さない (u[0.23,0.76])
+  ok - cook_body_8dir.png front: 縦がセル内に収まる (v[0.02,0.95])
+  ok - cook_body_8dir.png front: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - cook_body_8dir.png front_left: 絵がセル境界をはみ出さない (u[0.23,0.75])
+  ok - cook_body_8dir.png front_left: 縦がセル内に収まる (v[0.02,0.95])
+  ok - cook_body_8dir.png front_left: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - cook_body_8dir.png left: 絵がセル境界をはみ出さない (u[0.25,0.74])
+  ok - cook_body_8dir.png left: 縦がセル内に収まる (v[0.02,0.95])
+  ok - cook_body_8dir.png left: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - cook_body_8dir.png back_left: 絵がセル境界をはみ出さない (u[0.25,0.74])
+  ok - cook_body_8dir.png back_left: 縦がセル内に収まる (v[0.02,0.95])
+  ok - cook_body_8dir.png back_left: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - cook_body_8dir.png back: 絵がセル境界をはみ出さない (u[0.26,0.73])
+  ok - cook_body_8dir.png back: 縦がセル内に収まる (v[0.03,0.95])
+  ok - cook_body_8dir.png back: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - cook_body_8dir.png back_right: 絵がセル境界をはみ出さない (u[0.26,0.73])
+  ok - cook_body_8dir.png back_right: 縦がセル内に収まる (v[0.04,0.95])
+  ok - cook_body_8dir.png back_right: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - cook_body_8dir.png right: 絵がセル境界をはみ出さない (u[0.26,0.73])
+  ok - cook_body_8dir.png right: 縦がセル内に収まる (v[0.04,0.95])
+  ok - cook_body_8dir.png right: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - cook_body_8dir.png front_right: 絵がセル境界をはみ出さない (u[0.25,0.74])
+  ok - cook_body_8dir.png front_right: 縦がセル内に収まる (v[0.03,0.95])
+  ok - cook_body_8dir.png front_right: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - herbalist_body_8dir.png front: 絵がセル境界をはみ出さない (u[0.19,0.80])
+  ok - herbalist_body_8dir.png front: 縦がセル内に収まる (v[0.03,0.95])
+  ok - herbalist_body_8dir.png front: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - herbalist_body_8dir.png front_left: 絵がセル境界をはみ出さない (u[0.20,0.79])
+  ok - herbalist_body_8dir.png front_left: 縦がセル内に収まる (v[0.02,0.95])
+  ok - herbalist_body_8dir.png front_left: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - herbalist_body_8dir.png left: 絵がセル境界をはみ出さない (u[0.20,0.78])
+  ok - herbalist_body_8dir.png left: 縦がセル内に収まる (v[0.03,0.95])
+  ok - herbalist_body_8dir.png left: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - herbalist_body_8dir.png back_left: 絵がセル境界をはみ出さない (u[0.21,0.77])
+  ok - herbalist_body_8dir.png back_left: 縦がセル内に収まる (v[0.03,0.95])
+  ok - herbalist_body_8dir.png back_left: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - herbalist_body_8dir.png back: 絵がセル境界をはみ出さない (u[0.22,0.77])
+  ok - herbalist_body_8dir.png back: 縦がセル内に収まる (v[0.04,0.95])
+  ok - herbalist_body_8dir.png back: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - herbalist_body_8dir.png back_right: 絵がセル境界をはみ出さない (u[0.22,0.77])
+  ok - herbalist_body_8dir.png back_right: 縦がセル内に収まる (v[0.04,0.95])
+  ok - herbalist_body_8dir.png back_right: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - herbalist_body_8dir.png right: 絵がセル境界をはみ出さない (u[0.21,0.77])
+  ok - herbalist_body_8dir.png right: 縦がセル内に収まる (v[0.04,0.95])
+  ok - herbalist_body_8dir.png right: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - herbalist_body_8dir.png front_right: 絵がセル境界をはみ出さない (u[0.22,0.77])
+  ok - herbalist_body_8dir.png front_right: 縦がセル内に収まる (v[0.04,0.95])
+  ok - herbalist_body_8dir.png front_right: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - middle_aged_male_villager_body_8dir.png front: 絵がセル境界をはみ出さない (u[0.23,0.77])
+  ok - middle_aged_male_villager_body_8dir.png front: 縦がセル内に収まる (v[0.05,0.95])
+  ok - middle_aged_male_villager_body_8dir.png front: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - middle_aged_male_villager_body_8dir.png front_left: 絵がセル境界をはみ出さない (u[0.23,0.77])
+  ok - middle_aged_male_villager_body_8dir.png front_left: 縦がセル内に収まる (v[0.05,0.95])
+  ok - middle_aged_male_villager_body_8dir.png front_left: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - middle_aged_male_villager_body_8dir.png left: 絵がセル境界をはみ出さない (u[0.23,0.77])
+  ok - middle_aged_male_villager_body_8dir.png left: 縦がセル内に収まる (v[0.05,0.95])
+  ok - middle_aged_male_villager_body_8dir.png left: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - middle_aged_male_villager_body_8dir.png back_left: 絵がセル境界をはみ出さない (u[0.23,0.76])
+  ok - middle_aged_male_villager_body_8dir.png back_left: 縦がセル内に収まる (v[0.05,0.95])
+  ok - middle_aged_male_villager_body_8dir.png back_left: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - middle_aged_male_villager_body_8dir.png back: 絵がセル境界をはみ出さない (u[0.24,0.76])
+  ok - middle_aged_male_villager_body_8dir.png back: 縦がセル内に収まる (v[0.05,0.95])
+  ok - middle_aged_male_villager_body_8dir.png back: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - middle_aged_male_villager_body_8dir.png back_right: 絵がセル境界をはみ出さない (u[0.23,0.76])
+  ok - middle_aged_male_villager_body_8dir.png back_right: 縦がセル内に収まる (v[0.05,0.95])
+  ok - middle_aged_male_villager_body_8dir.png back_right: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - middle_aged_male_villager_body_8dir.png right: 絵がセル境界をはみ出さない (u[0.23,0.77])
+  ok - middle_aged_male_villager_body_8dir.png right: 縦がセル内に収まる (v[0.05,0.95])
+  ok - middle_aged_male_villager_body_8dir.png right: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - middle_aged_male_villager_body_8dir.png front_right: 絵がセル境界をはみ出さない (u[0.24,0.76])
+  ok - middle_aged_male_villager_body_8dir.png front_right: 縦がセル内に収まる (v[0.05,0.95])
+  ok - middle_aged_male_villager_body_8dir.png front_right: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - miner_body_8dir.png front: 絵がセル境界をはみ出さない (u[0.22,0.77])
+  ok - miner_body_8dir.png front: 縦がセル内に収まる (v[0.01,0.95])
+  ok - miner_body_8dir.png front: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - miner_body_8dir.png front_left: 絵がセル境界をはみ出さない (u[0.21,0.78])
+  ok - miner_body_8dir.png front_left: 縦がセル内に収まる (v[0.00,0.95])
+  ok - miner_body_8dir.png front_left: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - miner_body_8dir.png left: 絵がセル境界をはみ出さない (u[0.23,0.76])
+  ok - miner_body_8dir.png left: 縦がセル内に収まる (v[0.00,0.95])
+  ok - miner_body_8dir.png left: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - miner_body_8dir.png back_left: 絵がセル境界をはみ出さない (u[0.23,0.76])
+  ok - miner_body_8dir.png back_left: 縦がセル内に収まる (v[0.01,0.95])
+  ok - miner_body_8dir.png back_left: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - miner_body_8dir.png back: 絵がセル境界をはみ出さない (u[0.23,0.76])
+  ok - miner_body_8dir.png back: 縦がセル内に収まる (v[0.02,0.95])
+  ok - miner_body_8dir.png back: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - miner_body_8dir.png back_right: 絵がセル境界をはみ出さない (u[0.23,0.76])
+  ok - miner_body_8dir.png back_right: 縦がセル内に収まる (v[0.02,0.95])
+  ok - miner_body_8dir.png back_right: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - miner_body_8dir.png right: 絵がセル境界をはみ出さない (u[0.23,0.76])
+  ok - miner_body_8dir.png right: 縦がセル内に収まる (v[0.02,0.95])
+  ok - miner_body_8dir.png right: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - miner_body_8dir.png front_right: 絵がセル境界をはみ出さない (u[0.22,0.77])
+  ok - miner_body_8dir.png front_right: 縦がセル内に収まる (v[0.02,0.95])
+  ok - miner_body_8dir.png front_right: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - sailor_body_8dir.png front: 絵がセル境界をはみ出さない (u[0.25,0.73])
+  ok - sailor_body_8dir.png front: 縦がセル内に収まる (v[0.14,0.95])
+  ok - sailor_body_8dir.png front: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - sailor_body_8dir.png front_left: 絵がセル境界をはみ出さない (u[0.28,0.71])
+  ok - sailor_body_8dir.png front_left: 縦がセル内に収まる (v[0.13,0.95])
+  ok - sailor_body_8dir.png front_left: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - sailor_body_8dir.png left: 絵がセル境界をはみ出さない (u[0.28,0.71])
+  ok - sailor_body_8dir.png left: 縦がセル内に収まる (v[0.14,0.95])
+  ok - sailor_body_8dir.png left: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - sailor_body_8dir.png back_left: 絵がセル境界をはみ出さない (u[0.29,0.70])
+  ok - sailor_body_8dir.png back_left: 縦がセル内に収まる (v[0.14,0.95])
+  ok - sailor_body_8dir.png back_left: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - sailor_body_8dir.png back: 絵がセル境界をはみ出さない (u[0.28,0.71])
+  ok - sailor_body_8dir.png back: 縦がセル内に収まる (v[0.14,0.95])
+  ok - sailor_body_8dir.png back: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - sailor_body_8dir.png back_right: 絵がセル境界をはみ出さない (u[0.29,0.70])
+  ok - sailor_body_8dir.png back_right: 縦がセル内に収まる (v[0.14,0.95])
+  ok - sailor_body_8dir.png back_right: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - sailor_body_8dir.png right: 絵がセル境界をはみ出さない (u[0.29,0.70])
+  ok - sailor_body_8dir.png right: 縦がセル内に収まる (v[0.15,0.95])
+  ok - sailor_body_8dir.png right: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - sailor_body_8dir.png front_right: 絵がセル境界をはみ出さない (u[0.28,0.71])
+  ok - sailor_body_8dir.png front_right: 縦がセル内に収まる (v[0.14,0.95])
+  ok - sailor_body_8dir.png front_right: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - shrine_keeper_body_8dir.png front: 絵がセル境界をはみ出さない (u[0.20,0.79])
+  ok - shrine_keeper_body_8dir.png front: 縦がセル内に収まる (v[0.02,0.95])
+  ok - shrine_keeper_body_8dir.png front: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - shrine_keeper_body_8dir.png front_left: 絵がセル境界をはみ出さない (u[0.17,0.81])
+  ok - shrine_keeper_body_8dir.png front_left: 縦がセル内に収まる (v[0.02,0.95])
+  ok - shrine_keeper_body_8dir.png front_left: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - shrine_keeper_body_8dir.png left: 絵がセル境界をはみ出さない (u[0.20,0.78])
+  ok - shrine_keeper_body_8dir.png left: 縦がセル内に収まる (v[0.03,0.95])
+  ok - shrine_keeper_body_8dir.png left: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - shrine_keeper_body_8dir.png back_left: 絵がセル境界をはみ出さない (u[0.21,0.77])
+  ok - shrine_keeper_body_8dir.png back_left: 縦がセル内に収まる (v[0.07,0.95])
+  ok - shrine_keeper_body_8dir.png back_left: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - shrine_keeper_body_8dir.png back: 絵がセル境界をはみ出さない (u[0.21,0.78])
+  ok - shrine_keeper_body_8dir.png back: 縦がセル内に収まる (v[0.02,0.95])
+  ok - shrine_keeper_body_8dir.png back: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - shrine_keeper_body_8dir.png back_right: 絵がセル境界をはみ出さない (u[0.20,0.79])
+  ok - shrine_keeper_body_8dir.png back_right: 縦がセル内に収まる (v[0.02,0.95])
+  ok - shrine_keeper_body_8dir.png back_right: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - shrine_keeper_body_8dir.png right: 絵がセル境界をはみ出さない (u[0.20,0.78])
+  ok - shrine_keeper_body_8dir.png right: 縦がセル内に収まる (v[0.02,0.95])
+  ok - shrine_keeper_body_8dir.png right: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - shrine_keeper_body_8dir.png front_right: 絵がセル境界をはみ出さない (u[0.19,0.80])
+  ok - shrine_keeper_body_8dir.png front_right: 縦がセル内に収まる (v[0.02,0.95])
+  ok - shrine_keeper_body_8dir.png front_right: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - village_apprentice_body_8dir.png front: 絵がセル境界をはみ出さない (u[0.24,0.75])
+  ok - village_apprentice_body_8dir.png front: 縦がセル内に収まる (v[0.09,0.89])
+  ok - village_apprentice_body_8dir.png front: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - village_apprentice_body_8dir.png front_left: 絵がセル境界をはみ出さない (u[0.24,0.77])
+  ok - village_apprentice_body_8dir.png front_left: 縦がセル内に収まる (v[0.10,0.90])
+  ok - village_apprentice_body_8dir.png front_left: 中心がセル中央にある=正規化済み (u=0.500) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - village_apprentice_body_8dir.png left: 絵がセル境界をはみ出さない (u[0.24,0.76])
+  ok - village_apprentice_body_8dir.png left: 縦がセル内に収まる (v[0.10,0.90])
+  ok - village_apprentice_body_8dir.png left: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - village_apprentice_body_8dir.png back_left: 絵がセル境界をはみ出さない (u[0.25,0.75])
+  ok - village_apprentice_body_8dir.png back_left: 縦がセル内に収まる (v[0.10,0.90])
+  ok - village_apprentice_body_8dir.png back_left: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - village_apprentice_body_8dir.png back: 絵がセル境界をはみ出さない (u[0.25,0.75])
+  ok - village_apprentice_body_8dir.png back: 縦がセル内に収まる (v[0.12,0.90])
+  ok - village_apprentice_body_8dir.png back: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - village_apprentice_body_8dir.png back_right: 絵がセル境界をはみ出さない (u[0.25,0.75])
+  ok - village_apprentice_body_8dir.png back_right: 縦がセル内に収まる (v[0.10,0.90])
+  ok - village_apprentice_body_8dir.png back_right: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - village_apprentice_body_8dir.png right: 絵がセル境界をはみ出さない (u[0.25,0.75])
+  ok - village_apprentice_body_8dir.png right: 縦がセル内に収まる (v[0.10,0.89])
+  ok - village_apprentice_body_8dir.png right: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - village_apprentice_body_8dir.png front_right: 絵がセル境界をはみ出さない (u[0.24,0.76])
+  ok - village_apprentice_body_8dir.png front_right: 縦がセル内に収まる (v[0.10,0.90])
+  ok - village_apprentice_body_8dir.png front_right: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - village_girl_body_8dir.png front: 絵がセル境界をはみ出さない (u[0.21,0.78])
+  ok - village_girl_body_8dir.png front: 縦がセル内に収まる (v[0.05,0.95])
+  ok - village_girl_body_8dir.png front: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - village_girl_body_8dir.png front_left: 絵がセル境界をはみ出さない (u[0.22,0.78])
+  ok - village_girl_body_8dir.png front_left: 縦がセル内に収まる (v[0.05,0.95])
+  ok - village_girl_body_8dir.png front_left: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - village_girl_body_8dir.png left: 絵がセル境界をはみ出さない (u[0.23,0.77])
+  ok - village_girl_body_8dir.png left: 縦がセル内に収まる (v[0.05,0.95])
+  ok - village_girl_body_8dir.png left: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - village_girl_body_8dir.png back_left: 絵がセル境界をはみ出さない (u[0.23,0.76])
+  ok - village_girl_body_8dir.png back_left: 縦がセル内に収まる (v[0.05,0.95])
+  ok - village_girl_body_8dir.png back_left: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - village_girl_body_8dir.png back: 絵がセル境界をはみ出さない (u[0.22,0.77])
+  ok - village_girl_body_8dir.png back: 縦がセル内に収まる (v[0.05,0.95])
+  ok - village_girl_body_8dir.png back: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - village_girl_body_8dir.png back_right: 絵がセル境界をはみ出さない (u[0.23,0.77])
+  ok - village_girl_body_8dir.png back_right: 縦がセル内に収まる (v[0.05,0.95])
+  ok - village_girl_body_8dir.png back_right: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - village_girl_body_8dir.png right: 絵がセル境界をはみ出さない (u[0.23,0.77])
+  ok - village_girl_body_8dir.png right: 縦がセル内に収まる (v[0.05,0.95])
+  ok - village_girl_body_8dir.png right: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - village_girl_body_8dir.png front_right: 絵がセル境界をはみ出さない (u[0.23,0.77])
+  ok - village_girl_body_8dir.png front_right: 縦がセル内に収まる (v[0.05,0.95])
+  ok - village_girl_body_8dir.png front_right: 中心がセル中央にある=正規化済み (u=0.496) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - volcano_villager_body_8dir.png front: 絵がセル境界をはみ出さない (u[0.23,0.76])
+  ok - volcano_villager_body_8dir.png front: 縦がセル内に収まる (v[0.08,0.95])
+  ok - volcano_villager_body_8dir.png front: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - volcano_villager_body_8dir.png front_left: 絵がセル境界をはみ出さない (u[0.21,0.78])
+  ok - volcano_villager_body_8dir.png front_left: 縦がセル内に収まる (v[0.08,0.95])
+  ok - volcano_villager_body_8dir.png front_left: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - volcano_villager_body_8dir.png left: 絵がセル境界をはみ出さない (u[0.21,0.77])
+  ok - volcano_villager_body_8dir.png left: 縦がセル内に収まる (v[0.08,0.95])
+  ok - volcano_villager_body_8dir.png left: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - volcano_villager_body_8dir.png back_left: 絵がセル境界をはみ出さない (u[0.23,0.76])
+  ok - volcano_villager_body_8dir.png back_left: 縦がセル内に収まる (v[0.08,0.95])
+  ok - volcano_villager_body_8dir.png back_left: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - volcano_villager_body_8dir.png back: 絵がセル境界をはみ出さない (u[0.23,0.76])
+  ok - volcano_villager_body_8dir.png back: 縦がセル内に収まる (v[0.08,0.95])
+  ok - volcano_villager_body_8dir.png back: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - volcano_villager_body_8dir.png back_right: 絵がセル境界をはみ出さない (u[0.23,0.76])
+  ok - volcano_villager_body_8dir.png back_right: 縦がセル内に収まる (v[0.08,0.95])
+  ok - volcano_villager_body_8dir.png back_right: 中心がセル中央にある=正規化済み (u=0.488) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - volcano_villager_body_8dir.png right: 絵がセル境界をはみ出さない (u[0.23,0.77])
+  ok - volcano_villager_body_8dir.png right: 縦がセル内に収まる (v[0.08,0.95])
+  ok - volcano_villager_body_8dir.png right: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+  ok - volcano_villager_body_8dir.png front_right: 絵がセル境界をはみ出さない (u[0.22,0.77])
+  ok - volcano_villager_body_8dir.png front_right: 縦がセル内に収まる (v[0.08,0.95])
+  ok - volcano_villager_body_8dir.png front_right: 中心がセル中央にある=正規化済み (u=0.492) — 原画を art_src/ に置き tools/normalize_sheet.mjs で生成する
+sheets.test: PASS
+
+=== hud-hearts.test.mjs (13.2s) ===
+  ok - full / partial / empty states are represented together
+  ok - all HP states use the same heart glyph
+  ok - heart uses the text-presentation variation selector
+  ok - every heart has a fixed 24px square
+  ok - heart spacing is fixed at 3px
+  ok - full heart and partial/empty backgrounds use the intended colors
+  ok - partial heart actually renders a white half-fill overlay
+  ok - HP changes do not shift the heart row
+  ok - heart metrics stay fixed after HP changes
+hud-hearts.test: PASS
+
+=== smoke.test.mjs (13.1s) ===
+  ok - window.__game が生成されている
+  ok - サブシステム world が存在する
+  ok - サブシステム quests が存在する
+  ok - サブシステム jobs が存在する
+  ok - サブシステム ui が存在する
+  ok - サブシステム water が存在する
+  ok - サブシステム inventory が存在する
+  ok - サブシステム player が存在する
+  ok - ワールド幅 W=64 (x境界)
+  ok - ワールド奥行 D=112 (z境界)
+  ok - ワールド高さ H=32 (y境界)
+  ok - ニューゲーム後にプレイヤーがワールドに配置される
+  ok - 世界外の仮想ブロックは照準に当たらない (null)
+  ok - コンソールエラーなし
+smoke.test: PASS
+
+=== underwater-visuals.test.mjs (12.7s) ===
+  ok - water opacity is 0.66 (0.66)
+  ok - water render order is 2 (2)
+  ok - humanoid image faces render below water
+  ok - monster images render below water
+  ok - humanoid images, limbs and iron hammer are tint targets
+  ok - humanoid images, limbs and iron hammer share the water tint
+  ok - villager tint stays synchronized while paused
+  ok - standard monster image uses the shared water tint
+  ok - monster-specific tint is restored after leaving water
+  ok - hit flash is preserved and composed with the water tint
+  ok - monster tint stays synchronized while paused
+  ok - water tint does not affect the monster HP bar
+  ok - Grom and its battle range remain above the water surface
+  ok - Grom body, heads, necks and tail render below water
+  ok - Grom's destroyed-head color is preserved
+underwater-visuals.test: PASS
+
+=== water-escape.test.mjs (22.0s) ===
+  ok - コンソールエラーゼロ ([])
+water-escape.test: PASS
+
+--- 結果 ---
+PASS  hud-hearts.test.mjs  (13.2s)
+PASS  sheets.test.mjs  (0.2s)
+PASS  smoke.test.mjs  (13.1s)
+PASS  underwater-visuals.test.mjs  (12.7s)
+PASS  water-escape.test.mjs  (22.0s)
+
+全 5 件 PASS

@@ -1,0 +1,112 @@
+{
+  "version": 7,
+  "source": "../character.mjs",
+  "format": "game-humanoid-bust",
+  "cellSize": 128,
+  "columns": 4,
+  "rows": 2,
+  "directions": [
+    "front",
+    "front_left",
+    "left",
+    "back_left",
+    "back",
+    "back_right",
+    "right",
+    "front_right"
+  ],
+  "labels": [
+    "正面",
+    "左斜め前",
+    "左",
+    "左斜め後",
+    "背面",
+    "右斜め後",
+    "右",
+    "右斜め前"
+  ],
+  "anchor": {
+    "centerU": 0.494,
+    "bottomFromTop": 0.945
+  },
+  "normalization": [
+    {
+      "row": 0,
+      "col": 0,
+      "dx": 0,
+      "dy": 1,
+      "before": "0.488",
+      "after": "0.492"
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "dx": -1,
+      "dy": 1,
+      "before": "0.496",
+      "after": "0.492"
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "dx": 0,
+      "dy": 1,
+      "before": "0.492",
+      "after": "0.492"
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "dx": 0,
+      "dy": 1,
+      "before": "0.488",
+      "after": "0.492"
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "dx": 1,
+      "dy": 1,
+      "before": "0.484",
+      "after": "0.492"
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "dx": 0,
+      "dy": 1,
+      "before": "0.488",
+      "after": "0.492"
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "dx": 1,
+      "dy": 1,
+      "before": "0.484",
+      "after": "0.492"
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "dx": 1,
+      "dy": 1,
+      "before": "0.480",
+      "after": "0.492"
+    }
+  ],
+  "rigTuning": {
+    "headLiftByDirection": {
+      "front": 0.015,
+      "front_left": 0.025,
+      "left": 0.02,
+      "back_left": 0.02,
+      "back": 0.018,
+      "back_right": 0.02,
+      "right": 0.02,
+      "front_right": 0.025
+    }
+  },
+  "rigProfile": "../rig-profile.mjs",
+  "runtime": "Existing HumanoidRig; 3D limbs and equipment are not baked into the PNG"
+}

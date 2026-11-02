@@ -1,0 +1,56 @@
+# ジンベエの8方向コード生成・試作01
+
+元ゲームの村の長老「ジンベエ」（NPC ID `jinbei`）を、`assets/humanoids/middle_aged_male_villager_body_8dir.png` を参照して制作しました。額を出して後ろへ流した白髪、白い厚い眉と落ち着いた目元、四角めの顎、深緑の服と折り襟が特徴です。
+
+[制作ガイド](../../docs/CHARACTER_AUTHORING.md)に沿い、目・SVG部品・分離出力は既存の仕組みを再利用し、顔と髪は個別に作画しています。参照画像の画素は比較用にのみ使っています。
+
+## 原本と出力
+
+- `character.mjs`: 方向別の顔・耳・髪・白髪、首・襟・上着・ベルト。
+- `rig-profile.mjs`: 肩と袖の位置、頭の前後位置、方向別の高さ。
+- `export.mjs`: SVG、原画PNG、正規化PNG、比較画像とマニフェストの再生成。
+- `output/jinbei_code_head_layer_8dir.png`: 顔・耳・髪。首・襟は含めません。
+- `output/jinbei_code_torso_layer_8dir.png`: 首・襟・服・ベルト。
+- `output/jinbei_code_body_8dir.png`: 比較用合成。リグ用の2枚の代用にはしません。
+- `output/comparison.png`: 元画像との同倍率の8方向比較。
+- `output/manifest.json`: NPC ID、参照元、方向、正規化量、色、リグ設定、移植先候補。
+
+512×256px、4列×2行、1セル128px。左右対称の衣装と髪なので5方向から残り3方向を反転します。頭と胴は合成画像と同じ正規化量を使います。手足・道具・影は含めません。
+
+## 再生成と比較
+
+Studioと同じ親フォルダにゲームとインストール済み依存関係が必要です。PNG出力にはゲームの公式ブラウザヘルパーを使用します。
+
+```powershell
+npm.cmd run export:jinbei
+npm.cmd run export:jinbei -- --preview-game
+npm.cmd test
+```
+
+`--preview-game` はゲーム側の `art_src/jinbei_code_*.src.png`、`assets/humanoids/jinbei_code_*.png`、`prototypes/jinbei/rig-profile.mjs` へ書き出します。本編のNPC設定と元画像は変更しません。
+
+[ジンベエの3D比較](http://127.0.0.1:5175/builder_sprite_lab/prototypes/jinbei/)は左が元画像・従来配置、右がコード生成・専用配置です。ゲーム側の開発サーバーを起動して使用します。ゲームのルートで検証:
+
+```powershell
+$env:PROTOTYPE_URL='http://127.0.0.1:5175/builder_sprite_lab/prototypes/jinbei/'
+node tests/authoring/jinbei.test.mjs
+node tests/authoring/head-spacing.test.mjs
+node tests/authoring/sword-edge.test.mjs
+npm.cmd run test:ci
+```
+
+専用テストは8方向の待機・歩行・攻撃、ハンマー・剣、水中色、狭い画面、肩と胴の接続、道具の手への追従を確認します。襟の非混入検査はこのキャラクターの顎の直下（正規化後77〜79px）を使用し、他キャラクターの顎に掛かる検査帯は流用しません。
+
+## 比較で調整した点と残る差
+
+額を広く見せる髪際、眉、耳が隠れない白髪、後頭部の丸み、横向きの上着の厚みを調整しました。髪の筋は輪郭内へ収め、後頭部は毛束の流れを描いています。肩の支点と袖上端は襟より下で胴に接続させています。顎を基準に頭頂の高さを調整し、首と襟は胴だけに置きました。
+
+初版の試作です。元画像の細かな毛束、頬と顎の立体感、布の陰影には差が残ります。最終移植時には本編の地形・実際のNPCとしての表示を別途検証します。移植には頭・胴の2枚のPNG、配置設定、対応するリグ読込処理を揃えてください。
+
+## 髪・眉の白髪化
+
+ユーザー指定により、元画像の部分的な白髪から、髪全体と眉が白いデザインへ変更しています。毛束の影と輪郭も灰色に統一し、こめかみだけが別色に見えないよう同じ髪パレットを使用します。比較画面の右側の頭の側面色も灰色へ変更し、左側の元画像と従来色は保持しています。
+
+## 髪が二重に見える境界の修正
+
+前髪・後頭部・こめかみの別々の塗りと輪郭が、白髪化によって帽子の縁のように見えていました。髪は各方向で一つの連続した輪郭にし、こめかみの別パーツと内部の閉じた境界線を除去しました。顔の上に耳を避けた髪の輪郭を描き、頭頂から後頭部へ続く細い毛流れで陰影を補います。顔・眉・胴・リグの配置は維持しています。

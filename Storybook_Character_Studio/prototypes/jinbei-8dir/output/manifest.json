@@ -1,0 +1,143 @@
+{
+  "id": "jinbei",
+  "name": "ジンベエ",
+  "role": "村の長老",
+  "version": 1,
+  "status": "prototype",
+  "source": "../character.mjs",
+  "reference": "dqb3-tsugumono-ch1-3/assets/humanoids/middle_aged_male_villager_body_8dir.png",
+  "format": "game-humanoid-bust",
+  "cellSize": 128,
+  "columns": 4,
+  "rows": 2,
+  "directions": [
+    "front",
+    "front_left",
+    "left",
+    "back_left",
+    "back",
+    "back_right",
+    "right",
+    "front_right"
+  ],
+  "labels": [
+    "正面",
+    "左斜め前",
+    "左",
+    "左斜め後",
+    "背面",
+    "右斜め後",
+    "右",
+    "右斜め前"
+  ],
+  "anchor": {
+    "centerU": 0.494,
+    "bottomFromTop": 0.945
+  },
+  "normalization": [
+    {
+      "row": 0,
+      "col": 0,
+      "dx": 0,
+      "dy": 1,
+      "before": "0.488",
+      "after": "0.492"
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "dx": -1,
+      "dy": 1,
+      "before": "0.496",
+      "after": "0.492"
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "dx": -2,
+      "dy": 1,
+      "before": "0.504",
+      "after": "0.492"
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "dx": 0,
+      "dy": 1,
+      "before": "0.488",
+      "after": "0.492"
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "dx": -1,
+      "dy": 1,
+      "before": "0.500",
+      "after": "0.492"
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "dx": 0,
+      "dy": 1,
+      "before": "0.488",
+      "after": "0.492"
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "dx": 2,
+      "dy": 1,
+      "before": "0.473",
+      "after": "0.492"
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "dx": 1,
+      "dy": 1,
+      "before": "0.480",
+      "after": "0.492"
+    }
+  ],
+  "output": "jinbei_code_body_8dir.png",
+  "runtime": "HumanoidRig with separate headSheetUrl/bodySheetUrl; limbs and equipment supplied by the game",
+  "runtimeSheets": {
+    "headSheetUrl": "jinbei_code_head_layer_8dir.png",
+    "bodySheetUrl": "jinbei_code_torso_layer_8dir.png"
+  },
+  "rigColors": {
+    "sleeve": 4875328,
+    "hand": 13607024,
+    "pants": 5722175,
+    "boot": 3813158,
+    "headBack": 10594985,
+    "bodyBack": 3821363
+  },
+  "rigTuning": {
+    "bodyTopV": 0.54,
+    "armSep": 0.15,
+    "armRestTilt": 0.22,
+    "shoulderLift": -0.012,
+    "sleeveY": -0.11,
+    "headForward": 0.02,
+    "headDepth": 0.024,
+    "headOffsetY": 0,
+    "headLiftByDirection": {
+      "front": 0.02,
+      "front_left": 0.028,
+      "left": 0.022,
+      "back_left": 0.022,
+      "back": 0.018,
+      "back_right": 0.022,
+      "right": 0.022,
+      "front_right": 0.028
+    },
+    "bodyDepth": -0.008
+  },
+  "rigProfile": "../rig-profile.mjs",
+  "futureTarget": {
+    "npcId": "jinbei",
+    "sheet": "assets/humanoids/middle_aged_male_villager_body_8dir.png"
+  }
+}

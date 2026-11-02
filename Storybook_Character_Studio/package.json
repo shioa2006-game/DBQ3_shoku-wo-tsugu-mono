@@ -1,0 +1,25 @@
+{
+  "name": "character-studio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node tools/start-studio.mjs",
+    "export:hero": "node prototypes/adventurer-8dir/export.mjs",
+    "export:mina": "node prototypes/mina-8dir/export.mjs",
+    "export:pino": "node prototypes/pino-8dir/export.mjs",
+    "export:inaho": "node prototypes/inaho-8dir/export.mjs",
+    "export:gonta": "node prototypes/gonta-8dir/export.mjs",
+    "export:all": "npm run export:hero && npm run export:mina && npm run export:pino && npm run export:inaho && npm run export:gonta && npm run export:jinbei && npm run export:watari && npm run export:slime && npm run export:bat && npm run export:rat && npm run export:dorotabo && npm run export:squid",
+    "test": "node --test tests/node/*.test.mjs",
+    "export:jinbei": "node prototypes/jinbei-8dir/export.mjs",
+    "export:watari": "node prototypes/watari-8dir/export.mjs",
+    "export:slime": "node prototypes/slime-8dir/export.mjs",
+    "export:bat": "node prototypes/night-bat-8dir/export.mjs",
+    "export:rat": "node prototypes/field-rat-8dir/export.mjs",
+    "export:dorotabo": "node prototypes/dorotabo-8dir/export.mjs",
+    "export:squid": "node prototypes/squid-8dir/export.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

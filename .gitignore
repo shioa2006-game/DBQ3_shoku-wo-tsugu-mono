@@ -1,0 +1,34 @@
+# Dependencies and reproducible build/cache output (all subprojects)
+node_modules/
+dist/
+.npm-cache/
+.vite/
+coverage/
+test-results/
+playwright-report/
+work/
+exports/
+*.log
+.DS_Store
+Thumbs.db
+
+# Local agent/editor settings and credentials
+.claude/
+.codex/
+.agents/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.bundle
+
+# Generated game comparison screenshots; retain HTML/JS/profiles and Studio art
+/dqb3-tsugumono-ch1-3/prototypes/**/*.png
+/quality-audit-*/
+
+# Machine-local migration/backup files must stay outside version control
+/.migration-backup/
+/backups/

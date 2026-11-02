@@ -1,0 +1,143 @@
+{
+  "id": "mina",
+  "name": "ミナ",
+  "role": "農家の少女",
+  "version": 5,
+  "status": "prototype",
+  "source": "../character.mjs",
+  "reference": "dqb3-tsugumono-ch1-3/assets/humanoids/village_girl_body_8dir.png",
+  "format": "game-humanoid-bust",
+  "cellSize": 128,
+  "columns": 4,
+  "rows": 2,
+  "directions": [
+    "front",
+    "front_left",
+    "left",
+    "back_left",
+    "back",
+    "back_right",
+    "right",
+    "front_right"
+  ],
+  "labels": [
+    "正面",
+    "左斜め前",
+    "左",
+    "左斜め後",
+    "背面",
+    "右斜め後",
+    "右",
+    "右斜め前"
+  ],
+  "anchor": {
+    "centerU": 0.494,
+    "bottomFromTop": 0.945
+  },
+  "normalization": [
+    {
+      "row": 0,
+      "col": 0,
+      "dx": 0,
+      "dy": 1,
+      "before": "0.492",
+      "after": "0.492"
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "dx": -3,
+      "dy": 1,
+      "before": "0.512",
+      "after": "0.492"
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "dx": -3,
+      "dy": 1,
+      "before": "0.512",
+      "after": "0.492"
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "dx": -1,
+      "dy": 1,
+      "before": "0.496",
+      "after": "0.492"
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "dx": 0,
+      "dy": 1,
+      "before": "0.492",
+      "after": "0.492"
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "dx": 1,
+      "dy": 1,
+      "before": "0.480",
+      "after": "0.492"
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "dx": 3,
+      "dy": 1,
+      "before": "0.465",
+      "after": "0.492"
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "dx": 3,
+      "dy": 1,
+      "before": "0.465",
+      "after": "0.492"
+    }
+  ],
+  "output": "mina_code_body_8dir.png",
+  "runtime": "HumanoidRig with separate headSheetUrl/bodySheetUrl; limbs and equipment supplied by the game",
+  "runtimeSheets": {
+    "headSheetUrl": "mina_code_head_layer_8dir.png",
+    "bodySheetUrl": "mina_code_torso_layer_8dir.png"
+  },
+  "rigColors": {
+    "sleeve": 3108717,
+    "hand": 15647642,
+    "pants": 9067059,
+    "boot": 5913124,
+    "headBack": 9067059,
+    "bodyBack": 2512725
+  },
+  "rigTuning": {
+    "bodyTopV": 0.54,
+    "armSep": 0.145,
+    "armRestTilt": 0.22,
+    "shoulderLift": 0.018,
+    "sleeveY": -0.095,
+    "headForward": 0.024,
+    "headDepth": 0.025,
+    "headOffsetY": -0.008,
+    "headLiftByDirection": {
+      "front": 0.025,
+      "front_left": 0.04,
+      "left": 0.028,
+      "back_left": 0.035,
+      "back": 0.03,
+      "back_right": 0.035,
+      "right": 0.028,
+      "front_right": 0.04
+    },
+    "bodyDepth": -0.01
+  },
+  "rigProfile": "../rig-profile.mjs",
+  "futureTarget": {
+    "npcId": "mina",
+    "sheet": "assets/humanoids/village_girl_body_8dir.png"
+  }
+}
