@@ -3,8 +3,9 @@
 このフォルダは将来の第6～7章ゲームの制作場所です。現在はゲーム実装・依存関係はありません。
 
 - [共通ストーリー資料・実装と計画の境界](../docs/story/README.md)
+- [第6～7章シナリオと共通設計・未決事項](../docs/story/planned/chapter6-7-scenario.md)
 - 第6章制作計画: [よみがえるダーマ神殿](../docs/story/planned/chapter6.md)
-- 第7章制作計画: [大穴の影](../docs/story/planned/chapter7.md)
+- 第7章制作計画: [神殿防衛と三頭竜の最終決戦](../docs/story/planned/chapter7.md)（章名は未決定。従来の「大穴の影」は仮題）
 - 着手前の確認: [未解決の不整合](../docs/story/inconsistencies.md)。過去章の説明は第1～5章の実装を基準にします。
 
 着手時は第4～5章の必要なコードを基礎にします。Gitは親リポジトリを使用し、ここで個別に初期化しません。実行環境とセーブ領域は他の編から独立させます。
