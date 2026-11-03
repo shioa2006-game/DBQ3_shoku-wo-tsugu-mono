@@ -9,7 +9,8 @@ const browser = await launchBrowser();
 try {
   const page = await browser.newPage({ viewport: { width: 960, height: 540 } });
   let blacksmithRequests = 0;
-  await page.route(/blacksmith_body_8dir.*\.png$/, async (route) => {
+  // Belk loads separate head and torso layers; only the head layer fails once.
+  await page.route(/belk_code_head_layer_8dir.*\.png$/, async (route) => {
     blacksmithRequests += 1;
     if (blacksmithRequests === 1) await route.abort("failed");
     else await route.continue();
@@ -24,7 +25,7 @@ try {
       bodyLoaded: Boolean(v.rig.bodyTexture.image?.complete),
     };
   });
-  expect(!before.headLoaded && !before.bodyLoaded, "初回失敗直後はベルクの画像が未読込");
+  expect(!before.headLoaded, "初回失敗直後はベルクの頭の画像が未読込");
 
   const recovered = await waitForCond(page, () => {
     const rig = window.__game.villager("belk")?.rig;
@@ -33,12 +34,12 @@ try {
     const body = rig.bodyTexture.image;
     if (!head?.complete || !body?.complete || head.naturalWidth <= 0 || body.naturalWidth <= 0) return false;
     return {
-      sameSource: rig.headTexture.source === rig.bodyTexture.source,
+      headLayer: head.src.includes("belk_code_head_layer_8dir"),
       width: head.naturalWidth,
       height: head.naturalHeight,
     };
   }, undefined, { timeout: 5000, label: "character sheet retry" });
-  expect(recovered.sameSource, "既存の頭・胴体テクスチャへ再試行画像が反映される");
+  expect(recovered.headLayer, "既存の頭テクスチャへ再試行画像が反映される");
   expect(recovered.width > 0 && recovered.height > 0, `ベルク画像が自動復旧 (${recovered.width}x${recovered.height})`);
 
   await page.waitForTimeout(1800);
@@ -47,7 +48,7 @@ try {
 
   const failedPage = await browser.newPage({ viewport: { width: 960, height: 540 } });
   let failedRequests = 0;
-  await failedPage.route(/blacksmith_body_8dir.*\.png$/, async (route) => {
+  await failedPage.route(/belk_code_head_layer_8dir.*\.png$/, async (route) => {
     failedRequests += 1;
     await route.abort("failed");
   });

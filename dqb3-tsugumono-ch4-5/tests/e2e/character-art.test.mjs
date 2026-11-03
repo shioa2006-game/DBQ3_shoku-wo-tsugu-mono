@@ -1,10 +1,11 @@
-// 第1～3章から流用したStudioのキャラクター（主人公・ミナ・ゴンタ・ワタリ、こうもり・どろたぼうの色替え）が、
-// 本島編と同じ画像・頭胴の分離層・リグ設定で、8方向・歩行・道具・A/B切替まで動くことを確かめる。
+// Studioのキャラクターが、頭胴の分離層・リグ設定で8方向・歩行・道具・A/B切替まで動くことを確かめる。
+// 第1～3章から流用: 主人公・ミナ・ゴンタ・ワタリ、こうもり・どろたぼうの色替え。
+// 火山島編の新規: ベルク・ロク・カヤ・ナギ・ヨモギ・スミ・テル（段階2）。
 // CHARACTER_ART_SCREENSHOTS=1 で work/character-migration/ に8方向の一覧画像を書き出す。
 import assert from 'node:assert/strict';
 import {mkdir,writeFile} from 'node:fs/promises';
 import {launchBrowser,openGame,newGame,waitForCond} from '../helpers.mjs';
-const villagers=['mina','gonta','watari'];
+const villagers=['mina','gonta','watari','belk','roku','kaya','nagi','yomogi','sumi','teru'];
 const monsters=['fire_bat','ash_dorotabo','taint_bat','taint_dorotabo'];
 const artNames=['night_bat','dorotabo','night_bat','dorotabo'];
 const directions=['front','front_left','left','back_left','back','back_right','right','front_right'];
@@ -92,7 +93,7 @@ try {
      const scene=new g.scene.constructor();scene.background=g.scene.background.clone().setHex(0xdce4de);
      scene.add(g.hemiLight.clone(),g.sunLight.clone());
      const ids=group==='humans'?['adventurer',...villagers]:monsters;
-     const spacing=group==='humans'?1:1.5;
+     const spacing=group==='humans'?.85:1.5;
      for(const [j,id] of ids.entries()){
       const e=id==='adventurer'?g.player:villagers.includes(id)?g.villager(id):g.monsters.monsters.find(m=>m.type===id);
       if(e.rig){e.rig.setDirection(direction);e.rig.setTool(null);e.rig.attackT=0;e.rig.animTime=0;e.rig.update(0,false);}
@@ -117,5 +118,5 @@ try {
   }
  }
  assert.deepEqual(errors,[]);
- console.log('character-art.test: PASS (4 humans, 4 recolored monsters; all directions, layers, profiles and animation)');
+ console.log('character-art.test: PASS (11 humans, 4 recolored monsters; all directions, layers, profiles and animation)');
 }finally{await browser.close();}

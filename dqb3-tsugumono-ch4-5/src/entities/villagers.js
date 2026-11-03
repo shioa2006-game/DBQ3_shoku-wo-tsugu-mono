@@ -5,13 +5,19 @@ import { PLACES, WORLD } from "../world/world.js";
 import { MINA_RIG_PROFILE } from "../content/rig-profiles/mina.mjs";
 import { GONTA_RIG_PROFILE } from "../content/rig-profiles/gonta.mjs";
 import { WATARI_RIG_PROFILE } from "../content/rig-profiles/watari.mjs";
+import { BELK_RIG_PROFILE } from "../content/rig-profiles/belk.mjs";
+import { ROKU_RIG_PROFILE } from "../content/rig-profiles/roku.mjs";
+import { KAYA_RIG_PROFILE } from "../content/rig-profiles/kaya.mjs";
+import { NAGI_RIG_PROFILE } from "../content/rig-profiles/nagi.mjs";
+import { YOMOGI_RIG_PROFILE } from "../content/rig-profiles/yomogi.mjs";
+import { SUMI_RIG_PROFILE } from "../content/rig-profiles/sumi.mjs";
+import { TERU_RIG_PROFILE } from "../content/rig-profiles/teru.mjs";
 
 const HUMANOIDS = (file) => new URL(`../../assets/humanoids/${file}`, import.meta.url).href;
 
-// 火山島編の登場人物。
-// 旅の仲間（ミナ・ゴンタ・ワタリ）は本島編と同じStudioの頭・胴の分離画像とリグ設定を使い、
-// ベルク・ロク・カヤ・ナギは火山島の新規画像を使う。
-// 追加の背景住民（スミ・テル）はカヤの画像を流用し、手足の色で差を付ける。
+// 火山島編の登場人物。全員、Storybook Character Studio でコードから描いた頭・胴の分離画像と
+// リグ設定を使う（docs/CHARACTER_ART.md）。旅の仲間（ミナ・ゴンタ・ワタリ）は本島編と同じもの、
+// ベルク・ロク・カヤ・ナギ・ヨモギ・スミ・テルは火山島編のもの。ナギは巫女の姿、スミ・テルは専用の姿。
 export const VILLAGER_DEFS = {
   mina: {
     name: "ミナ",
@@ -51,7 +57,10 @@ export const VILLAGER_DEFS = {
   belk: {
     name: "ベルク",
     title: "槌を置いた鍛冶職人",
-    sheet: HUMANOIDS("blacksmith_body_8dir.png"),
+    sheet: HUMANOIDS("belk_code_body_8dir.png"),
+    headSheet: HUMANOIDS("belk_code_head_layer_8dir.png"),
+    torsoSheet: HUMANOIDS("belk_code_torso_layer_8dir.png"),
+    rig: BELK_RIG_PROFILE,
     colors: { sleeve: 0x6b3a26, hand: 0xc98f66, pants: 0x4a4440, boot: 0x2e2a26, headBack: 0x3a332e, bodyBack: 0x54301f },
     fighter: true,
     atk: 3,
@@ -60,7 +69,10 @@ export const VILLAGER_DEFS = {
   roku: {
     name: "ロク",
     title: "鉱夫兼炭焼き",
-    sheet: HUMANOIDS("miner_body_8dir.png"),
+    sheet: HUMANOIDS("roku_code_body_8dir.png"),
+    headSheet: HUMANOIDS("roku_code_head_layer_8dir.png"),
+    torsoSheet: HUMANOIDS("roku_code_torso_layer_8dir.png"),
+    rig: ROKU_RIG_PROFILE,
     colors: { sleeve: 0x5c5a52, hand: 0xd0a074, pants: 0x4f4436, boot: 0x332b20, headBack: 0x44403a, bodyBack: 0x4a483f },
     fighter: true,
     atk: 2,
@@ -69,14 +81,20 @@ export const VILLAGER_DEFS = {
   kaya: {
     name: "カヤ",
     title: "町へ帰る住民",
-    sheet: HUMANOIDS("volcano_villager_body_8dir.png"),
-    colors: { sleeve: 0x8a4a3a, hand: 0xeec39a, pants: 0x6b5233, boot: 0x4a3320, headBack: 0x3c2c22, bodyBack: 0x6e392c },
+    sheet: HUMANOIDS("kaya_code_body_8dir.png"),
+    headSheet: HUMANOIDS("kaya_code_head_layer_8dir.png"),
+    torsoSheet: HUMANOIDS("kaya_code_torso_layer_8dir.png"),
+    rig: KAYA_RIG_PROFILE,
+    colors: { sleeve: 0x4d6d98, hand: 0xeec39a, pants: 0x6b5233, boot: 0x4a3320, headBack: 0x3e2618, bodyBack: 0xa7782a },
     fighter: false,
   },
   nagi: {
     name: "ナギ",
     title: "竹林の社守り",
-    sheet: HUMANOIDS("shrine_keeper_body_8dir.png"),
+    sheet: HUMANOIDS("nagi_code_body_8dir.png"),
+    headSheet: HUMANOIDS("nagi_code_head_layer_8dir.png"),
+    torsoSheet: HUMANOIDS("nagi_code_torso_layer_8dir.png"),
+    rig: NAGI_RIG_PROFILE,
     colors: { sleeve: 0xf2ecdc, hand: 0xeec39a, pants: 0xa03024, boot: 0x3a2f26, headBack: 0x2b2b33, bodyBack: 0xd8d2c2 },
     fighter: false,
     healer: true,
@@ -84,24 +102,33 @@ export const VILLAGER_DEFS = {
   yomogi: {
     name: "ヨモギ",
     title: "薬草の知恵を持つ住民",
-    sheet: HUMANOIDS("herbalist_body_8dir.png"),
+    sheet: HUMANOIDS("yomogi_code_body_8dir.png"),
+    headSheet: HUMANOIDS("yomogi_code_head_layer_8dir.png"),
+    torsoSheet: HUMANOIDS("yomogi_code_torso_layer_8dir.png"),
+    rig: YOMOGI_RIG_PROFILE,
     colors: { sleeve: 0x6a7a4a, hand: 0xd8b08a, pants: 0x57503f, boot: 0x3a2f26, headBack: 0x5a6a42, bodyBack: 0xcfc4a4 },
     fighter: false,
     healer: true,
   },
-  // 背景住民（カヤの画像を流用し、手足の色と配置で差を付ける）。
+  // 背景住民。
   sumi: {
     name: "スミ",
     title: "鉱山町の住民",
-    sheet: HUMANOIDS("volcano_villager_body_8dir.png"),
-    colors: { sleeve: 0x4a5a6b, hand: 0xd8b08a, pants: 0x57503f, boot: 0x3a2f26, headBack: 0x3c2c22, bodyBack: 0x3c4a58 },
+    sheet: HUMANOIDS("sumi_code_body_8dir.png"),
+    headSheet: HUMANOIDS("sumi_code_head_layer_8dir.png"),
+    torsoSheet: HUMANOIDS("sumi_code_torso_layer_8dir.png"),
+    rig: SUMI_RIG_PROFILE,
+    colors: { sleeve: 0x4b5c6e, hand: 0xd8b08a, pants: 0x57503f, boot: 0x3a2f26, headBack: 0x3c2e26, bodyBack: 0x3c4a58 },
     fighter: false,
   },
   teru: {
     name: "テル",
     title: "鉱山町の住民",
-    sheet: HUMANOIDS("volcano_villager_body_8dir.png"),
-    colors: { sleeve: 0x6b6b3a, hand: 0xeec39a, pants: 0x4f4436, boot: 0x332b20, headBack: 0x3c2c22, bodyBack: 0x565626 },
+    sheet: HUMANOIDS("teru_code_body_8dir.png"),
+    headSheet: HUMANOIDS("teru_code_head_layer_8dir.png"),
+    torsoSheet: HUMANOIDS("teru_code_torso_layer_8dir.png"),
+    rig: TERU_RIG_PROFILE,
+    colors: { sleeve: 0x6b6b3a, hand: 0xeec39a, pants: 0x4f4436, boot: 0x332b20, headBack: 0x3c2618, bodyBack: 0x565626 },
     fighter: false,
   },
 };
