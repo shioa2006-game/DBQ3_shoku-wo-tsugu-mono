@@ -44,11 +44,15 @@ function eye(x,y,width) {
 // 部品は頭の中心を基準に置く。横顔では奥の目と角は手前の輪郭に隠れる。
 function head(view) {
   const side = view === 2, rear = view > 2, front = view === 0 || view === 4;
+  const crown = path(side ? 'M-16 -7 Q-14 -16 0 -17 Q16 -18 18 -3 L14 9 9 7 6 15 -6 13 -19 10 -23 6Z'
+    : 'M-16 -7 Q-17 -13 -9 -15 L-12 -19 -4 -16 -1 -20 5 -16 10 -18 9 -15 Q19 -12 16 0 L18 5 13 5 13 10 8 10 5 14 -4 15 -11 11 -15 12 -14 7 -19 6Z','url(#coat)');
+  if (view === 3) {
+    const horns = horn(-3,-13,-.88,.96) + horn(4,-12,.98,1);
+    return horns + ear(-13,-3,-1,true) + crown + ear(9,-3,1,true);
+  }
   const horns = front ? horn(-5,-12,-1,1) + horn(5,-12,1,1)
     : (side ? '' : horn(-8,-13,-.57,.9)) + horn(side ? -8 : 0,-12,1.12,1);
   const ears = (front ? ear(-7,0,-1,rear) : '') + ear(8,-1,1,rear);
-  const crown = path(side ? 'M-16 -7 Q-14 -16 0 -17 Q16 -18 18 -3 L14 9 9 7 6 15 -6 13 -19 10 -23 6Z'
-    : 'M-16 -7 Q-17 -13 -9 -15 L-12 -19 -4 -16 -1 -20 5 -16 10 -18 9 -15 Q19 -12 16 0 L18 5 13 5 13 10 8 10 5 14 -4 15 -11 11 -15 12 -14 7 -19 6Z','url(#coat)');
   if (rear) return horns + crown + ears;
   if (side) {
     const profile = path('M-7 -4 Q-10 0 -21 4 Q-25 6 -23 10 Q-17 14 -8 14 L0 9Z','var(--cream)')
