@@ -28,6 +28,8 @@
 
 新たに復活するのは料理人の書です。農民の書は第1章で復活済み。イナホが加わり、作る・育てる・料理する役割がつながります。第3章への遷移は[quests3.js](../../../dqb3-tsugumono-ch1-3/src/game/quests3.js)の `maybeStart()` が処理し、浜のワタリへの会話が入口となります。
 
+章末の予告は「職をつぐ旅」とし、第1章と同様、島への本神殿建立を予告しません。第3章の船出へ続きます。
+
 ## 既存の確認対象
 
-[第2章通しテスト](../../../dqb3-tsugumono-ch1-3/tests/e2e/chapter2.test.mjs)。今回の整理では実行していません。旧脚本は[原文保存](../../../archive/story/2026-11-03/dqb3-tsugumono-ch1-3/assets/chapter2_story.md)を参照。
+[第2章通しテスト](../../../dqb3-tsugumono-ch1-3/tests/e2e/chapter2.test.mjs)。台詞反映後の確認結果は[不整合一覧](../inconsistencies.md#implementation-2026-11-03)を参照してください。旧脚本は[原文保存](../../../archive/story/2026-11-03/dqb3-tsugumono-ch1-3/assets/chapter2_story.md)を参照。

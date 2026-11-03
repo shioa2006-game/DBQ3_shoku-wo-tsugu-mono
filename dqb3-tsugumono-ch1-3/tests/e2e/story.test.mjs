@@ -165,7 +165,23 @@ try {
   expect((await stage(page)) === "SHRINE_DONE", "社完成でSHRINE_DONEへ");
 
   await page.evaluate(() => window.__game.quests.onAltarPrayed());
-  await page.waitForTimeout(300);
+  // 書の予告が長くなっても、小さめのPC画面で会話枠からはみ出さない。
+  await page.evaluate(() => {
+    const dialogue = window.__game.ui.dialogue;
+    while (dialogue.open && !dialogue.fullText.includes("料理人の書")) dialogue.advance();
+    if (dialogue.typing) dialogue.advance();
+  });
+  await page.setViewportSize({ width: 640, height: 720 });
+  const dialogueFits = await page.locator(".dlg-text").evaluate((text) => {
+    const box = text.closest(".dialogue");
+    const r = text.getBoundingClientRect();
+    const b = box.getBoundingClientRect();
+    return !box.classList.contains("hidden") && text.textContent.includes("僧侶の書") &&
+      text.scrollWidth <= text.clientWidth && text.scrollHeight <= text.clientHeight &&
+      r.bottom <= b.bottom && b.bottom <= innerHeight && b.right <= innerWidth;
+  });
+  expect(dialogueFits, "書の予告全文が幅640pxの会話枠に収まる");
+  await page.setViewportSize({ width: 1280, height: 720 });
   await dlg(page, 20);
   // エンディング演出はクリック用リスナが 4秒後に付く（ui.playEnding の setTimeout）。
   // 早すぎるクリックは無視されるので、POSTGAME になるまでクリックし続ける。

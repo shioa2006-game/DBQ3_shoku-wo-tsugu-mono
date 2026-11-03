@@ -6,7 +6,7 @@
 
 | フォルダ | 内容 |
 |---|---|
-| [dqb3-tsugumono-ch1-3](dqb3-tsugumono-ch1-3/README.md) | 本島編。制作した人型7人・基本モンスター5種を本編へ移植済み |
+| [dqb3-tsugumono-ch1-3](dqb3-tsugumono-ch1-3/README.md) | ジパング復興編。制作した人型7人・基本モンスター5種を本編へ移植済み |
 | [dqb3-tsugumono-ch4-5](dqb3-tsugumono-ch4-5/README.md) | 火山島編。第4～5章の独立ゲーム |
 | [dqb3-tsugumono-ch6-7](dqb3-tsugumono-ch6-7/README.md) | ダーマ再興編の予定地。ゲーム実装は未作成 |
 | [Storybook_Character_Studio](Storybook_Character_Studio/README.md) | 8方向キャラクターの制作原本・生成画像・制作ガイド |
@@ -14,7 +14,7 @@
 | [docs](docs/GITHUB_WORKFLOW.md) | GitHub運用と統合記録 |
 | archive | 過去の修正メモ |
 
-ストーリーの確認・更新は [docs/story/README.md](docs/story/README.md) から始めてください。第1～5章は現在の実装、第6～7章は未実装の制作計画として分けています。第1～3章の「本島編／ジパング復興編」など、ゲーム内に残る差異は [不整合一覧](docs/story/inconsistencies.md) に記録しています。旧企画書・脚本の原文は [履歴資料](archive/story/2026-11-03/README.md) へ保存しました。
+ストーリーの確認・更新は [docs/story/README.md](docs/story/README.md) から始めてください。第1～5章は現在の実装、第6～7章は未実装の制作計画として分けています。編名・台詞の不整合と解消状況は [不整合一覧](docs/story/inconsistencies.md) に記録しています。旧企画書・脚本の原文は [履歴資料](archive/story/2026-11-03/README.md) へ保存しました。
 
 各ゲームの起動・依存関係・セーブ領域は独立しています。フォルダ間の相対参照を保つため、現在の名前と配置で利用してください。
 

@@ -2,7 +2,7 @@
 
 ドラゴンクエストビルダーズ風ブロックメイクRPG「職をつぐ者」の火山島編。
 第4章「鬼火の山」と第5章「眠る竹林の社」を収録する独立ゲームで、
-本島編（`dqb3-tsugumono-ch1-3`）の正史を組み込んだ固定状態から New Game が始まる。
+ジパング復興編（`dqb3-tsugumono-ch1-3`）の正史を組み込んだ固定状態から New Game が始まる。
 
 - [共通ストーリー資料・参照ルール](../docs/story/README.md)
 - [第4章の実装記録](../docs/story/implemented/chapter4.md) / [第5章の実装記録](../docs/story/implemented/chapter5.md)

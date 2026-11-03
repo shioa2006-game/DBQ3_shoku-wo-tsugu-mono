@@ -447,7 +447,7 @@ export class UI {
   playEnding(cb, opts = {}) {
     this.ending.classList.remove("hidden");
     const body = opts.lines
-      ? opts.lines.map((l) => `<p${l.includes("本島編") ? ' class="ending-title"' : ""}>${l}</p>`).join("")
+      ? opts.lines.map((l) => `<p${l.includes("ジパング復興編") ? ' class="ending-title"' : ""}>${l}</p>`).join("")
       : `
         <p>勇者は、闇を払った。</p>
         <p>だが、光の中で生きる術は失われた。</p>
@@ -466,7 +466,7 @@ export class UI {
         <p>&nbsp;</p>
         <p class="ending-title">職をつぐ者 〜ジパング復興編〜</p>
         <p>&nbsp;</p>
-        <p>― 新ダーマ神殿を建てる旅が、いま始まる ―`;
+        <p>― 職をつぐ旅は、ここから続いていく ―</p>`;
     this.ending.innerHTML = `
       <div class="ending-scroll">
         ${body}

@@ -1,4 +1,4 @@
-// 第3章「旅立ちの港」の通し回帰テスト（本島編・完）。
+// 第3章「旅立ちの港」の通し回帰テスト（ジパング復興編・完）。
 // CH2_DONE翌朝の開始 → 桟橋 → 灯台 → 船体/帆柱/帆（船乗りの書）→ 授職の儀 →
 // クラーケン防衛戦（触手→本体）→ 出航エンディング → CH3_DONE → セーブ復元。
 
@@ -252,6 +252,9 @@ try {
   await page.evaluate(() => window.__game.quests.onTalk("watari"));
   await advanceToChoice(page); // 別れの会話 → 「錨を上げるか」の選択肢
   await page.click(".choice-panel button"); // 「旅立つ」
+  await page.waitForSelector(".ending:not(.hidden) .ending-title");
+  expect(await page.locator(".ending-title").textContent() === "―― ジパング復興編・完 ――",
+    "改称後も出航エンディングの編名に見出し装飾が付く");
   // エンディングのクリックリスナは4秒後に付くので、CH3_DONE になるまで押し続ける。
   await waitForCond(
     page,
@@ -263,7 +266,7 @@ try {
     undefined,
     { label: "出航エンディング→CH3_DONE", timeout: 20000, interval: 500 },
   );
-  expect((await stage(page)) === "CH3_DONE", "出航エンディング後はCH3_DONE（本島編・完）");
+  expect((await stage(page)) === "CH3_DONE", "出航エンディング後はCH3_DONE（ジパング復興編・完）");
 
   // --- 後日談: 船のワタリに話すと出航を再演できる（やめれば自由行動のまま）------------
   await page.evaluate(() => window.__game.quests.onTalk("watari"));
@@ -291,7 +294,7 @@ try {
   });
   expect(squidAmbient > 0, `夜の海峡の水面にイカが湧く (${squidAmbient})`);
 
-  // --- セーブ/ロード: 本島編クリア状態が復元される -----------------------------------
+  // --- セーブ/ロード: ジパング復興編クリア状態が復元される -----------------------------
   await page.evaluate(() => window.__game.autosave());
   await page.reload({ waitUntil: "networkidle" });
   await page.waitForTimeout(2000);

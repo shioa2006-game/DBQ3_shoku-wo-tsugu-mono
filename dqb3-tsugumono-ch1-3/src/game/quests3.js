@@ -3,7 +3,7 @@ import { SFX } from "./sfx.js";
 import { CH3 } from "../content/chapter3.js";
 
 // 第3章「旅立ちの港」の進行エンジン。台詞・目標文は content/chapter3.js を参照する。
-// 本章はこのリポジトリの最終章（本島編・完）。QuestManager から CH3 ステージのあいだ委譲される。
+// 本章はジパング復興編の最終章。QuestManager から CH3 ステージのあいだ委譲される。
 
 const DECK_Y = 4; // 桟橋・船の桁の高さ（水面+1）。地形からは求めない。
 
