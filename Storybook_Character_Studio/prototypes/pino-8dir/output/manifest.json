@@ -5,7 +5,7 @@
   "version": 1,
   "status": "prototype",
   "source": "../character.mjs",
-  "reference": "dqb3-tsugumono-ch1-3/assets/humanoids/village_apprentice_body_8dir.png",
+  "reference": "references/humanoids/village_apprentice_body_8dir.png",
   "format": "game-humanoid-bust",
   "cellSize": 128,
   "columns": 4,

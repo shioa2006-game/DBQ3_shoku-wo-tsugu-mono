@@ -57,7 +57,7 @@ try {
       await writeFile(game(`assets/humanoids/${name}.png`),bytes);
     }
   }
-  const reference=await readFile(game('assets/humanoids/cook_body_8dir.png'));
+  const reference=await readFile(here('../../references/humanoids/cook_body_8dir.png'));
   await writeFile(here('output/inaho-code.svg'),svg);
   await writeFile(here('output/inaho_code_body_8dir.src.png'),raw);
   await writeFile(here('output/inaho_code_body_8dir.png'),normalized);
@@ -73,7 +73,7 @@ try {
   await writeFile(here('output/comparison.png'),await rasterize(board));
   await writeFile(here('output/manifest.json'),JSON.stringify({
     id:'inaho',name:'イナホ',role:'料理見習い',version:1,status:'prototype',
-    source:'../character.mjs',reference:'dqb3-tsugumono-ch1-3/assets/humanoids/cook_body_8dir.png',
+    source:'../character.mjs',reference:'references/humanoids/cook_body_8dir.png',
     format:'game-humanoid-bust',cellSize:128,columns:4,rows:2,directions:DIRECTIONS,labels:LABELS,
     anchor:{centerU:.494,bottomFromTop:.945},normalization:report,
     output:'inaho_code_body_8dir.png',runtime:'HumanoidRig with separate headSheetUrl/bodySheetUrl; limbs and equipment supplied by the game',
@@ -83,8 +83,6 @@ try {
     futureTarget:{npcId:'inaho',sheet:'assets/humanoids/cook_body_8dir.png'},
   },null,2)+'\n');
   if(previewGame) {
-    await mkdir(game('prototypes/inaho/'),{recursive:true});
-    await writeFile(game('prototypes/inaho/rig-profile.mjs'),await readFile(here('rig-profile.mjs')));
     await writeFile(game('art_src/inaho_code_body_8dir.src.png'),raw);
     await writeFile(game('assets/humanoids/inaho_code_body_8dir.png'),normalized);
   }

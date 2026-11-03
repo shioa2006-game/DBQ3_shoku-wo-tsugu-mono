@@ -15,8 +15,8 @@
 ## 原本と出力
 
 - `models.mjs`: 作画原本。`createPropModels(THREE, { tile, spikes })` が、ブロック名（ゲームの `B` のキー）→作る関数を返す。依存なし。`tile(name)` はブロック模様のテクスチャを返す関数で、無いときは単色になる。
-- `export.mjs`: 原本の写しを `dqb3-tsugumono-ch1-3/prototypes/props-3d/prop-models.js`（確認ページ用）へ書き出す。`--preview-game` を付けると、両ゲームの `src/world/prop-models.js` にも書き出す。写しは先頭に生成ファイルの注記を付けるだけ。
-- 比較ページ: `dqb3-tsugumono-ch1-3/prototypes/props-3d/` と `dqb3-tsugumono-ch4-5/prototypes/props-3d/`。それぞれのゲームの開発サーバーで開く（three.jsとゲームのコードを使うため）。`preview.js` は両編で同じ内容で、編ごとの設定（とげ罠・穂の色）は `index.html` の `body` の data 属性で渡し、その編にある設置物だけを並べる。
+- `export.mjs`: `--preview-game` を付けると、原本の写しを両ゲームの `src/world/prop-models.js` へ書き出す。写しは先頭に生成ファイルの注記を付けるだけ。付けないときは何も書かない（比較ページは原本を直接読む）。
+- 比較ページ: Studioの `compare/ch1-3/props-3d/` と `compare/ch4-5/props-3d/`。Studioのサーバーで開く（three.jsとゲームのコードは、サーバーが配る `games/<編>/` から読む）。ページのコードは両編で共通の `compare/shared/props-3d-preview.js` で、編ごとの設定（`data-game`・とげ罠・穂の色）は `index.html` の `body` の data 属性で渡し、その編にある設置物だけを並べる。
 
 ## 試作01で作り直したもの（第1～3章）
 
@@ -52,12 +52,11 @@
 ## 再生成と確認
 
 ```powershell
-npm.cmd run export:props
 npm.cmd run export:props -- --preview-game
 npm.cmd test
 ```
 
-比較ページは、ゲームのCH1～3の開発サーバー（`npm.cmd --prefix dqb3-tsugumono-ch1-3 run dev`）で `/builder_sprite_lab/prototypes/props-3d/` を開きます（Studioのほかの3D比較と同じく、リンクはポート5175。開発サーバーのポートに読み替えてください）。左が今の本編（ゲームの `PropRenderer` がそのまま作る形）、右が新しい形です。ゲームと同じ角度の8方向、夜（たいまつの光）、扉の開閉を切り替えられます。
+比較ページは、Studioのサーバー（`start-studio.bat`）で [第1～3章](../../compare/ch1-3/props-3d/)・[第4～5章](../../compare/ch4-5/props-3d/) を開きます。左が今の本編（ゲームの `PropRenderer` がそのまま作る形）、右が新しい形です。ゲームと同じ角度の8方向、夜（たいまつの光）、扉の開閉を切り替えられます。
 
 Studioのテスト（`tests/node/props-3d.test.mjs`）では、次を確認します。
 
@@ -66,7 +65,7 @@ Studioのテスト（`tests/node/props-3d.test.mjs`）では、次を確認し�
 - 輪郭線を含めて大きさの上限に収まること
 - 置くたびに形状を使い回すこと
 - 名前が両方のゲームのブロックIDにあること
-- 比較ページの写しが原本と同じこと
+- 比較ページが両編共通のページのコードで原本を直接読み、ゲームのフォルダに比較ページが残っていないこと
 
 ## 本編への移植（第1～5章とも移植済み）
 
@@ -75,7 +74,7 @@ Studioのテスト（`tests/node/props-3d.test.mjs`）では、次を確認し�
 1. 原本を各ゲームの `src/world/prop-models.js` へ書き出した。ゲームの `props.js` が `createPropModels(THREE, { tile, spikes })` を呼び、作り直した設置物だけ `BUILDERS` を置き換える（第4～5章にかかしは無いので7件）。とげ罠は第1～3章が `'stone'`、第4～5章が `'iron'`。模様はゲームのブロック模様（`drawTileIcon`）から作る。
 2. 形を変えたわらのベッド・職業の祭壇・鳥居のアイコン（Studioの `item-icons`）を新しい形に合わせて描き直した。
 3. 両ゲームの `tests/e2e/prop-models.test.mjs`（`test:ci` に含む）で、本編の `PropRenderer` が輪郭線と模様つきで作ること、扉の開閉とたいまつの炎の部品が残ることを確認する。
-4. 本編へ移したあとは、比較ページの左右が同じ形になる。原本を直したら、`--preview-game` を付けずに書き出して左右の差を確かめ、よければ本編へ書き出す。
+4. 本編へ移したあとは、比較ページの左右が同じ形になる。原本を直したら、比較ページ（右が原本をそのまま読む）で左右の差を確かめ、よければ `--preview-game` で本編へ書き出す。
 
 ## 試作03で作り直したもの（第4～5章だけの設置物）
 
@@ -91,7 +90,7 @@ Studioのテスト（`tests/node/props-3d.test.mjs`）では、次を確認し�
 | 清めの香草 | 細い葉の株に、白い小花の房が3つ |
 | 祈り柱 | 石の台座と石柱、しめ縄と紙垂、頭に光る玉 |
 
-確認は第4～5章の開発サーバーの `/dqb3-tsugumono-ch4-5/prototypes/props-3d/` で行います。2026-11-03に第4～5章へ移植しました（`PROP_MODEL_VERSION` 3）。坑道灯と金床のアイコンも新しい形に合わせました。この時点で、古い作り方が残るのは魚のかげだけでした。
+確認は [第4～5章の比較ページ](../../compare/ch4-5/props-3d/) で行います。2026-11-03に第4～5章へ移植しました（`PROP_MODEL_VERSION` 3）。坑道灯と金床のアイコンも新しい形に合わせました。この時点で、古い作り方が残るのは魚のかげだけでした。
 
 ## 試作04で作り直したもの（魚のかげ）
 

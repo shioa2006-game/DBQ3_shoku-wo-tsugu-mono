@@ -57,7 +57,7 @@ try {
       await writeFile(game(`assets/humanoids/${name}.png`),bytes);
     }
   }
-  const reference=await readFile(game('assets/humanoids/village_girl_body_8dir.png'));
+  const reference=await readFile(here('../../references/humanoids/village_girl_body_8dir.png'));
   await writeFile(here('output/mina-code.svg'),svg);
   await writeFile(here('output/mina_code_body_8dir.src.png'),raw);
   await writeFile(here('output/mina_code_body_8dir.png'),normalized);
@@ -73,7 +73,7 @@ try {
   await writeFile(here('output/comparison.png'),await rasterize(board));
   await writeFile(here('output/manifest.json'),JSON.stringify({
     id:'mina',name:'ミナ',role:'農家の少女',version:5,status:'prototype',
-    source:'../character.mjs',reference:'dqb3-tsugumono-ch1-3/assets/humanoids/village_girl_body_8dir.png',
+    source:'../character.mjs',reference:'references/humanoids/village_girl_body_8dir.png',
     format:'game-humanoid-bust',cellSize:128,columns:4,rows:2,directions:DIRECTIONS,labels:LABELS,
     anchor:{centerU:.494,bottomFromTop:.945},normalization:report,
     output:'mina_code_body_8dir.png',runtime:'HumanoidRig with separate headSheetUrl/bodySheetUrl; limbs and equipment supplied by the game',
@@ -83,8 +83,6 @@ try {
     futureTarget:{npcId:'mina',sheet:'assets/humanoids/village_girl_body_8dir.png'},
   },null,2)+'\n');
   if(previewGame) {
-    await mkdir(game('prototypes/mina/'),{recursive:true});
-    await writeFile(game('prototypes/mina/rig-profile.mjs'),await readFile(here('rig-profile.mjs')));
     await writeFile(game('art_src/mina_code_body_8dir.src.png'),raw);
     await writeFile(game('assets/humanoids/mina_code_body_8dir.png'),normalized);
   }

@@ -23,7 +23,7 @@
 
 参照変更は `src/entities/player.js`・`villagers.js`・`monsters.js`。主人公は合成シート、住民6人は独立した頭・胴をHumanoidRigへ渡します。合成body画像を住民の頭・胴両方へ渡すと襟が重なるため、分離画像を必ずセットで使います。頭の高さ、肩、袖、頭胴の前後位置、胴のUV上端もStudioの設定を移植。ジンベエは頭側面色も白髪に合わせます。
 
-旧画像は専用比較ページの参照画像として保持。本編は `_code_` 画像を直接読むので、旧ファイルを上書きする必要はありません。本編がStudioフォルダやprototypesフォルダへ実行時依存することもありません。
+旧画像と3D比較のページは、2026-11-03にこのフォルダから外し、Studioの `references/`（旧画像）と `compare/ch1-3/`（比較ページ）へ移しました。本編は `_code_` 画像だけを読み、Studioフォルダへ実行時依存することもありません。
 
 ## ボス・動作
 
@@ -38,10 +38,10 @@
 
 1. 原本は隣の `Storybook_Character_Studio/prototypes/*-8dir/` で編集。
 2. Studioの対象 `export:* -- --preview-game` で正規化済み画像と原画を本リポジトリへ同期。このコマンドで更新される `_code_` 画像は、現在は本編も使用します。
-3. リグ設定を変えた場合はStudioの `rig-profile.mjs` を本編の `src/content/rig-profiles/<id>.mjs` にも同期。比較ページ側のコピーだけ更新して終わらないこと。Studioの `prototypes/shared/game-targets.mjs` に各キャラクターの書き出し先を書き、Studioのテスト（`tests/node/game-targets.test.mjs`）が本編の画像・原画・リグ設定との一致を確かめる。
+3. リグ設定を変えた場合はStudioの `rig-profile.mjs` を本編の `src/content/rig-profiles/<id>.mjs` にも同期。Studioの比較ページはStudioの `rig-profile.mjs` を直接読むので、比較ページで確かめたあと本編の写しの同期を忘れないこと。Studioの `prototypes/shared/game-targets.mjs` に各キャラクターの書き出し先を書き、Studioのテスト（`tests/node/game-targets.test.mjs`）が本編の画像・原画・リグ設定との一致を確かめる。
    `src/entities/rig.js` は第4～5章と同じ内容に保つ（2026-11-03に統一）。第4～5章の移植は [第4～5章の記録](../../dqb3-tsugumono-ch4-5/docs/CHARACTER_ART.md)。
 4. 層を個別に再正規化しない。頭・胴は制作時の合成シートと共通の基準点を使う。モンスターの飛行用余白も完成出力のまま移植。
-5. 本編の検証は `npm.cmd run test:ci` と `npm.cmd run test:e2e`。専用比較は従来の `tests/authoring/`。
+5. 本編の検証は `npm.cmd run test:ci` と `npm.cmd run test:e2e`。3D比較のブラウザーテストはStudioの `npm.cmd run test:compare`（`tests/compare/ch1-3/`）。
 
 `tests/e2e/character-art.test.mjs` は実際のPlayer/Villager/Monsterから全種を生成し、画像読込、分離層、調整値、8方向、歩行、剣・ハンマー、A/B切替、ボス倍率・色、触手を検査します。`texture-retry.test.mjs` は片方の層の読込失敗からの復旧を検査します。
 

@@ -5,7 +5,7 @@
   "version": 1,
   "status": "prototype",
   "source": "../character.mjs",
-  "reference": "dqb3-tsugumono-ch4-5/assets/humanoids/blacksmith_body_8dir.png",
+  "reference": "references/humanoids/blacksmith_body_8dir.png",
   "format": "game-humanoid-bust",
   "cellSize": 128,
   "columns": 4,

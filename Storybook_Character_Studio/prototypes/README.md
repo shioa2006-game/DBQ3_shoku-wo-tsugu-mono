@@ -23,9 +23,9 @@
 | 火山トカゲ（第4～5章） | [volcano-lizard-8dir](volcano-lizard-8dir/README.md) | [A](volcano-lizard-8dir/output/volcano_lizard_code_idle_a_8dir.png)・[B](volcano-lizard-8dir/output/volcano_lizard_code_idle_b_8dir.png) | 第4～5章 `assets/nonhumanoids/volcano_lizard_idle_{a,b}_8dir.png` |
 | 瘴泉竜グロム（第5章） | [grom-8dir](grom-8dir/README.md) | [頭](grom-8dir/output/grom_code_head_8dir.png)・[胴](grom-8dir/output/grom_code_body_8dir.png) | 第4～5章 `assets/dragons/grom_{head,body}_8dir.png` |
 
-12種とも本編へ移植済みです。本編は `_code_` 画像を直接読み、住民6人は頭・胴の分離画像、主人公を含む7人は `src/content/rig-profiles/` の設定を使用します。旧画像は専用比較ページ用として残しています。`shared/` は目・鼻・SVG部品・方向順の共通処理です。主人公の共用化では生成SVGが変更前と完全一致することを確認しています。
+12種とも本編へ移植済みです。本編は `_code_` 画像を直接読み、住民6人は頭・胴の分離画像、主人公を含む7人は `src/content/rig-profiles/` の設定を使用します。旧画像はゲームから外し、比較用としてStudioの `references/` に残しています。`shared/` は目・鼻・SVG部品・方向順の共通処理です。主人公の共用化では生成SVGが変更前と完全一致することを確認しています。
 
-ゲーム側の `prototypes/adventurer/` 、`prototypes/mina/`、`prototypes/pino/`、`prototypes/inaho/`、`prototypes/gonta/`、`prototypes/jinbei/`、`prototypes/watari/` は実際のリグとの比較用です。現在の開発サーバーでは [主人公](http://127.0.0.1:5175/builder_sprite_lab/prototypes/adventurer/)／[ミナ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/mina/)／[ピノ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/pino/)／[イナホ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/inaho/)／[ゴンタ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/gonta/)／[ジンベエ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/jinbei/)／[ワタリ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/watari/) から確認できます。
+Studioの `compare/ch1-3/` の各ページは実際のリグとの比較用です。Studioのサーバーで [主人公](../compare/ch1-3/adventurer/)／[ミナ](../compare/ch1-3/mina/)／[ピノ](../compare/ch1-3/pino/)／[イナホ](../compare/ch1-3/inaho/)／[ゴンタ](../compare/ch1-3/gonta/)／[ジンベエ](../compare/ch1-3/jinbei/)／[ワタリ](../compare/ch1-3/watari/) から確認できます。
 
 ## 移植後も揃えて更新するもの
 
@@ -47,15 +47,15 @@
 | どろたぼう | [dorotabo-8dir](dorotabo-8dir/README.md) | [A](dorotabo-8dir/output/dorotabo_code_idle_a_8dir.png)・[B](dorotabo-8dir/output/dorotabo_code_idle_b_8dir.png) | `assets/nonhumanoids/dorotabo_idle_a_8dir.png`・`dorotabo_idle_b_8dir.png` |
 | イカ | [squid-8dir](squid-8dir/README.md) | [A](squid-8dir/output/squid_code_idle_a_8dir.png)・[B](squid-8dir/output/squid_code_idle_b_8dir.png) | `assets/nonhumanoids/squid_idle_a_8dir.png`・`squid_idle_b_8dir.png` |
 
-[スライムの比較ページ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/slime/)で8方向・2ポーズを確認します。全身シート2枚とマニフェストの表示条件を揃えて移植します。元ゲームの「書喰いのスライム」も同じ画像を拡大・着色して使うため、本編の倍率・着色でボス表示も確認しました。
+[スライムの比較ページ](../compare/ch1-3/slime/)で8方向・2ポーズを確認します。全身シート2枚とマニフェストの表示条件を揃えて移植します。元ゲームの「書喰いのスライム」も同じ画像を拡大・着色して使うため、本編の倍率・着色でボス表示も確認しました。
 
-[おおこうもりの比較ページ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/night-bat/)で全8方向・羽ばたき2ポーズを確認できます。
+[おおこうもりの比較ページ](../compare/ch1-3/night-bat/)で全8方向・羽ばたき2ポーズを確認できます。
 
-[おおねずみの比較ページ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/field-rat/)で8方向・2ポーズと接地位置を確認できます。
+[おおねずみの比較ページ](../compare/ch1-3/field-rat/)で8方向・2ポーズと接地位置を確認できます。
 
-[どろたぼうの比較ページ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/dorotabo/)で8方向・泥が沈む2ポーズを確認できます。共用画像を使うボス「泥田の主」も本編の倍率・着色で確認しました。
+[どろたぼうの比較ページ](../compare/ch1-3/dorotabo/)で8方向・泥が沈む2ポーズを確認できます。共用画像を使うボス「泥田の主」も本編の倍率・着色で確認しました。
 
-[イカの比較ページ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/squid/)で腕の2ポーズと浮遊を確認できます。共用画像のクラーケンも本編の拡大・着色で表示を確認しました。
+[イカの比較ページ](../compare/ch1-3/squid/)で腕の2ポーズと浮遊を確認できます。共用画像のクラーケンも本編の拡大・着色で表示を確認しました。
 
 ## アイテムアイコン
 

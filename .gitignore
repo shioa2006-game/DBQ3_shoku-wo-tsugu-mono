@@ -25,8 +25,8 @@ Thumbs.db
 *.pfx
 *.bundle
 
-# Generated game comparison screenshots; retain HTML/JS/profiles and Studio art
-/dqb3-tsugumono-ch1-3/prototypes/**/*.png
+# Screenshots taken by the Studio comparison tests (npm.cmd run test:compare); retain the HTML/JS pages
+/Storybook_Character_Studio/compare/**/*.png
 /quality-audit-*/
 
 # Machine-local migration/backup files must stay outside version control

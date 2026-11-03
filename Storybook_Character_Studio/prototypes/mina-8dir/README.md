@@ -1,6 +1,6 @@
 # ミナの8方向コード生成・試作05
 
-第1～3章の農家の少女「ミナ」（NPC ID `mina`）を選び、`assets/humanoids/village_girl_body_8dir.png` を参考に制作しました。茶色のボブヘア、茶色の目、白い襟、深緑の服、金色のボタンとベルトが特徴です。
+第1～3章の農家の少女「ミナ」（NPC ID `mina`）を選び、`references/humanoids/village_girl_body_8dir.png` を参考に制作しました。茶色のボブヘア、茶色の目、白い襟、深緑の服、金色のボタンとベルトが特徴です。
 
 ## 原本と出力
 
@@ -26,21 +26,22 @@ node prototypes/mina-8dir/export.mjs
 node prototypes/mina-8dir/export.mjs --preview-game
 ```
 
-`--preview-game` は合成画像と頭・胴体レイヤーの原画を `art_src/`、正規化済みPNGを `assets/humanoids/`、配置設定を比較画面用の `prototypes/mina/rig-profile.mjs` に出力します。本編で使う `village_girl_body_8dir.png` とNPCの読込設定は変更しません。
+`--preview-game` は合成画像と頭・胴体レイヤーの原画を `art_src/`、正規化済みPNGを `assets/humanoids/` に出力します。本編で使う `village_girl_body_8dir.png` とNPCの読込設定は変更しません。
 
 ## 表示と確認
 
-ゲームの開発サーバーの `/builder_sprite_lab/prototypes/mina/` を開きます。主人公との切り替えリンクがあります。手足の色・寸法と照明を揃え、左側は元画像・従来の配置、右側はコード生成画像・調整済みの配置で比較します。
+Studioのサーバー（`start-studio.bat`）で [`compare/ch1-3/mina/`](../../compare/ch1-3/mina/) を開きます。主人公との切り替えリンクがあります。手足の色・寸法と照明を揃え、左側は元画像・従来の配置、右側はコード生成画像・調整済みの配置で比較します。
 
-ゲームのルートで実行:
+確認のコマンド:
 
 ```powershell
-$env:PROTOTYPE_URL='http://127.0.0.1:5175/builder_sprite_lab/prototypes/mina/'
-node tests/authoring/mina.test.mjs
+# Studioで実行（サーバーは自動で起動する）
+npm.cmd run test:compare -- mina
+# ゲームのルートで実行
 npm.cmd run test:ci
 ```
 
-8方向・待機・歩行・攻撃・道具・水中色、頭と胴のUV窓、正規化による画素欠落、390px幅での横溢れを確認します。配置の検査では動作の複数位相で袖上端と胴体の交差、胴の上下動への肩の追従、道具の手元への追従、頭と胴の前後関係も確認します。比較画面の `preview.png` と `rig-8dir.png` はゲーム側の `prototypes/mina/` に保存されます。
+8方向・待機・歩行・攻撃・道具・水中色、頭と胴のUV窓、正規化による画素欠落、390px幅での横溢れを確認します。配置の検査では動作の複数位相で袖上端と胴体の交差、胴の上下動への肩の追従、道具の手元への追従、頭と胴の前後関係も確認します。比較画面の `preview.png` と `rig-8dir.png` はゲーム側の Studioの `compare/ch1-3/mina/` に保存されます。
 
 ## 制作・移植の前提
 

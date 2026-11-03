@@ -3,7 +3,7 @@
 // 木・石・わらの面にはブロックの16px模様を、1マス=1枚の密度で貼る。
 //
 // このファイルは依存なし。THREE はゲームから渡す（Studioのテストでも同じ）。
-// 書き出し: Studio で `npm.cmd run export:props -- --preview-game`（確認ページと両ゲームの src/world/prop-models.js）。
+// 書き出し: Studio で `npm.cmd run export:props -- --preview-game`（両ゲームの src/world/prop-models.js）。比較ページはこの原本を直接読む。
 //
 // 約束（ゲームの PropRenderer が使うので守る）:
 // - 原点はマスの底面の中央。大きさは基本1マス（PROP_LIMITS の例外を除く）。

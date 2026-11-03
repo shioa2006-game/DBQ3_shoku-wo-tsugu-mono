@@ -59,6 +59,8 @@ export const CHARACTERS = Object.freeze([
 ]);
 
 export const gameUrl = (game, path) => new URL(`../../../${GAMES[game]}/${path}`, import.meta.url);
+// 作り直す前の画像（比較用）。ゲームからは外し、Studioの references/ に置く。
+export const referenceUrl = (path) => new URL(`../../references/${path}`, import.meta.url);
 
 // ゲームのリグ設定の写し。先頭のコメントだけを書き換え、値は Studio の rig-profile.mjs のまま。
 export function runtimeRigProfile(character, studioSource) {

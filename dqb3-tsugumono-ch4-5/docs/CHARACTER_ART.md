@@ -11,6 +11,7 @@
 | 2 | 新しい人型7人（ベルク・ロク・カヤ・ナギ・ヨモギ・スミ・テル） | 2026-11-03 完了（試作はf8d29a3、本編へ移植） |
 | 3 | 新しいモンスター3種（鬼火・火山トカゲ・鉄甲サソリ） | 2026-11-03 完了（本編へ移植） |
 | 4 | 竜グロムの頭と胴 | 2026-11-03 完了（本編へ移植） |
+| 5 | 以前の画像と3D比較のページをStudioへ移す（`references/`・`compare/`） | 2026-11-03 完了 |
 
 ## 段階0でそろえたもの
 
@@ -31,7 +32,7 @@
 - 2026-11-03の決定: ナギは巫女の少女として描き直す（元画像は水色の着物の少年風で、台詞「わたし」「ナギちゃん」と手足の色＝白い袖・赤い袴に合っていなかった）。スミ・テルはカヤの画像の共用をやめ、別々に描く。
 - Studioの `prototypes/<名前>-8dir/` に7人の原本がある。共通の描画の土台は `prototypes/shared/humanoid-kit.mjs`、書き出しは `prototypes/shared/humanoid-export.mjs`（`npm.cmd run export:<名前> -- --preview-game`）。
 - 画像は `assets/humanoids/<名前>_code_{head_layer,torso_layer,body}_8dir.png`、リグ設定は `src/content/rig-profiles/<名前>.mjs`。`src/entities/villagers.js` の7人は頭・胴の分離画像（`headSheet`・`torsoSheet`）とリグ設定（`rig`）を使う。
-- 3Dリグでの比較は開発サーバー、またはStudioのサーバー（`/games/ch4-5/`）で `prototypes/characters/?c=<名前>`（左が以前の画像、右がコード生成）。左右それぞれ専用のカメラで描くので、立ち位置による見え方の差は出ない。
+- 3Dリグでの比較はStudioのサーバーで `compare/ch4-5/characters/?c=<名前>`（左が以前の画像、右がコード生成）。左右それぞれ専用のカメラで描くので、立ち位置による見え方の差は出ない。
 - 移植では、カヤ・スミ・テルの手足の色（袖・頭と胴の裏の色）を新しい服に合わせた。ベルク・ロク・ナギ・ヨモギの色はそのまま。`character-art.test.mjs` が11人の画像・分離層・リグ設定・8方向・歩行・道具を確かめる。`texture-retry.test.mjs` は、ベルクの頭の画像の読み込み失敗からの復旧を確かめる。
 
 ## 段階3で作ったもの
@@ -40,7 +41,7 @@
 - 画像は `assets/nonhumanoids/<名前>_code_idle_{a,b}_8dir.png`。`src/entities/monsters.js` の鬼火・瘴気の鬼火・炉喰らいの大鬼火・鉄甲サソリ・火山トカゲがこれを使う（倍率・色替え・飛行の高さは以前のまま）。
 - ユーザー確認での主な決定: 鬼火は炎アイコンのように、丸い底から伸びる主炎と内側へ巻く左右の舌で描く。鉄甲サソリの斜め前は正面寄り、背面はAでもはさみを下げて見せる。火山トカゲの正面・背面は頭を体から出し、Bで頭が上下する。
 - `tests/e2e/character-art.test.mjs` が新しい3種と鬼火の色替え2種の画像・倍率・色・A/B切替・8方向を確かめる。
-- 比較は `prototypes/monsters/?c=<名前>`。本編と同じ倍率・色替え・飛行の高さで、左右それぞれ専用のカメラで描く。鬼火は「種類」で瘴気の鬼火・炉喰らいの大鬼火の色替えも見られる。
+- 比較はStudioの `compare/ch4-5/monsters/?c=<名前>`。本編と同じ倍率・色替え・飛行の高さで、左右それぞれ専用のカメラで描く。鬼火は「種類」で瘴気の鬼火・炉喰らいの大鬼火の色替えも見られる。
 
 ## 段階4で作ったもの
 
@@ -48,7 +49,7 @@
 - 画像は `assets/dragons/grom_code_{head,body}_8dir.png`。`src/entities/dragon-configs.js` の `GROM_CONFIG` がこれを使う。
 - ユーザー確認での主な決定: 頭は元画像の5方向の輪郭に合わせ、眉間から立つ中央の角と左右後ろの太い角の3本。黄土色の部分は下あごそのものとして塗り分け、口の線と牙は描かない。胴は向き・爪の向き・腕脚の付き方を元画像に合わせる。
 - 共通の竜のリグ（`src/entities/dragon.js`）も調整した: 尾は付け根を細く（半径0.225→先端0.11、×胴体の大きさ）、玉を17個にして隙間をなくした。翼の骨は前縁の手首の関節から付け根・前縁・後縁の3つの指先へ扇形に広げた。
-- 比較は `prototypes/dragon/`。本編と同じ `DragonRig` と `GROM_CONFIG`（3Dの首・翼・尾、浮遊、首のうねり）で、左右それぞれ専用のカメラで描く。
+- 比較はStudioの `compare/ch4-5/dragon/`。本編と同じ `DragonRig` と `GROM_CONFIG`（3Dの首・翼・尾、浮遊、首のうねり）で、左右それぞれ専用のカメラで描く。
 
 ## 今のキャラクターと予定
 
@@ -68,7 +69,7 @@
 | 火山トカゲ | nonhumanoids/volcano_lizard_code_idle_{a,b} | 段階3で移植済み |
 | 竜グロム | dragons/grom_code_head_8dir.png・grom_code_body_8dir.png ＋ 3Dの首・翼・尾（`dragon.js`） | 段階4で移植済み |
 
-`assets/` にあるピノ・イナホ・ジンベエ・スライム・おおねずみ・イカの以前の画像と、段階1・2で置き換えた以前の画像（adventurer_boy・village_girl・adult_male_villager・sailor・night_bat_idle・dorotabo_idle・blacksmith・miner・volcano_villager・shrine_keeper・herbalist）は、この編では使っていません（比較ページの左側だけが使う）。比較用に残すか消すかは、移植の最後に決めます。
+以前の画像（段階1～4で置き換えたものと、この編では使っていなかったピノ・イナホ・ジンベエ・スライム・おおねずみ・イカの画像、その原画）と3D比較のページは、2026-11-03にこのフォルダから外しました。旧画像はStudioの `references/`、比較ページは `compare/ch4-5/`（第1～3章のものは `compare/ch1-3/`）にあり、Studioのサーバーで開きます。この編のフォルダに比較用の画像やページは置きません。
 
 ## 確認
 

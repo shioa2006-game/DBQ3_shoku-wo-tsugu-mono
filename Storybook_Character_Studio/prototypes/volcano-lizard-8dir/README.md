@@ -1,6 +1,6 @@
 # 火山トカゲの8方向コード生成・試作01
 
-第4～5章の「火山トカゲ」（モンスターID `volcano_lizard` ほか）を、第4～5章の `assets/nonhumanoids/volcano_lizard_idle_{a,b}_8dir.png` を参照して制作しました。炭色の鱗に溶岩のひびの網目、背中へ反る尾、細い脚と長い指。Aは伏せ、Bは脚を伸ばして頭を上げる。
+第4～5章の「火山トカゲ」（モンスターID `volcano_lizard` ほか）を、第4～5章で使っていた `references/nonhumanoids/volcano_lizard_idle_{a,b}_8dir.png` を参照して制作しました。炭色の鱗に溶岩のひびの網目、背中へ反る尾、細い脚と長い指。Aは伏せ、Bは脚を伸ばして頭を上げる。
 
 全身をA・B 2枚の8方向シートに描き、本編の `MonsterSprite` が0.38秒ごとに切り替えます。人型の頭胴分離は使いません。5方向を描き、右側の3方向は反転します。共通の書き出しは `../shared/monster-export.mjs`、細長い体・脚・溶岩のひびの部品は `../shared/monster-kit.mjs` にあります。
 

@@ -1,9 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import * as THREE from '../../../dqb3-tsugumono-ch1-3/node_modules/three/build/three.module.js';
 import { createPropModels, PROP_MODEL_NAMES, PROP_REQUIREMENTS, PROP_LIMITS } from '../../prototypes/props-3d/models.mjs';
-import { generatedModule, PREVIEW_COPIES, GAME_COPIES } from '../../prototypes/props-3d/export.mjs';
+import { generatedModule, GAME_COPIES } from '../../prototypes/props-3d/export.mjs';
+import { GAMES } from '../../prototypes/shared/game-targets.mjs';
 
 const blockNames = async (folder) => {
   const source = await readFile(new URL(`../../../${folder}/src/world/blocks.js`, import.meta.url), 'utf8');
@@ -77,14 +78,16 @@ test('prop model names match the block ids of each game', async () => {
 
 const lf = (text) => text.replace(/\r\n/g, '\n');
 
-test('both comparison pages use the current Studio source and the same page code', async () => {
-  const expected = lf(await generatedModule());
-  for (const { folder, path } of PREVIEW_COPIES) {
-    const copy = await readFile(new URL(`../../../${folder}/${path}`, import.meta.url), 'utf8');
-    assert.equal(lf(copy), expected, `${folder}: run npm.cmd run export:props`);
+// 比較ページは compare/ に置き、原本の models.mjs を直接読む。ゲームのフォルダには比較用の写しを置かない。
+test('both comparison pages read the Studio source through one shared page script', async () => {
+  const script = await readFile(new URL('../../compare/shared/props-3d-preview.js', import.meta.url), 'utf8');
+  assert.ok(script.includes("from '../../prototypes/props-3d/models.mjs'"), 'the page reads models.mjs');
+  for (const [game, folder] of Object.entries(GAMES)) {
+    const html = await readFile(new URL(`../../compare/${game}/props-3d/index.html`, import.meta.url), 'utf8');
+    assert.match(html, new RegExp(`data-game="${game}"`));
+    assert.ok(html.includes('src="../../shared/props-3d-preview.js"'), `${game} uses the shared page script`);
+    await assert.rejects(access(new URL(`../../../${folder}/prototypes`, import.meta.url)), `${folder} keeps no comparison pages`);
   }
-  const page = (folder) => readFile(new URL(`../../../${folder}/prototypes/props-3d/preview.js`, import.meta.url), 'utf8');
-  assert.equal(lf(await page('dqb3-tsugumono-ch4-5')), lf(await page('dqb3-tsugumono-ch1-3')), 'preview.js is shared by both games');
 });
 
 // 本編の写しは、確認ページで形が決まってから --preview-game で更新する。

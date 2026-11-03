@@ -4,7 +4,7 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { DIRECTIONS, LABELS } from './sheet-format.mjs';
-import { CHARACTERS, gameUrl, runtimeRigProfile, writeToGames } from './game-targets.mjs';
+import { CHARACTERS, referenceUrl, runtimeRigProfile, writeToGames } from './game-targets.mjs';
 import { launchBrowser } from '../../../dqb3-tsugumono-ch4-5/tests/helpers.mjs';
 import { normalize } from '../../../dqb3-tsugumono-ch4-5/tools/normalize_sheet.mjs';
 
@@ -62,7 +62,7 @@ export async function exportHumanoid({ id, name, role, build, reference, summary
     await writeFile(here(`output/${id}-code.svg`), svg);
 
     // 比較画像: 元画像とコード生成を同じ2倍で上下に並べる。
-    const ref = await readFile(gameUrl('ch4-5', reference));
+    const ref = await readFile(referenceUrl(reference));
     const uri = bytes => `data:image/png;base64,${bytes.toString('base64')}`;
     const board = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="660" viewBox="0 0 1080 660">
       <rect width="1080" height="660" fill="#eee9df"/>
@@ -73,7 +73,7 @@ export async function exportHumanoid({ id, name, role, build, reference, summary
     await writeFile(here('output/comparison.png'), await rasterize(board));
     await writeFile(here('output/manifest.json'), JSON.stringify({
       id, name, role, version: 1, status: 'prototype',
-      source: '../character.mjs', reference: `dqb3-tsugumono-ch4-5/${reference}`,
+      source: '../character.mjs', reference: `references/${reference}`,
       format: 'game-humanoid-bust', cellSize: 128, columns: 4, rows: 2, directions: DIRECTIONS, labels: LABELS,
       anchor: { centerU: .494, bottomFromTop: .945 }, normalization: report,
       output: `${id}_code_body_8dir.png`, runtime: 'HumanoidRig with separate headSheetUrl/bodySheetUrl; limbs and equipment supplied by the game',

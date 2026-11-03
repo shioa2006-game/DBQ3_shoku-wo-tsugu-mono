@@ -1,6 +1,6 @@
 # 主人公の8方向コード生成・試作07
 
-第1～3章の主人公 `adventurer_boy_body_8dir.png` を参考に、青い帽子・真鍮のゴーグル・金髪・赤いスカーフ・青い上着をコードで制作した試作です。
+第1～3章の主人公の以前の画像 `references/humanoids/adventurer_boy_body_8dir.png` を参考に、青い帽子・真鍮のゴーグル・金髪・赤いスカーフ・青い上着をコードで制作した試作です。
 
 ## 原本と生成物
 
@@ -27,7 +27,6 @@ node prototypes/adventurer-8dir/export.mjs --preview-game
 dqb3-tsugumono-ch1-3/
   art_src/adventurer_code_body_8dir.src.png
   assets/humanoids/adventurer_code_body_8dir.png
-  prototypes/adventurer/rig-profile.mjs
 ```
 
 ## 描画仕様
@@ -42,19 +41,19 @@ dqb3-tsugumono-ch1-3/
 
 ## 3Dリグとの比較
 
-ゲーム側で `npm.cmd run dev` を起動し、表示されたベースURLの末尾に `prototypes/adventurer/` を付けて開きます。
+Studioのサーバー（`start-studio.bat`）で [`compare/ch1-3/adventurer/`](../../compare/ch1-3/adventurer/) を開きます。
 
-元画像と生成画像を同じ `HumanoidRig`・照明・寸法で表示し、8方向、待機・歩行・攻撃、木のハンマー・銅の剣、水中の色を切り替えられます。この画面はVite開発サーバー専用で、通常のゲームビルドには含まれません。
+元画像と生成画像を同じ `HumanoidRig`・照明・寸法で表示し、8方向、待機・歩行・攻撃、木のハンマー・銅の剣、水中の色を切り替えられます。この画面はStudioの比較用で、ゲームには含まれません。
 
 右側の生成画像には `rig-profile.mjs` の方向別頭高さを適用します。頭と胴の食い込みを減らし、合成シートに含まれるスカーフが分断しない範囲に抑えています。左側の元画像は従来の配置です。
 
 ```powershell
-# ゲームのルートで実行。URLは起動済みdev serverに合わせる。
-$env:PROTOTYPE_URL='http://127.0.0.1:5173/builder_sprite_lab/prototypes/adventurer/'
-node tests/authoring/adventurer.test.mjs
+# Studioで実行（サーバーは自動で起動する）
+npm.cmd run test:compare -- adventurer
+# ゲームのルートで実行
 npm.cmd run test:ci
 ```
 
-専用テストはセル数・透明余白・中心・頭胴のUV窓・正規化による欠落がないことを検査します。ブラウザーでは8方向、歩行と攻撃の代表姿勢、道具の取付、水中色、画面幅390pxでの横溢れ、読込エラーを確認し、ゲーム側 `prototypes/adventurer/` に `preview.png` と `rig-8dir.png` を保存します。
+専用テストはセル数・透明余白・中心・頭胴のUV窓・正規化による欠落がないことを検査します。ブラウザーでは8方向、歩行と攻撃の代表姿勢、道具の取付、水中色、画面幅390pxでの横溢れ、読込エラーを確認し、Studioの `compare/ch1-3/adventurer/` に `preview.png` と `rig-8dir.png` を保存します。
 
 本編の地形・水面・実戦での見え方、全アニメーション位相、左右非対称な装備、他のキャラクターへの汎用化はこの試作の検証範囲に含みません。

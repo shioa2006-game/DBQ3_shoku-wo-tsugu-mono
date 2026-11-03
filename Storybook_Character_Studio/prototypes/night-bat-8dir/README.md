@@ -1,6 +1,6 @@
 # おおこうもりの8方向コード生成・試作01
 
-CH1の `MONSTER_TYPES.bat`。元画像はゲームの `assets/nonhumanoids/night_bat_idle_a_8dir.png` と `night_bat_idle_b_8dir.png`。紺色の丸い体、長い耳、紫の翼膜と翼骨、黄色い目、小さな牙をコードで描きます。元画像の画素は比較用にだけ使用します。
+CH1の `MONSTER_TYPES.bat`。元画像は以前の `references/nonhumanoids/night_bat_idle_a_8dir.png` と `night_bat_idle_b_8dir.png`。紺色の丸い体、長い耳、紫の翼膜と翼骨、黄色い目、小さな牙をコードで描きます。元画像の画素は比較用にだけ使用します。
 
 [制作ガイド](../../docs/CHARACTER_AUTHORING.md)を参照。全身シート方式で、Aは翼を上げる、Bは翼を下げるポーズです。体と足は変形せず、翼の関節と膜を描き替えます。正面・斜め前は2眼、真横は1眼、斜め後ろ・背面は顔なし。左右反転で反対側を作ります。
 
@@ -27,16 +27,18 @@ npm.cmd test
 
 `--preview-game` は専用の `night_bat_code_idle_*` 画像だけをゲーム側へ書き出します。
 
-[おおこうもりの比較ページ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/night-bat/)で8方向・A/B固定・交互再生・水中色を確認できます。実際の `MonsterSprite` を本編と同じ倍率0.85、飛行用 `yOffset=0.4`、着色0xffffff、切り替え間隔0.38秒で使います。
+[おおこうもりの比較ページ](../../compare/ch1-3/night-bat/)で8方向・A/B固定・交互再生・水中色を確認できます。実際の `MonsterSprite` を本編と同じ倍率0.85、飛行用 `yOffset=0.4`、着色0xffffff、切り替え間隔0.38秒で使います。
 
-ゲームのルートで実行:
+確認のコマンド:
 
 ```powershell
-node tests/authoring/night-bat.test.mjs
+# Studioで実行（サーバーは自動で起動する）
+npm.cmd run test:compare -- night-bat
+# ゲームのルートで実行
 npm.cmd run test:ci
 ```
 
-テストは全16セルの正規化と配置、各方向の羽ばたき差分、クラスのUV・倍率・飛行高さ、同期再生、水中色、狭い画面を確認します。`prototypes/night-bat/preview.png` と `rig-8dir-a.png`・`rig-8dir-b.png` に比較結果を保存します。
+テストは全16セルの正規化と配置、各方向の羽ばたき差分、クラスのUV・倍率・飛行高さ、同期再生、水中色、狭い画面を確認します。Studioの `compare/ch1-3/night-bat/preview.png` と `rig-8dir-a.png`・`rig-8dir-b.png` に比較結果を保存します。
 
 初回試作です。元画像の細かな毛並みやポーズごとの傾きは簡略化しています。移動・追跡・攻撃AIは比較画面の対象外です。本編の画像とモンスター定義は、全キャラクター完成後の移植時に変更します。
 

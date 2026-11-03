@@ -3,7 +3,7 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { DIRECTIONS, LABELS } from './sheet-format.mjs';
-import { CHARACTERS, gameUrl, writeToGames } from './game-targets.mjs';
+import { CHARACTERS, referenceUrl, writeToGames } from './game-targets.mjs';
 import { normalizeCells } from './monster-export.mjs';
 import { launchBrowser } from '../../../dqb3-tsugumono-ch4-5/tests/helpers.mjs';
 
@@ -44,7 +44,7 @@ export async function exportDragon({ id, name, role, sheets, summary, runtime })
         await writeToGames(character, `assets/${character.dir}/${fileName}.png`, png);
         await writeToGames(character, `art_src/${fileName}.src.png`, raw);
       }
-      parts.push({ part, output: `${fileName}.png`, normalization: report, png, reference: await readFile(gameUrl('ch4-5', reference)) });
+      parts.push({ part, output: `${fileName}.png`, normalization: report, png, reference: await readFile(referenceUrl(reference)) });
     }
     const uri = bytes => `data:image/png;base64,${bytes.toString('base64')}`;
     const board = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1200" viewBox="0 0 1080 1200"><rect width="1080" height="1200" fill="#eee9df"/>
@@ -57,7 +57,7 @@ export async function exportDragon({ id, name, role, sheets, summary, runtime })
       id, name, role, version: 1, status: 'prototype', source: '../character.mjs', format: 'game-dragon-billboards',
       cellSize: 128, columns: 4, rows: 2, directions: DIRECTIONS, labels: LABELS, anchor: { centerU: .494, bottomFromTop: .945 },
       parts: parts.map(({ png, reference, ...p }) => p), runtime: { class: 'DragonRig (MonsterSprite head/body, 3D neck, wings and tail)', ...runtime },
-      references: Object.values(sheets).map(s => `dqb3-tsugumono-ch4-5/${s.reference}`), targets: character.targets,
+      references: Object.values(sheets).map(s => `references/${s.reference}`), targets: character.targets,
     }, null, 2) + '\n');
     console.log(`${name} exported to Studio${previewGame ? ` and ${character.targets.join(', ')}` : ''}.`);
   } finally { await browser.close(); }

@@ -12,7 +12,7 @@ Git管理は[親リポジトリ](../README.md)に統合しました。Studio単�
 
 `start-studio.bat` をダブルクリックするか、`npm.cmd start` を実行します。通常は http://127.0.0.1:8081/ で主人公・ミナ・ピノ・イナホ・ゴンタ・ジンベエ・ワタリ・スライム・おおこうもり・おおねずみ・どろたぼう・イカの最新画像・比較画像・ダウンロードを開けます。既存の同じフォルダのサーバーを再利用します。起動機能はNode.js 18以上で動き、インストールは不要です。
 
-3D比較（ゲーム側の `prototypes/` の比較ページ）も、このStudioのサーバーから開けます。サーバーは `/games/ch1-3/`・`/games/ch4-5/` でゲームのフォルダを読み取り専用で配り、比較ページは `three` をゲームの `node_modules` から読むので、ゲームの開発サーバーは不要です（各ゲームで `npm.cmd install` 済みであること）。例: 第4～5章の新しい人型 http://127.0.0.1:8081/games/ch4-5/prototypes/characters/ 、第1～3章のワタリ http://127.0.0.1:8081/games/ch1-3/prototypes/watari/ 。トップページの「3D比較を開く」から各ページへ移れます。起動ツールは、同じフォルダでも古いコードのまま動いているサーバーは再利用せず、次の空きポート（8082など）で新しく起動します。古いサーバーは止めないので、開いたURLは起動時の表示を見てください。ゲームのVite開発サーバー上でも同じページが動きます。
+3D比較のページは `compare/`（第1～3章は `compare/ch1-3/`、第4～5章は `compare/ch4-5/`）、作り直す前の画像は `references/` にあります。どちらもゲームのフォルダには置きません。比較ページは本編のリグ・設置物のコードと `three` を、このサーバーが `/games/ch1-3/`・`/games/ch4-5/` で読み取り専用で配るゲームのフォルダから読み、リグ設定は `prototypes/*-8dir/rig-profile.mjs` を直接読みます。ゲームの開発サーバーは不要です（各ゲームで `npm.cmd install` 済みであること）。例: 第4～5章の新しい人型 http://127.0.0.1:8081/compare/ch4-5/characters/ 、第1～3章のワタリ http://127.0.0.1:8081/compare/ch1-3/watari/ 。トップページの「3D比較を開く」から各ページへ移れます。起動ツールは、同じフォルダでも古いコードのまま動いているサーバーは再利用せず、次の空きポート（8082など）で新しく起動します。古いサーバーは止めないので、開いたURLは起動時の表示を見てください。
 
 ## 再生成する
 
@@ -91,18 +91,18 @@ npm.cmd run sync:games -- mina    # 指定したキャラクターだけ
 npm.cmd test
 ```
 
-PNGの再生成後は、ゲーム側の公式 `tests/authoring/adventurer.test.mjs`、`tests/authoring/mina.test.mjs`、`tests/authoring/pino.test.mjs`、`tests/authoring/inaho.test.mjs`、`tests/authoring/gonta.test.mjs`、`tests/authoring/jinbei.test.mjs`、`tests/authoring/watari.test.mjs` で実際のリグ表示を確認します。ゲームのコードを変更した場合はゲームの `AGENTS.md` に従ってビルド・回帰テストを実行してください。
+PNGの再生成後は、`npm.cmd run test:compare` で比較ページのブラウザーテスト（`tests/compare/ch1-3/`。人型7人・モンスター5種・頭の間隔・剣の向き）を実行し、実際のリグ表示を確認します。空いているポートでこのStudioのサーバーを起動し、終わったら止めます。`npm.cmd run test:compare -- mina slime` のように名前で絞れます。スクリーンショットは `compare/ch1-3/<名前>/` に保存され、Git管理しません。ゲームのコードを変更した場合はゲームの `AGENTS.md` に従ってビルド・回帰テストを実行してください。
 
 2026-11-02、CH1～CH3の人型7人・基本モンスター5種を本編へ移植しました。作画原本は引き続きここで管理します。移植先と確認項目は [制作一覧](prototypes/README.md) を参照してください。
 
 第4～5章のキャラクターも同じ方法で作り直します（[第4～5章の移植記録](../dqb3-tsugumono-ch4-5/docs/CHARACTER_ART.md)）。各キャラクターの書き出し先のゲームは `prototypes/shared/game-targets.mjs` に書き、`tests/node/game-targets.test.mjs` が、書き出し先のゲームの画像・原画・リグ設定がこのフォルダの出力と同じであること、両編の `rig.js` が同じであることを確かめます。
 
-スライムは `tests/authoring/slime.test.mjs` で8方向・2ポーズの境界と切り替え・水中色・狭い画面を確認します。詳しくは [スライムの制作手順](prototypes/slime-8dir/README.md) を参照してください。
+スライムは `npm.cmd run test:compare -- slime` で8方向・2ポーズの境界と切り替え・水中色・狭い画面を確認します。詳しくは [スライムの制作手順](prototypes/slime-8dir/README.md) を参照してください。
 
-おおこうもりは [制作手順](prototypes/night-bat-8dir/README.md) と [比較ページ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/night-bat/) を参照。ゲーム側の `tests/authoring/night-bat.test.mjs` で8方向と飛行用の配置、羽ばたきを確認します。今後はCH1～3の制作・調整を優先し、残りの対象は [制作一覧](prototypes/README.md) で管理します。
+おおこうもりは [制作手順](prototypes/night-bat-8dir/README.md) と [比較ページ](compare/ch1-3/night-bat/) を参照。`npm.cmd run test:compare -- night-bat` で8方向と飛行用の配置、羽ばたきを確認します。今後はCH1～3の制作・調整を優先し、残りの対象は [制作一覧](prototypes/README.md) で管理します。
 
-おおねずみは [制作手順](prototypes/field-rat-8dir/README.md) と [比較ページ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/field-rat/) を参照。ゲーム側の `tests/authoring/field-rat.test.mjs` で8方向・2ポーズ・部品接続・接地位置を確認します。
+おおねずみは [制作手順](prototypes/field-rat-8dir/README.md) と [比較ページ](compare/ch1-3/field-rat/) を参照。`npm.cmd run test:compare -- field-rat` で8方向・2ポーズ・部品接続・接地位置を確認します。
 
-どろたぼうは [制作手順](prototypes/dorotabo-8dir/README.md) と [比較ページ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/dorotabo/) を参照。ゲーム側の `tests/authoring/dorotabo.test.mjs` で8方向・2ポーズ・泥と草の接続・接地位置を確認します。
+どろたぼうは [制作手順](prototypes/dorotabo-8dir/README.md) と [比較ページ](compare/ch1-3/dorotabo/) を参照。`npm.cmd run test:compare -- dorotabo` で8方向・2ポーズ・泥と草の接続・接地位置を確認します。
 
-イカは [制作手順](prototypes/squid-8dir/README.md) と [比較ページ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/squid/) を参照。ゲーム側の `tests/authoring/squid.test.mjs` で触腕の接続・浮遊・8方向・2ポーズを確認します。CH1～3の人型7人と基本モンスター5種は本編へ移植済みです。ボス3体も共用画像を切り替えています。
+イカは [制作手順](prototypes/squid-8dir/README.md) と [比較ページ](compare/ch1-3/squid/) を参照。`npm.cmd run test:compare -- squid` で触腕の接続・浮遊・8方向・2ポーズを確認します。CH1～3の人型7人と基本モンスター5種は本編へ移植済みです。ボス3体も共用画像を切り替えています。

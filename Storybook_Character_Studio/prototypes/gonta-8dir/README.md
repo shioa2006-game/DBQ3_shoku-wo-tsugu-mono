@@ -1,6 +1,6 @@
 # ゴンタの8方向コード生成・試作01
 
-元ゲームの「ゴンタ」（NPC ID `gonta`、役割「村の若者」）を、`assets/humanoids/adult_male_villager_body_8dir.png` を参照して制作しました。短く流した茶髪、太い眉、少し広い顎、生成りの襟と緑の服、金具付きの革ベルトを個別に描いています。
+元ゲームの「ゴンタ」（NPC ID `gonta`、役割「村の若者」）を、`references/humanoids/adult_male_villager_body_8dir.png` を参照して制作しました。短く流した茶髪、太い眉、少し広い顎、生成りの襟と緑の服、金具付きの革ベルトを個別に描いています。
 
 [制作ガイド](../../docs/CHARACTER_AUTHORING.md)に沿って、顔・耳・髪は頭、首・襟・服は胴へ分離しています。既存の子どもの顔をそのまま流用せず、共通の目・鼻とSVG部品からゴンタの比率を設計しました。元画像の画素は比較画像だけに使います。
 
@@ -28,19 +28,20 @@ npm.cmd run export:gonta -- --preview-game
 npm.cmd test
 ```
 
-`--preview-game` はゲーム側の `art_src/gonta_code_*.src.png`、`assets/humanoids/gonta_code_*.png`、`prototypes/gonta/rig-profile.mjs` を更新します。本編用の元画像とNPC設定は置き換えません。
+`--preview-game` はゲーム側の `art_src/gonta_code_*.src.png`、`assets/humanoids/gonta_code_*.png` を更新します。本編用の元画像とNPC設定は置き換えません。
 
-[ゴンタの3D比較](http://127.0.0.1:5175/builder_sprite_lab/prototypes/gonta/)では、左に元画像・従来配置、右に生成画像・専用配置を表示します。ゲームの開発サーバーが必要です。本編で装備する石の剣も選択できます。ゲームのルートで実行:
+[ゴンタの3D比較](../../compare/ch1-3/gonta/)では、左に元画像・従来配置、右に生成画像・専用配置を表示します。Studioのサーバー（`start-studio.bat`）で開きます。本編で装備する石の剣も選択できます。
 
 ```powershell
-$env:PROTOTYPE_URL='http://127.0.0.1:5175/builder_sprite_lab/prototypes/gonta/'
-node tests/authoring/gonta.test.mjs
-node tests/authoring/head-spacing.test.mjs
-node tests/authoring/sword-edge.test.mjs
+# Studioで実行（サーバーは自動で起動する）
+npm.cmd run test:compare -- gonta
+npm.cmd run test:compare -- head-spacing
+npm.cmd run test:compare -- sword-edge
+# ゲームのルートで実行
 npm.cmd run test:ci
 ```
 
-頭・胴の画素欠落や襟の混入、8方向・待機／歩行／攻撃・水中色・狭い画面、袖と胴の接続、道具の手への追従を検査します。ゲームの `prototypes/gonta/` に全方向・真横・斜め前などの比較画像が保存されます。
+頭・胴の画素欠落や襟の混入、8方向・待機／歩行／攻撃・水中色・狭い画面、袖と胴の接続、道具の手への追従を検査します。Studioの `compare/ch1-3/gonta/` に全方向・真横・斜め前などの比較画像が保存されます。
 
 ## 初版の判断と残る差
 

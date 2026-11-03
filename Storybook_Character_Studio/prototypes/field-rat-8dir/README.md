@@ -1,6 +1,6 @@
 # おおねずみの8方向コード生成・試作01
 
-CH2の `MONSTER_TYPES.field_rat`。元ゲームの `assets/nonhumanoids/field_rat_idle_a_8dir.png` と `field_rat_idle_b_8dir.png` を参照し、丸い灰色の体、大きな前歯、黄色い目、ピンクの耳・鼻・手足、節のあるしっぽをコードで描きます。元画像の画素は比較用にだけ使用します。
+CH2の `MONSTER_TYPES.field_rat`。以前の画像 `references/nonhumanoids/field_rat_idle_a_8dir.png` と `field_rat_idle_b_8dir.png` を参照し、丸い灰色の体、大きな前歯、黄色い目、ピンクの耳・鼻・手足、節のあるしっぽをコードで描きます。元画像の画素は比較用にだけ使用します。
 
 [制作ガイド](../../docs/CHARACTER_AUTHORING.md)の全身シート方式です。正面・斜め前は2眼、真横は1眼、斜め後ろ・背面に顔や前歯は描きません。手前の耳は体の前、奥の耳は体の後ろに置き、しっぽも方向によって前後を切り替えます。同じしっぽを二重に描きません。
 
@@ -29,16 +29,18 @@ npm.cmd test
 
 `--preview-game` は専用の `field_rat_code_idle_*` 原画と画像だけをゲーム側に書き出します。本編の元画像とモンスター定義は変更しません。
 
-[おおねずみの比較ページ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/field-rat/)で8方向・A/B固定・自動再生・水中色を確認します。本編の `MonsterSprite` を倍率0.9、着色0xffffff、`yOffset=0`、切り替え間隔0.38秒で使用します。
+[おおねずみの比較ページ](../../compare/ch1-3/field-rat/)で8方向・A/B固定・自動再生・水中色を確認します。本編の `MonsterSprite` を倍率0.9、着色0xffffff、`yOffset=0`、切り替え間隔0.38秒で使用します。
 
 ゲーム側で実行:
 
 ```powershell
-node tests/authoring/field-rat.test.mjs
+# Studioで実行（サーバーは自動で起動する）
+npm.cmd run test:compare -- field-rat
+# ゲームのルートで実行
 npm.cmd run test:ci
 ```
 
-16セルの切れ・孤立した部品・正規化による画素欠落、接地位置、ポーズ差、クラスのUV・倍率・同期再生、水中色、狭い画面を検査します。ゲーム側の `prototypes/field-rat/preview.png`、`rig-8dir-a.png`・`rig-8dir-b.png` に比較結果を保存します。
+16セルの切れ・孤立した部品・正規化による画素欠落、接地位置、ポーズ差、クラスのUV・倍率・同期再生、水中色、狭い画面を検査します。ゲーム側の Studioの `compare/ch1-3/field-rat/preview.png`、`rig-8dir-a.png`・`rig-8dir-b.png` に比較結果を保存します。
 
 初回試作です。元画像の毛並み、左右で異なる細かな姿勢や表情には差が残ります。全キャラクターの制作・調整後に本編へ移植し、田んぼの防衛戦などで移動・攻撃時の見え方も確認します。
 

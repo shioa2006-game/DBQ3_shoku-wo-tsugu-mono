@@ -1,6 +1,6 @@
 # ピノの8方向コード生成・試作01
 
-第1章の大工見習い「ピノ」（NPC ID `pino`）を、`dqb3-tsugumono-ch1-3/assets/humanoids/village_apprentice_body_8dir.png` を参考に制作しました。紺の帽子、短い黒髪、濃い瞳、生成りの首布、赤茶色の上着と真鍮の留め具が特徴です。
+第1章の大工見習い「ピノ」（NPC ID `pino`）を、`references/humanoids/village_apprentice_body_8dir.png` を参考に制作しました。紺の帽子、短い黒髪、濃い瞳、生成りの首布、赤茶色の上着と真鍮の留め具が特徴です。
 
 [制作ガイド](../../docs/CHARACTER_AUTHORING.md)に沿って、顔・耳・髪・帽子は頭へ、首・首布・上着・ベルトは胴へ分離しました。左右対称の衣装なので5つの向きを描き、右側3方向を反転しています。元画像の画素は比較画像にだけ使用し、キャラクターの出力はすべてコードによるSVG作画です。
 
@@ -42,22 +42,21 @@ npm.cmd run export:pino
 npm.cmd run export:pino -- --preview-game
 ```
 
-`--preview-game` は `art_src/pino_code_*.src.png`、`assets/humanoids/pino_code_*.png`、`prototypes/pino/rig-profile.mjs` を更新します。本編用の `village_apprentice_body_8dir.png` とNPC読込設定は置き換えません。
+`--preview-game` は `art_src/pino_code_*.src.png`、`assets/humanoids/pino_code_*.png` を更新します。本編用の `village_apprentice_body_8dir.png` とNPC読込設定は置き換えません。
 
 ## 比較・検証
 
-[ピノの3D比較](http://127.0.0.1:5175/builder_sprite_lab/prototypes/pino/)で、左の元画像と右の生成画像を比べます。ゲーム側の開発サーバーが必要です。表示ポートが異なる場合はURLを読み替えてください。
+[ピノの3D比較](../../compare/ch1-3/pino/)で、左の元画像と右の生成画像を比べます。ゲーム側の開発サーバーが必要です。表示ポートが異なる場合はURLを読み替えてください。
 
 ```powershell
-# Studioルート
+# Studioルート（比較テストはサーバーを自動で起動する）
 npm.cmd test
+npm.cmd run test:compare -- pino
 # ゲームのルート
-$env:PROTOTYPE_URL='http://127.0.0.1:5175/builder_sprite_lab/prototypes/pino/'
-node tests/authoring/pino.test.mjs
 npm.cmd run test:ci
 ```
 
-8方向・待機／歩行／攻撃・道具・水中色・狭い画面を確認します。頭に首布が混入しないこと、共通の正規化量、袖と胴の交差、肩・道具の追従、胴の縮尺と裾の位置も検査します。ゲーム側の `prototypes/pino/preview.png` と `rig-8dir.png` に確認画像を保存します。
+8方向・待機／歩行／攻撃・道具・水中色・狭い画面を確認します。頭に首布が混入しないこと、共通の正規化量、袖と胴の交差、肩・道具の追従、胴の縮尺と裾の位置も検査します。ゲーム側の Studioの `compare/ch1-3/pino/preview.png` と `rig-8dir.png` に確認画像を保存します。
 
 ## 移植時と残る差
 

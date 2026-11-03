@@ -1,6 +1,6 @@
 # イカの8方向コード生成・試作01
 
-CH3の `MONSTER_TYPES.squid`。参照画像はゲームの `assets/nonhumanoids/squid_idle_a_8dir.png` と `squid_idle_b_8dir.png`。白い尖った胴体、青い陰影、ひれ、濃い目元、巻き上がる触腕と吸盤をコードで描きます。元画像の画素は比較用にだけ使用します。
+CH3の `MONSTER_TYPES.squid`。参照画像は以前の `references/nonhumanoids/squid_idle_a_8dir.png` と `squid_idle_b_8dir.png`。白い尖った胴体、青い陰影、ひれ、濃い目元、巻き上がる触腕と吸盤をコードで描きます。元画像の画素は比較用にだけ使用します。
 
 [制作ガイド](../../docs/CHARACTER_AUTHORING.md)の全身シート方式です。正面・斜め前は2眼、横は1眼、斜め後ろ・背面は顔なし。胴体とひれを保ちながら、見える6本の短い腕と左右の長い触腕を描き替えます。奥の腕は胴体の後ろ、横向きの手前の触腕は前に重ねます。
 
@@ -31,17 +31,19 @@ npm.cmd test
 
 `--preview-game` は専用の `squid_code_idle_*` 原画・画像だけをゲーム側へ書き出します。
 
-[イカの比較ページ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/squid/)で8方向・A/B固定・交互再生・水中色を確認できます。本編の `MonsterSprite` を倍率0.95、着色0xffffff、`yOffset=0.4`、切り替え間隔0.38秒で使います。
+[イカの比較ページ](../../compare/ch1-3/squid/)で8方向・A/B固定・交互再生・水中色を確認できます。本編の `MonsterSprite` を倍率0.95、着色0xffffff、`yOffset=0.4`、切り替え間隔0.38秒で使います。
 
 自動再生では0.76秒の周期、上下各0.045の滑らかな上下動を加え、腕を寄せるAで上がり、広げるBで沈みます。元画像にも同じ変位を加え、A/B固定時は基準高さで静止します。影は床に固定します。本編の `Monster.updateBat` は巡回・追跡時の高度を別に制御するので、移植時に上下動を二重加算しないよう統合します。
 
 ゲーム側で実行:
 
 ```powershell
-node tests/authoring/squid.test.mjs
+# Studioで実行（サーバーは自動で起動する）
+npm.cmd run test:compare -- squid
+# ゲームのルートで実行
 npm.cmd run test:ci
 ```
 
-全16セルの境界・部品接続・正規化後の画素保持、腕の変化、実際のUV・倍率・浮遊位置、同期再生、水中色、上下動の連続性、狭い画面を確認します。ゲーム側の `prototypes/squid/preview.png`、`rig-8dir-a.png`・`rig-8dir-b.png` に結果を保存します。
+全16セルの境界・部品接続・正規化後の画素保持、腕の変化、実際のUV・倍率・浮遊位置、同期再生、水中色、上下動の連続性、狭い画面を確認します。ゲーム側の Studioの `compare/ch1-3/squid/preview.png`、`rig-8dir-a.png`・`rig-8dir-b.png` に結果を保存します。
 
 初回試作です。元画像の柔らかい質感、方向やポーズによる細かな傾きには差が残ります。本編の画像とモンスター定義は未変更です。「クラーケン」も同じシートを倍率2.8・色0x6a4a7aで使うため、最終移植時にボスの拡大・着色・戦闘中の表示を確認します。`kraken_arm` の触手は別の3Dメッシュで、新しい8方向画像への置き換え対象ではありません。

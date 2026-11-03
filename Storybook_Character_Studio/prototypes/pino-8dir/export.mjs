@@ -57,7 +57,7 @@ try {
       await writeFile(game(`assets/humanoids/${name}.png`),bytes);
     }
   }
-  const reference=await readFile(game('assets/humanoids/village_apprentice_body_8dir.png'));
+  const reference=await readFile(here('../../references/humanoids/village_apprentice_body_8dir.png'));
   await writeFile(here('output/pino-code.svg'),svg);
   await writeFile(here('output/pino_code_body_8dir.src.png'),raw);
   await writeFile(here('output/pino_code_body_8dir.png'),normalized);
@@ -73,7 +73,7 @@ try {
   await writeFile(here('output/comparison.png'),await rasterize(board));
   await writeFile(here('output/manifest.json'),JSON.stringify({
     id:'pino',name:'ピノ',role:'大工見習い',version:1,status:'prototype',
-    source:'../character.mjs',reference:'dqb3-tsugumono-ch1-3/assets/humanoids/village_apprentice_body_8dir.png',
+    source:'../character.mjs',reference:'references/humanoids/village_apprentice_body_8dir.png',
     format:'game-humanoid-bust',cellSize:128,columns:4,rows:2,directions:DIRECTIONS,labels:LABELS,
     anchor:{centerU:.494,bottomFromTop:.945},normalization:report,
     output:'pino_code_body_8dir.png',runtime:'HumanoidRig with separate headSheetUrl/bodySheetUrl; limbs and equipment supplied by the game',
@@ -83,8 +83,6 @@ try {
     futureTarget:{npcId:'pino',sheet:'assets/humanoids/village_apprentice_body_8dir.png'},
   },null,2)+'\n');
   if(previewGame) {
-    await mkdir(game('prototypes/pino/'),{recursive:true});
-    await writeFile(game('prototypes/pino/rig-profile.mjs'),await readFile(here('rig-profile.mjs')));
     await writeFile(game('art_src/pino_code_body_8dir.src.png'),raw);
     await writeFile(game('assets/humanoids/pino_code_body_8dir.png'),normalized);
   }

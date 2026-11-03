@@ -199,8 +199,8 @@
     "config": "src/entities/dragon-configs.js GROM_CONFIG"
   },
   "references": [
-    "dqb3-tsugumono-ch4-5/assets/dragons/grom_head_8dir.png",
-    "dqb3-tsugumono-ch4-5/assets/dragons/grom_body_8dir.png"
+    "references/dragons/grom_head_8dir.png",
+    "references/dragons/grom_body_8dir.png"
   ],
   "targets": [
     "ch4-5"

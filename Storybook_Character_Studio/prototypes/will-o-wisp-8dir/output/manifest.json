@@ -209,8 +209,8 @@
     ]
   },
   "references": [
-    "dqb3-tsugumono-ch4-5/assets/nonhumanoids/will_o_wisp_idle_a_8dir.png",
-    "dqb3-tsugumono-ch4-5/assets/nonhumanoids/will_o_wisp_idle_b_8dir.png"
+    "references/nonhumanoids/will_o_wisp_idle_a_8dir.png",
+    "references/nonhumanoids/will_o_wisp_idle_b_8dir.png"
   ],
   "targets": [
     "ch4-5"

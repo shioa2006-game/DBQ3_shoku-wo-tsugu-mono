@@ -3,7 +3,7 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { DIRECTIONS, LABELS } from './sheet-format.mjs';
-import { CHARACTERS, gameUrl, writeToGames } from './game-targets.mjs';
+import { CHARACTERS, referenceUrl, writeToGames } from './game-targets.mjs';
 import { launchBrowser } from '../../../dqb3-tsugumono-ch4-5/tests/helpers.mjs';
 
 const require = createRequire(new URL('../../../dqb3-tsugumono-ch4-5/package.json', import.meta.url));
@@ -80,7 +80,7 @@ export async function exportMonster({ id, name, role, build, references, summary
         await writeToGames(character, `assets/${character.dir}/${fileName}.png`, png);
         await writeToGames(character, `art_src/${fileName}.src.png`, raw);
       }
-      frames.push({ frame, output: `${fileName}.png`, normalization: report, png, reference: await readFile(gameUrl('ch4-5', references[frame])) });
+      frames.push({ frame, output: `${fileName}.png`, normalization: report, png, reference: await readFile(referenceUrl(references[frame])) });
     }
     const uri = bytes => `data:image/png;base64,${bytes.toString('base64')}`;
     const board = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1200" viewBox="0 0 1080 1200"><rect width="1080" height="1200" fill="#eee9df"/>
@@ -93,7 +93,7 @@ export async function exportMonster({ id, name, role, build, references, summary
       id, name, role, version: 1, status: 'prototype', source: '../character.mjs', format: 'game-monster-billboard',
       cellSize: 128, columns: 4, rows: 2, directions: DIRECTIONS, labels: LABELS, anchor: { centerU: .494, bottomFromTop: .945 },
       frames: frames.map(({ png, reference, ...f }) => f), runtime: { class: 'MonsterSprite', interval: .38, uv: { uMin: .02, uMax: .98, vMin: .02, vMax: .98 }, ...runtime },
-      references: Object.values(references).map(p => `dqb3-tsugumono-ch4-5/${p}`), targets: character.targets,
+      references: Object.values(references).map(p => `references/${p}`), targets: character.targets,
     }, null, 2) + '\n');
     console.log(`${name} exported to Studio${previewGame ? ` and ${character.targets.join(', ')}` : ''}.`);
   } finally { await browser.close(); }

@@ -1,6 +1,6 @@
 # イナホの8方向コード生成・試作01
 
-元ゲームの料理見習い「イナホ」（NPC ID `inaho`、参照画像 `assets/humanoids/cook_body_8dir.png`）を制作しました。白いコック帽、黒いボブヘア、赤い首布、黄土色の服と生成りの前立てが特徴です。
+元ゲームの料理見習い「イナホ」（NPC ID `inaho`、参照画像 `references/humanoids/cook_body_8dir.png`）を制作しました。白いコック帽、黒いボブヘア、赤い首布、黄土色の服と生成りの前立てが特徴です。
 
 [制作ガイド](../../docs/CHARACTER_AUTHORING.md)を基に、顔・髪・帽子は頭へ、首・首布・服は胴へ分離しています。参照画像の画素は比較画像だけに使い、生成シートはSVGのパス・グラデーションから描きます。
 
@@ -28,19 +28,20 @@ npm.cmd run export:inaho -- --preview-game
 npm.cmd test
 ```
 
-`--preview-game` はゲームの `art_src/inaho_code_*.src.png`、`assets/humanoids/inaho_code_*.png`、`prototypes/inaho/rig-profile.mjs` を更新します。本編の `cook_body_8dir.png` とNPC設定は置き換えません。
+`--preview-game` はゲームの `art_src/inaho_code_*.src.png`、`assets/humanoids/inaho_code_*.png` を更新します。本編の `cook_body_8dir.png` とNPC設定は置き換えません。
 
-[イナホの3D比較](http://127.0.0.1:5175/builder_sprite_lab/prototypes/inaho/)を開きます。ゲームの開発サーバーが必要です。左は元画像・従来配置、右は生成画像・イナホ用配置です。ゲームのルートで実行:
+[イナホの3D比較](../../compare/ch1-3/inaho/)を開きます。Studioのサーバー（`start-studio.bat`）で開きます。左は元画像・従来配置、右は生成画像・イナホ用配置です。
 
 ```powershell
-$env:PROTOTYPE_URL='http://127.0.0.1:5175/builder_sprite_lab/prototypes/inaho/'
-node tests/authoring/inaho.test.mjs
-node tests/authoring/head-spacing.test.mjs
-node tests/authoring/sword-edge.test.mjs
+# Studioで実行（サーバーは自動で起動する）
+npm.cmd run test:compare -- inaho
+npm.cmd run test:compare -- head-spacing
+npm.cmd run test:compare -- sword-edge
+# ゲームのルートで実行
 npm.cmd run test:ci
 ```
 
-8方向・待機／歩行／攻撃・道具・水中色・狭い画面、袖と胴の交差、肩と道具の追従、頭に赤い首布が混入しないことを確認します。横の後ろ髪は首布の高さまで届くため、その帯が完全に透明であることは要求しません。比較画像はゲーム側の `prototypes/inaho/` へ保存します。
+8方向・待機／歩行／攻撃・道具・水中色・狭い画面、袖と胴の交差、肩と道具の追従、頭に赤い首布が混入しないことを確認します。横の後ろ髪は首布の高さまで届くため、その帯が完全に透明であることは要求しません。比較画像はゲーム側の Studioの `compare/ch1-3/inaho/` へ保存します。
 
 ## 今回の造形と残る差
 

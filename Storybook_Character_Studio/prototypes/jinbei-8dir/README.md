@@ -1,6 +1,6 @@
 # ジンベエの8方向コード生成・試作01
 
-元ゲームの村の長老「ジンベエ」（NPC ID `jinbei`）を、`assets/humanoids/middle_aged_male_villager_body_8dir.png` を参照して制作しました。額を出して後ろへ流した白髪、白い厚い眉と落ち着いた目元、四角めの顎、深緑の服と折り襟が特徴です。
+元ゲームの村の長老「ジンベエ」（NPC ID `jinbei`）を、`references/humanoids/middle_aged_male_villager_body_8dir.png` を参照して制作しました。額を出して後ろへ流した白髪、白い厚い眉と落ち着いた目元、四角めの顎、深緑の服と折り襟が特徴です。
 
 [制作ガイド](../../docs/CHARACTER_AUTHORING.md)に沿い、目・SVG部品・分離出力は既存の仕組みを再利用し、顔と髪は個別に作画しています。参照画像の画素は比較用にのみ使っています。
 
@@ -27,15 +27,16 @@ npm.cmd run export:jinbei -- --preview-game
 npm.cmd test
 ```
 
-`--preview-game` はゲーム側の `art_src/jinbei_code_*.src.png`、`assets/humanoids/jinbei_code_*.png`、`prototypes/jinbei/rig-profile.mjs` へ書き出します。本編のNPC設定と元画像は変更しません。
+`--preview-game` はゲーム側の `art_src/jinbei_code_*.src.png`、`assets/humanoids/jinbei_code_*.png` へ書き出します。本編のNPC設定と元画像は変更しません。
 
-[ジンベエの3D比較](http://127.0.0.1:5175/builder_sprite_lab/prototypes/jinbei/)は左が元画像・従来配置、右がコード生成・専用配置です。ゲーム側の開発サーバーを起動して使用します。ゲームのルートで検証:
+[ジンベエの3D比較](../../compare/ch1-3/jinbei/)は左が元画像・従来配置、右がコード生成・専用配置です。ゲーム側の開発サーバーを起動して使用します。ゲームのルートで検証:
 
 ```powershell
-$env:PROTOTYPE_URL='http://127.0.0.1:5175/builder_sprite_lab/prototypes/jinbei/'
-node tests/authoring/jinbei.test.mjs
-node tests/authoring/head-spacing.test.mjs
-node tests/authoring/sword-edge.test.mjs
+# Studioで実行（サーバーは自動で起動する）
+npm.cmd run test:compare -- jinbei
+npm.cmd run test:compare -- head-spacing
+npm.cmd run test:compare -- sword-edge
+# ゲームのルートで実行
 npm.cmd run test:ci
 ```
 

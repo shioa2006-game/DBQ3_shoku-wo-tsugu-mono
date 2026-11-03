@@ -34,7 +34,7 @@ npm.cmd --prefix dqb3-tsugumono-ch4-5 run dev
 npm.cmd --prefix Storybook_Character_Studio start
 ```
 
-Viteが表示するURLを開いてください。CH1～3のURLパスは `/builder_sprite_lab/`、CH4～5は `/dqb3-tsugumono-ch4-5/` です。3D比較にはCH1～3の開発サーバーを使用します。
+Viteが表示するURLを開いてください。CH1～3のURLパスは `/builder_sprite_lab/`、CH4～5は `/dqb3-tsugumono-ch4-5/` です。キャラクターと設置物の3D比較のページはStudioの `compare/` にあり、Studioのサーバー（`start-studio.bat`）で開きます。
 
 ## 確認
 

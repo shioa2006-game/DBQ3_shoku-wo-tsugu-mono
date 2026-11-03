@@ -75,14 +75,16 @@ async function filesIn(directory){
 test('retained modules and documentation have no missing local imports or links',async()=>{
   for(const file of await filesIn(root)){
     const ext=path.extname(file);
-    if(!['.mjs','.html','.md'].includes(ext))continue;
+    if(!['.mjs','.js','.html','.md'].includes(ext))continue;
     const text=await readFile(file,'utf8');
+    // compare/ のページは new URL('…', import.meta.url) で画像も読むので、その固定パスも確かめる。
     const pattern=ext==='.mjs'?/(?:from\s+|import\s*)['"]([^'"]+)['"]/g
+      :ext==='.js'?/(?:from\s+|import\s*|new URL\()['"]([^'"]+)['"]/g
       :ext==='.html'?/(?:href|src)="([^"]+)"/g:/\]\(([^)]+)\)/g;
     for(const match of text.matchAll(pattern)){
       const target=match[1];
       if(/^(?:[a-z]+:|#|\/)/i.test(target))continue;
-      if(ext==='.mjs'&&!target.startsWith('.'))continue;
+      if((ext==='.mjs'||ext==='.js')&&!target.startsWith('.'))continue;
       let destination=path.resolve(path.dirname(file),target.split(/[?#]/)[0]);
       // games/<key>/ is served from the sibling game folder by tools/serve.mjs.
       const game=path.relative(root,destination).split(path.sep);

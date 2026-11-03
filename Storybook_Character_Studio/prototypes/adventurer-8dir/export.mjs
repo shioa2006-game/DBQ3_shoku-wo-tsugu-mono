@@ -38,12 +38,11 @@ try {
   await writeFile(here('output/adventurer-code.svg'), svg);
   await writeFile(here('output/adventurer_code_body_8dir.src.png'), raw);
   if (previewGame) {
-    await writeFile(game('prototypes/adventurer/rig-profile.mjs'), await readFile(here('rig-profile.mjs')));
     await writeFile(game('art_src/adventurer_code_body_8dir.src.png'), raw);
     await writeFile(game('assets/humanoids/adventurer_code_body_8dir.png'), normalized);
   }
   await writeFile(here('output/adventurer_code_body_8dir.png'), normalized);
-  const original = await readFile(game('assets/adventurer_boy_body_8dir.png'));
+  const original = await readFile(here('../../references/humanoids/adventurer_boy_body_8dir.png'));
   const uri = b => `data:image/png;base64,${b.toString('base64')}`;
   const board = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="920" viewBox="0 0 1200 920">
     <rect width="1200" height="920" rx="24" fill="#eee9df"/>

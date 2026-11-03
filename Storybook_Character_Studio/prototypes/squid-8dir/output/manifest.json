@@ -196,8 +196,8 @@
     }
   },
   "references": [
-    "dqb3-tsugumono-ch1-3/assets/nonhumanoids/squid_idle_a_8dir.png",
-    "dqb3-tsugumono-ch1-3/assets/nonhumanoids/squid_idle_b_8dir.png"
+    "references/nonhumanoids/squid_idle_a_8dir.png",
+    "references/nonhumanoids/squid_idle_b_8dir.png"
   ],
   "futureTarget": {
     "monsterId": "squid",

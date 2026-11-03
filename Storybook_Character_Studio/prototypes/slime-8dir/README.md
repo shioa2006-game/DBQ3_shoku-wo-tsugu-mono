@@ -1,6 +1,6 @@
 # スライムの8方向コード生成・試作01
 
-元ゲームの `slime` を、`assets/nonhumanoids/slime_idle_a_8dir.png` と `slime_idle_b_8dir.png` を参照して制作しました。紫色のしずく形、つり気味の目、ピンクの頬、光沢をコードで描きます。元画像の画素は比較用だけに使用しています。
+元ゲームの `slime` を、`references/nonhumanoids/slime_idle_a_8dir.png` と `slime_idle_b_8dir.png` を参照して制作しました。紫色のしずく形、つり気味の目、ピンクの頬、光沢をコードで描きます。元画像の画素は比較用だけに使用しています。
 
 [制作ガイド](../../docs/CHARACTER_AUTHORING.md)のモンスター用手順に従い、人型の頭胴分離ではなく全身のA・Bシートを出力します。Aは通常、Bは接地基準から幅1.055・高さ0.9へ変形した姿です。
 
@@ -29,15 +29,17 @@ npm.cmd test
 
 ## 比較・検証
 
-[スライムの比較ページ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/slime/)で元画像／生成画像を並べ、A・B固定、自動切り替え、8方向、水中色を操作できます。ゲームの `MonsterSprite` を倍率0.9、着色0xffffff、切り替え間隔0.38秒で使っています。影はゲームと同じく別メッシュです。
+[スライムの比較ページ](../../compare/ch1-3/slime/)で元画像／生成画像を並べ、A・B固定、自動切り替え、8方向、水中色を操作できます。ゲームの `MonsterSprite` を倍率0.9、着色0xffffff、切り替え間隔0.38秒で使っています。影はゲームと同じく別メッシュです。
 
-ゲームのルートで実行:
+確認のコマンド:
 
 ```powershell
-node tests/authoring/slime.test.mjs
+# Studioで実行（サーバーは自動で起動する）
+npm.cmd run test:compare -- slime
+# ゲームのルートで実行
 npm.cmd run test:ci
 ```
 
-全16セルの正規化・UV窓内への収まり、A/Bの接地位置と形状差、実際のクラスによる方向・テクスチャ切り替え、同じ位相での比較、水中色、狭い画面を確認します。`prototypes/slime/preview.png` と `rig-8dir-a.png`・`rig-8dir-b.png` に比較結果を保存します。
+全16セルの正規化・UV窓内への収まり、A/Bの接地位置と形状差、実際のクラスによる方向・テクスチャ切り替え、同じ位相での比較、水中色、狭い画面を確認します。Studioの `compare/ch1-3/slime/preview.png` と `rig-8dir-a.png`・`rig-8dir-b.png` に比較結果を保存します。
 
 初版の試作です。元画像の柔らかな反射や表情には差が残ります。本編の移動・ジャンプ・攻撃AIはこの比較画面の検証対象に含めていません。最終移植には2枚とマニフェストの表示条件を揃え、同じシートを拡大・着色して使う「書喰いのスライム」も確認します。
