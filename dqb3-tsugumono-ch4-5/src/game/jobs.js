@@ -1,3 +1,4 @@
+import { JobBooks } from "../../../game-shared/job-books.mjs";
 import { SFX } from "./sfx.js";
 
 // 職業の書のデータ定義とマネージャ。
@@ -93,44 +94,9 @@ export const JOBS = {
   },
 };
 
-export class JobManager {
+export class JobManager extends JobBooks {
   constructor(game) {
-    this.game = game;
-    this.revived = new Set(Object.keys(JOBS).filter((id) => JOBS[id].startRevived));
-  }
-
-  isRevived(id) {
-    return this.revived.has(id);
-  }
-
-  // 書の復活演出を再生して復活状態にする。二重復活は演出を飛ばして完了扱い。
-  revive(id, onDone) {
-    if (this.revived.has(id)) {
-      if (onDone) onDone();
-      return;
-    }
-    this.revived.add(id);
-    SFX.book();
-    this.game.ui.showBookRevival(JOBS[id].name, () => {
-      if (onDone) onDone();
-    });
-  }
-
-  // 職業の書UI（showJobBook）用のデータ。JOBS の定義順に並ぶ。
-  bookData() {
-    return Object.entries(JOBS).map(([id, def]) => {
-      const revived = this.isRevived(id);
-      return {
-        name: def.name,
-        desc: revived ? def.revivedDesc : def.lockedDesc,
-        progress: revived ? 1 : def.progress(this.game),
-        revived,
-      };
-    });
-  }
-
-  serialize() {
-    return { revived: [...this.revived] };
+    super(game, JOBS, SFX);
   }
 
   // ロード: セーブの復活状態をそのまま使う。jobs キーの無い異常データは

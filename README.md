@@ -9,7 +9,7 @@
 | [dqb3-tsugumono-ch1-3](dqb3-tsugumono-ch1-3/README.md) | ジパング復興編。制作した人型7人・基本モンスター5種を本編へ移植済み |
 | [dqb3-tsugumono-ch4-5](dqb3-tsugumono-ch4-5/README.md) | 火山島編。第4～5章の独立ゲーム |
 | [dqb3-tsugumono-ch6-7](dqb3-tsugumono-ch6-7/README.md) | ダーマ再興編の予定地。ゲーム実装は未作成 |
-| [game-shared](game-shared/) | 両編で同じ操作仕様を保つゲーム用部品（設計図の照準判定） |
+| [game-shared](game-shared/) | 設計図、所持品・クラフト・収納、職業の書、防衛戦、セーブの共通実装 |
 | [Storybook_Character_Studio](Storybook_Character_Studio/README.md) | 8方向キャラクターの制作原本・生成画像・制作ガイド |
 | [docs/story](docs/story/README.md) | 実装基準のストーリー資料・第6～7章計画・不整合一覧 |
 | [docs](docs/GITHUB_WORKFLOW.md) | GitHub運用と統合記録 |
@@ -19,7 +19,7 @@
 
 各ゲームの起動・依存関係・セーブ領域は独立しています。フォルダ間の相対参照を保つため、現在の名前と配置で利用してください。
 
-両編で同じ修正を反映すべき処理は `game-shared/` を直接参照し、各ゲームのビルドに含めます。開発には親フォルダを使い、配布時は各編のビルド結果だけで動作します。設計図では「どのマスを狙うか」が共通で、材料の消費や完成後の章進行は各編が担当します。章固有の地形・セーブ互換と、他作品にも持ち出すStudioの制作・書き出し処理は各フォルダに置きます。
+各ゲームは `game-shared/` の実装に、自編の設計図・道具・職業・敵・セーブキーを渡します。共通コードは各編のビルドに含まれます。地形、勝利後の章進行、旧セーブの復元は各編が担当します。第6～7章で引き継ぐコードと差し替える設定は[制作フォルダのREADME](dqb3-tsugumono-ch6-7/README.md)を参照してください。
 
 ## 初回セットアップと起動
 
@@ -42,6 +42,7 @@ Viteが表示するURLを開いてください。CH1～3のURLパスは `/builde
 ## 確認
 
 ```powershell
+node --test game-shared/tests/*.test.mjs
 npm.cmd --prefix dqb3-tsugumono-ch1-3 run test:ci
 npm.cmd --prefix dqb3-tsugumono-ch4-5 run test:ci
 npm.cmd --prefix Storybook_Character_Studio test

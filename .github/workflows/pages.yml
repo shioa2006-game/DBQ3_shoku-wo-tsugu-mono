@@ -37,6 +37,8 @@ jobs:
         run: |
           npm --prefix dqb3-tsugumono-ch1-3 ci
           npm --prefix dqb3-tsugumono-ch4-5 ci
+      - name: 共通ゲーム部品の回帰テスト
+        run: node --test game-shared/tests/*.test.mjs
       - name: 共通トップと両ゲームをビルド
         id: build
         run: node tools/build-portal.mjs

@@ -35,7 +35,7 @@ npm run test:ci  # 高速サブセット（sheets + smoke + HUDハート + 水�
 npm run test:e2e # 全テスト（第4章の通し・ロード復元を含む）
 ```
 
-[親リポジトリ](../README.md)内の配置で開発してください。設計図の照準判定は [game-shared](../game-shared/) を参照し、ビルド時にこの編の `dist/` に含まれます。公開は[共通トップの手順](../portal/README.md)を参照してください。
+[親リポジトリ](../README.md)内の配置で開発してください。建築・所持品・職業の書・防衛・保存の共通処理は [game-shared](../game-shared/) を参照し、ビルド時にこの編の `dist/` に含まれます。公開は[共通トップの手順](../portal/README.md)を参照してください。
 
 テストは playwright-core + ヘッドレス Chromium を使う。ブラウザは
 `PW_CHROMIUM_PATH` で明示指定できる（`tests/helpers.mjs` 参照）。

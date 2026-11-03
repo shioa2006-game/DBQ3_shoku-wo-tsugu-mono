@@ -15,7 +15,7 @@ npm.cmd run dev
 ```
 
 表示されたローカルURL（通常 `http://localhost:5173/builder_sprite_lab/`）をブラウザで開いてください。
-Windows では `start-dev.bat` でも起動できます。[親リポジトリ](../README.md)内の配置で開発してください。設計図の照準判定は [game-shared](../game-shared/) を参照し、`npm run build` でこの編の `dist/` に含まれます。公開は[共通トップの手順](../portal/README.md)を参照してください。
+Windows では `start-dev.bat` でも起動できます。[親リポジトリ](../README.md)内の配置で開発してください。建築・所持品・職業の書・防衛・保存の共通処理は [game-shared](../game-shared/) を参照し、`npm run build` でこの編の `dist/` に含まれます。公開は[共通トップの手順](../portal/README.md)を参照してください。
 
 ## テスト
 
