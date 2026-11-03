@@ -63,39 +63,75 @@ try {
   expect(wander.water === 0, `徘徊先に水没マスを選ばない (300回中 water=${wander.water})`);
   expect(wander.land > 0, `陸側の徘徊先は選べる (land=${wander.land})`);
 
-  // --- 桟橋・船のデッキと陸をまたぐ移動（routeViaDock）------------------------------
+  // 途中目標を1回問い合わせるだけでは、境界を踏んだ次のフレームの引き返しは見えない。
+  // 実際の設計図と衝突判定で、乗船・下船・食事への切り替えを最後まで歩かせる。
   const dock = await page.evaluate(() => {
     const g = window.__game;
-    const v = g.spawnVillager("mina", 20, 40);
-    const out = {};
-    v.pos.set(39.5, 5.1, 54.5); // 桟橋の上
-    out.deckToLand = v.routeViaDock({ x: 32, z: 44 });
-    v.pos.set(33, 5, 50); // 陸（北の浜）
-    out.landToDeck = v.routeViaDock({ x: 39.5, z: 54.5 });
-    v.pos.set(39.2, 3.5, 56); // 桟橋の脇の水中（デッキ上とは扱わない）
-    out.waterToDeck = v.routeViaDock({ x: 39.5, z: 54.5 });
-    v.pos.set(40, 4.9, 49.2); // 付け根の近く
-    out.atBase = v.routeViaDock({ x: 39.5, z: 54.5 });
-    v.pos.set(40.5, 5.1, 60.5); // 桟橋の先端 → 船の甲板
-    out.pierToShip = v.routeViaDock({ x: 36.5, z: 63.5 });
-    v.pos.set(38.5, 5.1, 61.4); // 乗船口のそば → 甲板へ直進
-    out.hatchToShip = v.routeViaDock({ x: 36.5, z: 63.5 });
-    v.pos.set(36.5, 5.1, 63.5); // 船の甲板 → 陸: まず乗船口へ
-    out.shipToLand = v.routeViaDock({ x: 32, z: 44 });
-    // 発振の再発防止: 付け根からデッキへ歩き出した位置（軸線上・付け根から
-    // 1.6以上離れる）でも、付け根へ引き返さず目的地へ向かい続ける。
-    v.pos.set(40, 4.1, 50.5);
-    out.axisNoBounce = v.routeViaDock({ x: 39.5, z: 54.5 });
-    return out;
+    const completed = g.blueprints.completed;
+    const mina = g.spawnVillager("mina", 39.5, 51.1);
+    mina.pos.set(39.5, 5.1, 51.1);
+    const beach = { x: 37.5, z: 54.5 };
+    const beforePier = mina.routeViaDock(beach, completed) === beach;
+
+    function build(id, x, z) {
+      const bp = g.blueprints.activate(id, { x, z }, 4);
+      for (const c of bp.cells) g.world.set(c.x, c.y, c.z, c.block);
+    }
+    build("bridge", 30, 57);
+    build("pier", 39, 51);
+    const deck = { x: 37.5, z: 62.5 };
+    mina.pos.set(35, 5, 53); // 浜から未完成の船へ、架空の乗船口を経由しない
+    const beforeHull = mina.routeViaDock(deck, completed) === deck;
+    const pier = { x: 39.5, z: 54.5 };
+    mina.pos.set(39.2, 3.5, 56); // デッキの下からは陸側の付け根へ
+    const fromWater = mina.routeViaDock(pier, completed);
+    for (const id of ["ship_hull", "ship_mast", "ship_sail"]) build(id, 34, 59);
+
+    const ctx = { world: g.world, completedBlueprints: completed, cameraYaw: 0 };
+    function walk(v, context, reached, seconds) {
+      let wet = false;
+      let passedHatch = false;
+      for (let frame = 0; frame < seconds * 60; frame++) {
+        v.update(1 / 60, context);
+        wet ||= v.inWater;
+        passedHatch ||= Math.abs(v.pos.x - 39) < 0.1 && Math.abs(v.pos.z - 61.5) < 0.2;
+        if (reached(v.pos)) return { arrived: true, wet, passedHatch };
+      }
+      return { arrived: false, wet, passedHatch, x: v.pos.x, z: v.pos.z };
+    }
+    const closeTo = (x, z) => (p) => Math.hypot(p.x - x, p.z - z) <= 0.5;
+
+    const watari = g.spawnVillager("watari", 31, 75.5); // 南岸から橋・浜・桟橋を経由して乗船
+    watari.thinkTimer = 60; // 徘徊先の抽選だけを固定し、通常のAI・物理で乗船
+    watari.moveTarget = watari.pos.clone().set(35.5, 6, 60.5);
+    const board = walk(watari, ctx, closeTo(35.5, 60.5), 35);
+
+    mina.pos.set(deck.x, 5.01, deck.z);
+    mina.thinkTimer = 0;
+    const farm = { ...ctx, farmWork: true, pickFarmCell: () => ({ x: 37, y: 5, z: 45 }) };
+    const toFarm = walk(mina, farm, closeTo(37.5, 45.5), 20);
+
+    const gonta = g.villager("gonta");
+    gonta.pos.set(40, 5.01, 53);
+    gonta.thinkTimer = 60;
+    gonta.moveTarget = gonta.pos.clone().set(beach.x, 4, beach.z);
+    const toBeach = walk(gonta, ctx, closeTo(beach.x, beach.z), 12);
+
+    // 乗船へ歩き出した途中で食事が始まる。桟橋を降り、南の村へは橋を渡る。
+    gonta.pos.set(40, 5.01, 58);
+    gonta.moveTarget = gonta.pos.clone().set(deck.x, 5, deck.z);
+    gonta.update(1 / 60, ctx);
+    const meal = { ...ctx, mealPos: { x: 40.5, z: 82.5 } };
+    const toMeal = walk(gonta, meal, (p) => p.z > 72 && p.x >= 30 && p.x < 32, 24);
+    return { beforePier, beforeHull, fromWater, board, toFarm, toBeach, toMeal };
   });
-  expect(near(dock.deckToLand.x, 40) && dock.deckToLand.z < 51, `桟橋→陸はまず付け根へ (${JSON.stringify(dock.deckToLand)})`);
-  expect(near(dock.landToDeck.x, 40) && dock.landToDeck.z < 51, `陸→桟橋もまず付け根へ (${JSON.stringify(dock.landToDeck)})`);
-  expect(near(dock.waterToDeck.x, 40) && dock.waterToDeck.z < 51, `桟橋脇の水中からは付け根へ退避 (${JSON.stringify(dock.waterToDeck)})`);
-  expect(near(dock.atBase.x, 39.5) && near(dock.atBase.z, 54.5), `付け根まで来たら目的地へ (${JSON.stringify(dock.atBase)})`);
-  expect(near(dock.pierToShip.x, 38.5) && near(dock.pierToShip.z, 61.5), `桟橋→船は乗船口経由 (${JSON.stringify(dock.pierToShip)})`);
-  expect(near(dock.hatchToShip.x, 36.5) && near(dock.hatchToShip.z, 63.5), `乗船口のそばからは甲板へ直進 (${JSON.stringify(dock.hatchToShip)})`);
-  expect(near(dock.shipToLand.x, 38.5) && near(dock.shipToLand.z, 61.5), `船→陸はまず乗船口へ (${JSON.stringify(dock.shipToLand)})`);
-  expect(near(dock.axisNoBounce.x, 39.5) && near(dock.axisNoBounce.z, 54.5), `軸線上では付け根へ引き返さない (${JSON.stringify(dock.axisNoBounce)})`);
+  expect(dock.beforePier && dock.beforeHull, "建設前の浜・船の予定地では港の経路を使わない");
+  expect(near(dock.fromWater.x, 40) && dock.fromWater.z < 51, "桟橋の下からは浜側の付け根へ向かう");
+  for (const [trip, description] of [[dock.board, "ワタリが舵輪へ乗船"], [dock.toFarm, "ミナが船から畑へ戻る"]]) {
+    expect(trip.arrived && trip.passedHatch && !trip.wet, `${description}（乗船口を通り、水に落ちずに到着） ${JSON.stringify(trip)}`);
+  }
+  expect(dock.toBeach.arrived && !dock.toBeach.wet, `桟橋の付け根で引き返さず浜へ到着 ${JSON.stringify(dock.toBeach)}`);
+  expect(dock.toMeal.arrived && !dock.toMeal.wet, `食事へ切り替えて桟橋を降り、橋で南の村へ ${JSON.stringify(dock.toMeal)}`);
 
   // --- 水中で待機しない: 海峡に落ちた住民は平時、自力で上陸する ---------------------
   await page.evaluate(() => {

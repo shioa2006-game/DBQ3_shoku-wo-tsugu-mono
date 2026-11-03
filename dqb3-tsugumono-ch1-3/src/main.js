@@ -1144,6 +1144,7 @@ class Game {
       // Villagers.
       const vctx = {
         world: this.world,
+        completedBlueprints: this.blueprints.completed,
         cameraYaw: this.cameraYaw,
         raidActive: this.defense.active,
         monsters: this.monsters.monsters,

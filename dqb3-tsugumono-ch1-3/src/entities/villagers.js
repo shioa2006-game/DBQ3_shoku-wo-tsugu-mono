@@ -12,6 +12,25 @@ import { WATARI_RIG_PROFILE } from "../content/rig-profiles/watari.mjs";
 
 const HUMANOIDS = (file) => new URL(`../../assets/humanoids/${file}`, import.meta.url).href;
 
+// 浜から乗船する順。乗船口は幅1マスなので、両側で中央に揃えてから横断する。
+const dockLanding = { x: PLACES.pier.x + 1, z: PLACES.pier.z - 2.2 };
+const pierGate = { x: PLACES.pier.x + 1, z: PLACES.ship.z + 2.5 };
+const shipGate = { x: PLACES.ship.x + 3.5, z: pierGate.z };
+const dockRoutes = {
+  land: { pier: [dockLanding], ship: [dockLanding, pierGate, shipGate] },
+  pier: { land: [dockLanding], ship: [pierGate, shipGate] },
+  ship: { land: [shipGate, pierGate, dockLanding], pier: [shipGate, pierGate] },
+};
+const WAYPOINT_RADIUS = 0.15;
+
+function dockZone({ x, z }, completed) {
+  const p = PLACES.pier;
+  const s = PLACES.ship;
+  if (completed.has("pier") && x >= p.x && x < p.x + 2 && z >= p.z && z < p.z + 11) return "pier";
+  if (completed.has("ship_hull") && x >= s.x && x < s.x + 5 && z >= s.z && z < s.z + 9) return "ship";
+  return "land";
+}
+
 export const VILLAGER_DEFS = {
   pino: {
     name: "ピノ",
@@ -137,6 +156,7 @@ export class Villager extends Entity {
 
     this.mode = "wander"; // wander | work | fight | cheer | down
     this.moveTarget = null;
+    this.dockRoute = null;
     this.thinkTimer = 1;
     this.workTimer = 0;
     this.attackCd = 0;
@@ -188,6 +208,7 @@ export class Villager extends Entity {
           this.pos.set(spot.x, spot.y + 0.1, spot.z);
           this.vel.set(0, 0, 0);
           this.moveTarget = null;
+          this.dockRoute = null;
         }
       }
     } else {
@@ -298,12 +319,8 @@ export class Villager extends Entity {
       }
     }
 
-    // 桟橋・船のデッキと陸をまたぐ移動は付け根・乗船口を経由し（routeViaDock）、
-    // 北の島と南の村をまたぐ移動は海を泳がず必ず橋を経由する（routeViaBridge）。
-    // dock を先に解決するのは、デッキへ向かう実目標が「付け根（北の浜）」へ
-    // 差し替わってから、島またぎの橋ルーティングを判定するため。
-    desired = this.routeViaDock(desired);
-    desired = this.routeViaBridge(desired);
+    const destination = desired;
+    desired = this.routeViaDock(destination, ctx.completedBlueprints);
 
     // 住民は直線移動しかしないため、木の幹など飛び越えられない障害物に
     // 当たり続けたら、進行方向に対して横へ数ブロック外した一時目標で迂回する
@@ -316,11 +333,16 @@ export class Villager extends Entity {
       const dz = desired.z - this.pos.z;
       const len = Math.hypot(dx, dz) || 1;
       const sign = Math.random() < 0.5 ? 1 : -1;
-      this.detour = {
+      const candidate = {
         x: this.pos.x - (dz / len) * 2.5 * sign + (dx / len) * 1.5,
         z: this.pos.z + (dx / len) * 2.5 * sign + (dz / len) * 1.5,
       };
-      this.detourT = 1.4;
+      // 舷側や桟橋から海へ踏み出す迂回は避け、元の目標への段差ジャンプを続ける。
+      const zone = dockZone(this.pos, ctx.completedBlueprints);
+      if (zone === "land" || dockZone(candidate, ctx.completedBlueprints) === zone) {
+        this.detour = candidate;
+        this.detourT = 1.4;
+      }
     }
     if (this.detourT > 0 && desired) {
       this.detourT -= dt;
@@ -333,7 +355,8 @@ export class Villager extends Entity {
       const dx = desired.x - this.pos.x;
       const dz = desired.z - this.pos.z;
       const d = Math.hypot(dx, dz);
-      const arrive = ctx.raidActive && this.def.fighter ? 0.9 : 0.5;
+      const destinationRadius = ctx.raidActive && this.def.fighter ? 0.9 : 0.5;
+      const arrive = desired === destination ? destinationRadius : WAYPOINT_RADIUS;
       if (d > arrive) {
         const speed = 2.3 * sprint;
         this.vel.x = (dx / d) * speed;
@@ -343,7 +366,7 @@ export class Villager extends Entity {
       } else {
         this.vel.x = 0;
         this.vel.z = 0;
-        if (this.moveTarget && d <= arrive) {
+        if (this.moveTarget === desired) {
           this.moveTarget = null;
           if (ctx.farmWork && this.id === "mina") this.workTimer = 2.5;
         }
@@ -431,7 +454,7 @@ export class Villager extends Entity {
     // 海峡内（橋の上か水中）→ 行き先側のたもとへ。
     if (mySide === 0) return landing(destSide);
     // 反対側へ渡る: 橋の軸線に乗っていれば対岸のたもとへ、外れていればまず自分側のたもとへ。
-    return Math.abs(this.pos.x - bx) <= 1.2 ? landing(destSide) : landing(mySide);
+    return Math.abs(this.pos.x - bx) <= 1 - this.halfW ? landing(destSide) : landing(mySide);
   }
 
   // 水中救出の行き先: 自分のまわりを近い順に走査し、水没していない床
@@ -477,39 +500,28 @@ export class Villager extends Entity {
   // ワタリの食事往復や防衛戦の立ち位置移動で、デッキの脇から海峡へ泳ぎ出す
   // のを防ぐ。水中にいる間は「デッキ上」と扱わないので、海に落ちた住民も
   // 付け根の浜へ泳いで自力で上陸できる。
-  routeViaDock(dest) {
-    if (!dest) return dest;
-    const p = PLACES.pier;
-    const s = PLACES.ship;
-    const onPier = (x, z) => x >= p.x && x < p.x + 2 && z >= p.z && z < p.z + 11;
-    const onShip = (x, z) => x >= s.x && x < s.x + 5 && z >= s.z && z < s.z + 9;
-    // デッキ床（y5）に立っている時だけ「デッキ上」。水中（泳ぎ）は含めない。
-    const deckLevel = this.pos.y > WORLD.WATER_LEVEL + 1.35;
-    const myPier = deckLevel && onPier(this.pos.x, this.pos.z);
-    const myShip = deckLevel && onShip(this.pos.x, this.pos.z);
-    const destPier = onPier(dest.x, dest.z);
-    const destShip = onShip(dest.x, dest.z);
-    if (!myPier && !myShip && !destPier && !destShip) return dest;
-    const nearMe = (t, r) => Math.hypot(this.pos.x - t.x, this.pos.z - t.z) < r;
-    const landing = { x: p.x + 1, z: p.z - 2.2 }; // 付け根（北の浜）
-    const hatch = { x: s.x + 4.5, z: s.z + 2.5 }; // 乗船口（桟橋に接する舷側の開口）
-    // 「付け根に到達済みか」は付け根への距離でなく、桟橋の軸線（x）に乗って
-    // 付け根より北にいるかで判定する。距離トグルだと、付け根→デッキへ歩き出した
-    // 途端に距離が開いて付け根へ引き返す発振（ふもとで小刻みに往復）が起きる。
-    const onAxis = Math.abs(this.pos.x - (p.x + 1)) <= 1.2 && this.pos.z < p.z + 0.6;
-    if (destShip) {
-      if (myShip) return dest;
-      if (myPier) return nearMe(hatch, 1.2) ? dest : hatch;
-      // 陸・水中から: まず付け根へ。軸線に乗ったらデッキ北端から桟橋に上がる。
-      return onAxis ? { x: p.x + 1, z: p.z + 0.5 } : landing;
+  routeViaDock(dest, completed) {
+    if (!dest || !completed.has("pier")) {
+      this.dockRoute = null;
+      return this.routeViaBridge(dest);
     }
-    if (destPier) {
-      if (myPier) return dest;
-      if (myShip) return nearMe(hatch, 1.2) ? dest : hatch;
-      return onAxis ? dest : landing;
+    const to = dockZone(dest, completed);
+    // 通過中は境界を踏むたびに経路を作り直さない。食事・戦闘などで行き先の
+    // 区域が変わった時は、その時点の立ち位置から乗り降りを組み直す。
+    if (this.dockRoute?.to !== to || this.inWater) {
+      const from = this.pos.y > WORLD.WATER_LEVEL + 1.35 ? dockZone(this.pos, completed) : "land";
+      const steps = dockRoutes[from][to];
+      this.dockRoute = steps ? { to, steps, index: 0 } : null;
     }
-    // dest は陸: デッキから降りるときも付け根を経由する。
-    if (myShip) return nearMe(hatch, 1.2) ? { x: p.x + 0.5, z: hatch.z } : hatch;
-    return landing; // myPier
+    const route = this.dockRoute;
+    if (route) {
+      const step = route.steps[route.index];
+      if (step && Math.hypot(this.pos.x - step.x, this.pos.z - step.z) <= WAYPOINT_RADIUS) route.index++;
+      const next = route.steps[route.index];
+      // 対岸から港へ来るときは、まず島を結ぶ橋を渡ってから浜へ。
+      if (next) return next === dockLanding && to !== "land" ? this.routeViaBridge(next) : next;
+    }
+    // 下船後は浜の目的地への直線が桟橋の付け根をかすめても、下船をやり直さない。
+    return to === "land" ? this.routeViaBridge(dest) : dest;
   }
 }
