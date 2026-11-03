@@ -106,7 +106,9 @@ export class ChunkRenderer {
             for (let f = 0; f < FACES.length; f += 1) {
               const face = FACES[f];
               const nb = world.get(x + face.n[0], y + face.n[1], z + face.n[2]);
-              if (nb !== B.AIR) continue;
+              // 魚のかげは水面のすぐ上のマスに置くプロップなので、その下にも水面を描く
+              // （描かないと水面に穴があき、砂の底が見えてしまう）。
+              if (nb !== B.AIR && nb !== B.FISH_SPOT) continue;
               // Sink the surface (top face, and the top edge of the surface cell's
               // side walls) so it sits just below the block top, matching before.
               const sink = f === 0 || dTop === 1 ? -0.12 : 0;

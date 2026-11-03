@@ -10,7 +10,7 @@ const LABELS = {
   SCARECROW: 'かかし', TORCH: 'たいまつ', BED: 'わらのベッド', TORII: '鳥居', DOOR: '木の扉', WORKBENCH: '作業台', ALTAR: '職業の祭壇', SPIKES: 'とげ罠',
   FENCE: '柵（3つ並べる）', CHEST: '収納箱', KAMADO: 'かまど', TABLE: 'ちゃぶ台', HELM: '舵輪', BANNER: '職業の旗',
   CROP1: '稲のなえ', CROP2: '育つ稲', CROP3: '実った稲', BUSH: 'わら草', MUSHROOM: 'きのこ',
-  MINE_LAMP: '坑道灯', KILN: '炭焼き窯', FORGE: '炉', ANVIL: '金床', TROUGH: '水桶', IRON_POT: '鉄鍋',
+  FISH_SPOT: '魚のかげ', MINE_LAMP: '坑道灯', KILN: '炭焼き窯', FORGE: '炉', ANVIL: '金床', TROUGH: '水桶', IRON_POT: '鉄鍋',
   TAINT_STONE: '穢れ石', INCENSE_PLANT: '清めの香草', PRAYER_PILLAR: '祈り柱',
 };
 const GAME = { spikes: document.body.dataset.spikes ?? 'stone', grain: document.body.dataset.grain ?? 'rice' };
@@ -54,6 +54,26 @@ function ground() {
   return g;
 }
 
+// 魚のかげ用の足もと: 砂の底と、ゲームと同じ高さ（0.12 下げた）の半透明の水面。
+function seabed() {
+  const g = new THREE.Group();
+  const sandTex = tile('sand').clone();
+  sandTex.repeat.set(3, 3);
+  sandTex.needsUpdate = true;
+  const sand = new THREE.Mesh(new THREE.BoxGeometry(3, 1, 3), new THREE.MeshLambertMaterial({ map: sandTex }));
+  sand.position.y = -1.5;
+  const waterTex = tile('water').clone();
+  waterTex.repeat.set(3, 3);
+  waterTex.needsUpdate = true;
+  const water = new THREE.Mesh(new THREE.PlaneGeometry(3, 3), new THREE.MeshLambertMaterial({ map: waterTex, transparent: true, opacity: 0.66, depthWrite: false, side: THREE.DoubleSide }));
+  water.rotation.x = -Math.PI / 2;
+  water.position.y = -0.12;
+  water.renderOrder = 2;
+  g.add(sand, water);
+  g.visible = false;
+  return g;
+}
+
 function makeScene() {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x8fb5c9);
@@ -62,8 +82,9 @@ function makeScene() {
   sun.position.set(20, 30, 14);
   const torchLight = new THREE.PointLight(0xffa54f, 0, 7, 1.6);
   torchLight.position.set(0, 0.8, 0);
-  scene.add(hemi, sun, torchLight, ground());
-  return { scene, hemi, sun, torchLight, holder: new THREE.Group() };
+  const land = ground(), sea = seabed();
+  scene.add(hemi, sun, torchLight, land, sea);
+  return { scene, hemi, sun, torchLight, land, sea, holder: new THREE.Group() };
 }
 const views = [makeScene(), makeScene()];
 for (const v of views) v.scene.add(v.holder);
@@ -113,7 +134,12 @@ function setState(next) {
   if (!NAMES.includes(state.prop) || !(state.direction >= 0 && state.direction < 8)) throw Error('Invalid preview state');
   if (!props[0] || prevProp !== state.prop) {
     props = [currentProp(state.prop), newProp(state.prop)];
-    views.forEach((v, i) => { v.holder.clear(); v.holder.add(props[i]); });
+    views.forEach((v, i) => {
+      v.holder.clear();
+      v.holder.add(props[i]);
+      v.land.visible = state.prop !== 'FISH_SPOT';
+      v.sea.visible = state.prop === 'FISH_SPOT';
+    });
   }
   for (const v of views) {
     v.hemi.intensity = state.night ? 0.55 : 2.4;

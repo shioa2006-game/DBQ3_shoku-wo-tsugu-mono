@@ -11,6 +11,7 @@ const RENEWED = [
   "SCARECROW", "TORCH", "BED", "TORII", "DOOR", "WORKBENCH", "ALTAR", "SPIKES",
   "FENCE", "CHEST", "KAMADO", "TABLE", "HELM", "BANNER", "CROP1", "CROP2", "CROP3", "BUSH", "MUSHROOM",
   "MINE_LAMP", "KILN", "FORGE", "ANVIL", "TROUGH", "IRON_POT", "TAINT_STONE", "INCENSE_PLANT", "PRAYER_PILLAR",
+  "FISH_SPOT",
 ].filter((n) => B[n] !== undefined);
 const REQUIRED = {
   TORCH: { name: "flame", flag: "torch" }, DOOR: { name: "hinge", flag: "door" }, ALTAR: { name: "orb" },
@@ -18,12 +19,12 @@ const REQUIRED = {
   CROP1: { flag: "sway" }, CROP2: { flag: "sway" }, CROP3: { flag: "sway" },
   MINE_LAMP: { name: "flame", flag: "torch" }, KILN: { name: "flame", flag: "torch" }, FORGE: { name: "flame", flag: "torch" },
   IRON_POT: { name: "flame", flag: "torch" }, TAINT_STONE: { name: "flame", flag: "torch" },
-  INCENSE_PLANT: { flag: "sway" }, PRAYER_PILLAR: { name: "orb" },
+  INCENSE_PLANT: { flag: "sway" }, PRAYER_PILLAR: { name: "orb" }, FISH_SPOT: { flag: "sway" },
 };
 // Thin plants are drawn without outlines on purpose.
-const NO_OUTLINE = new Set(["CROP1", "CROP2", "CROP3", "BUSH"]);
+const NO_OUTLINE = new Set(["CROP1", "CROP2", "CROP3", "BUSH", "FISH_SPOT"]);
 // CH4-5 has every renewed prop except the scarecrow; nothing should fall back to legacy code.
-const EXPECTED = B.SCARECROW !== undefined ? 19 : 27;
+const EXPECTED = B.SCARECROW !== undefined ? 20 : 28;
 
 const errors = [];
 const browser = await launchBrowser();
@@ -65,6 +66,25 @@ try {
     out.fenceRails = meshCount(g.props.props.get(`4,${y},10`)) - alone;
     g.world.set(4, y, 10, 0);
     g.world.set(5, y, 10, 0);
+    // The water surface continues under a fish spot (no hole showing the sand bed).
+    let fish = null;
+    for (let fy = 0; fy < 32 && !fish; fy += 1) for (let fz = 0; fz < 112 && !fish; fz += 1) for (let fx = 0; fx < 64 && !fish; fx += 1) {
+      if (g.world.get(fx, fy, fz) === ids.FISH_SPOT) fish = [fx, fy, fz];
+    }
+    out.fishSpot = fish;
+    if (fish) {
+      const [fx, fy, fz] = fish;
+      let under = 0;
+      for (const entry of g.chunks.meshes.values()) {
+        const pos = entry.water?.geometry.attributes.position;
+        if (!pos) continue;
+        for (let i = 0; i < pos.count; i += 1) {
+          const vx = pos.getX(i), vy = pos.getY(i), vz = pos.getZ(i);
+          if (vx >= fx && vx <= fx + 1 && vz >= fz && vz <= fz + 1 && Math.abs(vy - (fy - 0.12)) < 0.01) under += 1;
+        }
+      }
+      out.waterUnderFish = under;
+    }
     // The door opens toward a nearby player through the hinge, as before.
     const px = g.player.pos.x, pz = g.player.pos.z;
     const dx = Math.floor(px) + 1, dz = Math.floor(pz), dy = 20;
@@ -87,6 +107,7 @@ try {
     if (need?.flag) expect(r.flags.includes(need.flag), `${name} keeps userData.${need.flag}`);
   }
   expect(RENEWED.some((n) => report[n].textured > 0), "renewed props use block-pattern textures");
+  expect(report.fishSpot && report.waterUnderFish >= 4, `water surface is drawn under a fish spot (${report.fishSpot}: ${report.waterUnderFish} vertices)`);
   expect(report.fenceRails === 2, `a fence adds two rails toward a new neighbour (${report.fenceRails})`);
   expect(report.doorOpened, "door hinge opens near the player");
   expect(errors.length === 0, `no console errors (${JSON.stringify(errors)})`);

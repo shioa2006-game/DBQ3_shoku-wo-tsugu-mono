@@ -44,8 +44,9 @@ test('prop models stay inside their cell (outline included)', () => {
     const box = new THREE.Box3().setFromObject(prop);
     const limit = PROP_LIMITS[name] ?? PROP_LIMITS.default;
     const eps = 1e-6;
-    // 地面の下へは輪郭線の太さ（0.018）までしか出さない。
-    assert.ok(box.min.y >= -0.02, `${name} does not sink below the floor (${box.min.y.toFixed(3)})`);
+    // 地面の下へは輪郭線の太さ（0.018）までしか出さない（魚のかげは水の中まで）。
+    const minY = (limit.minY ?? 0) - 0.02;
+    assert.ok(box.min.y >= minY, `${name} does not sink below ${minY} (${box.min.y.toFixed(3)})`);
     assert.ok(box.max.y <= limit.y + eps, `${name} height ${box.max.y.toFixed(3)} <= ${limit.y}`);
     for (const k of ['x', 'z']) {
       assert.ok(Math.max(-box.min[k], box.max[k]) <= limit.xz + eps, `${name} ${k} half-width ${Math.max(-box.min[k], box.max[k]).toFixed(3)} <= ${limit.xz}`);

@@ -13,13 +13,14 @@
 // - 作る関数は ctx を受け取る。ctx.connects(dx, dz) は、隣のマスが柵か扉なら true
 //   （柵の横木をつなぐのに使う）。ゲームの PropRenderer は隣が変わると作り直す。
 
-export const PROP_MODEL_VERSION = 3;
+export const PROP_MODEL_VERSION = 4;
 
 // 作り直した設置物。ブロック名（ゲームの B のキー）で引く。
 export const PROP_MODEL_NAMES = Object.freeze([
   'SCARECROW', 'TORCH', 'BED', 'TORII', 'DOOR', 'WORKBENCH', 'ALTAR', 'SPIKES', // 試作01
   'FENCE', 'CHEST', 'KAMADO', 'TABLE', 'HELM', 'BANNER', 'CROP1', 'CROP2', 'CROP3', 'BUSH', 'MUSHROOM', // 試作02
   'MINE_LAMP', 'KILN', 'FORGE', 'ANVIL', 'TROUGH', 'IRON_POT', 'TAINT_STONE', 'INCENSE_PLANT', 'PRAYER_PILLAR', // 試作03（第4～5章だけ）
+  'FISH_SPOT', // 試作04
 ]);
 
 // ゲームの PropRenderer.update が使う部品と目印。
@@ -39,6 +40,7 @@ export const PROP_REQUIREMENTS = Object.freeze({
   TAINT_STONE: { names: ['flame'], userData: ['torch'] },
   INCENSE_PLANT: { names: [], userData: ['sway'] },
   PRAYER_PILLAR: { names: ['orb'], userData: [] },
+  FISH_SPOT: { names: [], userData: ['sway'] },
 });
 
 // 大きさの上限（輪郭線を含む）。xz は中心からの半幅、y は高さ。既定は1マス。
@@ -52,7 +54,12 @@ export const PROP_LIMITS = Object.freeze({
   FORGE: { xz: 0.5, y: 1.3 }, // 背の煙突（本編の今の形は約1.35）
   TAINT_STONE: { xz: 0.5, y: 1.2 }, // 結晶（本編の今の形は約1.1）
   PRAYER_PILLAR: { xz: 0.5, y: 2.0 }, // 石柱と光る玉（本編の今の形は約1.88）
+  FISH_SPOT: { xz: 0.5, y: 0.2, minY: -0.3 }, // 魚の影は水面の下（下の水のマスの中）に置く
 });
+
+// 水面の高さ（設置物の原点からの差）。ゲームの mesher.js は水の一番上のマスの上面を
+// 0.12 下げて描き、魚のかげはその上のマスに置かれるので、水面は原点の 0.12 下になる。
+export const WATER_SURFACE = -0.12;
 
 const OUTLINE_COLOR = 0x1a1410;
 const LINE = 0.018; // 輪郭線の太さ（ワールド単位）
@@ -76,6 +83,9 @@ export function createPropModels(THREE, { tile = () => null, spikes = 'stone', g
     ember: glow(0xff7a3d),
     wispRim: new THREE.MeshBasicMaterial({ color: 0x8a4ac0, transparent: true, opacity: 0.7, depthWrite: false }),
     steam: new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55, depthWrite: false }),
+    ripple: new THREE.MeshBasicMaterial({ color: 0xf2faff, transparent: true, opacity: 0.85, depthWrite: false, side: THREE.DoubleSide }),
+    fishShadow: new THREE.MeshBasicMaterial({ color: 0x16304a, transparent: true, opacity: 0.78, depthWrite: false }),
+    fin: toon(0x4f7393), splash: glow(0xf4fbff),
     flame: new THREE.MeshBasicMaterial({ color: 0xff8a3d, transparent: true, opacity: 0.82, depthWrite: false }),
     flameCore: glow(0xffe27a), orb: glow(0x9fd8ff), orbCore: glow(0xe8f7ff),
   };
@@ -127,6 +137,7 @@ export function createPropModels(THREE, { tile = () => null, spikes = 'stone', g
   const torusGeo = (r, t) => cached(`torus:${r},${t}`, () => new THREE.TorusGeometry(r, t, 6, 16));
   // きのこの傘など、上半分だけの球。
   const capGeo = (r) => cached(`cap:${r}`, () => new THREE.SphereGeometry(r, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2));
+  const ringGeo = (r0, r1, start = 0, len = Math.PI * 2) => cached(`ring:${r0},${r1},${start},${len}`, () => new THREE.RingGeometry(r0, r1, 24, 1, start, len));
 
   // 部品を置く。outline: 黒い輪郭線（裏面を少し大きく描く）を付けるか。
   function part(geometry, material, { x = 0, y = 0, z = 0, rx = 0, ry = 0, rz = 0, outline = true, name } = {}) {
@@ -678,6 +689,36 @@ export function createPropModels(THREE, { tile = () => null, spikes = 'stone', g
         cyl(0.17, 0.15, 0.05, C.stoneDark, { y: 1.665 }),
         orb,
       );
+    },
+
+    // --- 試作04 ------------------------------------------------------------------------
+    // 魚のかげ: 水面の波紋、水の中を泳ぐ魚の影、水面から出た背びれとしぶき。
+    // 水面そのものはゲームの mesher が描く（この設置物の下にも水面を描く）。
+    FISH_SPOT() {
+      const S = WATER_SURFACE;
+      const ripple = (r0, r1, start, len) => {
+        const m = new THREE.Mesh(ringGeo(r0, r1, start, len), C.ripple);
+        m.rotation.x = -Math.PI / 2;
+        m.position.y = S + 0.006;
+        m.renderOrder = 3; // 水（renderOrder 2）の上に描く
+        return m;
+      };
+      const shadow = group(
+        sphere(0.1, C.fishShadow, { outline: false }),
+        cone(0.09, 0.14, C.fishShadow, { x: -0.25, rz: Math.PI / 2, outline: false }, 3),
+      );
+      shadow.children[0].scale.set(2.3, 0.45, 0.95);
+      shadow.position.set(0.06, S - 0.08, 0.02);
+      shadow.rotation.y = 0.5;
+      shadow.children.forEach((c) => { c.renderOrder = 1; });
+      return Object.assign(group(
+        ripple(0.17, 0.215),
+        ripple(0.32, 0.365, 0.3, 4.6),
+        ripple(0.43, 0.46, 2.2, 2.6),
+        shadow,
+        cone(0.07, 0.17, C.fin, { x: 0.05, y: S + 0.06, rz: 0.35, ry: 0.5 }, 3),
+        [[-0.06, 0.1, 0.03], [0.1, 0.07, -0.04], [0.06, 0.12, 0.07]].map(([x, dy, z]) => sphere(0.018, C.splash, { x, y: S + dy, z, outline: false })),
+      ), { userData: { sway: true } });
     },
   };
 

@@ -7,43 +7,10 @@ import { cellKey } from "../core/utils.js";
 // Prop blocks are rendered as individual little meshes. Builders return a group
 // whose origin sits at the cell's min corner ground center (x+0.5, y, z+0.5).
 
-const MAT = {
-  steel: new THREE.MeshToonMaterial({ color: 0xaeb6bb }),
-};
-
-const BUILDERS = {
-  [B.FISH_SPOT]() {
-    const g = new THREE.Group();
-    const tileMat = new THREE.MeshBasicMaterial({
-      color: 0x4a8cdd,
-      transparent: true,
-      opacity: 0.82,
-      depthWrite: false,
-    });
-    const tile = new THREE.Mesh(new THREE.BoxGeometry(1.04, 0.04, 1.04), tileMat);
-    tile.position.y = 0.02;
-    g.add(tile);
-
-    // 水面の波紋と背びれ。sway で揺らす。
-    const ringMat = new THREE.MeshBasicMaterial({ color: 0xbfe3ff, transparent: true, opacity: 0.58, depthWrite: false });
-    for (const r of [0.18, 0.32]) {
-      const ring = new THREE.Mesh(new THREE.RingGeometry(r, r + 0.04, 20), ringMat);
-      ring.rotation.x = -Math.PI / 2;
-      ring.position.y = 0.045;
-      g.add(ring);
-    }
-    const fin = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.22, 4), MAT.steel);
-    fin.position.y = 0.14;
-    fin.rotation.z = 0.35;
-    g.add(fin);
-    g.userData.sway = true;
-    return g;
-  },
-};
-
-// 作り直した設置物は Storybook_Character_Studio/prototypes/props-3d/ の原本から
+// 設置物はすべて Storybook_Character_Studio/prototypes/props-3d/ の原本から
 // 書き出した prop-models.js で作る（輪郭線つき・ブロック模様を貼った基本形状）。
-// 原本にまだ無い設置物は、上の BUILDERS のまま。
+const BUILDERS = {};
+
 const propTiles = new Map();
 function propTile(name) {
   if (!propTiles.has(name)) {
