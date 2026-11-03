@@ -4,4 +4,4 @@
 
 Studioルートで `npm.cmd run export:goat` を実行すると、通常姿勢Aと頭を下げて踏ん張る姿勢Bの全身シートを `output/` へ書き出す。1セル128px、4列×2行。蹄の下端は両姿勢とも121px。第6章の制作素材としてStudio内で管理する。
 
-Studioを起動して[比較画面](../../compare/ch6-7/rockhorn-goat/)を開くと、方向と姿勢を選び、参照画とゲーム用の表示を見比べられる。
+Studioを起動して[比較画面](../../compare/ch4-5/monsters/?c=rockhorn_goat)を開くと、方向と姿勢を選び、参照画とゲーム用の表示を見比べられる。

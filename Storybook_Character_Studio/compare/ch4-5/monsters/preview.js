@@ -2,6 +2,7 @@
 // 本編と同じ MonsterSprite（倍率・色替え・飛行の高さ・0.38秒ごとのA/B切替）で、左右それぞれ専用のカメラで描く。
 import * as THREE from 'three';
 import { MonsterSprite } from '../../../games/ch4-5/src/entities/rig.js';
+import { fourViewReference } from './four-view-reference.js';
 
 const asset = file => new URL(`../../../games/ch4-5/assets/nonhumanoids/${file}`, import.meta.url).href;
 const reference = file => new URL(`../../../references/nonhumanoids/${file}`, import.meta.url).href;
@@ -14,6 +15,11 @@ const MONSTERS = {
     variants: [['鉄甲サソリ', 1.05, 0xffffff, false]] },
   volcano_lizard: { name: '火山トカゲ', art: 'volcano_lizard', note: '炭色の鱗に溶岩のひびの網目、背中へ反る長い尾、細い脚と長い指。Aは低く伏せ、Bは脚を伸ばして頭を上げる。',
     variants: [['火山トカゲ', .95, 0xffffff, false]] },
+  rockhorn_goat: { name: '岩角ヤギ', art: 'rockhorn_goat', chapter: 'ダーマ再興編',
+    design: new URL('../../../references/rockhorn-goat-4dir-v1.png', import.meta.url),
+    output: new URL('../../../prototypes/rockhorn-goat-8dir/output/', import.meta.url),
+    note: '第6章の山道に登場予定。Aは通常姿勢、Bは頭を下げて踏ん張る姿勢。左は4方向の参照画で、斜め後ろには背面、右向きには左向きの反転を表示します。',
+    variants: [['岩角ヤギ', 1, 0xffffff, false]] },
 };
 const ids = Object.keys(MONSTERS);
 const params = new URLSearchParams(location.search);
@@ -22,7 +28,7 @@ const directions = ['front', 'front_left', 'left', 'back_left', 'back', 'back_ri
 const labels = ['正面', '左斜め前', '左', '左斜め後', '背面', '右斜め後', '右', '右斜め前'];
 const facing = [[0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1], [1, 0], [1, 1]];
 const $ = el => document.getElementById(el);
-document.title = `${m.name}の8方向試作｜職をつぐ者 火山島編`;
+document.title = `${m.name}の8方向試作｜職をつぐ者 ${m.chapter ?? '火山島編'}`;
 $('title').textContent = `${m.name}を、コードから。`;
 $('note').textContent = m.note;
 for (const other of ids) {
@@ -31,7 +37,19 @@ for (const other of ids) {
   $('characters').append(a);
 }
 m.variants.forEach(([label], i) => { const o = document.createElement('option'); o.value = i; o.textContent = label; $('variant').append(o); });
-const ref = sheets(m.art, false), code = sheets(m.art, true);
+const designSheet = m.design && await fourViewReference(m.design);
+const ref = designSheet ? [designSheet, designSheet] : sheets(m.art, false);
+const code = m.output ? ['a','b'].map(f => new URL(`${m.art}_code_idle_${f}_8dir.png`,m.output).href) : sheets(m.art, true);
+if (m.design) {
+  document.querySelector('.eyebrow').textContent = `MONSTER STUDY / ${m.chapter}`;
+  $('reference-label').textContent = '4方向の参照画';
+  for (const f of ['a','b']) {
+    const image = $('ref-' + f);
+    image.previousElementSibling.textContent = '参照画（通常姿勢）';
+    image.alt = '4方向の参照画を比較用に配置したシート';
+  }
+  $('production-note').textContent = '第6章に向けてStudioで制作中。左は通常姿勢の参照画、右はコードで描いた8方向・2姿勢です。';
+}
 for (const [i, frame] of ['a', 'b'].entries()) { $(`ref-${frame}`).src = ref[i]; $(`code-${frame}`).src = code[i]; }
 
 const renderer = new THREE.WebGLRenderer({ canvas: $('scene'), antialias: true, alpha: true, preserveDrawingBuffer: true });

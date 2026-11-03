@@ -13,11 +13,11 @@
 <nav class="bar links" id="characters" aria-label="モンスター"></nav>
 <div class="bar"><label>ポーズ<select id="pose"><option value="auto">A/Bを交互に</option><option value="a">Aで止める</option><option value="b">Bで止める</option></select></label><label>種類<select id="variant"></select></label><button id="rotate" aria-pressed="false">8方向を順に見る</button><label><input type="checkbox" id="water">水中の色</label></div>
 <div class="directions" id="directions"></div>
-<div class="stage"><div class="labels"><span>以前の画像<span class="tag">REFERENCE</span></span><span>コード生成<span class="tag">PROTOTYPE</span></span></div><canvas id="scene" aria-label="以前の画像とコード生成画像を本編と同じ表示方式で並べた比較"></canvas></div>
+<div class="stage"><div class="labels"><span><span id="reference-label">以前の画像</span><span class="tag">REFERENCE</span></span><span>コード生成<span class="tag">PROTOTYPE</span></span></div><canvas id="scene" aria-label="以前の画像とコード生成画像を本編と同じ表示方式で並べた比較"></canvas></div>
 <p id="status" role="status">読み込み中…</p><p id="error" role="alert"></p>
 <section><h2>8方向シート（A・B）</h2><p>4列 × 2行、1セル128px、透明背景。本編は0.38秒ごとにAとBを切り替えます。</p>
 <div class="sheets"><div class="sheet"><strong>以前の画像 A</strong><img id="ref-a" alt="以前の8方向シートA"></div><div class="sheet"><strong>コード生成 A</strong><img id="code-a" alt="コードで描いた8方向シートA"></div>
 <div class="sheet"><strong>以前の画像 B</strong><img id="ref-b" alt="以前の8方向シートB"></div><div class="sheet"><strong>コード生成 B</strong><img id="code-b" alt="コードで描いた8方向シートB"></div></div></section>
-<p class="note">Storybook Character Studio（<code>prototypes/&lt;名前&gt;-8dir/</code>）で制作し、本編（<code>src/entities/monsters.js</code>）へ移植済みです。左は以前の画像との比較用です。</p>
+<p class="note" id="production-note">Storybook Character Studio（<code>prototypes/&lt;名前&gt;-8dir/</code>）で制作し、本編（<code>src/entities/monsters.js</code>）へ移植済みです。左は以前の画像との比較用です。</p>
 <div class="bar links"><a href="../../../">Studioへ戻る</a><a href="../characters/">人型の比較</a></div>
 </main><script type="module" src="./preview.js"></script></body></html>
