@@ -9,8 +9,8 @@ Claude Codeは`CLAUDE.md`からこのファイルを読み込みます。
 ## 最初に確認するもの
 
 - ゲーム全体、操作方法、構成は`README.md`を確認する。
-- 第4章の脚本は`assets/chapter4_story.md`、第5章は`assets/chapter5_story.md`を確認する。
-- 実装方針は`assets/chapter4_5_implementation_guide.md`を確認する。
+- ストーリーは[共通の入口](../docs/story/README.md)と[第4章](../docs/story/implemented/chapter4.md)・[第5章](../docs/story/implemented/chapter5.md)を確認する。現在の実装を基準にし、差異は[不整合一覧](../docs/story/inconsistencies.md)へ記録する。
+- コードの所在は[実装参照先](../docs/story/reference/ch4-5-implementation.md)を確認する。旧assets内の脚本・実装ガイドは移転案内であり、原文は履歴資料。第6～7章は未実装の計画として区別する。
 - 実装前に`package.json`のscriptsと、変更対象に対応する`tests/e2e/*.test.mjs`を確認する。
 
 ## 最優先ルール

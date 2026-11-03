@@ -4,10 +4,10 @@
 第4章「鬼火の山」と第5章「眠る竹林の社」を収録する独立ゲームで、
 本島編（`dqb3-tsugumono-ch1-3`）の正史を組み込んだ固定状態から New Game が始まる。
 
-- 企画書: `../dqb3_game_plan.md`
-- 第4章脚本: `assets/chapter4_story.md`
-- 第5章脚本: `assets/chapter5_story.md`
-- 実装ガイド: `assets/chapter4_5_implementation_guide.md`
+- [共通ストーリー資料・参照ルール](../docs/story/README.md)
+- [第4章の実装記録](../docs/story/implemented/chapter4.md) / [第5章の実装記録](../docs/story/implemented/chapter5.md)
+- [実装参照先](../docs/story/reference/ch4-5-implementation.md) / [不整合一覧](../docs/story/inconsistencies.md)
+- 第6～7章は[未実装の制作計画](../docs/story/planned/chapter6.md)。旧脚本・実装ガイドは移転案内へ置き換え、原文を保存しました。
 
 ## 実装状況
 
@@ -76,5 +76,5 @@ Git管理は[親リポジトリ](../README.md)に統合しました。GitHubへ�
 - ドラゴン基盤: `src/entities/dragon.js`（共通リグ）/ `dragon-configs.js` /
   `src/game/dragon-battle.js` — 頭部・胴体の8方向シート＋3D首/尾。第6〜7章の
   ヴァルガへ移植できる構造
-- 章ボス: 瘴泉竜グロム（翼なし・地上型の双頭竜。左右の頭を独立に破壊して討伐）
+- 章ボス: 瘴泉竜グロム（左右の翼を持ち、低空を漂う双頭竜。左右の頭を独立に破壊して討伐）
 - 素材: 竹材・薬草・清めの香草・薬草の煎じ湯・火山穀物の粥・鉄の山刀・無銘の黒鱗

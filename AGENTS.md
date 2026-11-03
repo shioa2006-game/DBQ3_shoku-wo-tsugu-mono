@@ -4,6 +4,7 @@
 - Gitの管理単位はこの親ディレクトリ1つ。接続先は `https://github.com/shioa2006-game/DBQ3_shoku-wo-tsugu-mono.git` のみ。
 - CH1～3、CH4～5、Character Studioは通常の子フォルダ。子に `.git` を作らず、旧GitLab・Studio単体リポジトリへpull/pushしない。
 - 最初にルートREADMEと対象フォルダの `AGENTS.md`・READMEを読む。過去のarchive・品質記録にある個別リポジトリ/GitLab手順は現行の運用指示ではない。
+- ストーリー資料の入口は [docs/story/README.md](docs/story/README.md)。第1～5章は現在の実装を基準にし、第6～7章の未実装計画と区別する。旧企画書・脚本の移転案内やarchiveへ現行仕様を追記しない。実装間の不整合は [一覧](docs/story/inconsistencies.md) に記録し、文書整理だけでゲーム内の台詞を変更しない。
 - 作業開始時に親で `git status --short --branch` を確認。他の未コミット変更を無断で破棄・上書き・まとめてコミットしない。
 - 必要な変更と確認を終えて対象ファイルを指定してコミットする。pushはユーザーが依頼した範囲で行い、force push・共有履歴の改変は行わない。
 - Git管理の統合と、ゲームの起動・セーブ領域の統合は別。各編の独立動作、既存セーブ、相対パスを維持する。

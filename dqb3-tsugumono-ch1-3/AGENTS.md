@@ -9,6 +9,7 @@ Claude Codeは`CLAUDE.md`からこのファイルを読み込みます。
 ## 最初に確認するもの
 
 - ゲーム全体、操作方法、構成は`README.md`を確認する。
+- ストーリーは[共通の入口](../docs/story/README.md)と[第1章](../docs/story/implemented/chapter1.md)・[第2章](../docs/story/implemented/chapter2.md)・[第3章](../docs/story/implemented/chapter3.md)を確認する。現在の実装を基準にし、旧assets内の企画書・脚本・開発記録は移転案内として扱う。差異は[不整合一覧](../docs/story/inconsistencies.md)へ記録する。
 - 実装前に`package.json`のscriptsと、変更対象に対応する`tests/e2e/*.test.mjs`を確認する。
 
 ## 最優先ルール

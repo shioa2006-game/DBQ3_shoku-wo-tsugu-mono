@@ -2,7 +2,9 @@
 
 このフォルダは将来の第6～7章ゲームの制作場所です。現在はゲーム実装・依存関係はありません。
 
-- 全体企画: [親の企画書](../dqb3_game_plan.md)
-- 第6章脚本: [chapter6_story.md](../dqb3-tsugumono-ch4-5/assets/chapter6_story.md)
+- [共通ストーリー資料・実装と計画の境界](../docs/story/README.md)
+- 第6章制作計画: [よみがえるダーマ神殿](../docs/story/planned/chapter6.md)
+- 第7章制作計画: [大穴の影](../docs/story/planned/chapter7.md)
+- 着手前の確認: [未解決の不整合](../docs/story/inconsistencies.md)。過去章の説明は第1～5章の実装を基準にします。
 
 着手時は第4～5章の必要なコードを基礎にします。Gitは親リポジトリを使用し、ここで個別に初期化しません。実行環境とセーブ領域は他の編から独立させます。
