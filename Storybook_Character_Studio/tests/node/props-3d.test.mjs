@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import * as THREE from '../../../dqb3-tsugumono-ch1-3/node_modules/three/build/three.module.js';
 import { createPropModels, PROP_MODEL_NAMES, PROP_REQUIREMENTS, PROP_LIMITS } from '../../prototypes/props-3d/models.mjs';
-import { generatedModule, PREVIEW_COPY, GAME_COPIES } from '../../prototypes/props-3d/export.mjs';
+import { generatedModule, PREVIEW_COPIES, GAME_COPIES } from '../../prototypes/props-3d/export.mjs';
 
 const blockNames = async (folder) => {
   const source = await readFile(new URL(`../../../${folder}/src/world/blocks.js`, import.meta.url), 'utf8');
@@ -65,17 +65,25 @@ test('placing many props reuses geometry and materials', () => {
 
 test('prop model names match the block ids of each game', async () => {
   const ch13 = await blockNames('dqb3-tsugumono-ch1-3'), ch45 = await blockNames('dqb3-tsugumono-ch4-5');
+  // 共通の設置物は両方に、かかしは第1～3章だけ、試作03の設備は第4～5章だけにある。
+  const only13 = new Set(['SCARECROW']);
+  const only45 = new Set(['MINE_LAMP', 'KILN', 'FORGE', 'ANVIL', 'TROUGH', 'IRON_POT', 'TAINT_STONE', 'INCENSE_PLANT', 'PRAYER_PILLAR']);
   for (const name of PROP_MODEL_NAMES) {
-    assert.ok(ch13.has(name), `CH1-3 has B.${name}`);
-    if (name !== 'SCARECROW') assert.ok(ch45.has(name), `CH4-5 has B.${name}`);
+    if (!only45.has(name)) assert.ok(ch13.has(name), `CH1-3 has B.${name}`);
+    if (!only13.has(name)) assert.ok(ch45.has(name), `CH4-5 has B.${name}`);
   }
 });
 
 const lf = (text) => text.replace(/\r\n/g, '\n');
 
-test('the comparison page uses the current Studio source', async () => {
-  const copy = await readFile(new URL(`../../../${PREVIEW_COPY.folder}/${PREVIEW_COPY.path}`, import.meta.url), 'utf8');
-  assert.equal(lf(copy), lf(await generatedModule()), 'run npm.cmd run export:props');
+test('both comparison pages use the current Studio source and the same page code', async () => {
+  const expected = lf(await generatedModule());
+  for (const { folder, path } of PREVIEW_COPIES) {
+    const copy = await readFile(new URL(`../../../${folder}/${path}`, import.meta.url), 'utf8');
+    assert.equal(lf(copy), expected, `${folder}: run npm.cmd run export:props`);
+  }
+  const page = (folder) => readFile(new URL(`../../../${folder}/prototypes/props-3d/preview.js`, import.meta.url), 'utf8');
+  assert.equal(lf(await page('dqb3-tsugumono-ch4-5')), lf(await page('dqb3-tsugumono-ch1-3')), 'preview.js is shared by both games');
 });
 
 // 本編の写しは、確認ページで形が決まってから --preview-game で更新する。

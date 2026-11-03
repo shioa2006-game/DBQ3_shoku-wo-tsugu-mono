@@ -10,14 +10,20 @@ import { launchBrowser, openGame, newGame, expect } from "../helpers.mjs";
 const RENEWED = [
   "SCARECROW", "TORCH", "BED", "TORII", "DOOR", "WORKBENCH", "ALTAR", "SPIKES",
   "FENCE", "CHEST", "KAMADO", "TABLE", "HELM", "BANNER", "CROP1", "CROP2", "CROP3", "BUSH", "MUSHROOM",
+  "MINE_LAMP", "KILN", "FORGE", "ANVIL", "TROUGH", "IRON_POT", "TAINT_STONE", "INCENSE_PLANT", "PRAYER_PILLAR",
 ].filter((n) => B[n] !== undefined);
 const REQUIRED = {
   TORCH: { name: "flame", flag: "torch" }, DOOR: { name: "hinge", flag: "door" }, ALTAR: { name: "orb" },
   KAMADO: { name: "flame", flag: "torch" }, BANNER: { name: "flag", flag: "banner" },
   CROP1: { flag: "sway" }, CROP2: { flag: "sway" }, CROP3: { flag: "sway" },
+  MINE_LAMP: { name: "flame", flag: "torch" }, KILN: { name: "flame", flag: "torch" }, FORGE: { name: "flame", flag: "torch" },
+  IRON_POT: { name: "flame", flag: "torch" }, TAINT_STONE: { name: "flame", flag: "torch" },
+  INCENSE_PLANT: { flag: "sway" }, PRAYER_PILLAR: { name: "orb" },
 };
 // Thin plants are drawn without outlines on purpose.
 const NO_OUTLINE = new Set(["CROP1", "CROP2", "CROP3", "BUSH"]);
+// CH4-5 has every renewed prop except the scarecrow; nothing should fall back to legacy code.
+const EXPECTED = B.SCARECROW !== undefined ? 19 : 27;
 
 const errors = [];
 const browser = await launchBrowser();
@@ -70,6 +76,7 @@ try {
     return out;
   }, { renewed: RENEWED, ids: B });
 
+  expect(RENEWED.length === EXPECTED, `all renewed props exist in this game (${RENEWED.length})`);
   for (const name of RENEWED) {
     const r = report[name];
     expect(r.built, `${name} is built by PropRenderer`);

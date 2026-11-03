@@ -43,7 +43,7 @@ CH1～CH3の人型7人・基本モンスター5種は、Storybook Character Stud
 
 魚のかげ以外の設置物（かかし・たいまつ・わらのベッド・鳥居・木の扉・作業台・職業の祭壇・とげ罠・柵・収納箱・かまど・ちゃぶ台・舵輪・職業の旗・稲・わら草・きのこ）は、Studioの [props-3d](../Storybook_Character_Studio/prototypes/props-3d/README.md) の原本から書き出した `src/world/prop-models.js` で作ります。基本形状に黒い輪郭線を付け、木・石・わらの面にはブロックの模様を貼っています。とげ罠は石のとげをスライムゼリーで固めた形です。柵は隣の柵・扉へ横木を渡し、かまどの焚き口と収納箱の留め具は手前（+z）を向きます。魚のかげは `src/world/props.js` の `BUILDERS` のままです。
 
-形を直すときはStudioの `models.mjs` を編集し、Studioで `npm.cmd run export:props -- --preview-game` を実行します（第1～3章と第4～5章の両方へ書き出します）。`prop-models.js` は直接編集しないでください。今の本編の形と新しい形は、第1～3章の開発サーバーの `/builder_sprite_lab/prototypes/props-3d/` で並べて比べられます。
+形を直すときはStudioの `models.mjs` を編集し、Studioで `npm.cmd run export:props -- --preview-game` を実行します（第1～3章と第4～5章の両方へ書き出します）。`prop-models.js` は直接編集しないでください。今の本編の形と新しい形は、開発サーバーの `/builder_sprite_lab/prototypes/props-3d/` で並べて比べられます（第4～5章だけの設備は第4～5章の開発サーバーで比べる）。
 
 ## 操作方法
 

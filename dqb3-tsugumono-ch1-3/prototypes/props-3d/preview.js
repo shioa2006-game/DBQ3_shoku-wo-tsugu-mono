@@ -1,4 +1,6 @@
 // 設置物の比較ページ。左は本編の PropRenderer が作る今の形、右は Studio 原本の新しい形。
+// 第1～3章と第4～5章で同じファイルを使う。編ごとの設定は index.html の body の data 属性
+// （data-spikes・data-grain）で渡し、その編のブロックにある設置物だけを並べる。
 import * as THREE from 'three';
 import { B, drawTileIcon } from '../../src/world/blocks.js';
 import { PropRenderer } from '../../src/world/props.js';
@@ -8,7 +10,11 @@ const LABELS = {
   SCARECROW: 'かかし', TORCH: 'たいまつ', BED: 'わらのベッド', TORII: '鳥居', DOOR: '木の扉', WORKBENCH: '作業台', ALTAR: '職業の祭壇', SPIKES: 'とげ罠',
   FENCE: '柵（3つ並べる）', CHEST: '収納箱', KAMADO: 'かまど', TABLE: 'ちゃぶ台', HELM: '舵輪', BANNER: '職業の旗',
   CROP1: '稲のなえ', CROP2: '育つ稲', CROP3: '実った稲', BUSH: 'わら草', MUSHROOM: 'きのこ',
+  MINE_LAMP: '坑道灯', KILN: '炭焼き窯', FORGE: '炉', ANVIL: '金床', TROUGH: '水桶', IRON_POT: '鉄鍋',
+  TAINT_STONE: '穢れ石', INCENSE_PLANT: '清めの香草', PRAYER_PILLAR: '祈り柱',
 };
+const GAME = { spikes: document.body.dataset.spikes ?? 'stone', grain: document.body.dataset.grain ?? 'rice' };
+const NAMES = PROP_MODEL_NAMES.filter((name) => B[name] !== undefined);
 // 隣とつながる設置物は、同じものを x 方向に3つ並べて見せる。
 const ROW = { FENCE: [-1, 0, 1] };
 const DIRECTION_LABELS = ['初期', '+45°', '+90°', '+135°', '+180°', '+225°', '+270°', '+315°'];
@@ -33,7 +39,7 @@ function tile(name) {
   }
   return tiles.get(name);
 }
-const models = createPropModels(THREE, { tile, spikes: 'stone' });
+const models = createPropModels(THREE, { tile, ...GAME });
 
 // 足もとの草地（3×3マス）。上面は草、横は草の側面の模様。
 function ground() {
@@ -92,7 +98,7 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.setScissorTest(true);
 const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
 
-const state = { prop: 'SCARECROW', direction: 0, auto: false, night: false, open: false, zoom: 'near' };
+const state = { prop: NAMES[0], direction: 0, auto: false, night: false, open: false, zoom: 'near' };
 let props = [null, null], turn = 0, last = 0, time = 0;
 
 function countMeshes(obj) {
@@ -104,7 +110,7 @@ function countMeshes(obj) {
 function setState(next) {
   const prevProp = state.prop;
   Object.assign(state, next);
-  if (!PROP_MODEL_NAMES.includes(state.prop) || !(state.direction >= 0 && state.direction < 8)) throw Error('Invalid preview state');
+  if (!NAMES.includes(state.prop) || !(state.direction >= 0 && state.direction < 8)) throw Error('Invalid preview state');
   if (!props[0] || prevProp !== state.prop) {
     props = [currentProp(state.prop), newProp(state.prop)];
     views.forEach((v, i) => { v.holder.clear(); v.holder.add(props[i]); });
@@ -173,7 +179,7 @@ function animate(dt) {
   }
 }
 
-for (const name of PROP_MODEL_NAMES) {
+for (const name of NAMES) {
   const b = document.createElement('button');
   b.textContent = LABELS[name];
   b.dataset.prop = name;

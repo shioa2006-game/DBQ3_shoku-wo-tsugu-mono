@@ -13,12 +13,13 @@
 // - 作る関数は ctx を受け取る。ctx.connects(dx, dz) は、隣のマスが柵か扉なら true
 //   （柵の横木をつなぐのに使う）。ゲームの PropRenderer は隣が変わると作り直す。
 
-export const PROP_MODEL_VERSION = 2;
+export const PROP_MODEL_VERSION = 3;
 
 // 作り直した設置物。ブロック名（ゲームの B のキー）で引く。
 export const PROP_MODEL_NAMES = Object.freeze([
   'SCARECROW', 'TORCH', 'BED', 'TORII', 'DOOR', 'WORKBENCH', 'ALTAR', 'SPIKES', // 試作01
   'FENCE', 'CHEST', 'KAMADO', 'TABLE', 'HELM', 'BANNER', 'CROP1', 'CROP2', 'CROP3', 'BUSH', 'MUSHROOM', // 試作02
+  'MINE_LAMP', 'KILN', 'FORGE', 'ANVIL', 'TROUGH', 'IRON_POT', 'TAINT_STONE', 'INCENSE_PLANT', 'PRAYER_PILLAR', // 試作03（第4～5章だけ）
 ]);
 
 // ゲームの PropRenderer.update が使う部品と目印。
@@ -31,6 +32,13 @@ export const PROP_REQUIREMENTS = Object.freeze({
   CROP1: { names: [], userData: ['sway'] },
   CROP2: { names: [], userData: ['sway'] },
   CROP3: { names: [], userData: ['sway'] },
+  MINE_LAMP: { names: ['flame'], userData: ['torch'] },
+  KILN: { names: ['flame'], userData: ['torch'] },
+  FORGE: { names: ['flame'], userData: ['torch'] },
+  IRON_POT: { names: ['flame'], userData: ['torch'] },
+  TAINT_STONE: { names: ['flame'], userData: ['torch'] },
+  INCENSE_PLANT: { names: [], userData: ['sway'] },
+  PRAYER_PILLAR: { names: ['orb'], userData: [] },
 });
 
 // 大きさの上限（輪郭線を含む）。xz は中心からの半幅、y は高さ。既定は1マス。
@@ -41,6 +49,9 @@ export const PROP_LIMITS = Object.freeze({
   TORII: { xz: 0.97, y: 2.2 },
   ALTAR: { xz: 0.5, y: 1.1 },
   BANNER: { xz: 0.97, y: 2.4 }, // 旗は柱の横へ張り出す（本編の今の形と同じ）
+  FORGE: { xz: 0.5, y: 1.3 }, // 背の煙突（本編の今の形は約1.35）
+  TAINT_STONE: { xz: 0.5, y: 1.2 }, // 結晶（本編の今の形は約1.1）
+  PRAYER_PILLAR: { xz: 0.5, y: 2.0 }, // 石柱と光る玉（本編の今の形は約1.88）
 });
 
 const OUTLINE_COLOR = 0x1a1410;
@@ -59,6 +70,12 @@ export function createPropModels(THREE, { tile = () => null, spikes = 'stone', g
     gold: toon(0xd9b545), copper: toon(0xc97b3f), jelly: toon(0x6f62ee), ink: toon(0x2a221c),
     green: toon(0x4c9440), greenDark: toon(0x356b2b), greenLight: toon(0x7cc158), tea: toon(0x8aa64a),
     banner: new THREE.MeshToonMaterial({ color: 0x2f5db0, side: THREE.DoubleSide }),
+    basalt: toon(0x4a4a50), charcoal: toon(0x2a2422), leather: toon(0x7a5232), water: toon(0x3f7fd0), waterLight: toon(0x8cc4f2),
+    stew: toon(0x8a5a30), ironInside: new THREE.MeshToonMaterial({ color: 0x3d4147, side: THREE.DoubleSide }),
+    taint: toon(0x4a2a5a), taintLight: toon(0x6a3a7e), taintGlow: glow(0xb06ae8),
+    ember: glow(0xff7a3d),
+    wispRim: new THREE.MeshBasicMaterial({ color: 0x8a4ac0, transparent: true, opacity: 0.7, depthWrite: false }),
+    steam: new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55, depthWrite: false }),
     flame: new THREE.MeshBasicMaterial({ color: 0xff8a3d, transparent: true, opacity: 0.82, depthWrite: false }),
     flameCore: glow(0xffe27a), orb: glow(0x9fd8ff), orbCore: glow(0xe8f7ff),
   };
@@ -78,6 +95,7 @@ export function createPropModels(THREE, { tile = () => null, spikes = 'stone', g
     log: () => tex('log_side', C.wood),
     stone: () => tex('stone', C.stone),
     thatch: () => tex('thatch', C.straw),
+    basalt: () => tex('basalt', C.basalt),
   };
 
   // --- 形状（同じ寸法は使い回す） -------------------------------------------------
@@ -466,6 +484,200 @@ export function createPropModels(THREE, { tile = () => null, spikes = 'stone', g
           x: x + Math.cos(a) * Math.sin(t) * 0.15 * s, y: 0.2 * s + Math.cos(t) * 0.15 * s, z: z + Math.sin(a) * Math.sin(t) * 0.15 * s, outline: false,
         })),
       ]));
+    },
+
+    // --- 試作03（第4～5章だけの設置物） ---------------------------------------------
+    // 坑道灯: 木の柱と腕木から鉄のかごを吊るし、中で鬼火のかけらが燃える。
+    // 鬼火は本編の敵と同じ紫の縁と橙の芯にした（ゲームの灯りの色も橙）。
+    MINE_LAMP() {
+      const wisp = group(
+        sphere(0.07, C.wispRim, { outline: false }),
+        sphere(0.042, C.flameCore, { y: -0.005, outline: false }),
+        cone(0.035, 0.08, C.ember, { y: 0.06, outline: false }, 6),
+      );
+      wisp.children[0].scale.y = 1.3;
+      wisp.position.set(0.15, 0.55, 0);
+      wisp.name = 'flame';
+      const bars = [[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([sx, sz]) => box(0.022, 0.24, 0.022, C.iron, { x: 0.15 + sx * 0.08, y: 0.55, z: sz * 0.08, outline: false }));
+      const g = group(
+        box(0.1, 0.9, 0.1, T.log(), { x: -0.2, y: 0.45 }),
+        box(0.44, 0.07, 0.08, C.woodDark, { x: -0.01, y: 0.86 }),
+        box(0.05, 0.22, 0.05, C.woodDark, { x: -0.1, y: 0.75, rz: -0.75 }),
+        box(0.015, 0.1, 0.015, C.iron, { x: 0.15, y: 0.77, outline: false }),
+        cone(0.13, 0.08, C.iron, { x: 0.15, y: 0.71, ry: Math.PI / 4 }, 4),
+        box(0.2, 0.025, 0.2, C.iron, { x: 0.15, y: 0.665, outline: false }),
+        box(0.2, 0.03, 0.2, C.iron, { x: 0.15, y: 0.43 }),
+        bars,
+        wisp,
+        [[-0.3, 0.1], [-0.12, -0.12]].map(([x, z], i) => box(0.09, 0.05, 0.08, C.basalt, { x, y: 0.025, z, ry: i })),
+      );
+      g.userData.torch = true;
+      return g;
+    },
+
+    // 炭焼き窯: 石の土台に玄武岩のドーム、正面（+z）の焚き口に燃えさし、後ろに煙突。脇に薪と炭。
+    KILN() {
+      const dome = part(capGeo(0.45), T.basalt(), { y: 0.16 });
+      dome.scale.y = 0.95;
+      const ember = flame(0.25, 0.55);
+      ember.position.z = 0.44;
+      const g = group(
+        box(0.92, 0.16, 0.92, T.stone(), { y: 0.08 }),
+        dome,
+        box(0.32, 0.26, 0.14, T.basalt(), { y: 0.29, z: 0.35 }),
+        box(0.18, 0.15, 0.02, C.black, { y: 0.25, z: 0.421, outline: false }),
+        ember,
+        cyl(0.07, 0.09, 0.36, T.stone(), { x: -0.16, y: 0.62, z: -0.14 }),
+        [0, 1].map((i) => cyl(0.04, 0.04, 0.3, T.log(), { x: -0.33 + i * 0.09, y: 0.2, z: 0.3, rx: Math.PI / 2, outline: false })),
+        [[0.3, 0.36], [0.36, 0.3], [0.33, 0.4]].map(([x, z], i) => box(0.07, 0.05, 0.07, C.charcoal, { x, y: 0.185 + (i === 2 ? 0.04 : 0), z, ry: i, outline: false })),
+      );
+      g.userData.torch = true;
+      return g;
+    },
+
+    // 炉: 玄武岩の炉体と石の天板、鉄の火床に炭と炎、背の煙突。左（-x）にふいご。
+    FORGE() {
+      const bellows = group(
+        box(0.22, 0.03, 0.34, T.plank(), { y: 0.2, rz: 0.12 }),
+        box(0.22, 0.03, 0.34, T.plank(), { y: 0.06 }),
+        box(0.18, 0.12, 0.3, C.leather, { y: 0.13, outline: false }),
+        cyl(0.025, 0.025, 0.16, C.iron, { x: 0.15, y: 0.1, rz: Math.PI / 2 }),
+      );
+      bellows.position.set(-0.36, 0, 0.12);
+      const g = group(
+        box(0.7, 0.52, 0.8, T.basalt(), { x: 0.1, y: 0.26 }),
+        box(0.74, 0.08, 0.84, T.stone(), { x: 0.1, y: 0.56 }),
+        box(0.46, 0.06, 0.4, C.iron, { x: 0.1, y: 0.63 }),
+        [[0, 0], [0.12, 0.08], [-0.1, 0.1], [0.08, -0.1]].map(([x, z], i) => box(0.08, 0.05, 0.08, i % 2 ? C.charcoal : C.ember, { x: 0.1 + x, y: 0.68, z, ry: i, outline: false })),
+        flame(0.76, 0.9),
+        box(0.3, 0.6, 0.26, T.basalt(), { x: 0.1, y: 0.9, z: -0.27 }),
+        box(0.36, 0.06, 0.32, C.basalt, { x: 0.1, y: 1.22, z: -0.27 }),
+        bellows,
+      );
+      g.getObjectByName('flame').position.x = 0.1;
+      g.userData.torch = true;
+      return g;
+    },
+
+    // 金床: 丸太の台に、角と打面のある鉄の金床。打面に金づち。
+    ANVIL() {
+      const hammer = group(
+        cyl(0.015, 0.015, 0.26, C.wood, { rz: Math.PI / 2, outline: false }),
+        box(0.05, 0.1, 0.05, C.iron, { x: -0.13 }),
+      );
+      hammer.position.set(-0.02, 0.575, 0.06);
+      hammer.rotation.y = 0.5;
+      return group(
+        cyl(0.2, 0.22, 0.3, T.log(), { y: 0.15 }),
+        box(0.18, 0.12, 0.14, C.iron, { y: 0.36 }),
+        box(0.5, 0.12, 0.22, C.iron, { y: 0.48 }),
+        box(0.5, 0.015, 0.22, C.steel, { y: 0.548, outline: false }),
+        cone(0.07, 0.2, C.iron, { x: 0.35, y: 0.48, rz: -Math.PI / 2 }, 8),
+        box(0.08, 0.08, 0.16, C.iron, { x: -0.29, y: 0.5 }),
+        hammer,
+      );
+    },
+
+    // 水桶: 焼き入れ用の水を張った板の桶。角の柱と鉄の帯、縁に柄杓。
+    TROUGH() {
+      const posts = [[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([sx, sz]) => box(0.07, 0.44, 0.07, C.woodDark, { x: sx * 0.38, y: 0.22, z: sz * 0.25 }));
+      return group(
+        box(0.76, 0.06, 0.5, T.plank(), { y: 0.03 }),
+        [-1, 1].map((s) => box(0.76, 0.4, 0.04, T.plank(), { y: 0.22, z: s * 0.25 })),
+        [-1, 1].map((s) => box(0.04, 0.4, 0.46, T.plank(), { x: s * 0.38, y: 0.22 })),
+        posts,
+        [0.12, 0.34].flatMap((y) => [-1, 1].map((s) => box(0.8, 0.035, 0.012, C.iron, { y, z: s * 0.276, outline: false }))),
+        box(0.72, 0.02, 0.46, C.water, { y: 0.36, outline: false }),
+        [[-0.15, 0.06], [0.12, -0.1]].map(([x, z]) => box(0.12, 0.022, 0.03, C.waterLight, { x, y: 0.362, z, outline: false })),
+        cyl(0.05, 0.04, 0.05, C.wood, { x: 0.22, y: 0.45, z: 0.08 }),
+        cyl(0.012, 0.012, 0.32, C.wood, { x: 0.06, y: 0.46, z: 0.08, rz: Math.PI / 2 - 0.15, outline: false }),
+      );
+    },
+
+    // 鉄鍋: 玄武岩の炉台に据えた大きな鉄の鍋。中に煮物、左右に取っ手、湯気。焚き口は正面（+z）。
+    IRON_POT() {
+      const bowl = part(capGeo(0.34), C.ironInside, { y: 0.71, rx: Math.PI, outline: false });
+      bowl.scale.y = 0.85;
+      const fire = flame(0.13, 0.6);
+      fire.position.z = 0.4;
+      const steam = group(
+        sphere(0.06, C.steam, { x: -0.06, y: 0, outline: false }),
+        sphere(0.045, C.steam, { x: 0.06, y: 0.08, outline: false }),
+        sphere(0.035, C.steam, { x: -0.02, y: 0.15, outline: false }),
+      );
+      steam.position.y = 0.8;
+      steam.name = 'orb';
+      const g = group(
+        box(0.82, 0.4, 0.74, T.basalt(), { y: 0.2 }),
+        box(0.3, 0.17, 0.02, C.black, { y: 0.13, z: 0.371, outline: false }),
+        fire,
+        bowl,
+        cyl(0.31, 0.31, 0.02, C.stew, { y: 0.66, outline: false }, 16),
+        part(torusGeo(0.335, 0.035), C.iron, { y: 0.71, rx: Math.PI / 2 }),
+        [-1, 1].map((s) => part(torusGeo(0.05, 0.015), C.iron, { x: s * 0.37, y: 0.68, ry: Math.PI / 2, outline: false })),
+        steam,
+      );
+      g.userData.torch = true;
+      return g;
+    },
+
+    // 穢れ石: グロムが打ち込んだ黒紫の結晶の群れ。根元の割れ目が紫に光る。
+    TAINT_STONE() {
+      const core = group(
+        sphere(0.1, C.taintGlow, { outline: false }),
+        sphere(0.05, C.orbCore, { x: 0.02, y: 0.02, z: 0.05, outline: false }),
+      );
+      core.position.set(0.02, 0.17, 0.16);
+      core.name = 'flame';
+      const g = group(
+        [[-0.25, 0.1], [0.2, 0.22], [0.26, -0.2], [-0.1, -0.28]].map(([x, z], i) => box(0.12, 0.06, 0.1, C.basalt, { x, y: 0.03, z, ry: i * 0.7 })),
+        cone(0.2, 0.95, C.taint, { y: 0.5, rz: 0.06, rx: -0.05 }, 5),
+        cone(0.13, 0.58, C.taintLight, { x: 0.22, y: 0.33, z: 0.12, rz: -0.42 }, 5),
+        cone(0.12, 0.52, C.taint, { x: -0.22, y: 0.3, z: -0.08, rz: 0.45 }, 5),
+        cone(0.09, 0.38, C.taintLight, { x: 0.04, y: 0.22, z: -0.24, rx: -0.4 }, 5),
+        [[0.04, 0.5, 0.15], [-0.05, 0.75, 0.1]].map(([x, y, z]) => box(0.025, 0.12, 0.012, C.taintGlow, { x, y, z, rz: 0.3, outline: false })),
+        core,
+      );
+      g.userData.torch = true; // 夜、不気味に光る（本編と同じ）
+      return g;
+    },
+
+    // 清めの香草: 細い葉の株に、白い小花の房が3つ。風に揺れる。
+    INCENSE_PLANT() {
+      const leaves = Array.from({ length: 9 }, (_, i) => {
+        const a = (i / 9) * Math.PI * 2, h = 0.16 + (i % 3) * 0.04;
+        return cone(0.035, h, i % 2 ? C.green : C.greenDark, { x: Math.cos(a) * 0.07, y: h / 2, z: Math.sin(a) * 0.07, rx: Math.sin(a) * 0.5, rz: -Math.cos(a) * 0.5, outline: false }, 4);
+      });
+      const blooms = [[-0.12, -0.06, 0.42], [0.13, 0.06, 0.36], [0, 0.15, 0.3]].flatMap(([x, z, h]) => [
+        box(0.015, h, 0.015, C.greenDark, { x, y: h / 2, z, outline: false }),
+        [[0, 0.05, 0], [0.05, 0.025, 0.015], [-0.045, 0.02, 0.035], [0.015, 0.025, -0.05]].map(([dx, dy, dz]) => sphere(0.045, C.white, { x: x + dx, y: h + dy, z: z + dz })),
+        sphere(0.02, C.gold, { x, y: h + 0.1, z, outline: false }),
+      ]);
+      const g = group(leaves, blooms);
+      g.userData.sway = true;
+      return g;
+    },
+
+    // 祈り柱: 石の台座に立つ石柱。しめ縄と紙垂を巻き、頭に光る玉。
+    PRAYER_PILLAR() {
+      const orb = group(
+        sphere(0.1, C.orb, { outline: false }),
+        sphere(0.045, C.orbCore, { x: -0.03, y: 0.03, z: 0.04, outline: false }),
+      );
+      orb.position.y = 1.78;
+      orb.name = 'orb';
+      const shide = [0, 2.1, 4.2].flatMap((a) => [0, 1, 2].map((k) => box(0.045, 0.06, 0.008, C.white, {
+        x: Math.sin(a) * 0.2 + (k % 2 ? 0.015 : -0.015) * Math.cos(a), y: 1.22 - k * 0.055, z: Math.cos(a) * 0.2 - (k % 2 ? 0.015 : -0.015) * Math.sin(a), ry: a, outline: false,
+      })));
+      return group(
+        box(0.5, 0.16, 0.5, T.stone(), { y: 0.08 }),
+        box(0.38, 0.08, 0.38, C.stoneDark, { y: 0.2 }),
+        cyl(0.13, 0.16, 1.4, T.stone(), { y: 0.94 }),
+        part(torusGeo(0.17, 0.045), C.straw, { y: 1.3, rx: Math.PI / 2 }),
+        shide,
+        cyl(0.17, 0.15, 0.05, C.stoneDark, { y: 1.665 }),
+        orb,
+      );
     },
   };
 
