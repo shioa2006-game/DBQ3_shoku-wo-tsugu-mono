@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>岩角ヤギ｜Studio造形比較</title>
+<script type="importmap">{"imports":{"three":"../../../games/ch4-5/node_modules/three/build/three.module.js"}}</script>
+<style>
+body{font:1rem/1.6 system-ui,sans-serif;color:#322c27;background:#f4f0e9;max-width:54rem;margin:auto;padding:1rem}
+section{display:flex;flex-wrap:wrap;gap:1rem;margin:1rem 0}figure{margin:0;text-align:center}canvas{display:block;background:#dedfd4;width:min(38vw,256px);height:auto}select{font:inherit}
+</style>
+<main><a href="../../../">Studioへ戻る</a><h1>岩角ヤギ</h1>
+<label>向き <select id="direction"></select></label>
+<label>姿勢 <select id="pose"><option value="auto">交互に表示</option><option value="a">通常</option><option value="b">踏ん張り</option></select></label>
+<section><figure><canvas id="reference" width="256" height="256"></canvas><figcaption id="caption">4方向参照画</figcaption></figure>
+<figure><canvas id="sprite" width="256" height="256"></canvas><figcaption>ゲームの表示方式</figcaption></figure></section>
+<p>斜め後ろには比較用に背面の参照画を表示します。</p>
+</main><script type="module" src="./preview.js"></script></html>

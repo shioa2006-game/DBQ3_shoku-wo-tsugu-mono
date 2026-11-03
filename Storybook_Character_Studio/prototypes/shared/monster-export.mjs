@@ -46,10 +46,11 @@ export function normalizeCells(src) {
   return { out, report };
 }
 
-export async function exportMonster({ id, name, role, build, references, summary, runtime }) {
-  const character = CHARACTERS.find(c => c.id === id);
+export async function exportMonster({ id, name, role, build, references, summary, runtime, studioFolder }) {
+  const character = studioFolder ? { folder: studioFolder, targets: [] } : CHARACTERS.find(c => c.id === id);
   if (!character) throw Error(`${id} is not listed in game-targets.mjs`);
   const previewGame = process.argv.includes('--preview-game');
+  if (previewGame && !character.targets.length) throw Error(`${name}の本編への移植先は未設定です。`);
   const unknown = process.argv.slice(2).filter(arg => arg !== '--preview-game');
   if (unknown.length) throw Error(`Unknown arguments: ${unknown.join(', ')}`);
   const here = file => new URL(`../${character.folder}/${file}`, import.meta.url);
