@@ -2,10 +2,11 @@ import * as THREE from "three";
 import { Entity, GRAVITY } from "./entity.js";
 import { HumanoidRig, submersionAt } from "./rig.js";
 import { ITEMS } from "../game/items.js";
+import { ADVENTURER_RIG_PROFILE } from "../content/rig-profiles/adventurer.mjs";
 
-// シオン。表示・操作は本島編のプレイヤーを流用し、画像は
-// assets/humanoids/ の8方向シートを使う（実装ガイド 3.1）。
-const SHEET_URL = new URL("../../assets/humanoids/adventurer_boy_body_8dir.png", import.meta.url).href;
+// シオン。表示・操作は本島編のプレイヤーを流用し、画像とリグ設定も本島編と同じ
+// Storybook Character Studio の主人公を使う（docs/CHARACTER_ART.md）。
+const SHEET_URL = new URL("../../assets/humanoids/adventurer_code_body_8dir.png", import.meta.url).href;
 
 const PLAYER_COLORS = {
   sleeve: 0x2856a8,
@@ -26,7 +27,7 @@ export class Player extends Entity {
     this.baseMaxHp = 20;
     this.maxHp = 20;
     this.hp = 20;
-    this.rig = new HumanoidRig({ sheetUrl: SHEET_URL, colors: PLAYER_COLORS });
+    this.rig = new HumanoidRig({ sheetUrl: SHEET_URL, colors: PLAYER_COLORS, tuning: ADVENTURER_RIG_PROFILE });
     this.root = new THREE.Group();
     this.root.add(this.rig.group);
     scene.add(this.root);

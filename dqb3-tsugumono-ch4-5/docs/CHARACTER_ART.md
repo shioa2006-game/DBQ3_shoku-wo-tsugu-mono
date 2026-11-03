@@ -7,7 +7,7 @@
 | 段階 | 内容 | 状況 |
 |---|---|---|
 | 0 | 仕組みをそろえる（リグ・書き出し先・テスト） | 2026-11-03 完了 |
-| 1 | 第1～3章で作ったキャラクターの流用（主人公・ミナ・ゴンタ・ワタリ、おおこうもり・どろたぼう） | 未着手 |
+| 1 | 第1～3章で作ったキャラクターの流用（主人公・ミナ・ゴンタ・ワタリ、おおこうもり・どろたぼう） | 2026-11-03 完了 |
 | 2 | 新しい人型5人（ベルク・カヤ・ナギ・ロク・ヨモギ） | 未着手 |
 | 3 | 新しいモンスター3種（鬼火・火山トカゲ・鉄甲サソリ） | 未着手 |
 | 4 | 竜グロムの頭と胴 | 未着手 |
@@ -18,25 +18,33 @@
 - 両編の `rig.js` は同じ内容に保つ。Studioのテスト（`tests/node/game-targets.test.mjs`）が一致を確かめる。
 - Studioの `prototypes/shared/game-targets.mjs` に、各キャラクターの書き出し先のゲームを書く。Studioのテストは、書き出し先のゲームの画像（`assets/`）・原画（`art_src/`）・リグ設定（`src/content/rig-profiles/`）がStudioの出力と同じであることを確かめる。
 
+## 段階1で流用したもの
+
+- Studioの `game-targets.mjs` で、主人公・ミナ・ゴンタ・ワタリ・おおこうもり・どろたぼうの書き出し先を両編にした。Studioの `npm.cmd run sync:games`（`tools/sync-game-targets.mjs`）が、出力画像を `assets/`、原画を `art_src/`、リグ設定を `src/content/rig-profiles/` へ写す。作画を直したら、そのキャラクターを書き出してから `sync:games` で両編へ配る。
+- 主人公（`player.js`）は `adventurer_code_body_8dir.png` と `ADVENTURER_RIG_PROFILE`。
+- ミナ・ゴンタ・ワタリ（`villagers.js`）は頭・胴の分離画像（`*_code_head_layer_8dir.png`・`*_code_torso_layer_8dir.png`）とリグ設定。肩書きと手足の色はこの編のまま。
+- こうもり・どろたぼうの色替え（`monsters.js`）は `*_code_idle_{a,b}_8dir.png` を使う。Studioのどろたぼうは以前の画像より明るい茶色で、灰どろたぼう・瘴気どろたぼうが普通の茶色に見えたため、灰どろたぼうを `0x98a8c0`（灰色寄り）、瘴気どろたぼうを `0x7a6ac8`（紫寄り）に変えた。火喰いこうもり（`0xff9a66`）と瘴気こうもり（`0x9a7ab8`）は今の色のままで見え方がそろう。
+- `tests/e2e/character-art.test.mjs`（`test:e2e` に含む）で、画像・分離層・リグ設定・8方向の頭の間隔と向き・歩行・道具（鉄のハンマー・山刀・鉄の剣）の振り・A/B切替・色替えを確かめる。`CHARACTER_ART_SCREENSHOTS=1` を付けると `work/character-migration/` に8方向の一覧画像を書き出す。
+
 ## 今のキャラクターと予定
 
 | キャラクター | 今の画像（assets/以下） | 予定 |
 |---|---|---|
-| 主人公 | humanoids/adventurer_boy_body_8dir.png | 段階1: 第1～3章と同じ `adventurer_code_body_8dir.png` とリグ設定 |
-| ミナ・ゴンタ・ワタリ | humanoids/village_girl・adult_male_villager・sailor_body_8dir.png | 段階1: 第1～3章と同じ頭・胴の分離画像とリグ設定 |
+| 主人公 | humanoids/adventurer_code_body_8dir.png ＋ リグ設定 | 段階1で移植済み |
+| ミナ・ゴンタ・ワタリ | humanoids/{mina,gonta,watari}_code_{head,torso}_layer_8dir.png ＋ リグ設定 | 段階1で移植済み |
 | ベルク（鍛冶屋） | humanoids/blacksmith_body_8dir.png | 段階2: 新規 |
 | カヤ（火山の村人）・スミ・テル | humanoids/volcano_villager_body_8dir.png（スミ・テルは手足の色違い） | 段階2: 新規。スミ・テルを描き分けるかは相談 |
 | ナギ（社の巫女） | humanoids/shrine_keeper_body_8dir.png | 段階2: 新規 |
 | ロク（鉱夫・炭焼き） | humanoids/miner_body_8dir.png | 段階2: 新規 |
 | ヨモギ（薬師） | humanoids/herbalist_body_8dir.png | 段階2: 新規 |
-| 火喰いこうもり・瘴気こうもり | nonhumanoids/night_bat_idle_{a,b}（色替え） | 段階1: 第1～3章のコード画像。色替えの色は調整し直す |
-| 灰どろたぼう・瘴気どろたぼう | nonhumanoids/dorotabo_idle_{a,b}（色替え） | 段階1: 同上 |
+| 火喰いこうもり・瘴気こうもり | nonhumanoids/night_bat_code_idle_{a,b}（色替え） | 段階1で移植済み |
+| 灰どろたぼう・瘴気どろたぼう | nonhumanoids/dorotabo_code_idle_{a,b}（色替え） | 段階1で移植済み（色替えの色を調整） |
 | 鬼火・瘴気の鬼火・炉喰らいの大鬼火 | nonhumanoids/will_o_wisp_idle_{a,b} | 段階3: 新規（色替え・拡大は共用） |
 | 鉄甲サソリ | nonhumanoids/armored_scorpion_idle_{a,b} | 段階3: 新規 |
 | 火山トカゲ | nonhumanoids/volcano_lizard_idle_{a,b} | 段階3: 新規 |
 | 竜グロム | dragons/grom_head_8dir.png・grom_body_8dir.png ＋ 3Dの首・翼・尾（`dragon.js`） | 段階4: 新規。Studioに竜の仕組みを作る |
 
-`assets/` にあるピノ・イナホ・ジンベエ・スライム・おおねずみ・イカの以前の画像は、この編では使っていません。比較用に残すか消すかは、移植の最後に決めます。
+`assets/` にあるピノ・イナホ・ジンベエ・スライム・おおねずみ・イカの以前の画像と、段階1で置き換えた以前の画像（adventurer_boy・village_girl・adult_male_villager・sailor・night_bat_idle・dorotabo_idle）は、この編では使っていません。比較用に残すか消すかは、移植の最後に決めます。
 
 ## 確認
 

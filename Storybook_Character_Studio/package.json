@@ -19,7 +19,8 @@
     "export:dorotabo": "node prototypes/dorotabo-8dir/export.mjs",
     "export:squid": "node prototypes/squid-8dir/export.mjs",
     "export:items": "node prototypes/item-icons/export.mjs",
-    "export:props": "node prototypes/props-3d/export.mjs"
+    "export:props": "node prototypes/props-3d/export.mjs",
+    "sync:games": "node tools/sync-game-targets.mjs"
   },
   "engines": {
     "node": ">=18"

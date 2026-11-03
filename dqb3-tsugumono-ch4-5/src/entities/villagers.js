@@ -2,18 +2,24 @@ import * as THREE from "three";
 import { Entity, GRAVITY } from "./entity.js";
 import { HumanoidRig, submersionAt } from "./rig.js";
 import { PLACES, WORLD } from "../world/world.js";
+import { MINA_RIG_PROFILE } from "../content/rig-profiles/mina.mjs";
+import { GONTA_RIG_PROFILE } from "../content/rig-profiles/gonta.mjs";
+import { WATARI_RIG_PROFILE } from "../content/rig-profiles/watari.mjs";
 
 const HUMANOIDS = (file) => new URL(`../../assets/humanoids/${file}`, import.meta.url).href;
 
 // 火山島編の登場人物。
-// 旅の仲間（ミナ・ゴンタ・ワタリ）は本島編の画像を流用し、
+// 旅の仲間（ミナ・ゴンタ・ワタリ）は本島編と同じStudioの頭・胴の分離画像とリグ設定を使い、
 // ベルク・ロク・カヤ・ナギは火山島の新規画像を使う。
 // 追加の背景住民（スミ・テル）はカヤの画像を流用し、手足の色で差を付ける。
 export const VILLAGER_DEFS = {
   mina: {
     name: "ミナ",
     title: "農民",
-    sheet: HUMANOIDS("village_girl_body_8dir.png"),
+    sheet: HUMANOIDS("mina_code_body_8dir.png"),
+    headSheet: HUMANOIDS("mina_code_head_layer_8dir.png"),
+    torsoSheet: HUMANOIDS("mina_code_torso_layer_8dir.png"),
+    rig: MINA_RIG_PROFILE,
     colors: { sleeve: 0x2f6f6d, hand: 0xeec39a, pants: 0x8a5a33, boot: 0x5a3a24, headBack: 0x8a5a33, bodyBack: 0x265755 },
     fighter: false,
     healer: true,
@@ -21,7 +27,10 @@ export const VILLAGER_DEFS = {
   gonta: {
     name: "ゴンタ",
     title: "守り手",
-    sheet: HUMANOIDS("adult_male_villager_body_8dir.png"),
+    sheet: HUMANOIDS("gonta_code_body_8dir.png"),
+    headSheet: HUMANOIDS("gonta_code_head_layer_8dir.png"),
+    torsoSheet: HUMANOIDS("gonta_code_torso_layer_8dir.png"),
+    rig: GONTA_RIG_PROFILE,
     colors: { sleeve: 0x55703c, hand: 0xd9a878, pants: 0x6b5233, boot: 0x4a3320, headBack: 0x5d4326, bodyBack: 0x435a2f },
     fighter: true,
     atk: 3,
@@ -30,7 +39,10 @@ export const VILLAGER_DEFS = {
   watari: {
     name: "ワタリ",
     title: "船乗り",
-    sheet: HUMANOIDS("sailor_body_8dir.png"),
+    sheet: HUMANOIDS("watari_code_body_8dir.png"),
+    headSheet: HUMANOIDS("watari_code_head_layer_8dir.png"),
+    torsoSheet: HUMANOIDS("watari_code_torso_layer_8dir.png"),
+    rig: WATARI_RIG_PROFILE,
     colors: { sleeve: 0x24506b, hand: 0xcaa079, pants: 0x2f2a24, boot: 0x38302a, headBack: 0x3a3630, bodyBack: 0x1d3b50 },
     fighter: true,
     atk: 3,
@@ -124,7 +136,10 @@ export class Villager extends Entity {
     this.pos.set(x, y, z);
     this.home = new THREE.Vector3(x, y, z);
     this.weapon = this.def.weapon ?? null; // 章の進行で持ち替えられる（ベルクの打った剣など）
-    this.rig = new HumanoidRig({ sheetUrl: this.def.sheet, colors: this.def.colors, tuning: this.def.rig });
+    this.rig = new HumanoidRig({
+      sheetUrl: this.def.sheet, headSheetUrl: this.def.headSheet, bodySheetUrl: this.def.torsoSheet,
+      colors: this.def.colors, tuning: this.def.rig,
+    });
     this.root = new THREE.Group();
     this.root.add(this.rig.group);
     this.root.position.copy(this.pos);

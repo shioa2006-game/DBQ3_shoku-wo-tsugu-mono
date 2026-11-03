@@ -10,10 +10,10 @@ const SCORPION_A = new URL("../../assets/nonhumanoids/armored_scorpion_idle_a_8d
 const SCORPION_B = new URL("../../assets/nonhumanoids/armored_scorpion_idle_b_8dir.png", import.meta.url).href;
 const LIZARD_A = new URL("../../assets/nonhumanoids/volcano_lizard_idle_a_8dir.png", import.meta.url).href;
 const LIZARD_B = new URL("../../assets/nonhumanoids/volcano_lizard_idle_b_8dir.png", import.meta.url).href;
-const BAT_A = new URL("../../assets/nonhumanoids/night_bat_idle_a_8dir.png", import.meta.url).href;
-const BAT_B = new URL("../../assets/nonhumanoids/night_bat_idle_b_8dir.png", import.meta.url).href;
-const DORO_A = new URL("../../assets/nonhumanoids/dorotabo_idle_a_8dir.png", import.meta.url).href;
-const DORO_B = new URL("../../assets/nonhumanoids/dorotabo_idle_b_8dir.png", import.meta.url).href;
+const BAT_A = new URL("../../assets/nonhumanoids/night_bat_code_idle_a_8dir.png", import.meta.url).href;
+const BAT_B = new URL("../../assets/nonhumanoids/night_bat_code_idle_b_8dir.png", import.meta.url).href;
+const DORO_A = new URL("../../assets/nonhumanoids/dorotabo_code_idle_a_8dir.png", import.meta.url).href;
+const DORO_B = new URL("../../assets/nonhumanoids/dorotabo_code_idle_b_8dir.png", import.meta.url).href;
 
 // 第4章のモンスター。
 // 新規画像は鬼火・鉄甲サソリ・火山トカゲの3種。既存色替えは
@@ -60,7 +60,7 @@ export const MONSTER_TYPES = {
     sheets: [DORO_A, DORO_B],
     hp: 16, atk: 4, scale: 1.15, flying: false, aggro: 6, speed: 1.9,
     drops: [["clay", 1, 2]],
-    tint: 0xb8b0a8,
+    tint: 0x98a8c0, // Studioのどろたぼう（明るい茶）を灰色寄りにする
   },
   // --- 第5章: 瘴気に染まった竹林の敵（既存画像の紫灰色 tint） -----------------------
   taint_wisp: {
@@ -82,7 +82,7 @@ export const MONSTER_TYPES = {
     sheets: [DORO_A, DORO_B],
     hp: 20, atk: 5, scale: 1.2, flying: false, aggro: 7, speed: 2.0,
     drops: [["clay", 1, 2], ["herb", 0, 1]],
-    tint: 0x8a6aa8,
+    tint: 0x7a6ac8, // 茶色の上でも紫が残るよう青を強める
   },
   great_will_o_wisp: {
     // 章ボス: 炉喰らいの大鬼火。鬼火画像の拡大・色替えで、黒い爪痕を帯びる。
