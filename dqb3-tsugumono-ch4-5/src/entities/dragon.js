@@ -15,7 +15,7 @@ import { MonsterSprite } from "./rig.js";
 // 置き、リグ本体へは埋め込まない。
 
 const NECK_SEGMENTS = 7;
-const TAIL_SEGMENTS = 11; // 隣同士の球が重なって連続した尾に見える密度
+const TAIL_SEGMENTS = 17; // 隣同士の球が重なって連続した尾に見える密度（細い先端でも隙間が出ない間隔）
 const FLAME_PARTICLES = 48; // 1つの頭あたりの炎パーティクル数（プール）
 
 // 炎パーティクル用のやわらかい円のテクスチャ（プロシージャル・共有）。
@@ -197,7 +197,8 @@ function buildWing(span, height, membraneMat, boneMat) {
   membraneGeom.translate(0, 0, -0.03);
   wing.add(new THREE.Mesh(membraneGeom, membraneMat));
 
-  // 骨: 前縁の腕と、付け根から各指先へ走る3本の指。
+  // 骨: 前縁の付け根寄りに手首の関節を置き、そこから扇形に広げる。
+  // 手首 → 付け根（腕）、手首 → 前縁の先（前縁の骨）→ 翼端、手首 → 後縁の3つの指先。
   const bone = (x0, y0, x1, y1, w) => {
     const len = Math.hypot(x1 - x0, y1 - y0);
     const m = new THREE.Mesh(new THREE.BoxGeometry(len, w, 0.1), boneMat);
@@ -205,10 +206,19 @@ function buildWing(span, height, membraneMat, boneMat) {
     m.rotation.z = Math.atan2(y1 - y0, x1 - x0);
     return m;
   };
-  wing.add(bone(0, height * 0.14, span * 0.7, height * 0.34, 0.14)); // 腕
-  wing.add(bone(span * 0.7, height * 0.34, tip[0], tip[1], 0.1)); // 翼端の骨
+  const wrist = [span * 0.27, height * 0.37]; // 前縁の曲線上（付け根から約1/4）
+  const lead = [span * 0.7, height * 0.34]; // 前縁の山
+  wing.add(bone(0, height * 0.16, wrist[0], wrist[1], 0.14)); // 腕
+  wing.add(bone(wrist[0], wrist[1], lead[0], lead[1], 0.11)); // 前縁の骨
+  wing.add(bone(lead[0], lead[1], tip[0], tip[1], 0.09)); // 翼端の骨
   for (const [fx, fy] of fingers) {
-    wing.add(bone(span * 0.16, height * 0.05, fx, fy, 0.07)); // 指
+    wing.add(bone(wrist[0], wrist[1], fx, fy, 0.08)); // 指
+  }
+  // 関節の節（骨の継ぎ目が角張って見えないように）。
+  for (const [jx, jy, r] of [[wrist[0], wrist[1], 0.1], [lead[0], lead[1], 0.07]]) {
+    const knob = new THREE.Mesh(new THREE.SphereGeometry(r, 8, 6), boneMat);
+    knob.position.set(jx, jy, 0);
+    wing.add(knob);
   }
   return wing;
 }
@@ -276,11 +286,12 @@ export class DragonRig {
       }
     }
 
-    // 尾: 後方へ長い曲線を描くセグメント列。小さめの胴体でも目立つ太さにする。
+    // 尾: 後方へ長い曲線を描くセグメント列。根元から先端へゆるやかに細くする
+    //（根元 0.225・先端 0.11 ×胴体の大きさ）。
     this.tail = [];
     for (let i = 0; i < TAIL_SEGMENTS; i += 1) {
       const t = i / (TAIL_SEGMENTS - 1);
-      const r = (0.3 - t * 0.19) * config.bodyScale;
+      const r = (0.225 - t * 0.115) * config.bodyScale;
       const seg = new THREE.Mesh(new THREE.SphereGeometry(Math.max(0.08, r), 9, 7), partMat);
       this.group.add(seg);
       this.tail.push(seg);

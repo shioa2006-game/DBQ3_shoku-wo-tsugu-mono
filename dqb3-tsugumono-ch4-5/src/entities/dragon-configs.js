@@ -1,8 +1,9 @@
 // ドラゴンごとの設定。共通リグ（dragon.js）へは埋め込まず、ここで差し替える。
 // 第6〜7章リポジトリのヴァルガは、同じ形式の設定（翼あり・単頭など）を追加する。
 
-const GROM_HEAD = new URL("../../assets/dragons/grom_head_8dir.png", import.meta.url).href;
-const GROM_BODY = new URL("../../assets/dragons/grom_body_8dir.png", import.meta.url).href;
+// 頭・胴は Storybook Character Studio でコードから描いた画像（docs/CHARACTER_ART.md）。
+const GROM_HEAD = new URL("../../assets/dragons/grom_code_head_8dir.png", import.meta.url).href;
+const GROM_BODY = new URL("../../assets/dragons/grom_code_body_8dir.png", import.meta.url).href;
 
 // 瘴泉竜グロム: 二つの頭と長い首、左右の翼を持つ双頭の翼竜。
 // 低空を羽ばたきながら泉の上を漂う。「無銘の主」が清めの泉を汚すために

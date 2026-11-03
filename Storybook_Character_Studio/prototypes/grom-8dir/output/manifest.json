@@ -1,0 +1,208 @@
+{
+  "id": "grom",
+  "name": "瘴泉竜グロム",
+  "role": "TWO-HEADED DRAGON",
+  "version": 1,
+  "status": "prototype",
+  "source": "../character.mjs",
+  "format": "game-dragon-billboards",
+  "cellSize": 128,
+  "columns": 4,
+  "rows": 2,
+  "directions": [
+    "front",
+    "front_left",
+    "left",
+    "back_left",
+    "back",
+    "back_right",
+    "right",
+    "front_right"
+  ],
+  "labels": [
+    "正面",
+    "左斜め前",
+    "左",
+    "左斜め後",
+    "背面",
+    "右斜め後",
+    "右",
+    "右斜め前"
+  ],
+  "anchor": {
+    "centerU": 0.494,
+    "bottomFromTop": 0.945
+  },
+  "parts": [
+    {
+      "part": "head",
+      "output": "grom_code_head_8dir.png",
+      "normalization": [
+        {
+          "row": 0,
+          "col": 0,
+          "dx": 1,
+          "dy": 1,
+          "bbox": "9-115/7-120",
+          "before": "0.484",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "dx": 0,
+          "dy": 2,
+          "bbox": "11-115/9-119",
+          "before": "0.492",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "dx": 0,
+          "dy": 1,
+          "bbox": "9-116/17-120",
+          "before": "0.488",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 3,
+          "dx": 3,
+          "dy": 0,
+          "bbox": "8-112/23-121",
+          "before": "0.469",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 0,
+          "dx": 0,
+          "dy": 0,
+          "bbox": "9-116/23-121",
+          "before": "0.488",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 1,
+          "dx": -2,
+          "dy": 0,
+          "bbox": "13-117/23-121",
+          "before": "0.508",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "dx": 0,
+          "dy": 1,
+          "bbox": "9-116/17-120",
+          "before": "0.488",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 3,
+          "dx": 1,
+          "dy": 2,
+          "bbox": "10-114/9-119",
+          "before": "0.484",
+          "after": "0.492"
+        }
+      ]
+    },
+    {
+      "part": "body",
+      "output": "grom_code_body_8dir.png",
+      "normalization": [
+        {
+          "row": 0,
+          "col": 0,
+          "dx": 0,
+          "dy": -4,
+          "bbox": "11-114/8-125",
+          "before": "0.488",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "dx": 1,
+          "dy": -3,
+          "bbox": "11-112/10-124",
+          "before": "0.480",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "dx": 4,
+          "dy": -1,
+          "bbox": "18-100/9-122",
+          "before": "0.461",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 3,
+          "dx": 5,
+          "dy": -1,
+          "bbox": "8-107/9-122",
+          "before": "0.449",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 0,
+          "dx": 0,
+          "dy": -1,
+          "bbox": "11-114/12-122",
+          "before": "0.488",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 1,
+          "dx": -5,
+          "dy": -1,
+          "bbox": "18-117/9-122",
+          "before": "0.527",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "dx": -3,
+          "dy": -1,
+          "bbox": "25-107/9-122",
+          "before": "0.516",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 3,
+          "dx": -1,
+          "dy": -3,
+          "bbox": "13-114/10-124",
+          "before": "0.496",
+          "after": "0.492"
+        }
+      ]
+    }
+  ],
+  "runtime": {
+    "class": "DragonRig (MonsterSprite head/body, 3D neck, wings and tail)",
+    "headScale": 1.5,
+    "bodyScale": 1.6,
+    "heads": 2,
+    "config": "src/entities/dragon-configs.js GROM_CONFIG"
+  },
+  "references": [
+    "dqb3-tsugumono-ch4-5/assets/dragons/grom_head_8dir.png",
+    "dqb3-tsugumono-ch4-5/assets/dragons/grom_body_8dir.png"
+  ],
+  "targets": [
+    "ch4-5"
+  ]
+}

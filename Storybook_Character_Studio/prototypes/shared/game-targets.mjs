@@ -9,7 +9,7 @@ export const GAMES = Object.freeze({
   'ch4-5': 'dqb3-tsugumono-ch4-5',
 });
 
-// kind: 'humanoid'（合成シート1枚）| 'humanoid-layers'（頭・胴の分離＋比較用合成）| 'monster'（A・Bの2枚）
+// kind: 'humanoid'（合成シート1枚）| 'humanoid-layers'（頭・胴の分離＋比較用合成）| 'monster'（A・Bの2枚）| 'dragon'（頭・胴の2枚）
 // files: output/ にある画像の名前（拡張子なし）。本編は assets/<dir>/<name>.png、原画は art_src/<name>.src.png。
 // rigProfile: リグ設定。本編の src/content/rig-profiles/<id>.mjs に、同じ値の写しを置く。
 const humanoid = (id, kind, targets) => ({
@@ -21,6 +21,12 @@ const humanoid = (id, kind, targets) => ({
 const monster = (folder, art, targets) => ({
   id: art, folder: `${folder}-8dir`, kind: 'monster', targets, dir: 'nonhumanoids', rigProfile: false,
   files: [`${art}_code_idle_a_8dir`, `${art}_code_idle_b_8dir`],
+});
+
+// Dragons: head and body billboards, one pose each (the game's DragonRig adds the 3D neck, wings and tail).
+const dragon = (folder, id, targets) => ({
+  id, folder: `${folder}-8dir`, kind: 'dragon', targets, dir: 'dragons', rigProfile: false,
+  files: [`${id}_code_head_8dir`, `${id}_code_body_8dir`],
 });
 
 export const CHARACTERS = Object.freeze([
@@ -48,6 +54,8 @@ export const CHARACTERS = Object.freeze([
   monster('will-o-wisp', 'will_o_wisp', ['ch4-5']),
   monster('armored-scorpion', 'armored_scorpion', ['ch4-5']),
   monster('volcano-lizard', 'volcano_lizard', ['ch4-5']),
+  // 第5章の章ボス（段階4）。
+  dragon('grom', 'grom', ['ch4-5']),
 ]);
 
 export const gameUrl = (game, path) => new URL(`../../../${GAMES[game]}/${path}`, import.meta.url);

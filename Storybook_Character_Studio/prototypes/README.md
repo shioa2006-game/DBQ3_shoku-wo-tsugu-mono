@@ -21,6 +21,7 @@
 | 鬼火（第4～5章） | [will-o-wisp-8dir](will-o-wisp-8dir/README.md) | [A](will-o-wisp-8dir/output/will_o_wisp_code_idle_a_8dir.png)・[B](will-o-wisp-8dir/output/will_o_wisp_code_idle_b_8dir.png) | 第4～5章 `assets/nonhumanoids/will_o_wisp_idle_{a,b}_8dir.png` |
 | 鉄甲サソリ（第4～5章） | [armored-scorpion-8dir](armored-scorpion-8dir/README.md) | [A](armored-scorpion-8dir/output/armored_scorpion_code_idle_a_8dir.png)・[B](armored-scorpion-8dir/output/armored_scorpion_code_idle_b_8dir.png) | 第4～5章 `assets/nonhumanoids/armored_scorpion_idle_{a,b}_8dir.png` |
 | 火山トカゲ（第4～5章） | [volcano-lizard-8dir](volcano-lizard-8dir/README.md) | [A](volcano-lizard-8dir/output/volcano_lizard_code_idle_a_8dir.png)・[B](volcano-lizard-8dir/output/volcano_lizard_code_idle_b_8dir.png) | 第4～5章 `assets/nonhumanoids/volcano_lizard_idle_{a,b}_8dir.png` |
+| 瘴泉竜グロム（第5章） | [grom-8dir](grom-8dir/README.md) | [頭](grom-8dir/output/grom_code_head_8dir.png)・[胴](grom-8dir/output/grom_code_body_8dir.png) | 第4～5章 `assets/dragons/grom_{head,body}_8dir.png` |
 
 12種とも本編へ移植済みです。本編は `_code_` 画像を直接読み、住民6人は頭・胴の分離画像、主人公を含む7人は `src/content/rig-profiles/` の設定を使用します。旧画像は専用比較ページ用として残しています。`shared/` は目・鼻・SVG部品・方向順の共通処理です。主人公の共用化では生成SVGが変更前と完全一致することを確認しています。
 

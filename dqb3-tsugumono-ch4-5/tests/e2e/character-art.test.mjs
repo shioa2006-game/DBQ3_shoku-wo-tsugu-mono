@@ -1,7 +1,7 @@
 // Studioのキャラクターが、頭胴の分離層・リグ設定で8方向・歩行・道具・A/B切替まで動くことを確かめる。
 // 第1～3章から流用: 主人公・ミナ・ゴンタ・ワタリ、こうもり・どろたぼうの色替え。
 // 火山島編の新規: ベルク・ロク・カヤ・ナギ・ヨモギ・スミ・テル（段階2）、鬼火（瘴気の鬼火・炉喰らいの大鬼火も共用）・
-// 鉄甲サソリ・火山トカゲ（段階3）。
+// 鉄甲サソリ・火山トカゲ（段階3）、竜グロムの頭・胴（段階4）。
 // CHARACTER_ART_SCREENSHOTS=1 で work/character-migration/ に8方向の一覧画像を書き出す。
 import assert from 'node:assert/strict';
 import {mkdir,writeFile} from 'node:fs/promises';
@@ -14,6 +14,14 @@ const recolored=['fire_bat','ash_dorotabo','taint_bat','taint_dorotabo','taint_w
 const directions=['front','front_left','left','back_left','back','back_right','right','front_right'];
 const profiles={};
 for(const id of ['adventurer',...villagers]) profiles[id]=(await import(`../../src/content/rig-profiles/${id}.mjs`))[`${id.toUpperCase()}_RIG_PROFILE`];
+// 竜グロム: 設定がStudioの頭・胴の画像を指し、どちらも 512×256 の8方向シートであること。
+const {GROM_CONFIG}=await import('../../src/entities/dragon-configs.js');
+const {PNG}=(await import('pngjs')).default;
+const {readFile}=await import('node:fs/promises');
+for(const [key,name] of [['headUrl','grom_code_head_8dir'],['bodyUrl','grom_code_body_8dir']]){
+ assert.match(GROM_CONFIG[key],new RegExp(name),`Grom ${key} uses the Studio sheet`);
+ const png=PNG.sync.read(await readFile(new URL(GROM_CONFIG[key])));assert.deepEqual([png.width,png.height],[512,256]);
+}
 const browser=await launchBrowser(),errors=[];
 try {
  const page=await browser.newPage({viewport:{width:1280,height:720}});
@@ -122,5 +130,5 @@ try {
   }
  }
  assert.deepEqual(errors,[]);
- console.log('character-art.test: PASS (11 humans, 9 monsters incl. recolors; all directions, layers, profiles and animation)');
+ console.log('character-art.test: PASS (11 humans, 9 monsters incl. recolors, Grom head/body; all directions, layers, profiles and animation)');
 }finally{await browser.close();}

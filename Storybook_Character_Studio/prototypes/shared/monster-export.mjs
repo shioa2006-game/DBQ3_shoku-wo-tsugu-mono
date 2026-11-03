@@ -25,7 +25,7 @@ export function monsterSheet({ cellSize = 128, palette = {}, frame = 'a' } = {},
 // The official normalizer finds the 4 cells of a row by empty columns, which fails when a monster
 // throws off detached pieces (embers). Studio art never crosses its 128px cell, so measure each
 // cell's own bounding box and apply the same rule: centre at u=.494, bottom at v=.945 (121px).
-function normalizeCells(src) {
+export function normalizeCells(src) {
   const out = new PNG({ width: src.width, height: src.height }), report = [];
   for (let row = 0; row < 2; row++) for (let col = 0; col < 4; col++) {
     let x0 = 128, x1 = -1, y0 = 128, y1 = -1;
