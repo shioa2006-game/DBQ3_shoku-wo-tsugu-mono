@@ -18,6 +18,13 @@
     "export:rat": "node prototypes/field-rat-8dir/export.mjs",
     "export:dorotabo": "node prototypes/dorotabo-8dir/export.mjs",
     "export:squid": "node prototypes/squid-8dir/export.mjs",
+    "export:belk": "node prototypes/belk-8dir/export.mjs",
+    "export:roku": "node prototypes/roku-8dir/export.mjs",
+    "export:kaya": "node prototypes/kaya-8dir/export.mjs",
+    "export:nagi": "node prototypes/nagi-8dir/export.mjs",
+    "export:yomogi": "node prototypes/yomogi-8dir/export.mjs",
+    "export:sumi": "node prototypes/sumi-8dir/export.mjs",
+    "export:teru": "node prototypes/teru-8dir/export.mjs",
     "export:items": "node prototypes/item-icons/export.mjs",
     "export:props": "node prototypes/props-3d/export.mjs",
     "sync:games": "node tools/sync-game-targets.mjs"

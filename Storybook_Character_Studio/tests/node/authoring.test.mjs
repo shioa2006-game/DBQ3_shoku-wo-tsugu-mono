@@ -13,6 +13,7 @@ import { buildPinoSheet } from '../../prototypes/pino-8dir/character.mjs';
 import { buildInahoSheet } from '../../prototypes/inaho-8dir/character.mjs';
 import { buildGontaSheet } from '../../prototypes/gonta-8dir/character.mjs';
 import { DIRECTIONS } from '../../prototypes/shared/sheet-format.mjs';
+import { GAMES } from '../../prototypes/shared/game-targets.mjs';
 
 const root=fileURLToPath(new URL('../../',import.meta.url));
 test('Studio serves the current character entry and all its local resources',async t=>{
@@ -82,12 +83,15 @@ test('retained modules and documentation have no missing local imports or links'
       const target=match[1];
       if(/^(?:[a-z]+:|#|\/)/i.test(target))continue;
       if(ext==='.mjs'&&!target.startsWith('.'))continue;
-      const destination=path.resolve(path.dirname(file),target.split(/[?#]/)[0]);
+      let destination=path.resolve(path.dirname(file),target.split(/[?#]/)[0]);
+      // games/<key>/ is served from the sibling game folder by tools/serve.mjs.
+      const game=path.relative(root,destination).split(path.sep);
+      if(game[0]==='games'&&GAMES[game[1]])destination=path.join(root,'..',GAMES[game[1]],...game.slice(2));
       await assert.doesNotReject(access(destination),`${path.relative(root,file)} -> ${target}`);
     }
   }
   const dirs=(await readdir(path.join(root,'prototypes'),{withFileTypes:true})).filter(e=>e.isDirectory()).map(e=>e.name).sort();
-  assert.deepEqual(dirs,['adventurer-8dir','dorotabo-8dir','field-rat-8dir','gonta-8dir','inaho-8dir','item-icons','jinbei-8dir','mina-8dir','night-bat-8dir','pino-8dir','props-3d','shared','slime-8dir','squid-8dir','watari-8dir']);
+  assert.deepEqual(dirs,['adventurer-8dir','belk-8dir','dorotabo-8dir','field-rat-8dir','gonta-8dir','inaho-8dir','item-icons','jinbei-8dir','kaya-8dir','mina-8dir','nagi-8dir','night-bat-8dir','pino-8dir','props-3d','roku-8dir','shared','slime-8dir','squid-8dir','sumi-8dir','teru-8dir','watari-8dir','yomogi-8dir']);
 });
 
 test('Pino separates neck cloth from face and validates authoring inputs',()=>{

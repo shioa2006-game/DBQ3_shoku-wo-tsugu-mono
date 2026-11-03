@@ -89,10 +89,10 @@ const rigs = [original, generated].map((sheetUrl, index) => {
   const parts = profiles[character].head && index === 1
     ? { headSheetUrl:profiles[character].head, bodySheetUrl:profiles[character].torso } : {};
   const rig = new HumanoidRig({ sheetUrl, colors:index === 1 ? {...colors,...profiles[character].generatedColors} : colors, tuning, ...parts });
-  rig.group.position.x = index === 0 ? -.76 : .76;
+  // Both models stand at the origin; each half of the canvas draws one of them (see draw()).
   rig.animTime = 0; scene.add(rig.group);
   const shadow = new THREE.Mesh(new THREE.CircleGeometry(.32,48), new THREE.MeshBasicMaterial({ color:0x657966, transparent:true, opacity:.2, depthWrite:false }));
-  shadow.rotation.x = -Math.PI/2; shadow.position.set(rig.group.position.x,-.125,0); shadow.scale.y=.8; scene.add(shadow);
+  shadow.rotation.x = -Math.PI/2; shadow.position.set(0,-.125,0); shadow.scale.y=.8; scene.add(shadow); rig.shadow = shadow;
   return rig;
 });
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(20,20), new THREE.MeshBasicMaterial({ color:0xdce4de }));
@@ -115,27 +115,38 @@ document.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>setState({ac
 $('rotate').onclick=()=>setState({auto:!state.auto}); $('tool').onchange=()=>setState({tool:$('tool').value}); $('water').onchange=()=>setState({water:$('water').checked});
 let last=0,rotationTime=0,attackTime=1;
 function ready() { return rigs.every(r=>r.headTexture.image?.width && r.bodyTexture.image?.width); }
+// Each half of the canvas has its own view centred on its model. With one camera for both,
+// the left model was seen slightly from its right and the right one from its left, so the
+// same boots looked turned differently. Both are now seen from the same angle, as in the game.
 function resize() {
-  const c=$('scene'); renderer.setSize(c.clientWidth,c.clientHeight,false); camera.aspect=c.clientWidth/c.clientHeight;
-  // Keep both models centered under their labels as the viewport changes.
-  const offset=Math.max(.56,Math.min(.92,camera.aspect*.36)); rigs[0].group.position.x=-offset; rigs[1].group.position.x=offset;
-  const shadows=scene.children.filter(o=>o.geometry?.type==='CircleGeometry'); shadows.forEach((s,i)=>s.position.x=rigs[i].group.position.x);
-  if(camera.aspect<1.55) camera.zoom=.76; else camera.zoom=1;
+  const c=$('scene'); renderer.setSize(c.clientWidth,c.clientHeight,false); camera.aspect=c.clientWidth/2/c.clientHeight;
+  if(camera.aspect<.78) camera.zoom=.76; else camera.zoom=1;
   camera.updateProjectionMatrix();
+}
+function draw() {
+  const {width,height}=renderer.getSize(new THREE.Vector2());
+  renderer.setScissorTest(true);
+  rigs.forEach((rig,i)=>{
+    rigs.forEach((r,j)=>{r.group.visible=r.shadow.visible=i===j;});
+    renderer.setViewport(i*width/2,0,width/2,height); renderer.setScissor(i*width/2,0,width/2,height);
+    renderer.render(scene,camera);
+  });
+  renderer.setScissorTest(false);
+  rigs.forEach(r=>{r.group.visible=r.shadow.visible=true;});
 }
 function renderFrame(now) {
   const dt=state.paused?0:Math.min(.05,last?(now-last)/1000:0); last=now;
   if(state.auto && (rotationTime+=dt)>1.1) { rotationTime=0; setState({direction:directions[(directions.indexOf(state.direction)+1)%8]}); }
   if(state.action==='attack' && (attackTime+=dt)>.85) { attackTime=0; rigs.forEach(r=>r.startAttack()); }
   rigs.forEach(r=>r.update(dt,state.action==='walk'));
-  renderer.render(scene,camera);
+  draw();
   const layout = profiles[character].tuning ? '同じ照明・手足 / 右：肩と頭の位置を調整' : '同じ寸法・同じ照明・同じ3D手足で表示';
   $('status').textContent=ready()?`${labels[directions.indexOf(state.direction)]} / ${state.action==='walk'?'歩行':state.action==='attack'?'攻撃':'待機'} · ${layout}`:'画像を読み込んでいます…';
   requestAnimationFrame(renderFrame);
 }
 // Only exposed by this dedicated prototype page for the repository's visual test.
-window.__heroPreview={ setState, ready, rigs, renderer, scene, camera, state,
-  pose(time=0){ rigs.forEach(r=>{r.walkTime=time;r.animTime=time;r.attackT=state.action==='attack'?.6:0;r.update(0,state.action==='walk');});renderer.render(scene,camera); },
+window.__heroPreview={ setState, ready, rigs, renderer, scene, camera, state, draw,
+  pose(time=0){ rigs.forEach(r=>{r.walkTime=time;r.animTime=time;r.attackT=state.action==='attack'?.6:0;r.update(0,state.action==='walk');});draw(); },
   snapshot(){return { ...state, character, ready:ready(), textureSizes:rigs.map(r=>[r.headTexture.image?.width,r.headTexture.image?.height]), directions:rigs.map(r=>r.direction), tools:rigs.map(r=>r.toolKind) };}
 };
 window.addEventListener('error',event=>$('error').textContent=event.message);

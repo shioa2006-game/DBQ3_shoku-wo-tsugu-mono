@@ -65,7 +65,7 @@ try{
             const p=window.__heroPreview;p.pose(time);
             if(p.state.action==='attack'){
               p.rigs.forEach(r=>{r.attackT=1-time;r.update(0,false);});
-              p.renderer.render(p.scene,p.camera);
+              p.draw();
             }
           },phase);
           assert.deepEqual(await page.evaluate(verifyPose),[],`${direction}: ${action} / ${tool} / ${phase}`);
@@ -100,8 +100,9 @@ try{
       p.setState({direction,paused:true,action:'idle',tool:'',water:false});p.pose(0);
       for(const [col,rig] of p.rigs.entries()){
         const center=rig.group.position.clone();center.y=.57;center.project(p.camera);
-        const sw=source.height*.50,sh=source.height*.60;
-        c.drawImage(source,(center.x+1)/2*source.width-sw/2,(1-center.y)/2*source.height-sh/2,sw,sh,col*360+20,50+row*385,320,384);
+        // Each model is drawn in its own half of the canvas (one view per model).
+        const sw=source.height*.50,sh=source.height*.60,half=source.width/2;
+        c.drawImage(source,col*half+(center.x+1)/2*half-sw/2,(1-center.y)/2*source.height-sh/2,sw,sh,col*360+20,50+row*385,320,384);
       }
       c.fillText(direction,24,72+row*385);
     }

@@ -40,3 +40,10 @@ test('both games run characters on the same rig.js', async () => {
   const [a, b] = await Promise.all(Object.keys(GAMES).map((game) => readFile(gameUrl(game, 'src/entities/rig.js'), 'utf8')));
   assert.equal(lf(b), lf(a), 'src/entities/rig.js must stay identical in both games');
 });
+
+// Studioのサーバー（tools/serve.mjs）は /games/<key>/ でゲームのフォルダを配る。単独でも動くよう同じ表を持つ。
+test('the Studio server serves the same game folders', async () => {
+  const source = await readFile(new URL('../../tools/serve.mjs', import.meta.url), 'utf8');
+  const table = source.match(/const GAMES = (\{[^}]*\});/)[1].replace(/'/g, '"').replace(/([{,]\s*)"?([\w-]+)"?:/g, '$1"$2":');
+  assert.deepEqual(JSON.parse(table), { ...GAMES });
+});

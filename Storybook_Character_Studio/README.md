@@ -12,7 +12,7 @@ Git管理は[親リポジトリ](../README.md)に統合しました。Studio単�
 
 `start-studio.bat` をダブルクリックするか、`npm.cmd start` を実行します。通常は http://127.0.0.1:8081/ で主人公・ミナ・ピノ・イナホ・ゴンタ・ジンベエ・ワタリ・スライム・おおこうもり・おおねずみ・どろたぼう・イカの最新画像・比較画像・ダウンロードを開けます。既存の同じフォルダのサーバーを再利用します。起動機能はNode.js 18以上で動き、インストールは不要です。
 
-3D比較は別途、ゲーム側のVite開発サーバーが必要です。現在の比較画面は [主人公](http://127.0.0.1:5175/builder_sprite_lab/prototypes/adventurer/)／[ミナ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/mina/)／[ピノ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/pino/)／[イナホ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/inaho/)／[ゴンタ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/gonta/)／[ジンベエ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/jinbei/)／[ワタリ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/watari/)／[スライム](http://127.0.0.1:5175/builder_sprite_lab/prototypes/slime/)／[おおこうもり](http://127.0.0.1:5175/builder_sprite_lab/prototypes/night-bat/)／[おおねずみ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/field-rat/)／[どろたぼう](http://127.0.0.1:5175/builder_sprite_lab/prototypes/dorotabo/)／[イカ](http://127.0.0.1:5175/builder_sprite_lab/prototypes/squid/) です。サーバーのポートが異なる場合はURLを読み替えてください。
+3D比較（ゲーム側の `prototypes/` の比較ページ）も、このStudioのサーバーから開けます。サーバーは `/games/ch1-3/`・`/games/ch4-5/` でゲームのフォルダを読み取り専用で配り、比較ページは `three` をゲームの `node_modules` から読むので、ゲームの開発サーバーは不要です（各ゲームで `npm.cmd install` 済みであること）。例: 第4～5章の新しい人型 http://127.0.0.1:8081/games/ch4-5/prototypes/characters/ 、第1～3章のワタリ http://127.0.0.1:8081/games/ch1-3/prototypes/watari/ 。トップページの「3D比較を開く」から各ページへ移れます。起動ツールは、同じフォルダでも古いコードのまま動いているサーバーは再利用せず、次の空きポート（8082など）で新しく起動します。古いサーバーは止めないので、開いたURLは起動時の表示を見てください。ゲームのVite開発サーバー上でも同じページが動きます。
 
 ## 再生成する
 

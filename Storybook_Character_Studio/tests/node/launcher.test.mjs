@@ -38,6 +38,15 @@ test('launcher skips a legacy server even when its HTML is identical',async t=>{
   assert.match(await (await fetch(result.url)).text(),/Identical studio HTML/);
 });
 
+test('launcher skips its own folder served by older server code, without stopping it',async t=>{
+  const studio=await fixture(t),current=await studio.start([0]);
+  const root=(await fetch(current.url)).headers.get('x-inkstone-root');
+  // Same folder, but the server predates the current tools/serve.mjs (no matching code version).
+  const old=createServer((req,res)=>{res.setHeader('x-inkstone-root',root);res.end('<h1>Identical studio HTML</h1>');}),port=await listen(t,old);
+  const result=await studio.start([port,0]);
+  assert.equal(result.reused,false);assert.notEqual(Number(new URL(result.url).port),port);assert.ok(old.listening);
+});
+
 test('launcher handles a occupied non-HTTP port without stopping its owner',async t=>{
   const server=createTcpServer(socket=>socket.destroy()),port=await listen(t,server);
   const studio=await fixture(t),result=await studio.start([port,0]);

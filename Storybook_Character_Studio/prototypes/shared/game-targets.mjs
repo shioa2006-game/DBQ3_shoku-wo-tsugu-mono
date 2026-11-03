@@ -31,6 +31,14 @@ export const CHARACTERS = Object.freeze([
   humanoid('gonta', 'humanoid-layers', ['ch1-3', 'ch4-5']),
   humanoid('jinbei', 'humanoid-layers', ['ch1-3']),
   humanoid('watari', 'humanoid-layers', ['ch1-3', 'ch4-5']),
+  // 第4～5章の新しい人型（段階2）。
+  humanoid('belk', 'humanoid-layers', ['ch4-5']),
+  humanoid('roku', 'humanoid-layers', ['ch4-5']),
+  humanoid('kaya', 'humanoid-layers', ['ch4-5']),
+  humanoid('nagi', 'humanoid-layers', ['ch4-5']),
+  humanoid('yomogi', 'humanoid-layers', ['ch4-5']),
+  humanoid('sumi', 'humanoid-layers', ['ch4-5']),
+  humanoid('teru', 'humanoid-layers', ['ch4-5']),
   monster('slime', 'slime', ['ch1-3']),
   monster('night-bat', 'night_bat', ['ch1-3', 'ch4-5']), // 第4～5章は火喰いこうもり・瘴気こうもり（色替え）
   monster('field-rat', 'field_rat', ['ch1-3']),

@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { realpath } from 'node:fs/promises';
+import { readFile, realpath } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 
@@ -7,11 +7,13 @@ import path from 'node:path';
 export async function findOrStartStudio(root, { ports = Array.from({ length: 10 }, (_, i) => 8081 + i) } = {}) {
   const realRoot = await realpath(root);
   const rootId = createHash('sha256').update(process.platform === 'win32' ? realRoot.toLowerCase() : realRoot).digest('hex');
+  // A server left running from older code (e.g. before /games/ existed) is skipped, not reused or stopped.
+  const serverId = createHash('sha256').update((await readFile(path.join(realRoot, 'tools/serve.mjs'), 'utf8')).replace(/\r\n/g, '\n')).digest('hex');
   for (const port of ports) {
     const url = `http://127.0.0.1:${port}/`;
     try {
       const response = await fetch(url, { method: 'HEAD', redirect: 'error', signal: AbortSignal.timeout(800) });
-      if (response.ok && response.headers.get('x-inkstone-root') === rootId) return { url, reused: true, child: null };
+      if (response.ok && response.headers.get('x-inkstone-root') === rootId && response.headers.get('x-inkstone-server') === serverId) return { url, reused: true, child: null };
       continue;
     } catch { /* Attempt a real bind; this also safely handles probe races. */ }
     const result = await new Promise((resolve, reject) => {

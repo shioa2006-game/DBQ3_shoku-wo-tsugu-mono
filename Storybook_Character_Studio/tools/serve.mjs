@@ -11,6 +11,10 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const realRoot = await realpath(ROOT);
 const rootId = createHash('sha256').update(process.platform === 'win32' ? realRoot.toLowerCase() : realRoot).digest('hex');
+// このサーバーのコードの版。起動ツールは、同じフォルダでも古いコードのまま動くサーバーは再利用しない。
+const serverId = createHash('sha256').update((await readFile(fileURLToPath(import.meta.url), 'utf8')).replace(/\r\n/g, '\n')).digest('hex');
+// prototypes/shared/game-targets.mjs の GAMES と同じ。サーバーは単独でコピーされても動くよう、ここに直接書く。
+const GAMES = { 'ch1-3': 'dqb3-tsugumono-ch1-3', 'ch4-5': 'dqb3-tsugumono-ch4-5' };
 const PORT = Number(process.argv[2] || process.env.PORT || 8080);
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.json': 'application/json; charset=utf-8', '.md': 'text/markdown; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml', '.txt': 'text/plain; charset=utf-8' };
@@ -18,10 +22,19 @@ const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; ch
 const server = createServer(async (req, res) => {
   // Copied studios can have identical HTML. Identify the actual serving folder.
   res.setHeader('x-inkstone-root', rootId);
+  res.setHeader('x-inkstone-server', serverId);
   try {
     let p = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-    let file = path.resolve(ROOT, '.' + p);
-    if (!file.startsWith(ROOT)) { res.writeHead(403).end('forbidden'); return; }
+    // /games/<ch1-3|ch4-5>/ はゲームのフォルダを読み取り専用で配る。ゲーム側の3D比較ページ
+    // （prototypes/）を、ゲームの開発サーバーを起動せずにこのStudioから開くため。
+    let base = ROOT;
+    const game = p.match(/^\/games\/([^/]+)(\/.*)?$/);
+    if (game) {
+      if (!Object.hasOwn(GAMES, game[1])) { res.writeHead(404, { 'content-type': TYPES['.txt'] }).end('unknown game: ' + game[1]); return; }
+      base = path.resolve(ROOT, '..', GAMES[game[1]]); p = game[2] || '/';
+    }
+    let file = path.resolve(base, '.' + p);
+    if (file !== base && !file.startsWith(base + path.sep)) { res.writeHead(403).end('forbidden'); return; }
     let s = await stat(file).catch(() => null);
     if (s && s.isDirectory()) {
       const idx = path.join(file, 'index.html');
