@@ -13,6 +13,12 @@ import { GROM_CONFIG } from "../entities/dragon-configs.js";
 
 const GATE_BASE_Y = 8; // 竹林の門の基準高さ（巻き道 z58 の路面。封鎖の山から取らない）
 
+// 宿坊ができるまで病人（スミ・テル）を寝かせ、ナギが付き添う場所（宿坊予約地からの相対）。
+// 宿坊の設計図は予約地から x+0..4・z+0..3 を使い、倒れた住民はブロックの設置を妨げるので、
+// 入り口（x+2, z+3）の南、火山灰畑の柵（x+0 の列）にも掛からない z+5 の列に並べる。
+const SICK_SPOTS = { sumi: { dx: 1, dz: 5 }, teru: { dx: 4, dz: 5 } };
+const NAGI_NURSE_SPOT = { dx: 2, dz: 5 };
+
 export class Chapter5 {
   constructor(quests) {
     this.quests = quests;
@@ -273,11 +279,11 @@ export class Chapter5 {
         if (nagi) {
           nagi.stayDown = false;
           nagi.setDown(false);
-          this.rehome("nagi", PLACES.lodgePlot.x + 2, PLACES.lodgePlot.z + 3);
+          this.rehome("nagi", PLACES.lodgePlot.x + NAGI_NURSE_SPOT.dx, PLACES.lodgePlot.z + NAGI_NURSE_SPOT.dz);
         }
         // 住民が瘴熱に倒れる（宿坊の予定地のそばへ）。
         for (const pid of ["sumi", "teru"]) {
-          this.relocate(pid, PLACES.lodgePlot.x + (pid === "sumi" ? 0 : 4), PLACES.lodgePlot.z + 3);
+          this.relocate(pid, PLACES.lodgePlot.x + SICK_SPOTS[pid].dx, PLACES.lodgePlot.z + SICK_SPOTS[pid].dz);
           const v = g.villager(pid);
           if (v) {
             v.setDown(true);
@@ -418,6 +424,14 @@ export class Chapter5 {
         v.setDown(sick);
         v.stayDown = sick;
       }
+    }
+    // 宿坊の完成前: 以前のセーブでは病人とナギが宿坊の予定地の中にいて建てられないことがある。
+    // 予定地の外の寝かせ場所へ移す。
+    if (sick && idx <= order.indexOf("CH5_LODGE")) {
+      for (const pid of ["sumi", "teru"]) {
+        this.relocate(pid, PLACES.lodgePlot.x + SICK_SPOTS[pid].dx, PLACES.lodgePlot.z + SICK_SPOTS[pid].dz);
+      }
+      this.rehome("nagi", PLACES.lodgePlot.x + NAGI_NURSE_SPOT.dx, PLACES.lodgePlot.z + NAGI_NURSE_SPOT.dz);
     }
     // グロム戦中のセーブは戦闘前の準備状態へ戻す。
     if (this.stage === "CH5_DRAGON" && !this.flags.gromDefeated) {

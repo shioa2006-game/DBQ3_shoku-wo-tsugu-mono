@@ -100,6 +100,46 @@ try {
   const passOpen = await page.evaluate(() => window.__game.passOpen);
   expect(passOpen === true, "竹林の門の完成で峠が開通する");
 
+  // 倒れた病人が宿坊の設計図のマスに重なると、設置できず進行不能になる。
+  const sickOnLodge = () => page.evaluate(() => {
+    const g = window.__game;
+    const sick = ["sumi", "teru"].map((id) => g.villager(id));
+    return g.blueprints.active.cells
+      .filter((c) => sick.some((e) =>
+        Math.abs(e.pos.x - (c.x + 0.5)) < e.halfW + 0.5 &&
+        Math.abs(e.pos.z - (c.z + 0.5)) < e.halfW + 0.5 &&
+        e.pos.y < c.y + 1 && e.pos.y + e.height > c.y))
+      .map((c) => `${c.x},${c.y},${c.z}`);
+  });
+  const blockedNew = await sickOnLodge();
+  expect(blockedNew.length === 0, `病人は宿坊の予定地の外で休む (${blockedNew.join(" ")})`);
+
+  // 以前のセーブ（テルが宿坊の南壁のマスに倒れている）をロードすると、予定地の外へ移される。
+  await page.evaluate(() => {
+    const g = window.__game;
+    g.quests.ch5.relocate("teru", 47, 16);
+    g.autosave();
+  });
+  await page.reload({ waitUntil: "networkidle" });
+  await page.waitForTimeout(2000);
+  await page.click(".btn-continue");
+  await page.waitForTimeout(1800);
+  const blockedOld = await sickOnLodge();
+  expect(blockedOld.length === 0, `以前のセーブでも病人が宿坊の設置を妨げない (${blockedOld.join(" ")})`);
+  const wallFilled = await page.evaluate(() => {
+    const g = window.__game;
+    const cell = g.blueprints.active.cells.find((c) => c.x === 47 && c.z === 16 && c.y === g.blueprints.active.baseY);
+    g.inventory.add("wall", 1);
+    // 付き添いのナギは歩き回るので、たまたま同じマスに来ないよう一時的に遠ざける。
+    const nagi = g.villager("nagi");
+    const nagiPos = nagi.pos.clone();
+    nagi.pos.set(0, -100, 0);
+    g.fillGhostCell(cell);
+    nagi.pos.copy(nagiPos);
+    return g.world.get(cell.x, cell.y, cell.z) === cell.block;
+  });
+  expect(wallFilled, "テルがいた宿坊の南壁のマスに壁を置ける");
+
   // --- ③④ 宿坊 → 薬草園 → 煎じ湯 ---------------------------------------------------------
   await completeActiveBlueprint(page); // 宿坊
   await advanceToStage(page, "CH5_HERB_GARDEN");
