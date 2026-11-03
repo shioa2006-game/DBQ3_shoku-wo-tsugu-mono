@@ -12,10 +12,10 @@ const defs = `<defs>
     ${line('M-7 -3 Q-6 2 -2 4','#935039',.75)}
   </g>
   <g id="front-pincer">
-    ${path('M-9 -9 Q-3 -15 5 -11 Q13 -9 14 1 Q15 8 17 15 Q10 13 7 8 L3 3 Q1 1 -2 3 Q-5 7 -4 12 L-2 21 Q-10 18 -12 9 Q-15 0 -9 -9Z','url(#pincer)')}
-    ${face('M-9 -5 Q-7 -12 0 -11 Q7 -11 10 -5 Q4 -8 0 -7 L-5 -4Z','#d9946b')}
-    ${face('M-12 3 Q-10 11 -6 13 L-2 21 Q-10 18 -12 9Z','#944830')}
-    ${line('M3 3 Q3 0 7 -2','#85422e',1)}
+    ${path('M-4 6 Q-11 3 -10 -8 Q-10 -16 -5 -27 L0 -36 Q1 -29 -1 -22 L-3 -14 Q-3 -10 0 -10 Q4 -11 8 -17 L15 -25 Q14 -17 11 -10 Q8 0 3 5 Q0 8 -4 6Z','url(#pincer)')}
+    ${face('M-8 -8 Q-8 -17 -1 -29 L-5 -14 -4 -9 -6 -4Z','#d9946b')}
+    ${face('M-7 1 Q0 3 5 -4 L11 -16 Q10 -5 4 3 Q-1 9 -7 1Z','#92482f')}
+    ${line('M-2 -10 Q-1 -7 3 -8','#85422e',1)}
   </g></defs>`;
 
 // x は左右、z は前方、h は高さ。同じ岩の稜線を回転してひびの位置を保つ。
@@ -78,9 +78,9 @@ function leg(camera,side,index,brace) {
     + path(`M${ankle[0]-3} ${ankle[1]} Q${ankle[0]-2} ${toe[1]-1} ${toe.join(' ')} Q${ankle[0]+4} ${ankle[1]+2} ${ankle[0]+3} ${ankle[1]-1}Z`,'#c29c72','#563e32',.8);
 }
 function pincer(camera,side,brace,front) {
-  // 正面は足の接地点より上で手首を上下させ、画面手前へ向く二本の爪を描く。
-  const height = front ? (brace ? 36 : 26) : (brace ? 27 : 14);
-  const [x,y] = camera.project([side*28,height,37]);
+  // 正面は手首を支点にハサミを立て、爪先を上に開いたまま両腕を上下させる。
+  const height = front ? (brace ? 27 : 16) : (brace ? 27 : 14);
+  const [x,y] = camera.project([side*(front ? 35 : 28),height,37]);
   // 真横では奥の腕が隠れ、見えている爪先は進行方向を向く。
   const outward = side*camera.c-1.25*camera.s;
   const width = Math.sign(outward || -1)*Math.max(.70,Math.min(1,Math.abs(outward)));
