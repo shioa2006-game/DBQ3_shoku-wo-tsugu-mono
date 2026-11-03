@@ -52,4 +52,4 @@ Git操作はこの親フォルダで行います。子フォルダは通常の�
 
 [日常のGitHub運用](docs/GITHUB_WORKFLOW.md) / [2026-11-02の統合・整理記録](docs/REPOSITORY_MIGRATION.md)
 
-GitHubへのpushはソースの保存です。GitHub Pagesへの自動公開やGitHub Actionsは、この統合では設定していません。
+共通トップと両ゲームは [GitHub Pages](https://shioa2006-game.github.io/DBQ3_shoku-wo-tsugu-mono/) で公開します。`main` のゲーム・共通トップ・公開処理に関する変更をpushすると、GitHub Actionsが両ゲームをビルドして公開します。Studioは公開対象に含めません。手順は [共通トップのREADME](portal/README.md) を参照してください。

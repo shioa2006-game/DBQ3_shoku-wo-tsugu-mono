@@ -40,7 +40,7 @@ npm.cmd run build
 Remove-Item Env:RELATIVE_ASSET_PATHS
 ```
 
-GitLab CI設定は廃止しました。GitHub ActionsとPagesは未設定です。pushだけではゲームをWeb公開しません。将来公開するときは2ゲームの配置先とViteのbaseを合わせて設定してください。
+GitLab CI設定は廃止しました。現在は [GitHub Actions](../.github/workflows/pages.yml) が、`main` の共通トップ・両ゲーム・公開処理に関するpushを受けてGitHub Pagesへ自動公開します。`tools/build-portal.mjs` が相対URLで両ゲームを専用フォルダへビルドし、共通トップとまとめて配信します。Studioは公開対象外です。PagesのSourceは「GitHub Actions」に設定します。手動実行や確認方法は [共通トップのREADME](../portal/README.md) を参照してください。
 
 ## 履歴
 

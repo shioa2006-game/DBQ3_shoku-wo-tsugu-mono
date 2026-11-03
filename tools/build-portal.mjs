@@ -1,5 +1,5 @@
 // 共通トップと2ゲームを、既存distとは別の新規ディレクトリへまとめる。
-import { cp, mkdir, mkdtemp, access, writeFile } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, access, writeFile, appendFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -43,6 +43,9 @@ try {
     ], path.join(root, game));
   }
   console.log(`\n出力先: ${output}`);
+  if (process.env.GITHUB_OUTPUT) {
+    await appendFile(process.env.GITHUB_OUTPUT, `path=${output}\n`);
+  }
   console.log(`確認: node tools/serve-portal.mjs "${path.relative(root, output)}"`);
   console.log("公開設定・pushは行っていません。");
 } catch (error) {
