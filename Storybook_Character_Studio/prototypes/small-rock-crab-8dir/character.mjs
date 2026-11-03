@@ -10,6 +10,12 @@ const defs = `<defs>
     ${face('M-7 -8 Q-1 -18 6 -16 L15 -12 Q9 -14 4 -11 L-1 -7Z','#d9946b')}
     ${face('M-7 6 L-2 8 4 4 Q11 10 17 7 Q12 14 2 12 L-5 10Z','#92482f')}
     ${line('M-7 -3 Q-6 2 -2 4','#935039',.75)}
+  </g>
+  <g id="front-pincer">
+    ${path('M-9 -9 Q-3 -15 5 -11 Q13 -9 14 1 Q15 8 17 15 Q10 13 7 8 L3 3 Q1 1 -2 3 Q-5 7 -4 12 L-2 21 Q-10 18 -12 9 Q-15 0 -9 -9Z','url(#pincer)')}
+    ${face('M-9 -5 Q-7 -12 0 -11 Q7 -11 10 -5 Q4 -8 0 -7 L-5 -4Z','#d9946b')}
+    ${face('M-12 3 Q-10 11 -6 13 L-2 21 Q-10 18 -12 9Z','#944830')}
+    ${line('M3 3 Q3 0 7 -2','#85422e',1)}
   </g></defs>`;
 
 // x は左右、z は前方、h は高さ。同じ岩の稜線を回転してひびの位置を保つ。
@@ -71,23 +77,26 @@ function leg(camera,side,index,brace) {
   return segment(root,knee,9,'#a65b42')+segment(knee,ankle,6,'#bb7150')
     + path(`M${ankle[0]-3} ${ankle[1]} Q${ankle[0]-2} ${toe[1]-1} ${toe.join(' ')} Q${ankle[0]+4} ${ankle[1]+2} ${ankle[0]+3} ${ankle[1]-1}Z`,'#c29c72','#563e32',.8);
 }
-function pincer(camera,side,brace) {
-  const [x,y] = camera.project([side*28,brace?27:14,37]);
+function pincer(camera,side,brace,front) {
+  // 正面は足の接地点より上で手首を上下させ、画面手前へ向く二本の爪を描く。
+  const height = front ? (brace ? 36 : 26) : (brace ? 27 : 14);
+  const [x,y] = camera.project([side*28,height,37]);
   // 真横では奥の腕が隠れ、見えている爪先は進行方向を向く。
   const outward = side*camera.c-1.25*camera.s;
   const width = Math.sign(outward || -1)*Math.max(.70,Math.min(1,Math.abs(outward)));
   const root = camera.project([side*26,13,22]);
   return line('M'+root.join(' ')+' L'+x+' '+y,'#634032',10)
     + line('M'+root.join(' ')+' L'+x+' '+y,'#a55c42',7)
-    + `<use href="#pincer-shape" transform="translate(${x} ${y}) scale(${width} 1) rotate(${brace?-28:3})"/>`;
+    + (front ? `<use href="#front-pincer" transform="translate(${x} ${y}) scale(${side} 1)"/>`
+      : `<use href="#pincer-shape" transform="translate(${x} ${y}) scale(${width} 1) rotate(${brace?-28:3})"/>`);
 }
 function draw(view,frame) {
-  const cam=camera(view), brace=frame==='b', lift=brace?2:0;
+  const cam=camera(view), brace=frame==='b', lift=brace && view!==0 ? 2 : 0;
   const limbs=[];
   for (const side of [-1,1]) {
     for (let i=0;i<4;i++) limbs.push({z:cam.depth([side*44,0,18-i*12]),svg:leg(cam,side,i,brace)});
     if (view!==4 && !(view===2 && side===-1)) {
-      limbs.push({z:cam.depth([side*28,0,37]),svg:pincer(cam,side,brace)});
+      limbs.push({z:cam.depth([side*28,0,37]),svg:pincer(cam,side,brace,view===0)});
     }
   }
   limbs.sort((a,b)=>a.z-b.z);
