@@ -1,13 +1,23 @@
 // Renewed placed objects come from src/world/prop-models.js (exported from
 // Storybook_Character_Studio/prototypes/props-3d/): each one builds in the real
 // PropRenderer with black outlines, block-pattern textures and the parts the
-// renderer animates (door hinge, torch flame), with no console errors.
+// renderer animates (door hinge, flames, banner flag, crop sway), fences join
+// their neighbours, and there are no console errors.
 
 import { B } from "../../src/world/blocks.js";
 import { launchBrowser, openGame, newGame, expect } from "../helpers.mjs";
 
-const RENEWED = ["SCARECROW", "TORCH", "BED", "TORII", "DOOR", "WORKBENCH", "ALTAR", "SPIKES"].filter((n) => B[n] !== undefined);
-const REQUIRED = { TORCH: { name: "flame", flag: "torch" }, DOOR: { name: "hinge", flag: "door" }, ALTAR: { name: "orb" } };
+const RENEWED = [
+  "SCARECROW", "TORCH", "BED", "TORII", "DOOR", "WORKBENCH", "ALTAR", "SPIKES",
+  "FENCE", "CHEST", "KAMADO", "TABLE", "HELM", "BANNER", "CROP1", "CROP2", "CROP3", "BUSH", "MUSHROOM",
+].filter((n) => B[n] !== undefined);
+const REQUIRED = {
+  TORCH: { name: "flame", flag: "torch" }, DOOR: { name: "hinge", flag: "door" }, ALTAR: { name: "orb" },
+  KAMADO: { name: "flame", flag: "torch" }, BANNER: { name: "flag", flag: "banner" },
+  CROP1: { flag: "sway" }, CROP2: { flag: "sway" }, CROP3: { flag: "sway" },
+};
+// Thin plants are drawn without outlines on purpose.
+const NO_OUTLINE = new Set(["CROP1", "CROP2", "CROP3", "BUSH"]);
 
 const errors = [];
 const browser = await launchBrowser();
@@ -36,11 +46,19 @@ try {
         meshes,
         outlines,
         textured,
-        names: ["flame", "hinge", "orb"].filter((n) => prop?.getObjectByName(n)),
+        names: ["flame", "hinge", "orb", "flag", "emblem"].filter((n) => prop?.getObjectByName(n)),
         flags: Object.keys(prop?.userData ?? {}),
       };
       g.world.set(x, y, z, 0);
     });
+    // A fence gains rails when a neighbouring fence is placed (the renderer rebuilds it).
+    const meshCount = (p) => { let n = 0; p.traverse((o) => o.isMesh && !o.userData.outline && (n += 1)); return n; };
+    g.world.set(4, y, 10, ids.FENCE);
+    const alone = meshCount(g.props.props.get(`4,${y},10`));
+    g.world.set(5, y, 10, ids.FENCE);
+    out.fenceRails = meshCount(g.props.props.get(`4,${y},10`)) - alone;
+    g.world.set(4, y, 10, 0);
+    g.world.set(5, y, 10, 0);
     // The door opens toward a nearby player through the hinge, as before.
     const px = g.player.pos.x, pz = g.player.pos.z;
     const dx = Math.floor(px) + 1, dz = Math.floor(pz), dy = 20;
@@ -55,12 +73,14 @@ try {
   for (const name of RENEWED) {
     const r = report[name];
     expect(r.built, `${name} is built by PropRenderer`);
-    expect(r.outlines > 0 && r.meshes > r.outlines, `${name} has outlined parts (${r.meshes - r.outlines} parts, ${r.outlines} outlines)`);
+    if (NO_OUTLINE.has(name)) expect(r.meshes > 4, `${name} has parts (${r.meshes})`);
+    else expect(r.outlines > 0 && r.meshes > r.outlines, `${name} has outlined parts (${r.meshes - r.outlines} parts, ${r.outlines} outlines)`);
     const need = REQUIRED[name];
     if (need?.name) expect(r.names.includes(need.name), `${name} keeps "${need.name}"`);
     if (need?.flag) expect(r.flags.includes(need.flag), `${name} keeps userData.${need.flag}`);
   }
   expect(RENEWED.some((n) => report[n].textured > 0), "renewed props use block-pattern textures");
+  expect(report.fenceRails === 2, `a fence adds two rails toward a new neighbour (${report.fenceRails})`);
   expect(report.doorOpened, "door hinge opens near the player");
   expect(errors.length === 0, `no console errors (${JSON.stringify(errors)})`);
 } finally {

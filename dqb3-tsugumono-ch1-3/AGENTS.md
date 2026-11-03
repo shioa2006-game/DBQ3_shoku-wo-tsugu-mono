@@ -61,7 +61,7 @@ npm.cmd run test:e2e
 - `tests/e2e/smoke.test.mjs`：サブシステム、ワールド寸法、ニューゲームの起動スモーク。
 - `tests/e2e/sheets.test.mjs`：8方向スプライトシートの境界と中心位置。
 - `tests/e2e/item-icons.test.mjs`：全アイテムがStudio製アイコン画像を使い、ホットバーとドロップに表示されること。
-- `tests/e2e/prop-models.test.mjs`：作り直した設置物が `src/world/prop-models.js` から輪郭線つきで作られ、扉の開閉・たいまつの炎の部品が残ること。
+- `tests/e2e/prop-models.test.mjs`：作り直した設置物が `src/world/prop-models.js` から作られ、扉の開閉・炎・旗・稲の揺れの部品が残り、柵が隣とつながること。
 
 ### ヘッドレステストの注意
 

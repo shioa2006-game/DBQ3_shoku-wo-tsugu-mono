@@ -4,7 +4,13 @@ import { B, drawTileIcon } from '../../src/world/blocks.js';
 import { PropRenderer } from '../../src/world/props.js';
 import { createPropModels, PROP_MODEL_NAMES } from './prop-models.js';
 
-const LABELS = { SCARECROW: 'かかし', TORCH: 'たいまつ', BED: 'わらのベッド', TORII: '鳥居', DOOR: '木の扉', WORKBENCH: '作業台', ALTAR: '職業の祭壇', SPIKES: 'とげ罠' };
+const LABELS = {
+  SCARECROW: 'かかし', TORCH: 'たいまつ', BED: 'わらのベッド', TORII: '鳥居', DOOR: '木の扉', WORKBENCH: '作業台', ALTAR: '職業の祭壇', SPIKES: 'とげ罠',
+  FENCE: '柵（3つ並べる）', CHEST: '収納箱', KAMADO: 'かまど', TABLE: 'ちゃぶ台', HELM: '舵輪', BANNER: '職業の旗',
+  CROP1: '稲のなえ', CROP2: '育つ稲', CROP3: '実った稲', BUSH: 'わら草', MUSHROOM: 'きのこ',
+};
+// 隣とつながる設置物は、同じものを x 方向に3つ並べて見せる。
+const ROW = { FENCE: [-1, 0, 1] };
 const DIRECTION_LABELS = ['初期', '+45°', '+90°', '+135°', '+180°', '+225°', '+270°', '+315°'];
 // ゲームのカメラ（main.js）: 初期の向き atan2(6.5, 8.0)、45°刻み、高さ8.2・半径11.5、画角40°。
 const YAW0 = Math.atan2(6.5, 8.0), CAMERA_HEIGHT = 8.2, CAMERA_RADIUS = 11.5;
@@ -56,18 +62,28 @@ function makeScene() {
 const views = [makeScene(), makeScene()];
 for (const v of views) v.scene.add(v.holder);
 
-// 今の本編の形: 1マスだけの仮の世界で PropRenderer に作らせる。
+// 今の本編の形: 小さな仮の世界で PropRenderer に作らせる（柵は隣とつながった状態）。
 function currentProp(name) {
-  const cell = { x: 1, y: 1, z: 1 };
-  const world = { get: (x, y, z) => (x === cell.x && y === cell.y && z === cell.z ? B[name] : 0), onChange() {} };
+  const offsets = ROW[name] ?? [0];
+  const cells = new Set(offsets.map((dx) => `${2 + dx},1,1`));
+  const world = { get: (x, y, z) => (cells.has(`${x},${y},${z}`) ? B[name] : 0), onChange() {} };
   const renderer = new PropRenderer(world, new THREE.Scene());
-  const prop = [...renderer.props.values()][0];
-  prop.position.set(0, 0, 0);
-  return prop;
+  const g = new THREE.Group();
+  for (const prop of [...renderer.props.values()]) {
+    prop.position.set(prop.userData.cell.x - 2, 0, 0);
+    g.add(prop);
+  }
+  return g;
 }
 function newProp(name) {
-  const prop = models[name]();
-  return prop;
+  const offsets = ROW[name] ?? [0];
+  const g = new THREE.Group();
+  for (const dx of offsets) {
+    const prop = models[name]({ connects: (ox, oz) => oz === 0 && offsets.includes(dx + ox) });
+    prop.position.x = dx;
+    g.add(prop);
+  }
+  return g;
 }
 
 const renderer = new THREE.WebGLRenderer({ canvas: $('scene'), antialias: true, preserveDrawingBuffer: true });
@@ -138,13 +154,22 @@ function render() {
   });
 }
 
+// ゲームの PropRenderer.update と同じ動き（炎のゆらぎ・旗のなびき・稲の揺れ）。
 function animate(dt) {
   time += dt;
-  for (const p of props) {
-    if (!p?.userData.torch) continue;
-    const flame = p.getObjectByName('flame');
-    const s = 1 + Math.sin(time * 9) * 0.18;
-    flame?.scale.set(s, 1.15 - s * 0.15, s);
+  for (const holder of props) {
+    for (const p of holder?.children ?? []) {
+      if (p.userData.torch) {
+        const s = 1 + Math.sin(time * 9 + p.position.x * 7) * 0.18;
+        p.getObjectByName('flame')?.scale.set(s, 1.15 - s * 0.15, s);
+      }
+      if (p.userData.banner) {
+        const pos = p.getObjectByName('flag').geometry.attributes.position;
+        for (let i = 0; i < pos.count; i += 1) pos.setZ(i, Math.sin(time * 4 + pos.getX(i) * 3.5) * 0.06 * (pos.getX(i) + 0.45));
+        pos.needsUpdate = true;
+      }
+      if (p.userData.sway) p.rotation.z = Math.sin(time * 1.8 + p.position.x) * 0.05;
+    }
   }
 }
 

@@ -10,17 +10,27 @@
 // - 設置物は回転しない。カメラは +x・+z 側の斜め上から45°刻みで回るので、
 //   どの向きからも見られる形にし、顔や焚き口などの正面は +z に向ける。
 // - 名前の付いた部品と userData の目印（PROP_REQUIREMENTS）を残す。
+// - 作る関数は ctx を受け取る。ctx.connects(dx, dz) は、隣のマスが柵か扉なら true
+//   （柵の横木をつなぐのに使う）。ゲームの PropRenderer は隣が変わると作り直す。
 
-export const PROP_MODEL_VERSION = 1;
+export const PROP_MODEL_VERSION = 2;
 
 // 作り直した設置物。ブロック名（ゲームの B のキー）で引く。
-export const PROP_MODEL_NAMES = Object.freeze(['SCARECROW', 'TORCH', 'BED', 'TORII', 'DOOR', 'WORKBENCH', 'ALTAR', 'SPIKES']);
+export const PROP_MODEL_NAMES = Object.freeze([
+  'SCARECROW', 'TORCH', 'BED', 'TORII', 'DOOR', 'WORKBENCH', 'ALTAR', 'SPIKES', // 試作01
+  'FENCE', 'CHEST', 'KAMADO', 'TABLE', 'HELM', 'BANNER', 'CROP1', 'CROP2', 'CROP3', 'BUSH', 'MUSHROOM', // 試作02
+]);
 
 // ゲームの PropRenderer.update が使う部品と目印。
 export const PROP_REQUIREMENTS = Object.freeze({
   TORCH: { names: ['flame'], userData: ['torch'] },
   DOOR: { names: ['hinge'], userData: ['door'] },
   ALTAR: { names: ['orb'], userData: [] },
+  KAMADO: { names: ['flame'], userData: ['torch'] },
+  BANNER: { names: ['flag', 'emblem'], userData: ['banner'] },
+  CROP1: { names: [], userData: ['sway'] },
+  CROP2: { names: [], userData: ['sway'] },
+  CROP3: { names: [], userData: ['sway'] },
 });
 
 // 大きさの上限（輪郭線を含む）。xz は中心からの半幅、y は高さ。既定は1マス。
@@ -30,12 +40,13 @@ export const PROP_LIMITS = Object.freeze({
   DOOR: { xz: 0.5, y: 2.0 },
   TORII: { xz: 0.97, y: 2.2 },
   ALTAR: { xz: 0.5, y: 1.1 },
+  BANNER: { xz: 0.97, y: 2.4 }, // 旗は柱の横へ張り出す（本編の今の形と同じ）
 });
 
 const OUTLINE_COLOR = 0x1a1410;
 const LINE = 0.018; // 輪郭線の太さ（ワールド単位）
 
-export function createPropModels(THREE, { tile = () => null, spikes = 'stone' } = {}) {
+export function createPropModels(THREE, { tile = () => null, spikes = 'stone', grain = 'rice' } = {}) {
   // --- 材質（設置物どうしで共有） ---------------------------------------------------
   const toon = (color) => new THREE.MeshToonMaterial({ color });
   const glow = (color) => new THREE.MeshBasicMaterial({ color });
@@ -46,6 +57,8 @@ export function createPropModels(THREE, { tile = () => null, spikes = 'stone' } 
     red: toon(0xc23b2a), redDark: toon(0x8c2a1e), black: toon(0x2a2a2e),
     white: toon(0xf2ecdc), cloth: toon(0xe9e1cc), indigo: toon(0x3a62a8), indigoDark: toon(0x26447a),
     gold: toon(0xd9b545), copper: toon(0xc97b3f), jelly: toon(0x6f62ee), ink: toon(0x2a221c),
+    green: toon(0x4c9440), greenDark: toon(0x356b2b), greenLight: toon(0x7cc158), tea: toon(0x8aa64a),
+    banner: new THREE.MeshToonMaterial({ color: 0x2f5db0, side: THREE.DoubleSide }),
     flame: new THREE.MeshBasicMaterial({ color: 0xff8a3d, transparent: true, opacity: 0.82, depthWrite: false }),
     flameCore: glow(0xffe27a), orb: glow(0x9fd8ff), orbCore: glow(0xe8f7ff),
   };
@@ -94,6 +107,8 @@ export function createPropModels(THREE, { tile = () => null, spikes = 'stone' } 
   const coneGeo = (r, h, seg = 8) => cached(`cone:${r},${h},${seg}`, () => new THREE.ConeGeometry(r, h, seg));
   const sphereGeo = (r, ws = 12, hs = 10) => cached(`sphere:${r},${ws},${hs}`, () => new THREE.SphereGeometry(r, ws, hs));
   const torusGeo = (r, t) => cached(`torus:${r},${t}`, () => new THREE.TorusGeometry(r, t, 6, 16));
+  // きのこの傘など、上半分だけの球。
+  const capGeo = (r) => cached(`cap:${r}`, () => new THREE.SphereGeometry(r, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2));
 
   // 部品を置く。outline: 黒い輪郭線（裏面を少し大きく描く）を付けるか。
   function part(geometry, material, { x = 0, y = 0, z = 0, rx = 0, ry = 0, rz = 0, outline = true, name } = {}) {
@@ -118,7 +133,7 @@ export function createPropModels(THREE, { tile = () => null, spikes = 'stone' } 
   const sphere = (r, mat, o) => part(sphereGeo(r), mat, o);
   const group = (...children) => {
     const g = new THREE.Group();
-    for (const c of children.flat()) g.add(c);
+    for (const c of children.flat(Infinity)) g.add(c); // 部品の配列は入れ子でもよい
     return g;
   };
 
@@ -304,7 +319,179 @@ export function createPropModels(THREE, { tile = () => null, spikes = 'stone' } 
         cyl(0.15, 0.15, 0.03, C.strawDark, { y: 1.41, z: -0.03, rx: -0.42, outline: false }, 12),
       );
     },
+
+    // --- 試作02 ------------------------------------------------------------------------
+    // 柵: 丸太の杭に角の笠、隣の柵・扉へ板の横木を2本渡す。
+    FENCE(ctx = {}) {
+      const connects = ctx.connects ?? (() => false);
+      const g = group(
+        box(0.14, 0.86, 0.14, T.log(), { y: 0.43 }),
+        cone(0.11, 0.1, C.woodDark, { y: 0.91, ry: Math.PI / 4 }, 4),
+      );
+      for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        if (!connects(dx, dz)) continue;
+        for (const y of [0.34, 0.68]) {
+          g.add(box(dx ? 0.43 : 0.07, 0.1, dz ? 0.43 : 0.07, T.plank(), { x: dx * 0.285, y, z: dz * 0.285 }));
+        }
+      }
+      return g;
+    },
+
+    // 収納箱: 板材の箱と段のついたふた、四方を巻く鉄の帯、正面（+z）の金の留め具。
+    CHEST() {
+      return group(
+        box(0.86, 0.46, 0.66, T.plank(), { y: 0.23 }),
+        box(0.9, 0.12, 0.7, C.wood, { y: 0.52 }),
+        box(0.84, 0.06, 0.64, T.plank(), { y: 0.61 }),
+        [-0.3, 0.3].map((x) => box(0.07, 0.62, 0.72, C.iron, { x, y: 0.32 })),
+        box(0.15, 0.13, 0.04, C.gold, { y: 0.47, z: 0.365 }),
+        box(0.03, 0.05, 0.01, C.black, { y: 0.455, z: 0.388, outline: false }),
+      );
+    },
+
+    // かまど: 石積みの竈。焚き口は正面（+z）で、中に薪と炎。上に羽釜と木のふた。
+    KAMADO() {
+      const g = group(
+        box(0.9, 0.56, 0.5, T.stone(), { y: 0.28, z: -0.15 }),
+        [-1, 1].map((s) => box(0.28, 0.56, 0.3, T.stone(), { x: s * 0.31, y: 0.28, z: 0.25 })),
+        box(0.34, 0.22, 0.3, T.stone(), { y: 0.45, z: 0.25 }),
+        box(0.34, 0.03, 0.3, C.black, { y: 0.015, z: 0.25, outline: false }),
+        box(0.96, 0.08, 0.86, C.stoneDark, { y: 0.6 }),
+        [-0.06, 0.07].map((x, i) => cyl(0.035, 0.035, 0.3, T.log(), { x, y: 0.06 + i * 0.03, z: 0.22, rx: Math.PI / 2, ry: i ? 0.3 : -0.2, outline: false })),
+        flame(0.17, 0.75),
+        sphere(0.3, C.iron, { y: 0.76 }),
+        part(torusGeo(0.3, 0.035), C.black, { y: 0.74, rx: Math.PI / 2 }),
+        cyl(0.24, 0.26, 0.05, T.plank(), { y: 0.88 }),
+        cyl(0.04, 0.05, 0.05, C.woodDark, { y: 0.93 }),
+      );
+      g.children.find((c) => c.geometry?.type === 'SphereGeometry').scale.y = 0.6;
+      g.getObjectByName('flame').position.z = 0.25;
+      g.userData.torch = true; // かまどの火も夜の明かりとして扱う
+      return g;
+    },
+
+    // ちゃぶ台: 丸い板の天板と短い脚。湯のみ2つと急須。
+    TABLE() {
+      const legs = [[-0.25, -0.25], [0.25, -0.25], [-0.25, 0.25], [0.25, 0.25]].map(([x, z]) => box(0.06, 0.24, 0.06, C.woodDark, { x, y: 0.12, z }));
+      const cups = [[0.17, 0.12], [-0.15, -0.13]].flatMap(([x, z]) => [
+        cyl(0.045, 0.038, 0.07, C.cloth, { x, y: 0.365, z }, 10),
+        cyl(0.038, 0.038, 0.004, C.tea, { x, y: 0.398, z, outline: false }, 10),
+      ]);
+      const pot = sphere(0.07, C.woodDark, { x: -0.04, y: 0.39, z: 0.14 });
+      pot.scale.y = 0.85;
+      return group(
+        legs,
+        cyl(0.4, 0.4, 0.04, C.woodDark, { y: 0.26, outline: false }, 16),
+        cyl(0.44, 0.44, 0.06, T.plank(), { y: 0.3 }, 16),
+        cups,
+        pot,
+        cone(0.018, 0.08, C.woodDark, { x: 0.04, y: 0.4, z: 0.14, rz: -1.1, outline: false }, 6),
+        cyl(0.02, 0.02, 0.03, C.black, { x: -0.04, y: 0.46, z: 0.14, outline: false }, 6),
+      );
+    },
+
+    // 舵輪: 台座と柱に、木の輪・8本のスポークと取っ手・銅のハブ。輪は正面（+z）を向く。
+    HELM() {
+      const wheel = group(
+        part(torusGeo(0.24, 0.032), C.wood, {}),
+        part(torusGeo(0.09, 0.018), C.plank, { outline: false }),
+        [0, 1, 2, 3].map((i) => box(0.032, 0.6, 0.032, C.plank, { rz: (i * Math.PI) / 4 })),
+        Array.from({ length: 8 }, (_, i) => sphere(0.026, C.woodDark, { x: Math.cos((i * Math.PI) / 4) * 0.3, y: Math.sin((i * Math.PI) / 4) * 0.3, outline: false })),
+        cyl(0.055, 0.055, 0.08, C.copper, { rx: Math.PI / 2 }),
+      );
+      wheel.position.set(0, 0.64, 0.04);
+      return group(
+        box(0.4, 0.08, 0.3, C.woodDark, { y: 0.04 }),
+        box(0.14, 0.56, 0.14, T.log(), { y: 0.36 }),
+        wheel,
+      );
+    },
+
+    // 職業の旗: 石の台座、柱と金の頭、旗竿の金の横棒、青い旗と金の紋。
+    // 旗はゲームが頂点を波打たせるので、置くたびに別の形状を作る（使い回さない）。
+    BANNER() {
+      const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.6, 6, 1), C.banner);
+      flag.position.set(0.48, 1.85, 0);
+      flag.name = 'flag';
+      const emblem = new THREE.Mesh(cached('emblem', () => new THREE.CircleGeometry(0.14, 16)), C.gold);
+      emblem.position.set(0.48, 1.85, 0.03);
+      emblem.name = 'emblem';
+      const back = new THREE.Mesh(emblem.geometry, C.gold);
+      back.position.set(0.48, 1.85, -0.03);
+      back.rotation.y = Math.PI;
+      const g = group(
+        box(0.36, 0.12, 0.36, T.stone(), { y: 0.06 }),
+        box(0.24, 0.06, 0.24, C.stoneDark, { y: 0.15 }),
+        cyl(0.045, 0.055, 2.1, C.woodDark, { y: 1.2 }),
+        sphere(0.07, C.gold, { y: 2.29 }),
+        cyl(0.018, 0.018, 0.95, C.gold, { x: 0.47, y: 2.16, rz: Math.PI / 2, outline: false }),
+        flag, emblem, back,
+      );
+      g.userData.banner = true;
+      return g;
+    },
+
+    // 稲（なえ・育つ・実った）。4～5株を植え、葉は細い板を外へ反らせる。
+    // 第4～5章の火山穀物は grain: 'volcano' で穂を赤金色にする。
+    CROP1() {
+      return crop([[-0.22, -0.22], [0.22, -0.2], [-0.2, 0.22], [0.2, 0.2], [0, 0]], 5, 0.26, C.green, C.greenLight, null, 0.045);
+    },
+    CROP2() {
+      return crop([[-0.22, -0.22], [0.22, -0.2], [-0.2, 0.22], [0.2, 0.2], [0, 0]], 7, 0.5, C.greenDark, C.green, null, 0.055);
+    },
+    CROP3() {
+      return crop([[-0.22, -0.22], [0.22, -0.2], [-0.2, 0.22], [0.2, 0.2], [0, 0]], 6, 0.6, C.straw, null, grain === 'volcano' ? C.copper : C.gold, 0.05);
+    },
+
+    // わら草: 細い葉の束が外へ広がり、穂が2本。刈るとわらが取れる草。
+    BUSH() {
+      const blades = Array.from({ length: 14 }, (_, i) => {
+        const a = (i / 14) * Math.PI * 2 + (i % 2) * 0.2, h = 0.28 + (i % 4) * 0.06;
+        const r = i % 2 ? 0.1 : 0.05;
+        return cone(0.04, h, [C.straw, C.strawLight, C.strawDark][i % 3], { x: Math.cos(a) * r, y: h / 2, z: Math.sin(a) * r, rx: Math.sin(a) * 0.42, rz: -Math.cos(a) * 0.42, outline: false }, 4);
+      });
+      return group(
+        blades,
+        sphere(0.035, C.strawDark, { x: 0.12, y: 0.4, z: 0.05, outline: false }),
+        sphere(0.035, C.strawDark, { x: -0.1, y: 0.36, z: -0.08, outline: false }),
+      );
+    },
+
+    // きのこ: 白い軸に、白い斑点のある赤い傘。大小3本。
+    MUSHROOM() {
+      return group([[-0.16, -0.08, 1], [0.18, 0.12, 0.72], [0.02, 0.2, 0.56]].flatMap(([x, z, s]) => [
+        cyl(0.045 * s, 0.065 * s, 0.22 * s, C.white, { x, y: 0.11 * s, z }, 8),
+        part(capGeo(0.15 * s), C.red, { x, y: 0.2 * s, z }),
+        [[0.4, 0.5], [2.4, 0.7], [4.3, 0.45]].map(([a, t]) => sphere(0.022 * s, C.white, {
+          x: x + Math.cos(a) * Math.sin(t) * 0.15 * s, y: 0.2 * s + Math.cos(t) * 0.15 * s, z: z + Math.sin(a) * Math.sin(t) * 0.15 * s, outline: false,
+        })),
+      ]));
+    },
   };
+
+  // 稲の株。spots: 株の位置、blades: 1株の葉の数、h: 高さ、tip: 葉先の色、head: 穂の色、w: 葉の幅。
+  // 遠くのカメラからも見えるよう、葉は太めにして外へ反らせる。穂は1株に2本、反対向きに垂らす。
+  function crop(spots, blades, h, leaf, tip, head, w) {
+    const g = group(spots.flatMap(([x, z], k) => {
+      const parts = [];
+      for (let i = 0; i < blades; i += 1) {
+        const a = (i / blades) * Math.PI * 2 + k;
+        const hh = h * (0.82 + 0.18 * ((i * 7 + k) % 3) / 2);
+        parts.push(box(w, hh, 0.02, leaf, { x: x + Math.cos(a) * 0.035, y: hh / 2, z: z + Math.sin(a) * 0.035, ry: -a, rz: 0.3 * Math.cos(a), rx: -0.3 * Math.sin(a), outline: false }));
+        if (tip) parts.push(box(w * 0.9, 0.07, 0.022, tip, { x: x + Math.cos(a) * 0.09, y: hh - 0.01, z: z + Math.sin(a) * 0.09, ry: -a, rz: 0.3 * Math.cos(a), rx: -0.3 * Math.sin(a), outline: false }));
+      }
+      if (head) {
+        for (const side of [1, -1]) {
+          for (const [d, dy] of [[0.0, 0.04], [0.035, 0.03], [0.065, 0.0], [0.09, -0.04], [0.105, -0.09]]) {
+            parts.push(sphere(0.034, head, { x: x + side * d, y: h + dy, z: z + side * 0.02, outline: false }));
+          }
+        }
+      }
+      return parts;
+    }));
+    g.userData.sway = true;
+    return g;
+  }
 
   return MODELS;
 }

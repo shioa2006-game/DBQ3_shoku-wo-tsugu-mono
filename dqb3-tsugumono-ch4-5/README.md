@@ -48,7 +48,7 @@ Git管理は[親リポジトリ](../README.md)に統合しました。GitHubへ�
 
 ## 設置物の3D
 
-たいまつ・わらのベッド・鳥居・木の扉・作業台・職業の祭壇・とげ罠は、Studioの [props-3d](../Storybook_Character_Studio/prototypes/props-3d/README.md) の原本から書き出した `src/world/prop-models.js` で作ります。基本形状に黒い輪郭線を付け、木・石・わらの面にはブロックの模様を貼っています。とげ罠は鉄のとげです（本島編は石）。ほかの設置物は `src/world/props.js` の `BUILDERS` のままです。
+本島編と共通の設置物（たいまつ・わらのベッド・鳥居・木の扉・作業台・職業の祭壇・とげ罠・柵・収納箱・かまど・ちゃぶ台・舵輪・職業の旗・作物・わら草・きのこ）は、Studioの [props-3d](../Storybook_Character_Studio/prototypes/props-3d/README.md) の原本から書き出した `src/world/prop-models.js` で作ります。基本形状に黒い輪郭線を付け、木・石・わらの面にはブロックの模様を貼っています。とげ罠は鉄のとげ（ジパング復興編は石）、実った作物は赤金色の火山穀物の穂です。この編だけの設備（坑道灯・炭焼き窯・炉・金床・水桶・鉄鍋・穢れ石・清めの香草・祈り柱）と魚のかげは、`src/world/props.js` の `BUILDERS` のままです。
 
 形を直すときはStudioの `models.mjs` を編集し、Studioで `npm.cmd run export:props -- --preview-game` を実行します（第1～3章と第4～5章の両方へ書き出します）。`prop-models.js` は直接編集しないでください。今の本編の形と新しい形は、第1～3章の開発サーバーの `/builder_sprite_lab/prototypes/props-3d/` で並べて比べられます。
 

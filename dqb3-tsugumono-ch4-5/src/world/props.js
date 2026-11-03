@@ -10,24 +10,17 @@ import { cellKey } from "../core/utils.js";
 const MAT = {
   wood: new THREE.MeshToonMaterial({ color: 0x8a5a2c }),
   woodDark: new THREE.MeshToonMaterial({ color: 0x5f3d1c }),
-  plank: new THREE.MeshToonMaterial({ color: 0xc99c5f }),
   straw: new THREE.MeshToonMaterial({ color: 0xc2a557 }),
-  strawDark: new THREE.MeshToonMaterial({ color: 0x96793a }),
   stone: new THREE.MeshToonMaterial({ color: 0x8b9196 }),
   basalt: new THREE.MeshToonMaterial({ color: 0x4a4a50 }),
   steel: new THREE.MeshToonMaterial({ color: 0xaeb6bb }),
   iron: new THREE.MeshToonMaterial({ color: 0x5d6166 }),
-  red: new THREE.MeshToonMaterial({ color: 0xc23b2a }),
   white: new THREE.MeshToonMaterial({ color: 0xf2ecdc }),
-  green: new THREE.MeshToonMaterial({ color: 0x4c9440 }),
   greenDark: new THREE.MeshToonMaterial({ color: 0x356b2b }),
-  gold: new THREE.MeshToonMaterial({ color: 0xd9b545 }),
-  copper: new THREE.MeshToonMaterial({ color: 0xc97b3f }),
   flame: new THREE.MeshBasicMaterial({ color: 0xffb347 }),
   ember: new THREE.MeshBasicMaterial({ color: 0xff7a3d }),
   wisp: new THREE.MeshBasicMaterial({ color: 0x9fd8ff }),
   glow: new THREE.MeshBasicMaterial({ color: 0x9fd8ff }),
-  cloth: new THREE.MeshToonMaterial({ color: 0x2f5db0, side: THREE.DoubleSide }),
 };
 
 function box(w, h, d, mat, x = 0, y = 0, z = 0) {
@@ -49,37 +42,6 @@ function cone(r, h, mat, x = 0, y = 0, z = 0, seg = 6) {
 }
 
 const BUILDERS = {
-  [B.FENCE](world, x, y, z) {
-    const g = new THREE.Group();
-    g.add(box(0.14, 0.95, 0.14, MAT.wood, 0, 0.475, 0));
-    const link = (dx, dz) => {
-      const nid = world.get(x + dx, y, z + dz);
-      if (nid === B.FENCE || nid === B.DOOR) {
-        g.add(box(dx !== 0 ? 0.5 : 0.09, 0.09, dz !== 0 ? 0.5 : 0.09, MAT.woodDark, dx * 0.25, 0.72, dz * 0.25));
-        g.add(box(dx !== 0 ? 0.5 : 0.09, 0.09, dz !== 0 ? 0.5 : 0.09, MAT.woodDark, dx * 0.25, 0.38, dz * 0.25));
-      }
-    };
-    link(1, 0); link(-1, 0); link(0, 1); link(0, -1);
-    return g;
-  },
-  [B.HELM]() {
-    // 舵輪: 台座柱＋8本スポークの輪＋銅のハブ（第3章で直した船の舵）。
-    const g = new THREE.Group();
-    g.add(box(0.16, 0.55, 0.16, MAT.woodDark, 0, 0.275, 0));
-    const wheel = new THREE.Group();
-    wheel.position.set(0, 0.74, 0);
-    wheel.add(new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.045, 8, 18), MAT.wood));
-    for (let i = 0; i < 4; i += 1) {
-      const spoke = box(0.05, 0.78, 0.05, MAT.plank, 0, 0, 0);
-      spoke.rotation.z = (i * Math.PI) / 4;
-      wheel.add(spoke);
-    }
-    const hub = cylinder(0.08, 0.08, 0.1, MAT.copper, 0, 0, 0);
-    hub.rotation.x = Math.PI / 2;
-    wheel.add(hub);
-    g.add(wheel);
-    return g;
-  },
   [B.MINE_LAMP]() {
     // 坑道灯: 鬼火のかけらを封じた青白い吊り灯。
     const g = new THREE.Group();
@@ -92,84 +54,6 @@ const BUILDERS = {
     flame.name = "flame";
     g.add(flame);
     g.userData.torch = true;
-    return g;
-  },
-  [B.CHEST]() {
-    const g = new THREE.Group();
-    g.add(box(0.88, 0.52, 0.72, MAT.wood, 0, 0.26, 0));
-    g.add(box(0.94, 0.14, 0.78, MAT.plank, 0, 0.59, 0));
-    g.add(box(0.08, 0.68, 0.8, MAT.woodDark, -0.32, 0.34, 0));
-    g.add(box(0.08, 0.68, 0.8, MAT.woodDark, 0.32, 0.34, 0));
-    g.add(box(0.18, 0.16, 0.08, MAT.gold, 0, 0.44, -0.4));
-    return g;
-  },
-  [B.CROP1]() {
-    const g = new THREE.Group();
-    for (const [dx, dz] of [[-0.22, -0.22], [0.22, -0.2], [-0.2, 0.22], [0.2, 0.2]]) {
-      g.add(box(0.05, 0.28, 0.05, MAT.green, dx, 0.14, dz));
-    }
-    g.userData.sway = true;
-    return g;
-  },
-  [B.CROP2]() {
-    const g = new THREE.Group();
-    for (const [dx, dz] of [[-0.22, -0.22], [0.22, -0.2], [-0.2, 0.22], [0.2, 0.2], [0, 0]]) {
-      g.add(box(0.06, 0.55, 0.06, MAT.greenDark, dx, 0.27, dz));
-      g.add(box(0.14, 0.1, 0.14, MAT.green, dx, 0.58, dz));
-    }
-    g.userData.sway = true;
-    return g;
-  },
-  [B.CROP3]() {
-    const g = new THREE.Group();
-    // 火山穀物: 赤金色の穂が重く垂れる。
-    for (const [dx, dz] of [[-0.22, -0.22], [0.22, -0.2], [-0.2, 0.22], [0.2, 0.2], [0, 0]]) {
-      g.add(box(0.06, 0.7, 0.06, MAT.straw, dx, 0.35, dz));
-      const head = box(0.12, 0.22, 0.12, MAT.copper, dx + 0.06, 0.74, dz);
-      head.rotation.z = -0.5;
-      g.add(head);
-    }
-    g.userData.sway = true;
-    return g;
-  },
-  [B.BANNER]() {
-    const g = new THREE.Group();
-    g.add(cylinder(0.05, 0.06, 2.2, MAT.woodDark, 0, 1.1, 0));
-    g.add(new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), MAT.gold).translateY(2.24));
-    const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.6, 6, 1), MAT.cloth);
-    flag.position.set(0.48, 1.85, 0);
-    flag.name = "flag";
-    g.add(flag);
-    const emblem = new THREE.Mesh(new THREE.CircleGeometry(0.14, 16), MAT.gold);
-    emblem.position.set(0.48, 1.85, 0.012);
-    emblem.name = "emblem";
-    g.add(emblem);
-    g.userData.banner = true;
-    return g;
-  },
-  [B.BUSH]() {
-    const g = new THREE.Group();
-    for (const [dx, dz, s] of [[-0.15, -0.1, 1], [0.18, 0.05, 0.8], [0, 0.16, 0.9]]) {
-      g.add(cone(0.16 * s, 0.42 * s, MAT.straw, dx, 0.21 * s, dz, 5));
-    }
-    return g;
-  },
-  [B.KAMADO]() {
-    const g = new THREE.Group();
-    // 石積みの竈: 胴体 + 焚き口 + 羽釜 + ゆらめく炎。
-    g.add(box(0.9, 0.55, 0.8, MAT.stone, 0, 0.275, 0));
-    g.add(box(0.96, 0.1, 0.86, MAT.stone, 0, 0.6, 0));
-    g.add(box(0.34, 0.26, 0.06, MAT.woodDark, 0, 0.16, -0.39)); // 焚き口
-    const flame = cone(0.1, 0.18, MAT.flame, 0, 0.2, -0.34);
-    flame.name = "flame";
-    g.add(flame);
-    const pot = new THREE.Mesh(new THREE.SphereGeometry(0.3, 12, 8), MAT.steel);
-    pot.scale.y = 0.62;
-    pot.position.y = 0.74;
-    g.add(pot);
-    g.add(cylinder(0.34, 0.34, 0.05, MAT.woodDark, 0, 0.9, 0, 12)); // 木ぶた
-    g.add(cylinder(0.05, 0.05, 0.1, MAT.woodDark, 0, 0.97, 0));
-    g.userData.torch = true; // 竈の火も夜の明かりとして扱う
     return g;
   },
   [B.IRON_POT]() {
@@ -248,27 +132,6 @@ const BUILDERS = {
     g.add(box(0.8, 0.4, 0.55, MAT.wood, 0, 0.2, 0));
     g.add(box(0.66, 0.06, 0.42, new THREE.MeshBasicMaterial({ color: 0x3f7fd0 }), 0, 0.36, 0));
     for (const dx of [-0.36, 0.36]) g.add(box(0.06, 0.46, 0.58, MAT.woodDark, dx, 0.23, 0));
-    return g;
-  },
-  [B.TABLE]() {
-    const g = new THREE.Group();
-    // ちゃぶ台と湯のみ。食事シーンの集合場所。
-    g.add(cylinder(0.46, 0.46, 0.07, MAT.plank, 0, 0.32, 0, 14));
-    for (const [dx, dz] of [[-0.26, -0.26], [0.26, -0.26], [-0.26, 0.26], [0.26, 0.26]]) {
-      g.add(box(0.08, 0.3, 0.08, MAT.woodDark, dx, 0.15, dz));
-    }
-    g.add(cylinder(0.05, 0.04, 0.07, MAT.white, 0.15, 0.39, 0.1, 8));
-    g.add(cylinder(0.05, 0.04, 0.07, MAT.white, -0.18, 0.39, -0.08, 8));
-    return g;
-  },
-  [B.MUSHROOM]() {
-    const g = new THREE.Group();
-    for (const [dx, dz, s] of [[-0.16, -0.08, 1], [0.18, 0.12, 0.7], [0.02, 0.2, 0.55]]) {
-      g.add(cylinder(0.05 * s, 0.07 * s, 0.22 * s, MAT.white, dx, 0.11 * s, dz, 8));
-      const cap = new THREE.Mesh(new THREE.SphereGeometry(0.14 * s, 10, 8, 0, Math.PI * 2, 0, Math.PI / 2), MAT.red);
-      cap.position.set(dx, 0.2 * s, dz);
-      g.add(cap);
-    }
     return g;
   },
   [B.TAINT_STONE]() {
@@ -368,9 +231,16 @@ function propTile(name) {
   }
   return propTiles.get(name);
 }
-const PROP_MODELS = createPropModels(THREE, { tile: propTile, spikes: "iron" });
+const PROP_MODELS = createPropModels(THREE, { tile: propTile, spikes: "iron", grain: "volcano" });
+// 柵は隣の柵・扉へ横木を渡すので、隣のマスを ctx.connects で教える。
 for (const [name, build] of Object.entries(PROP_MODELS)) {
-  if (B[name] !== undefined) BUILDERS[B[name]] = () => build();
+  if (B[name] === undefined) continue;
+  BUILDERS[B[name]] = (world, x, y, z) => build({
+    connects: (dx, dz) => {
+      const id = world.get(x + dx, y, z + dz);
+      return id === B.FENCE || id === B.DOOR;
+    },
+  });
 }
 const MAX_TORCH_LIGHTS = 8;
 
