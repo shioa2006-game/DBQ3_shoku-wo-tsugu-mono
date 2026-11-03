@@ -50,6 +50,17 @@ h1 {
 }
 .chapter-art { position: relative; background: #718a7c; }
 .chapter-art img { width: 100%; height: auto; aspect-ratio: 18 / 11; object-fit: cover; display: block; }
+/* 元画像1916×940の (384, 110) から1152×704を表示し、HUDを枠外にする。 */
+.chapter-art--zipangu { aspect-ratio: 18 / 11; overflow: hidden; }
+.chapter-art--zipangu img {
+  position: absolute;
+  width: 166.319444%;
+  height: 133.522727%;
+  max-width: none;
+  aspect-ratio: auto;
+  left: -33.333333%;
+  top: -15.625%;
+}
 .art-caption { position: absolute; right: 10px; bottom: 8px; padding: 3px 8px; border-radius: 3px; background: #13282ce8; color: #f7fbff; font-size: 14px; }
 .chapter-content { padding: 20px 24px 24px; display: flex; flex: 1; flex-direction: column; }
 .chapter-number { font-size: 16px; font-weight: 700; margin: 0 0 6px; }
