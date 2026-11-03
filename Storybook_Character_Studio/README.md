@@ -72,7 +72,7 @@ npm.cmd run export:squid -- --preview-game
 | `prototypes/field-rat-8dir/` | おおねずみの全身作画・通常／かがむ2ポーズ・再生成 |
 | `prototypes/dorotabo-8dir/` | どろたぼうの全身作画・泥が沈む2ポーズ・再生成 |
 | `prototypes/squid-8dir/` | イカの全身作画・触腕2ポーズ・再生成 |
-| `prototypes/shared/` | 目・鼻・SVG部品・方向順 |
+| `prototypes/shared/` | 目・鼻・SVG部品・方向順、各キャラクターの書き出し先のゲーム（`game-targets.mjs`） |
 | `docs/` | 制作上の知見と整理記録 |
 | `index.html` | 人型7人とモンスター5体の制作入口 |
 | `tools/` | 起動とローカル静的配信 |
@@ -87,6 +87,8 @@ npm.cmd test
 PNGの再生成後は、ゲーム側の公式 `tests/authoring/adventurer.test.mjs`、`tests/authoring/mina.test.mjs`、`tests/authoring/pino.test.mjs`、`tests/authoring/inaho.test.mjs`、`tests/authoring/gonta.test.mjs`、`tests/authoring/jinbei.test.mjs`、`tests/authoring/watari.test.mjs` で実際のリグ表示を確認します。ゲームのコードを変更した場合はゲームの `AGENTS.md` に従ってビルド・回帰テストを実行してください。
 
 2026-11-02、CH1～CH3の人型7人・基本モンスター5種を本編へ移植しました。作画原本は引き続きここで管理します。移植先と確認項目は [制作一覧](prototypes/README.md) を参照してください。
+
+第4～5章のキャラクターも同じ方法で作り直します（[第4～5章の移植記録](../dqb3-tsugumono-ch4-5/docs/CHARACTER_ART.md)）。各キャラクターの書き出し先のゲームは `prototypes/shared/game-targets.mjs` に書き、`tests/node/game-targets.test.mjs` が、書き出し先のゲームの画像・原画・リグ設定がこのフォルダの出力と同じであること、両編の `rig.js` が同じであることを確かめます。
 
 スライムは `tests/authoring/slime.test.mjs` で8方向・2ポーズの境界と切り替え・水中色・狭い画面を確認します。詳しくは [スライムの制作手順](prototypes/slime-8dir/README.md) を参照してください。
 

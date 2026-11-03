@@ -309,6 +309,72 @@ const TOOL_BUILDERS = {
     addOutline(guard, 1.12);
     addOutline(pommel, 1.12);
   },
+  hammer_iron(group) {
+    // 第4章: ベルクと打った鉄のハンマー。黒鉄の頭に磨いた打面。
+    const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.036, 0.42, 8), toonMat(0x6d4a26));
+    handle.rotation.z = Math.PI / 2;
+    handle.position.x = -0.21;
+    const collar = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.042, 0.04, 8), toonMat(0x5d6166));
+    collar.rotation.z = Math.PI / 2;
+    collar.position.x = -0.34;
+    const head = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.32, 0.14), toonMat(0x4c5056));
+    head.position.x = -0.46;
+    for (const y of [-0.14, 0.14]) {
+      const cap = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.045, 0.15), toonMat(0xaeb6bb));
+      cap.position.y = y;
+      head.add(cap);
+    }
+    group.add(handle, collar, head);
+    addOutline(handle, 1.14);
+    addOutline(head, 1.08);
+    group.userData.hammerHead = head;
+  },
+  machete(group) {
+    // 第5章: 黒竹を払う鉄の山刀。幅広の片刃。
+    const blade = new THREE.Mesh(makeBladeGeometry([
+      [-0.12, -0.03], [-0.48, -0.06], [-0.56, 0.02], [-0.44, 0.075], [-0.12, 0.055],
+    ], 0.03), toonMat(0x9ba3ab));
+    const spine = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.02, 0.034), toonMat(0x6b7178));
+    spine.position.set(-0.29, 0.055, 0);
+    const guard = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.14, 0.07), toonMat(0x3d4147));
+    guard.position.x = -0.12;
+    const grip = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.13, 8), toonMat(0x54301f));
+    grip.rotation.z = Math.PI / 2;
+    grip.position.x = -0.05;
+    group.add(blade, spine, guard, grip);
+    addOutline(blade, 1.05);
+    addOutline(guard, 1.12);
+  },
+  sword_iron(group) {
+    // 第4章: ベルクが自らの意思で打った、町を守る鉄の剣。
+    const blade = new THREE.Mesh(makeBladeGeometry([
+      [-0.13, -0.055], [-0.55, -0.055], [-0.66, 0], [-0.55, 0.055], [-0.13, 0.055],
+    ], 0.035), toonMat(0x9ba3ab));
+    for (const y of [-0.042, 0.042]) {
+      const edge = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.016, 0.038), toonMat(0xd7dde2));
+      edge.position.set(-0.34, y, 0);
+      group.add(edge);
+    }
+    const fuller = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.024, 0.04), toonMat(0x6b7178));
+    fuller.position.x = -0.32;
+    const guard = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.24, 0.08), toonMat(0x3d4147));
+    guard.position.x = -0.13;
+    const grip = new THREE.Mesh(new THREE.CylinderGeometry(0.034, 0.034, 0.14, 8), toonMat(0x2e2a26));
+    grip.rotation.z = Math.PI / 2;
+    grip.position.x = -0.05;
+    for (const x of [-0.085, -0.05, -0.015]) {
+      const band = new THREE.Mesh(new THREE.CylinderGeometry(0.039, 0.039, 0.02, 8), toonMat(0x54301f));
+      band.rotation.z = Math.PI / 2;
+      band.position.x = x;
+      group.add(band);
+    }
+    const pommel = new THREE.Mesh(new THREE.SphereGeometry(0.045, 10, 8), toonMat(0x5d6166));
+    pommel.position.x = 0.02;
+    group.add(blade, fuller, guard, grip, pommel);
+    addOutline(blade, 1.04);
+    addOutline(guard, 1.12);
+    addOutline(pommel, 1.12);
+  },
 };
 
 export function createToolMesh(kind) {

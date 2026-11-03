@@ -141,6 +141,7 @@ node tools/normalize_sheet.mjs art_src/<name>_body_8dir.src.png assets/humanoids
 - Preview確認に時間を使いすぎず、使えない場合は数値検証、実装、設計、ユーザー確認へ戻る。
 - キャラクター調整は原則として`src/main.js`冒頭のパラメータで行い、
   ジオメトリ生成ロジックは必要な場合だけ変更する。
+- `src/entities/rig.js` は第4～5章と同じ内容に保つ（第4～5章の道具も含む）。直すときは両編へ同じ変更を入れる。Studioのテストが一致を確かめる。
 
 ## 作業完了時
 

@@ -433,14 +433,13 @@ const tmpQuat = new THREE.Quaternion();
 const tmpQuat2 = new THREE.Quaternion();
 
 export class HumanoidRig {
-  constructor({ sheetUrl, colors, scale = 1, tuning = {} }) {
+  constructor({ sheetUrl, headSheetUrl = sheetUrl, bodySheetUrl = sheetUrl, colors, scale = 1, tuning = {} }) {
     this.colors = colors;
     this.scale = scale;
     this.tuning = tuning;
-    const shared = loadSheet(sheetUrl);
-    this.headTexture = shared.clone();
+    this.headTexture = loadSheet(headSheetUrl).clone();
     this.headTexture.needsUpdate = true;
-    this.bodyTexture = shared.clone();
+    this.bodyTexture = loadSheet(bodySheetUrl).clone();
     this.bodyTexture.needsUpdate = true;
 
     this.group = new THREE.Group(); // rotated to camera yaw by the owner
@@ -484,7 +483,7 @@ export class HumanoidRig {
 
   createHead() {
     const group = new THREE.Group();
-    group.position.y = HEAD_CY;
+    group.position.y = HEAD_CY + this.getHeadOffsetY("front");
     const box = makeFaceBox(new THREE.BoxGeometry(HEAD_W, HEAD_H, HEAD_D), this.headTexture, this.colors.headBack);
     // Water is renderOrder 2. Preserve head-over-body layering below the water,
     // so image faces and procedural 3D parts receive the same water veil.
@@ -496,7 +495,11 @@ export class HumanoidRig {
   createBody() {
     const group = new THREE.Group();
     group.position.y = BODY_CY;
-    const box = makeFaceBox(new THREE.BoxGeometry(BODY_W, BODY_H, BODY_D), this.bodyTexture, this.colors.bodyBack);
+    // Extend the window upward for an authored neck layer, preserving the pixel
+    // scale and bottom anchor of the original torso (no stretching of clothes).
+    const extraHeight = BODY_H * ((this.tuning.bodyTopV ?? BODY_V.v1) - BODY_V.v1) / (BODY_V.v1 - BODY_V.v0);
+    const box = makeFaceBox(new THREE.BoxGeometry(BODY_W, BODY_H + extraHeight, BODY_D), this.bodyTexture, this.colors.bodyBack);
+    box.position.y = extraHeight / 2;
     box.renderOrder = 0;
     group.add(box);
     return group;
@@ -504,11 +507,11 @@ export class HumanoidRig {
 
   createArm(side) {
     const pivot = new THREE.Group();
-    pivot.position.set(side * ARM_X, SHOULDER_Y, 0);
+    pivot.position.set(side * ARM_X, SHOULDER_Y + (this.tuning.shoulderLift ?? 0), 0);
     const limb = new THREE.Group();
-    limb.rotation.z = side * ARM_REST_TILT;
+    limb.rotation.z = side * (this.tuning.armRestTilt ?? ARM_REST_TILT);
     const upper = new THREE.Mesh(new THREE.CapsuleGeometry(0.056, 0.1, 4, 8), toonMat(this.colors.sleeve));
-    upper.position.y = -0.12;
+    upper.position.y = this.tuning.sleeveY ?? -0.12;
     const hand = new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 10), toonMat(this.colors.hand));
     hand.position.y = -0.26;
     const toolMount = new THREE.Group();
@@ -565,12 +568,14 @@ export class HumanoidRig {
   }
 
   setDirection(direction) {
+    const previousHeadOffset = this.getHeadOffsetY();
     this.direction = direction;
+    this.head.position.y += this.getHeadOffsetY() - previousHeadOffset;
     const frame = DIRECTIONS[direction];
     const headCenter = this.artCenter("head", direction, HEAD_HALF_U);
     const bodyCenter = this.artCenter("body", direction, BODY_HALF_U);
     setCellWindow(this.headTexture, frame, headCenter - HEAD_HALF_U, headCenter + HEAD_HALF_U, HEAD_V.v0, HEAD_V.v1);
-    setCellWindow(this.bodyTexture, frame, bodyCenter - BODY_HALF_U, bodyCenter + BODY_HALF_U, BODY_V.v0, BODY_V.v1);
+    setCellWindow(this.bodyTexture, frame, bodyCenter - BODY_HALF_U, bodyCenter + BODY_HALF_U, BODY_V.v0, this.tuning.bodyTopV ?? BODY_V.v1);
     this.setLimbLayout(direction);
     this.updateToolMount();
   }
@@ -581,20 +586,32 @@ export class HumanoidRig {
     if (key !== this.direction) this.setDirection(key);
   }
 
+  getHeadOffsetY(direction = this.direction ?? "front") {
+    return (this.tuning.headOffsetY ?? 0) + (this.tuning.headLiftByDirection?.[direction] ?? 0);
+  }
+
   setLimbLayout(direction) {
     const [fx, fz] = FACING[direction];
     const sx = fz;
     const limbDepthScale = this.tuning.limbDepthScale ?? LIMB_DEPTH_SCALE;
     const legSep = this.tuning.legSep ?? LEG_SEP;
     const armSep = this.tuning.armSep ?? ARM_SEP;
+    // Optional authored attachment settings. Defaults preserve existing rigs;
+    // they move meshes, never the fixed sprite UV windows or cell anchors.
+    const armRestTilt = this.tuning.armRestTilt ?? ARM_REST_TILT;
+    const shoulderY = SHOULDER_Y + (this.tuning.shoulderLift ?? 0);
+    const bodyDepth = this.tuning.bodyDepth ?? 0;
+    this.body.position.z = bodyDepth;
+    this.head.position.x = fx * (this.tuning.headForward ?? 0);
+    this.head.position.z = this.tuning.headDepth ?? 0;
     const sz = -fx * limbDepthScale;
     this.leftLeg.position.set(-sx * legSep, HIP_Y + LEG_LIFT, -sz * legSep);
     this.rightLeg.position.set(sx * legSep, HIP_Y + LEG_LIFT, sz * legSep);
-    this.leftArm.position.set(-sx * armSep, SHOULDER_Y, -sz * armSep);
-    this.rightArm.position.set(sx * armSep, SHOULDER_Y, sz * armSep);
+    this.leftArm.position.set(-sx * armSep, shoulderY, bodyDepth - sz * armSep);
+    this.rightArm.position.set(sx * armSep, shoulderY, bodyDepth + sz * armSep);
     const screenSide = Math.sign(sx);
-    this.leftArm.userData.tiltGroup.rotation.z = -screenSide * ARM_REST_TILT;
-    this.rightArm.userData.tiltGroup.rotation.z = screenSide * ARM_REST_TILT;
+    this.leftArm.userData.tiltGroup.rotation.z = -screenSide * armRestTilt;
+    this.rightArm.userData.tiltGroup.rotation.z = screenSide * armRestTilt;
   }
 
   updateToolMount() {
@@ -622,6 +639,22 @@ export class HumanoidRig {
     this.tool.position.copy(tmpMount);
     const theta = TOOL_DIRECTION_ANGLE[this.direction];
     this.tool.rotation.set(0.08, 0, theta);
+    if (this.toolKind.startsWith("sword_")) {
+      // Local -X is the blade's length and local Z its broad-face normal.
+      // Roll about the grip-to-tip axis so the blade plane contains the swing
+      // tangent. This changes edge alignment, never the tip path or hand pose.
+      const [fx, fz] = FACING[this.direction];
+      tmpHandleDir.set(-1, 0, 0).applyQuaternion(this.tool.quaternion);
+      tmpAxis.set(-fz, 0, fx).normalize();
+      tmpAxis.addScaledVector(tmpHandleDir, -tmpAxis.dot(tmpHandleDir)).normalize();
+      tmpQuat.copy(this.tool.quaternion).invert();
+      tmpAxis.applyQuaternion(tmpQuat);
+      if (tmpAxis.z < 0) tmpAxis.negate(); // Same cutting plane, shortest roll.
+      const roll = Math.atan2(-tmpAxis.y, tmpAxis.z);
+      tmpAxis.set(1, 0, 0);
+      tmpQuat.setFromAxisAngle(tmpAxis, roll);
+      this.tool.quaternion.multiply(tmpQuat);
+    }
     if (swingAngle !== 0) {
       const [fx, fz] = FACING[this.direction];
       tmpSwingAxis.set(-fz, 0, fx).normalize();
@@ -663,9 +696,9 @@ export class HumanoidRig {
     const bob = walking ? Math.abs(phase) * 0.045 : (idle + 1) * 0.5 * 0.018;
     const headBob = bob + (walking ? Math.abs(phase) * 0.02 : idle * 0.008);
     this.body.position.y = BODY_CY + bob;
-    this.head.position.y = HEAD_CY + headBob;
-    this.leftArm.position.y = SHOULDER_Y + bob;
-    this.rightArm.position.y = SHOULDER_Y + bob;
+    this.head.position.y = HEAD_CY + this.getHeadOffsetY() + headBob;
+    this.leftArm.position.y = SHOULDER_Y + (this.tuning.shoulderLift ?? 0) + bob;
+    this.rightArm.position.y = SHOULDER_Y + (this.tuning.shoulderLift ?? 0) + bob;
     this.updateToolAttachment(this.attackT > 0 ? chop * 0.9 : 0);
   }
 }

@@ -38,7 +38,8 @@
 
 1. 原本は隣の `Storybook_Character_Studio/prototypes/*-8dir/` で編集。
 2. Studioの対象 `export:* -- --preview-game` で正規化済み画像と原画を本リポジトリへ同期。このコマンドで更新される `_code_` 画像は、現在は本編も使用します。
-3. リグ設定を変えた場合はStudioの `rig-profile.mjs` を本編の `src/content/rig-profiles/<id>.mjs` にも同期。比較ページ側のコピーだけ更新して終わらないこと。
+3. リグ設定を変えた場合はStudioの `rig-profile.mjs` を本編の `src/content/rig-profiles/<id>.mjs` にも同期。比較ページ側のコピーだけ更新して終わらないこと。Studioの `prototypes/shared/game-targets.mjs` に各キャラクターの書き出し先を書き、Studioのテスト（`tests/node/game-targets.test.mjs`）が本編の画像・原画・リグ設定との一致を確かめる。
+   `src/entities/rig.js` は第4～5章と同じ内容に保つ（2026-11-03に統一）。第4～5章の移植は [第4～5章の記録](../../dqb3-tsugumono-ch4-5/docs/CHARACTER_ART.md)。
 4. 層を個別に再正規化しない。頭・胴は制作時の合成シートと共通の基準点を使う。モンスターの飛行用余白も完成出力のまま移植。
 5. 本編の検証は `npm.cmd run test:ci` と `npm.cmd run test:e2e`。専用比較は従来の `tests/authoring/`。
 
