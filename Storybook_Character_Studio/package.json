@@ -18,7 +18,8 @@
     "export:rat": "node prototypes/field-rat-8dir/export.mjs",
     "export:dorotabo": "node prototypes/dorotabo-8dir/export.mjs",
     "export:squid": "node prototypes/squid-8dir/export.mjs",
-    "export:items": "node prototypes/item-icons/export.mjs"
+    "export:items": "node prototypes/item-icons/export.mjs",
+    "export:props": "node prototypes/props-3d/export.mjs"
   },
   "engines": {
     "node": ">=18"
