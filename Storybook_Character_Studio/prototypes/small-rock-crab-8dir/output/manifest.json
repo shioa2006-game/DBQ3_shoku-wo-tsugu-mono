@@ -1,0 +1,212 @@
+{
+  "id": "small_rock_crab",
+  "name": "小岩ガニ",
+  "role": "SMALL ROCK CRAB",
+  "version": 1,
+  "status": "prototype",
+  "source": "../character.mjs",
+  "format": "game-monster-billboard",
+  "cellSize": 128,
+  "columns": 4,
+  "rows": 2,
+  "directions": [
+    "front",
+    "front_left",
+    "left",
+    "back_left",
+    "back",
+    "back_right",
+    "right",
+    "front_right"
+  ],
+  "labels": [
+    "正面",
+    "左斜め前",
+    "左",
+    "左斜め後",
+    "背面",
+    "右斜め後",
+    "右",
+    "右斜め前"
+  ],
+  "anchor": {
+    "centerU": 0.494,
+    "bottomFromTop": 0.945
+  },
+  "frames": [
+    {
+      "frame": "a",
+      "output": "small_rock_crab_code_idle_a_8dir.png",
+      "normalization": [
+        {
+          "row": 0,
+          "col": 0,
+          "dx": 0,
+          "dy": 7,
+          "bbox": "11-114/57-114",
+          "before": "0.488",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "dx": 7,
+          "dy": 3,
+          "bbox": "2-110/56-118",
+          "before": "0.438",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "dx": 13,
+          "dy": 2,
+          "bbox": "10-90/57-119",
+          "before": "0.391",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 3,
+          "dx": 7,
+          "dy": 4,
+          "bbox": "2-110/57-117",
+          "before": "0.438",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 0,
+          "dx": 0,
+          "dy": 11,
+          "bbox": "11-114/58-110",
+          "before": "0.488",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 1,
+          "dx": -6,
+          "dy": 4,
+          "bbox": "15-123/57-117",
+          "before": "0.539",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "dx": -13,
+          "dy": 2,
+          "bbox": "36-115/57-119",
+          "before": "0.590",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 3,
+          "dx": -6,
+          "dy": 3,
+          "bbox": "15-123/56-118",
+          "before": "0.539",
+          "after": "0.492"
+        }
+      ]
+    },
+    {
+      "frame": "b",
+      "output": "small_rock_crab_code_idle_b_8dir.png",
+      "normalization": [
+        {
+          "row": 0,
+          "col": 0,
+          "dx": 0,
+          "dy": 11,
+          "bbox": "10-115/55-110",
+          "before": "0.488",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "dx": 6,
+          "dy": 3,
+          "bbox": "4-110/55-118",
+          "before": "0.445",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "dx": 12,
+          "dy": 2,
+          "bbox": "12-89/55-119",
+          "before": "0.395",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 3,
+          "dx": 6,
+          "dy": 4,
+          "bbox": "4-110/49-117",
+          "before": "0.445",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 0,
+          "dx": 0,
+          "dy": 11,
+          "bbox": "10-115/56-110",
+          "before": "0.488",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 1,
+          "dx": -5,
+          "dy": 4,
+          "bbox": "15-121/49-117",
+          "before": "0.531",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "dx": -12,
+          "dy": 2,
+          "bbox": "36-113/55-119",
+          "before": "0.582",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 3,
+          "dx": -5,
+          "dy": 3,
+          "bbox": "15-121/55-118",
+          "before": "0.531",
+          "after": "0.492"
+        }
+      ]
+    }
+  ],
+  "runtime": {
+    "class": "MonsterSprite",
+    "interval": 0.38,
+    "uv": {
+      "uMin": 0.02,
+      "uMax": 0.98,
+      "vMin": 0.02,
+      "vMax": 0.98
+    },
+    "scale": 1,
+    "tint": 16777215,
+    "yOffset": 0
+  },
+  "references": [
+    "references/small-rock-crab-4dir-v2.png",
+    "references/small-rock-crab-4dir-v2.png"
+  ],
+  "targets": []
+}

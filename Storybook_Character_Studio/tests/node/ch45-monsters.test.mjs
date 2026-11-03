@@ -7,6 +7,7 @@ import { createRequire } from 'node:module';
 import { buildWillOWispSheet } from '../../prototypes/will-o-wisp-8dir/character.mjs';
 import { buildArmoredScorpionSheet } from '../../prototypes/armored-scorpion-8dir/character.mjs';
 import { buildVolcanoLizardSheet } from '../../prototypes/volcano-lizard-8dir/character.mjs';
+import { buildCrabSheet } from '../../prototypes/small-rock-crab-8dir/character.mjs';
 import { buildGromHeadSheet, buildGromBodySheet } from '../../prototypes/grom-8dir/character.mjs';
 
 const require = createRequire(new URL('../../../dqb3-tsugumono-ch4-5/package.json', import.meta.url));
@@ -14,11 +15,12 @@ const { PNG } = require('pngjs');
 const MONSTERS = {
   will_o_wisp: ['will-o-wisp-8dir', buildWillOWispSheet],
   armored_scorpion: ['armored-scorpion-8dir', buildArmoredScorpionSheet],
+  small_rock_crab: ['small-rock-crab-8dir', buildCrabSheet],
   volcano_lizard: ['volcano-lizard-8dir', buildVolcanoLizardSheet],
 };
 const output = (folder, file) => new URL(`../../prototypes/${folder}/output/${file}`, import.meta.url);
 
-test('new CH4-5 monster SVGs reproduce exactly from their authoring code', async () => {
+test('monster SVGs reproduce exactly from their authoring code', async () => {
   for (const [id, [folder, build]] of Object.entries(MONSTERS)) {
     for (const frame of ['a', 'b']) assert.equal(build({ frame }), await readFile(output(folder, `${id}_code_idle_${frame}_8dir.svg`), 'utf8'), `${id} ${frame}`);
     assert.throws(() => build({ frame: 'c' }), /Unknown frame/);

@@ -20,6 +20,11 @@ const MONSTERS = {
     output: new URL('../../../prototypes/rockhorn-goat-8dir/output/', import.meta.url),
     note: '第6章の山道に登場予定。Aは通常姿勢、Bは頭を下げて踏ん張る姿勢。左は4方向の参照画で、斜め後ろには背面、右向きには左向きの反転を表示します。',
     variants: [['岩角ヤギ', 1, 0xffffff, false]] },
+  small_rock_crab: { name: '小岩ガニ', art: 'small_rock_crab', chapter: 'ダーマ再興編',
+    design: new URL('../../../references/small-rock-crab-4dir-v2.png', import.meta.url),
+    output: new URL('../../../prototypes/small-rock-crab-8dir/output/', import.meta.url),
+    note: '採石洞の岩に紛れるカニ。Aは通常姿勢、Bは両方のハサミを構える姿勢。斜め後ろの参照には背面を使います。大岩ガニは同じ造形を拡大した試作です。',
+    variants: [['小岩ガニ', 1, 0xffffff, false], ['大岩ガニ（拡大試作）', 2, 0xffffff, false]] },
 };
 const ids = Object.keys(MONSTERS);
 const params = new URLSearchParams(location.search);
