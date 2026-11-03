@@ -26,6 +26,11 @@ function face(view) {
   const straight=view===0 || view===4;
   const farHorn=horn(straight?-9:-6,profile?-.66:-.88);
   const nearHorn=horn(straight?8:5,1);
+  if(view===3) {
+    // 奥の耳の根元だけを頭で隠し、手前の耳は側面の輪郭に重ねる。
+    return farHorn+nearHorn+ear(15,.85)+head+ear(-13,-1)
+      +line('M-7 -8 L-2 -10 4 -6','#898992',.8);
+  }
   let result=farHorn+nearHorn+(straight?ear(-13,-1):'')+head+ear(straight?13:10,1);
   if(back) return result+line('M-7 -8 L-2 -10 4 -6','#898992',.8);
   function eye(x,width) {
@@ -109,6 +114,7 @@ function draw(view,frame,flying) {
   const head=group(hx,hy,`<g transform="scale(.84)">${face(view)}</g>`);
   const rear=view>=3;
   const trunk=foot(-1)+arm(-1)+foot(1)+body;
+  if(view===3) return trunk+arm(1)+wing(-1)+wing(1)+head+tail;
   if(rear) return trunk+arm(1)+head+wing(-1)+wing(1)+tail;
   if(view===1 || view===2) return wing(-1)+tail+trunk+wing(1)+arm(1)+head;
   return wing(-1)+wing(1)+tail+trunk+arm(1)+head;
