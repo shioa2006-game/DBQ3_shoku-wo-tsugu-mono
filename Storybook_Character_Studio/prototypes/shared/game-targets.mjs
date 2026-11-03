@@ -44,6 +44,10 @@ export const CHARACTERS = Object.freeze([
   monster('field-rat', 'field_rat', ['ch1-3']),
   monster('dorotabo', 'dorotabo', ['ch1-3', 'ch4-5']), // 第4～5章は灰どろたぼう・瘴気どろたぼう（色替え）
   monster('squid', 'squid', ['ch1-3']),
+  // 第4～5章の新しいモンスター（段階3）。鬼火は瘴気の鬼火・炉喰らいの大鬼火にも色替え・拡大で使う。
+  monster('will-o-wisp', 'will_o_wisp', ['ch4-5']),
+  monster('armored-scorpion', 'armored_scorpion', ['ch4-5']),
+  monster('volcano-lizard', 'volcano_lizard', ['ch4-5']),
 ]);
 
 export const gameUrl = (game, path) => new URL(`../../../${GAMES[game]}/${path}`, import.meta.url);

@@ -1,13 +1,16 @@
 // Studioのキャラクターが、頭胴の分離層・リグ設定で8方向・歩行・道具・A/B切替まで動くことを確かめる。
 // 第1～3章から流用: 主人公・ミナ・ゴンタ・ワタリ、こうもり・どろたぼうの色替え。
-// 火山島編の新規: ベルク・ロク・カヤ・ナギ・ヨモギ・スミ・テル（段階2）。
+// 火山島編の新規: ベルク・ロク・カヤ・ナギ・ヨモギ・スミ・テル（段階2）、鬼火（瘴気の鬼火・炉喰らいの大鬼火も共用）・
+// 鉄甲サソリ・火山トカゲ（段階3）。
 // CHARACTER_ART_SCREENSHOTS=1 で work/character-migration/ に8方向の一覧画像を書き出す。
 import assert from 'node:assert/strict';
 import {mkdir,writeFile} from 'node:fs/promises';
 import {launchBrowser,openGame,newGame,waitForCond} from '../helpers.mjs';
 const villagers=['mina','gonta','watari','belk','roku','kaya','nagi','yomogi','sumi','teru'];
-const monsters=['fire_bat','ash_dorotabo','taint_bat','taint_dorotabo'];
-const artNames=['night_bat','dorotabo','night_bat','dorotabo'];
+const monsters=['fire_bat','ash_dorotabo','taint_bat','taint_dorotabo','will_o_wisp','taint_wisp','great_will_o_wisp','iron_scorpion','lava_lizard'];
+const artNames=['night_bat','dorotabo','night_bat','dorotabo','will_o_wisp','will_o_wisp','will_o_wisp','armored_scorpion','volcano_lizard'];
+// Recolored variants share another monster's sheets; the new monsters use their own colours.
+const recolored=['fire_bat','ash_dorotabo','taint_bat','taint_dorotabo','taint_wisp','great_will_o_wisp'];
 const directions=['front','front_left','left','back_left','back','back_right','right','front_right'];
 const profiles={};
 for(const id of ['adventurer',...villagers]) profiles[id]=(await import(`../../src/content/rig-profiles/${id}.mjs`))[`${id.toUpperCase()}_RIG_PROFILE`];
@@ -74,10 +77,11 @@ try {
    assert.ok(Math.abs(p.bodyUV[3]-(h.id==='adventurer'?.2:.245))<1e-8,'separate torso includes collar');
   }
  }
- const scales=[.85,1.15,.9,1.2];
+ const scales=[.85,1.15,.9,1.2,.85,.9,2.6,1.05,.95];
  for(const [i,m] of result.mobs.entries()){
   assert.match(m.a,new RegExp(`${artNames[i]}_code_idle_a_8dir`));assert.match(m.b,new RegExp(`${artNames[i]}_code_idle_b_8dir`));
-  assert.equal(m.scale,scales[i]);assert.equal(m.tint,m.defTint);assert.notEqual(m.tint,0xffffff,`${m.id}: recolored`);
+  assert.equal(m.scale,scales[i]);assert.equal(m.tint,m.defTint);
+  if(recolored.includes(m.id))assert.notEqual(m.tint,0xffffff,`${m.id}: recolored`);else assert.equal(m.tint,0xffffff,`${m.id}: own colours`);
   for(const [j,p] of m.poses.entries()){
    assert.ok(p.cycle);assert.ok(Math.abs(p.uv[0]-(j%4+.02)/4)<1e-8);assert.ok(Math.abs(p.uv[1]-(1-Math.floor(j/4)+.02)/2)<1e-8);
   }
@@ -118,5 +122,5 @@ try {
   }
  }
  assert.deepEqual(errors,[]);
- console.log('character-art.test: PASS (11 humans, 4 recolored monsters; all directions, layers, profiles and animation)');
+ console.log('character-art.test: PASS (11 humans, 9 monsters incl. recolors; all directions, layers, profiles and animation)');
 }finally{await browser.close();}

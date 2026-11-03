@@ -9,7 +9,7 @@
 | 0 | 仕組みをそろえる（リグ・書き出し先・テスト） | 2026-11-03 完了 |
 | 1 | 第1～3章で作ったキャラクターの流用（主人公・ミナ・ゴンタ・ワタリ、おおこうもり・どろたぼう） | 2026-11-03 完了 |
 | 2 | 新しい人型7人（ベルク・ロク・カヤ・ナギ・ヨモギ・スミ・テル） | 2026-11-03 完了（試作はf8d29a3、本編へ移植） |
-| 3 | 新しいモンスター3種（鬼火・火山トカゲ・鉄甲サソリ） | 未着手 |
+| 3 | 新しいモンスター3種（鬼火・火山トカゲ・鉄甲サソリ） | 2026-11-03 完了（本編へ移植） |
 | 4 | 竜グロムの頭と胴 | 未着手 |
 
 ## 段階0でそろえたもの
@@ -34,6 +34,14 @@
 - 3Dリグでの比較は開発サーバー、またはStudioのサーバー（`/games/ch4-5/`）で `prototypes/characters/?c=<名前>`（左が以前の画像、右がコード生成）。左右それぞれ専用のカメラで描くので、立ち位置による見え方の差は出ない。
 - 移植では、カヤ・スミ・テルの手足の色（袖・頭と胴の裏の色）を新しい服に合わせた。ベルク・ロク・ナギ・ヨモギの色はそのまま。`character-art.test.mjs` が11人の画像・分離層・リグ設定・8方向・歩行・道具を確かめる。`texture-retry.test.mjs` は、ベルクの頭の画像の読み込み失敗からの復旧を確かめる。
 
+## 段階3で作ったもの
+
+- Studioの `prototypes/{will-o-wisp,armored-scorpion,volcano-lizard}-8dir/` に原本がある。書き出しは `prototypes/shared/monster-export.mjs`（`npm.cmd run export:{wisp,scorpion,lizard} -- --preview-game`）。火の粉のように離れた部品があっても崩れないよう、正規化はセルごとに測る（規則は公式ツールと同じ中心 u=.494・下端121px）。
+- 画像は `assets/nonhumanoids/<名前>_code_idle_{a,b}_8dir.png`。`src/entities/monsters.js` の鬼火・瘴気の鬼火・炉喰らいの大鬼火・鉄甲サソリ・火山トカゲがこれを使う（倍率・色替え・飛行の高さは以前のまま）。
+- ユーザー確認での主な決定: 鬼火は炎アイコンのように、丸い底から伸びる主炎と内側へ巻く左右の舌で描く。鉄甲サソリの斜め前は正面寄り、背面はAでもはさみを下げて見せる。火山トカゲの正面・背面は頭を体から出し、Bで頭が上下する。
+- `tests/e2e/character-art.test.mjs` が新しい3種と鬼火の色替え2種の画像・倍率・色・A/B切替・8方向を確かめる。
+- 比較は `prototypes/monsters/?c=<名前>`。本編と同じ倍率・色替え・飛行の高さで、左右それぞれ専用のカメラで描く。鬼火は「種類」で瘴気の鬼火・炉喰らいの大鬼火の色替えも見られる。
+
 ## 今のキャラクターと予定
 
 | キャラクター | 今の画像（assets/以下） | 予定 |
@@ -47,9 +55,9 @@
 | ヨモギ（薬師） | humanoids/yomogi_code_{head,torso}_layer_8dir.png ＋ リグ設定 | 段階2で移植済み |
 | 火喰いこうもり・瘴気こうもり | nonhumanoids/night_bat_code_idle_{a,b}（色替え） | 段階1で移植済み |
 | 灰どろたぼう・瘴気どろたぼう | nonhumanoids/dorotabo_code_idle_{a,b}（色替え） | 段階1で移植済み（色替えの色を調整） |
-| 鬼火・瘴気の鬼火・炉喰らいの大鬼火 | nonhumanoids/will_o_wisp_idle_{a,b} | 段階3: 新規（色替え・拡大は共用） |
-| 鉄甲サソリ | nonhumanoids/armored_scorpion_idle_{a,b} | 段階3: 新規 |
-| 火山トカゲ | nonhumanoids/volcano_lizard_idle_{a,b} | 段階3: 新規 |
+| 鬼火・瘴気の鬼火・炉喰らいの大鬼火 | nonhumanoids/will_o_wisp_code_idle_{a,b}（色替え・拡大は共用） | 段階3で移植済み |
+| 鉄甲サソリ | nonhumanoids/armored_scorpion_code_idle_{a,b} | 段階3で移植済み |
+| 火山トカゲ | nonhumanoids/volcano_lizard_code_idle_{a,b} | 段階3で移植済み |
 | 竜グロム | dragons/grom_head_8dir.png・grom_body_8dir.png ＋ 3Dの首・翼・尾（`dragon.js`） | 段階4: 新規。Studioに竜の仕組みを作る |
 
 `assets/` にあるピノ・イナホ・ジンベエ・スライム・おおねずみ・イカの以前の画像と、段階1・2で置き換えた以前の画像（adventurer_boy・village_girl・adult_male_villager・sailor・night_bat_idle・dorotabo_idle・blacksmith・miner・volcano_villager・shrine_keeper・herbalist）は、この編では使っていません（比較ページの左側だけが使う）。比較用に残すか消すかは、移植の最後に決めます。

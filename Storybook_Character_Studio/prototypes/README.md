@@ -18,6 +18,9 @@
 | ヨモギ／薬草の知恵を持つ住民（第4～5章） | [yomogi-8dir](yomogi-8dir/README.md) | [頭](yomogi-8dir/output/yomogi_code_head_layer_8dir.png)・[胴体](yomogi-8dir/output/yomogi_code_torso_layer_8dir.png)・[比較用合成](yomogi-8dir/output/yomogi_code_body_8dir.png) | 第4～5章 `assets/humanoids/herbalist_body_8dir.png` |
 | スミ／鉱山町の住民（第4～5章） | [sumi-8dir](sumi-8dir/README.md) | [頭](sumi-8dir/output/sumi_code_head_layer_8dir.png)・[胴体](sumi-8dir/output/sumi_code_torso_layer_8dir.png)・[比較用合成](sumi-8dir/output/sumi_code_body_8dir.png) | 第4～5章 `assets/humanoids/volcano_villager_body_8dir.png` |
 | テル／鉱山町の住民（第4～5章） | [teru-8dir](teru-8dir/README.md) | [頭](teru-8dir/output/teru_code_head_layer_8dir.png)・[胴体](teru-8dir/output/teru_code_torso_layer_8dir.png)・[比較用合成](teru-8dir/output/teru_code_body_8dir.png) | 第4～5章 `assets/humanoids/volcano_villager_body_8dir.png` |
+| 鬼火（第4～5章） | [will-o-wisp-8dir](will-o-wisp-8dir/README.md) | [A](will-o-wisp-8dir/output/will_o_wisp_code_idle_a_8dir.png)・[B](will-o-wisp-8dir/output/will_o_wisp_code_idle_b_8dir.png) | 第4～5章 `assets/nonhumanoids/will_o_wisp_idle_{a,b}_8dir.png` |
+| 鉄甲サソリ（第4～5章） | [armored-scorpion-8dir](armored-scorpion-8dir/README.md) | [A](armored-scorpion-8dir/output/armored_scorpion_code_idle_a_8dir.png)・[B](armored-scorpion-8dir/output/armored_scorpion_code_idle_b_8dir.png) | 第4～5章 `assets/nonhumanoids/armored_scorpion_idle_{a,b}_8dir.png` |
+| 火山トカゲ（第4～5章） | [volcano-lizard-8dir](volcano-lizard-8dir/README.md) | [A](volcano-lizard-8dir/output/volcano_lizard_code_idle_a_8dir.png)・[B](volcano-lizard-8dir/output/volcano_lizard_code_idle_b_8dir.png) | 第4～5章 `assets/nonhumanoids/volcano_lizard_idle_{a,b}_8dir.png` |
 
 12種とも本編へ移植済みです。本編は `_code_` 画像を直接読み、住民6人は頭・胴の分離画像、主人公を含む7人は `src/content/rig-profiles/` の設定を使用します。旧画像は専用比較ページ用として残しています。`shared/` は目・鼻・SVG部品・方向順の共通処理です。主人公の共用化では生成SVGが変更前と完全一致することを確認しています。
 

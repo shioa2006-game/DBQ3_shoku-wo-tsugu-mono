@@ -4,18 +4,18 @@ import { MonsterSprite, submersionAt } from "./rig.js";
 import { B } from "../world/blocks.js";
 import { WORLD, PLACES } from "../world/world.js";
 
-const WISP_A = new URL("../../assets/nonhumanoids/will_o_wisp_idle_a_8dir.png", import.meta.url).href;
-const WISP_B = new URL("../../assets/nonhumanoids/will_o_wisp_idle_b_8dir.png", import.meta.url).href;
-const SCORPION_A = new URL("../../assets/nonhumanoids/armored_scorpion_idle_a_8dir.png", import.meta.url).href;
-const SCORPION_B = new URL("../../assets/nonhumanoids/armored_scorpion_idle_b_8dir.png", import.meta.url).href;
-const LIZARD_A = new URL("../../assets/nonhumanoids/volcano_lizard_idle_a_8dir.png", import.meta.url).href;
-const LIZARD_B = new URL("../../assets/nonhumanoids/volcano_lizard_idle_b_8dir.png", import.meta.url).href;
+const WISP_A = new URL("../../assets/nonhumanoids/will_o_wisp_code_idle_a_8dir.png", import.meta.url).href;
+const WISP_B = new URL("../../assets/nonhumanoids/will_o_wisp_code_idle_b_8dir.png", import.meta.url).href;
+const SCORPION_A = new URL("../../assets/nonhumanoids/armored_scorpion_code_idle_a_8dir.png", import.meta.url).href;
+const SCORPION_B = new URL("../../assets/nonhumanoids/armored_scorpion_code_idle_b_8dir.png", import.meta.url).href;
+const LIZARD_A = new URL("../../assets/nonhumanoids/volcano_lizard_code_idle_a_8dir.png", import.meta.url).href;
+const LIZARD_B = new URL("../../assets/nonhumanoids/volcano_lizard_code_idle_b_8dir.png", import.meta.url).href;
 const BAT_A = new URL("../../assets/nonhumanoids/night_bat_code_idle_a_8dir.png", import.meta.url).href;
 const BAT_B = new URL("../../assets/nonhumanoids/night_bat_code_idle_b_8dir.png", import.meta.url).href;
 const DORO_A = new URL("../../assets/nonhumanoids/dorotabo_code_idle_a_8dir.png", import.meta.url).href;
 const DORO_B = new URL("../../assets/nonhumanoids/dorotabo_code_idle_b_8dir.png", import.meta.url).href;
 
-// 第4章のモンスター。
+// 第4章のモンスター。画像はすべて Storybook Character Studio でコードから描いたもの（docs/CHARACTER_ART.md）。
 // 新規画像は鬼火・鉄甲サソリ・火山トカゲの3種。既存色替えは
 // 火喰いこうもり（night_bat の tint）と灰どろたぼう（dorotabo の tint）の2種に固定する。
 // 章ボス「炉喰らいの大鬼火」は鬼火画像の拡大・色替え（専用画像は持たない）。

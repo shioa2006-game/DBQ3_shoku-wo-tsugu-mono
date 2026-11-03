@@ -25,6 +25,9 @@
     "export:yomogi": "node prototypes/yomogi-8dir/export.mjs",
     "export:sumi": "node prototypes/sumi-8dir/export.mjs",
     "export:teru": "node prototypes/teru-8dir/export.mjs",
+    "export:wisp": "node prototypes/will-o-wisp-8dir/export.mjs",
+    "export:scorpion": "node prototypes/armored-scorpion-8dir/export.mjs",
+    "export:lizard": "node prototypes/volcano-lizard-8dir/export.mjs",
     "export:items": "node prototypes/item-icons/export.mjs",
     "export:props": "node prototypes/props-3d/export.mjs",
     "sync:games": "node tools/sync-game-targets.mjs"

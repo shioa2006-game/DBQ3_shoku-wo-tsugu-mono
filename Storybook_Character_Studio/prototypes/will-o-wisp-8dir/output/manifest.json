@@ -1,0 +1,218 @@
+{
+  "id": "will_o_wisp",
+  "name": "鬼火",
+  "role": "WILL-O-WISP",
+  "version": 1,
+  "status": "prototype",
+  "source": "../character.mjs",
+  "format": "game-monster-billboard",
+  "cellSize": 128,
+  "columns": 4,
+  "rows": 2,
+  "directions": [
+    "front",
+    "front_left",
+    "left",
+    "back_left",
+    "back",
+    "back_right",
+    "right",
+    "front_right"
+  ],
+  "labels": [
+    "正面",
+    "左斜め前",
+    "左",
+    "左斜め後",
+    "背面",
+    "右斜め後",
+    "右",
+    "右斜め前"
+  ],
+  "anchor": {
+    "centerU": 0.494,
+    "bottomFromTop": 0.945
+  },
+  "frames": [
+    {
+      "frame": "a",
+      "output": "will_o_wisp_code_idle_a_8dir.png",
+      "normalization": [
+        {
+          "row": 0,
+          "col": 0,
+          "dx": -2,
+          "dy": -1,
+          "bbox": "26-103/9-122",
+          "before": "0.504",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "dx": -10,
+          "dy": -1,
+          "bbox": "32-114/9-122",
+          "before": "0.570",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "dx": -16,
+          "dy": -1,
+          "bbox": "37-120/9-122",
+          "before": "0.613",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 3,
+          "dx": -17,
+          "dy": -1,
+          "bbox": "37-123/9-122",
+          "before": "0.625",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 0,
+          "dx": -2,
+          "dy": -1,
+          "bbox": "26-103/9-122",
+          "before": "0.504",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 1,
+          "dx": 18,
+          "dy": -1,
+          "bbox": "2-88/9-122",
+          "before": "0.352",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "dx": 17,
+          "dy": -1,
+          "bbox": "5-87/9-122",
+          "before": "0.359",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 3,
+          "dx": 11,
+          "dy": -1,
+          "bbox": "11-93/9-122",
+          "before": "0.406",
+          "after": "0.492"
+        }
+      ]
+    },
+    {
+      "frame": "b",
+      "output": "will_o_wisp_code_idle_b_8dir.png",
+      "normalization": [
+        {
+          "row": 0,
+          "col": 0,
+          "dx": -2,
+          "dy": 0,
+          "bbox": "16-113/29-121",
+          "before": "0.504",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "dx": -8,
+          "dy": 0,
+          "bbox": "24-118/29-121",
+          "before": "0.555",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "dx": -14,
+          "dy": 0,
+          "bbox": "33-120/29-121",
+          "before": "0.598",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 3,
+          "dx": -15,
+          "dy": 0,
+          "bbox": "33-122/29-121",
+          "before": "0.605",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 0,
+          "dx": -2,
+          "dy": 0,
+          "bbox": "16-113/29-121",
+          "before": "0.504",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 1,
+          "dx": 15,
+          "dy": 0,
+          "bbox": "3-92/29-121",
+          "before": "0.371",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "dx": 14,
+          "dy": 0,
+          "bbox": "5-92/29-121",
+          "before": "0.379",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 3,
+          "dx": 9,
+          "dy": 0,
+          "bbox": "7-101/29-121",
+          "before": "0.422",
+          "after": "0.492"
+        }
+      ]
+    }
+  ],
+  "runtime": {
+    "class": "MonsterSprite",
+    "interval": 0.38,
+    "uv": {
+      "uMin": 0.02,
+      "uMax": 0.98,
+      "vMin": 0.02,
+      "vMax": 0.98
+    },
+    "scale": 0.85,
+    "tint": 16777215,
+    "yOffset": 0.4,
+    "sharedBy": [
+      "taint_wisp",
+      "great_will_o_wisp"
+    ]
+  },
+  "references": [
+    "dqb3-tsugumono-ch4-5/assets/nonhumanoids/will_o_wisp_idle_a_8dir.png",
+    "dqb3-tsugumono-ch4-5/assets/nonhumanoids/will_o_wisp_idle_b_8dir.png"
+  ],
+  "targets": [
+    "ch4-5"
+  ]
+}
