@@ -6,7 +6,8 @@
 // - 橋の水中橋脚をゴーストクリックで設置できる
 // - 全マス充填で設計図が完成扱いになる
 
-import { launchBrowser, openGame, newGame, expect } from "../helpers.mjs";
+import { launchBrowser, openGame, newGame, expect, waitForCond } from "../helpers.mjs";
+import { aimAtCell } from "../../../game-shared/tests/aim-at-cell.mjs";
 
 const errors = [];
 const browser = await launchBrowser();
@@ -26,28 +27,19 @@ try {
     g.inventory.add("door", 3);
     g.inventory.add("bed", 4);
     g.inventory.add("hammer_wood", 1);
+    g.inventory.selected = g.inventory.slots.findIndex((s) => s?.id === "wall");
     const wall = bp.cells
       .filter((c) => c.block === 10 && g.world.get(c.x, c.y, c.z) === 0 && c.y === baseY)
       .sort((a, b) => a.y - b.y)[0];
     g.player.pos.set(wall.x + 1.6, baseY + 0.1, wall.z + 0.5);
     return { wall: { x: wall.x, y: wall.y, z: wall.z }, baseY };
   });
-  await page.waitForTimeout(800); // カメラが追従するのを待つ
-
-  // ゴースト中心をスクリーン座標へ投影してマウスを合わせる。
-  const sp = await page.evaluate((w) => {
-    const g = window.__game;
-    const v = new (Object.getPrototypeOf(g.player.pos).constructor)(w.x + 0.5, w.y + 0.5, w.z + 0.5);
-    v.project(g.camera);
-    return { x: ((v.x + 1) / 2) * innerWidth, y: ((1 - v.y) / 2) * innerHeight };
-  }, setup.wall);
-  await page.mouse.move(sp.x, sp.y);
-  await page.waitForTimeout(200);
+  // 小屋では輪郭が重なる。クリック前後で同じ最前面のセルを検証する。
+  const sp = await aimAtCell(page, setup.wall, { allowOverlap: true });
 
   // --- ブロック所持: オートスナップがゴーストを狙う -----------------------------
   const caseBlock = await page.evaluate(() => {
     const g = window.__game;
-    g.inventory.selected = g.inventory.slots.findIndex((s) => s && s.id === "wall");
     g.updateAim();
     return g.aimGhost ? { x: g.aimGhost.x, y: g.aimGhost.y, z: g.aimGhost.z } : null;
   });
@@ -74,7 +66,7 @@ try {
     return { target: { x: c.x, y: c.y, z: c.z, block: c.block }, mats };
   });
   await page.mouse.click(sp.x, sp.y);
-  await page.waitForTimeout(250);
+  await waitForCond(page, c => window.__game.world.get(c.x, c.y, c.z) === c.block, before.target, { label: "小屋のマスに設置" });
   const after = await page.evaluate(
     (t) => ({
       block: window.__game.world.get(t.x, t.y, t.z),
@@ -137,6 +129,7 @@ try {
     const g = window.__game;
     const bp = g.blueprints.activate("bridge", { x: 30, z: 57 }, 4);
     g.inventory.add("log", 2);
+    g.inventory.selected = g.inventory.slots.findIndex((s) => s?.id === "log");
     const cell = bp.cells
       .filter((c) => g.world.get(c.x, c.y, c.z) === 5) // B.WATER
       .sort((a, b) => b.y - a.y)[0];
@@ -146,20 +139,10 @@ try {
     g.player.vel.set(0, 0, 0);
     return { x: cell.x, y: cell.y, z: cell.z, block: cell.block };
   });
-  await page.waitForTimeout(800);
-
-  const waterSp = await page.evaluate((c) => {
-    const g = window.__game;
-    const v = new (Object.getPrototypeOf(g.player.pos).constructor)(c.x + 0.5, c.y + 0.5, c.z + 0.5);
-    v.project(g.camera);
-    return { x: ((v.x + 1) / 2) * innerWidth, y: ((1 - v.y) / 2) * innerHeight };
-  }, waterSetup);
-  await page.mouse.move(waterSp.x, waterSp.y);
-  await page.waitForTimeout(200);
+  const waterSp = await aimAtCell(page, waterSetup);
 
   const waterBefore = await page.evaluate(() => {
     const g = window.__game;
-    g.inventory.selected = g.inventory.slots.findIndex((s) => s && s.id === "log");
     g.updateAim();
     const c = g.aimGhost;
     return {
@@ -171,7 +154,7 @@ try {
   expect(waterBefore.target !== null && waterBefore.current === 5, "水中の橋脚ゴーストがaimGhostになる");
 
   await page.mouse.click(waterSp.x, waterSp.y);
-  await page.waitForTimeout(250);
+  await waitForCond(page, c => window.__game.world.get(c.x, c.y, c.z) === c.block, waterSetup, { label: "水中の橋脚に設置" });
   const waterAfter = await page.evaluate((c) => ({
     block: window.__game.world.get(c.x, c.y, c.z),
     logs: window.__game.inventory.count("log"),

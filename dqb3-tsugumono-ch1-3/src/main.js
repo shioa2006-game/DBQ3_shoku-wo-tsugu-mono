@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { cellInReach, pickBlueprintCell } from "../../game-shared/blueprint-target.mjs";
 import { Input } from "./core/input.js";
 import { cellKey } from "./core/utils.js";
 import { B, BLOCK_DEFS } from "./world/blocks.js";
@@ -586,17 +587,12 @@ class Game {
     const dir = this.raycaster.ray.direction;
     const hit = this.world.raycast(origin, dir, 80);
     this.aim = null;
-    if (hit) {
-      const cx = hit.x + 0.5;
-      const cz = hit.z + 0.5;
-      const dist = Math.hypot(cx - this.player.pos.x, hit.y + 0.5 - (this.player.pos.y + 0.6), cz - this.player.pos.z);
-      if (dist <= REACH) {
-        this.aim = {
-          cell: { x: hit.x, y: hit.y, z: hit.z },
-          place: { x: hit.x + hit.nx, y: hit.y + hit.ny, z: hit.z + hit.nz },
-          id: hit.id,
-        };
-      }
+    if (hit && cellInReach(hit, this.player.pos, REACH)) {
+      this.aim = {
+        cell: { x: hit.x, y: hit.y, z: hit.z },
+        place: { x: hit.x + hit.nx, y: hit.y + hit.ny, z: hit.z + hit.nz },
+        id: hit.id,
+      };
     }
     const held = this.inventory.held();
     const kind = held ? ITEMS[held.id].kind : null;
@@ -634,27 +630,11 @@ class Game {
   pickGhostCell() {
     const bp = this.blueprints.active;
     if (!bp) return null;
-    const meshes = [];
-    for (const cell of bp.cells) {
-      if (!cell.ghost.visible) continue;
-      const current = this.world.get(cell.x, cell.y, cell.z);
-      if (current !== B.AIR && current !== B.WATER) continue; // obstacle / filled
-      cell.ghost.userData.cell = cell;
-      meshes.push(cell.ghost);
-    }
-    if (!meshes.length) return null;
     this.raycaster.setFromCamera({ x: this.input.mouse.ndcX, y: this.input.mouse.ndcY }, this.camera);
-    const hits = this.raycaster.intersectObjects(meshes, false);
-    for (const hit of hits) {
-      const cell = hit.object.userData.cell;
-      const d = Math.hypot(
-        cell.x + 0.5 - this.player.pos.x,
-        cell.y + 0.5 - (this.player.pos.y + 0.6),
-        cell.z + 0.5 - this.player.pos.z,
-      );
-      if (d <= REACH) return cell;
-    }
-    return null;
+    return pickBlueprintCell({
+      cells: bp.cells, raycaster: this.raycaster, world: this.world,
+      blocks: B, playerPos: this.player.pos, reach: REACH,
+    });
   }
 
   // Place the block a ghost cell requires, consumed from anywhere in the inventory.

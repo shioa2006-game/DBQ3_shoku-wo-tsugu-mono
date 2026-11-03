@@ -7,6 +7,8 @@ on:
       - index.html
       - portal/**
       - tools/build-portal.mjs
+      - tools/serve-portal.mjs
+      - game-shared/**
       - dqb3-tsugumono-ch1-3/**
       - dqb3-tsugumono-ch4-5/**
       - .github/workflows/pages.yml
@@ -38,6 +40,19 @@ jobs:
       - name: 共通トップと両ゲームをビルド
         id: build
         run: node tools/build-portal.mjs
+      - name: 公開用ビルドで両編の設計図を確認
+        timeout-minutes: 8
+        env:
+          PORTAL_BUILD: ${{ steps.build.outputs.path }}
+        run: |
+          node tools/serve-portal.mjs "$PORTAL_BUILD" &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          base=http://127.0.0.1:5188/DBQ3_shoku-wo-tsugu-mono
+          curl --fail --silent --show-error --retry 10 --retry-connrefused --retry-delay 1 "$base/" --output /dev/null
+          for game in dqb3-tsugumono-ch1-3 dqb3-tsugumono-ch4-5; do
+            BASE_URL="$base/$game/" node "$game/tests/e2e/blueprint.test.mjs"
+          done
       - uses: actions/upload-pages-artifact@v4
         with:
           path: ${{ steps.build.outputs.path }}

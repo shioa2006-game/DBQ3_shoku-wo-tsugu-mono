@@ -3,6 +3,7 @@
 // - wrong solid blocks remain obstacles and are never auto-overwritten
 
 import { launchBrowser, openGame, newGame, expect, waitForCond } from "../helpers.mjs";
+import { aimAtCell } from "../../../game-shared/tests/aim-at-cell.mjs";
 
 const errors = [];
 const browser = await launchBrowser();
@@ -10,37 +11,6 @@ try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   await openGame(page, { collectErrors: errors });
   await newGame(page);
-
-
-  // Camera interpolation and swimming progress in simulation time, not wall time.
-  // Reproject until the actual raycast agrees with the specific target cell.
-  async function aimAt(cell, ghost) {
-    let previous=null,stable=0;
-    for(let n=0;n<100;n++){
-      const current=await page.evaluate(()=>window.__game.camera.position.toArray());
-      stable=previous && current.every((v,i)=>Math.abs(v-previous[i])<0.002)?stable+1:0;
-      if(stable>=3)break;
-      previous=current;await page.waitForTimeout(100);
-    }
-    if(stable<3)throw Error("camera did not settle before blueprint aiming");
-    for(let n=0;n<100;n++){
-      const sp=await page.evaluate(c=>{
-        const g=window.__game;
-        const v=g.player.pos.clone().set(c.x+0.5,c.y+0.7,c.z+0.5).project(g.camera);
-        return {x:(v.x+1)/2*innerWidth,y:(1-v.y)/2*innerHeight};
-      },cell);
-      await page.mouse.move(sp.x,sp.y);
-      await page.waitForTimeout(100);
-      const ready=await page.evaluate(({cell,ghost})=>{
-        const g=window.__game;
-        g.updateAim();
-        const c=ghost?g.aimGhost:g.aim?.cell;
-        return c && c.x===cell.x && c.y===cell.y && c.z===cell.z;
-      },{cell,ghost});
-      if(ready)return sp;
-    }
-    throw Error("raycast did not settle on "+JSON.stringify(cell));
-  }
 
   const waterSetup = await page.evaluate(() => {
     const g = window.__game;
@@ -59,7 +29,7 @@ try {
     g.player.vel.set(0, 0, 0);
     return { x: cell.x, y: cell.y, z: cell.z, block: cell.block };
   });
-  const waterSp = await aimAt(waterSetup, true);
+  const waterSp = await aimAtCell(page, waterSetup);
 
   const waterBefore = await page.evaluate(() => {
     const g = window.__game;
@@ -103,7 +73,7 @@ try {
     };
   }, waterBefore.target);
   expect(obstacleSetup.obstacle === true, "水以外の誤ブロックは障害物として維持される");
-  const obstacleSp = await aimAt(obstacleSetup, false);
+  const obstacleSp = await aimAtCell(page, obstacleSetup, { target: "block" });
   const obstacleAim = await page.evaluate(() => {
     window.__game.updateAim();
     return window.__game.aimGhost;

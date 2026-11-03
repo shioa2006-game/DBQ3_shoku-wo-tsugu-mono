@@ -38,7 +38,7 @@ dqb3-tsugumono-ch4-5/index.html + assets/...
 
 リンク・CSS・画像・ゲームの生成アセットは相対パスです。GitHub Pagesのプロジェクト配下でも配置を維持できます。確認サーバーも同じプロジェクトパス配下で配信します。
 
-公開処理は [`.github/workflows/pages.yml`](../.github/workflows/pages.yml) です。GitHubのSettings → Pages → Sourceは **GitHub Actions** を選びます。`main` の共通トップ・両ゲーム・公開処理に関する変更をpushすると、依存関係をlockfileからインストールし、このビルド出力だけを公開します。Studio・開発用ページ・ソース一式は公開成果物に含めません。
+公開処理は [`.github/workflows/pages.yml`](../.github/workflows/pages.yml) です。GitHubのSettings → Pages → Sourceは **GitHub Actions** を選びます。`main` の共通トップ・両ゲーム・`game-shared/`・公開処理に関する変更をpushすると、依存関係をlockfileからインストールし、このビルド出力だけを公開します。公開前に、両編の `tests/e2e/blueprint.test.mjs` を公開用の相対URLで順番に実行します。Studio・開発用ページ・ソース一式は公開成果物に含めません。
 
 公開先は https://shioa2006-game.github.io/DBQ3_shoku-wo-tsugu-mono/ です。Actionsの「共通トップと両ゲームを公開」から手動実行もできます。ビルド失敗時は公開ジョブが動かず、直前の公開内容が維持されます。公開後は両編のタイトル画面と、画面内のビルドIDを確認してください。
 
