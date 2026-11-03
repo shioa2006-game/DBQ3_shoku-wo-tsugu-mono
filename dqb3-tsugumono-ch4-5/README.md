@@ -31,7 +31,7 @@ npm run dev      # http://localhost:5173/dqb3-tsugumono-ch4-5/
 
 ```sh
 npm run build    # dist/ へビルド（base: /dqb3-tsugumono-ch4-5/）
-npm run test:ci  # 高速サブセット（sheets + smoke + HUDハート + 水中描画 + 水からの脱出 + アイテムアイコン）
+npm run test:ci  # 高速サブセット（sheets + smoke + HUDハート + 水中描画 + 水からの脱出 + アイテムアイコン + 設置物の3D）
 npm run test:e2e # 全テスト（第4章の通し・ロード復元を含む）
 ```
 
@@ -45,6 +45,12 @@ Git管理は[親リポジトリ](../README.md)に統合しました。GitHubへ�
 インベントリ・ホットバー・クラフト一覧・設計図・地面のドロップのアイコンは、Studioの [item-icons](../Storybook_Character_Studio/prototypes/item-icons/README.md) でコードから描いた16×16のドット絵です。本島編と同じ `assets/items/item_icons_16.png`（全編のアイコンを並べた1枚）と、この編のアイテムの位置だけを書いた `item_icons_16.json` を読み込み、2倍の32pxで表示します。画像が読めないときだけ、従来のブロックの模様・emoji（`items.js` の `tile`・`icon`）で表示します。
 
 アイコンを直すときはStudioの `icons.mjs` を編集し、Studioで `npm.cmd run export:items -- --preview-game` を実行します（第1～3章と第4～5章の両方へ書き出します）。ゲーム側の画像を直接編集しないでください。
+
+## 設置物の3D
+
+たいまつ・わらのベッド・鳥居・木の扉・作業台・職業の祭壇・とげ罠は、Studioの [props-3d](../Storybook_Character_Studio/prototypes/props-3d/README.md) の原本から書き出した `src/world/prop-models.js` で作ります。基本形状に黒い輪郭線を付け、木・石・わらの面にはブロックの模様を貼っています。とげ罠は鉄のとげです（本島編は石）。ほかの設置物は `src/world/props.js` の `BUILDERS` のままです。
+
+形を直すときはStudioの `models.mjs` を編集し、Studioで `npm.cmd run export:props -- --preview-game` を実行します（第1～3章と第4～5章の両方へ書き出します）。`prop-models.js` は直接編集しないでください。今の本編の形と新しい形は、第1～3章の開発サーバーの `/builder_sprite_lab/prototypes/props-3d/` で並べて比べられます。
 
 ## 主要な技術メモ
 

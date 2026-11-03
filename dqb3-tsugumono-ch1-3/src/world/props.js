@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { B } from "./blocks.js";
+import { B, drawTileIcon } from "./blocks.js";
+import { createPropModels } from "./prop-models.js";
 import { WORLD } from "./world.js";
 import { cellKey } from "../core/utils.js";
 
@@ -75,49 +76,6 @@ const BUILDERS = {
     g.add(wheel);
     return g;
   },
-  [B.SPIKES]() {
-    const g = new THREE.Group();
-    g.add(box(0.9, 0.06, 0.9, MAT.woodDark, 0, 0.03, 0));
-    for (const [dx, dz] of [[-0.25, -0.25], [0.25, -0.25], [-0.25, 0.25], [0.25, 0.25], [0, 0]]) {
-      g.add(cone(0.09, 0.34, MAT.steel, dx, 0.23, dz));
-    }
-    return g;
-  },
-  [B.TORCH]() {
-    const g = new THREE.Group();
-    g.add(box(0.09, 0.62, 0.09, MAT.wood, 0, 0.31, 0));
-    const flame = cone(0.12, 0.24, MAT.flame, 0, 0.72, 0);
-    flame.name = "flame";
-    g.add(flame);
-    g.userData.torch = true;
-    return g;
-  },
-  [B.DOOR]() {
-    const g = new THREE.Group();
-    const frame = new THREE.Group();
-    frame.add(box(0.1, 1.9, 0.12, MAT.woodDark, -0.45, 0.95, 0));
-    frame.add(box(0.1, 1.9, 0.12, MAT.woodDark, 0.45, 0.95, 0));
-    frame.add(box(1.0, 0.1, 0.12, MAT.woodDark, 0, 1.9, 0));
-    const hinge = new THREE.Group();
-    hinge.position.set(-0.4, 0, 0);
-    const panel = box(0.8, 1.8, 0.08, MAT.plank, 0.4, 0.9, 0);
-    panel.add(box(0.1, 0.1, 0.12, MAT.woodDark, 0.28, 0.05, 0));
-    hinge.add(panel);
-    hinge.name = "hinge";
-    g.add(frame, hinge);
-    g.userData.door = true;
-    return g;
-  },
-  [B.WORKBENCH]() {
-    const g = new THREE.Group();
-    g.add(box(0.95, 0.12, 0.75, MAT.plank, 0, 0.62, 0));
-    for (const [dx, dz] of [[-0.38, -0.28], [0.38, -0.28], [-0.38, 0.28], [0.38, 0.28]]) {
-      g.add(box(0.1, 0.62, 0.1, MAT.woodDark, dx, 0.31, dz));
-    }
-    g.add(box(0.28, 0.1, 0.2, MAT.steel, -0.2, 0.73, 0.1));
-    g.add(cylinder(0.04, 0.04, 0.3, MAT.wood, 0.15, 0.72, -0.12).rotateZ(Math.PI / 2.4));
-    return g;
-  },
   [B.CHEST]() {
     const g = new THREE.Group();
     g.add(box(0.88, 0.52, 0.72, MAT.wood, 0, 0.26, 0));
@@ -125,13 +83,6 @@ const BUILDERS = {
     g.add(box(0.08, 0.68, 0.8, MAT.woodDark, -0.32, 0.34, 0));
     g.add(box(0.08, 0.68, 0.8, MAT.woodDark, 0.32, 0.34, 0));
     g.add(box(0.18, 0.16, 0.08, MAT.gold, 0, 0.44, -0.4));
-    return g;
-  },
-  [B.BED]() {
-    const g = new THREE.Group();
-    g.add(box(0.92, 0.18, 0.6, MAT.straw, 0, 0.14, 0));
-    g.add(box(0.92, 0.08, 0.6, MAT.strawDark, 0, 0.04, 0));
-    g.add(box(0.26, 0.12, 0.4, MAT.white, -0.28, 0.28, 0));
     return g;
   },
   [B.CROP1]() {
@@ -160,36 +111,6 @@ const BUILDERS = {
       g.add(head);
     }
     g.userData.sway = true;
-    return g;
-  },
-  [B.ALTAR]() {
-    const g = new THREE.Group();
-    g.add(box(0.95, 0.3, 0.95, MAT.stone, 0, 0.15, 0));
-    g.add(box(0.7, 0.3, 0.7, MAT.stone, 0, 0.45, 0));
-    g.add(box(0.5, 0.12, 0.5, MAT.white, 0, 0.66, 0));
-    const orb = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 10), MAT.glow);
-    orb.position.y = 0.92;
-    orb.name = "orb";
-    g.add(orb);
-    return g;
-  },
-  [B.TORII]() {
-    const g = new THREE.Group();
-    g.add(cylinder(0.09, 0.11, 1.9, MAT.red, -0.55, 0.95, 0));
-    g.add(cylinder(0.09, 0.11, 1.9, MAT.red, 0.55, 0.95, 0));
-    const top = box(1.7, 0.14, 0.18, MAT.red, 0, 1.95, 0);
-    top.rotation.z = 0;
-    g.add(top);
-    g.add(box(1.4, 0.1, 0.14, MAT.red, 0, 1.62, 0));
-    g.add(box(1.76, 0.08, 0.2, MAT.woodDark, 0, 2.05, 0));
-    return g;
-  },
-  [B.SCARECROW]() {
-    const g = new THREE.Group();
-    g.add(box(0.08, 1.3, 0.08, MAT.wood, 0, 0.65, 0));
-    g.add(box(0.8, 0.08, 0.08, MAT.wood, 0, 1.0, 0));
-    g.add(cone(0.3, 0.26, MAT.straw, 0, 1.45, 0, 8));
-    g.add(box(0.2, 0.2, 0.18, MAT.strawDark, 0, 1.26, 0));
     return g;
   },
   [B.BANNER]() {
@@ -282,6 +203,31 @@ const BUILDERS = {
   },
 };
 
+// 作り直した設置物は Storybook_Character_Studio/prototypes/props-3d/ の原本から
+// 書き出した prop-models.js で作る（輪郭線つき・ブロック模様を貼った基本形状）。
+// 原本にまだ無い設置物は、上の BUILDERS のまま。
+const propTiles = new Map();
+function propTile(name) {
+  if (!propTiles.has(name)) {
+    const canvas = document.createElement("canvas");
+    canvas.width = 16;
+    canvas.height = 16;
+    drawTileIcon(canvas.getContext("2d"), name, 0, 0, 16);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.magFilter = THREE.NearestFilter;
+    texture.minFilter = THREE.NearestFilter;
+    texture.generateMipmaps = false;
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.colorSpace = THREE.SRGBColorSpace;
+    propTiles.set(name, texture);
+  }
+  return propTiles.get(name);
+}
+const PROP_MODELS = createPropModels(THREE, { tile: propTile, spikes: "stone" });
+for (const [name, build] of Object.entries(PROP_MODELS)) {
+  if (B[name] !== undefined) BUILDERS[B[name]] = () => build();
+}
 const MAX_TORCH_LIGHTS = 8;
 
 export class PropRenderer {

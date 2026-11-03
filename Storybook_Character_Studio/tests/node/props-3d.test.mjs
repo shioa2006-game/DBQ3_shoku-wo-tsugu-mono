@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import * as THREE from '../../../dqb3-tsugumono-ch1-3/node_modules/three/build/three.module.js';
 import { createPropModels, PROP_MODEL_NAMES, PROP_REQUIREMENTS, PROP_LIMITS } from '../../prototypes/props-3d/models.mjs';
-import { generatedModule } from '../../prototypes/props-3d/export.mjs';
+import { generatedModule, PREVIEW_COPY, GAME_COPIES } from '../../prototypes/props-3d/export.mjs';
 
 const blockNames = async (folder) => {
   const source = await readFile(new URL(`../../../${folder}/src/world/blocks.js`, import.meta.url), 'utf8');
@@ -58,7 +58,19 @@ test('prop model names match the block ids of each game', async () => {
   }
 });
 
-test('the comparison page uses the current Studio source', async () => {
-  const copy = await readFile(new URL('../../../dqb3-tsugumono-ch1-3/prototypes/props-3d/prop-models.js', import.meta.url), 'utf8');
-  assert.equal(copy, await generatedModule(), 'run npm.cmd run export:props');
+test('the comparison page and both games use the current Studio source', async () => {
+  const expected = await generatedModule();
+  for (const { folder, path } of [PREVIEW_COPY, ...GAME_COPIES]) {
+    const lf = (text) => text.replace(/\r\n/g, '\n');
+    const copy = await readFile(new URL(`../../../${folder}/${path}`, import.meta.url), 'utf8');
+    assert.equal(lf(copy), lf(expected), `${folder}/${path}: run npm.cmd run export:props -- --preview-game`);
+  }
+});
+
+test('each game builds the renewed props from prop-models.js', async () => {
+  for (const { folder } of GAME_COPIES) {
+    const source = await readFile(new URL(`../../../${folder}/src/world/props.js`, import.meta.url), 'utf8');
+    assert.ok(source.includes('createPropModels(THREE'), `${folder} builds props with createPropModels`);
+    for (const name of PROP_MODEL_NAMES) assert.ok(!source.includes(`[B.${name}]() {`), `${folder} has no legacy ${name} builder`);
+  }
 });

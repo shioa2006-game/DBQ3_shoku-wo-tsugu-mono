@@ -1,12 +1,12 @@
 // 生成ファイル。直接編集しない。
 // 原本: Storybook_Character_Studio/prototypes/props-3d/models.mjs
-// 更新: Storybook_Character_Studio で npm.cmd run export:props
+// 更新: Storybook_Character_Studio で npm.cmd run export:props -- --preview-game
 // 設置物の3Dモデルの作画原本。基本形状（箱・円柱・円錐・球）を組み、
 // 手持ち道具（ゲームの rig.js）と同じトゥーン陰影と黒い輪郭線を付ける。
 // 木・石・わらの面にはブロックの16px模様を、1マス=1枚の密度で貼る。
 //
 // このファイルは依存なし。THREE はゲームから渡す（Studioのテストでも同じ）。
-// 書き出し: Studio で `npm.cmd run export:props`（確認ページ用の写しを作る）。
+// 書き出し: Studio で `npm.cmd run export:props -- --preview-game`（確認ページと両ゲームの src/world/prop-models.js）。
 //
 // 約束（ゲームの PropRenderer が使うので守る）:
 // - 原点はマスの底面の中央。大きさは基本1マス（PROP_LIMITS の例外を除く）。

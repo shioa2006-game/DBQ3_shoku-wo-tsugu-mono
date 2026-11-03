@@ -15,7 +15,7 @@
 ## 原本と出力
 
 - `models.mjs`: 作画原本。`createPropModels(THREE, { tile, spikes })` が、ブロック名（ゲームの `B` のキー）→作る関数を返す。依存なし。`tile(name)` はブロック模様のテクスチャを返す関数で、無いときは単色になる。
-- `export.mjs`: 原本の写しを `dqb3-tsugumono-ch1-3/prototypes/props-3d/prop-models.js` へ書き出す（先頭に生成ファイルの注記を付けるだけ）。
+- `export.mjs`: 原本の写しを `dqb3-tsugumono-ch1-3/prototypes/props-3d/prop-models.js`（確認ページ用）へ書き出す。`--preview-game` を付けると、両ゲームの `src/world/prop-models.js` にも書き出す。写しは先頭に生成ファイルの注記を付けるだけ。
 - 比較ページ: `dqb3-tsugumono-ch1-3/prototypes/props-3d/`。ゲームのCH1～3の開発サーバーで開く（three.jsとゲームのコードを使うため）。
 
 ## 試作01で作り直したもの（第1～3章）
@@ -35,6 +35,7 @@
 
 ```powershell
 npm.cmd run export:props
+npm.cmd run export:props -- --preview-game
 npm.cmd test
 ```
 
@@ -49,11 +50,11 @@ Studioのテスト（`tests/node/props-3d.test.mjs`）では、次を確認し�
 - 名前が両方のゲームのブロックIDにあること
 - 比較ページの写しが原本と同じこと
 
-## 本編への移植（未実施）
+## 本編への移植（第1～5章とも移植済み）
 
-ユーザーが決めた段階で行います。予定:
+2026-11-03に両ゲームへ移植しました。
 
-1. 原本を各ゲームの `src/world/prop-models.js` へ書き出す（第1～3章は `spikes: 'stone'`、第4～5章は `'iron'`）。
-2. `props.js` は、作り直した設置物だけ新しいモデルを使い、残りは今の `BUILDERS` のままにする。
-3. 形を変えた設置物のアイコン（Studioの `item-icons`）を新しい形に合わせて描き直す。
-4. 両ゲームの `test:ci`・`test:e2e` を実行し、ゲーム内で見た目を確かめる。
+1. 原本を各ゲームの `src/world/prop-models.js` へ書き出した。ゲームの `props.js` が `createPropModels(THREE, { tile, spikes })` を呼び、作り直した設置物だけ `BUILDERS` を置き換える（第4～5章にかかしは無いので7件）。とげ罠は第1～3章が `'stone'`、第4～5章が `'iron'`。模様はゲームのブロック模様（`drawTileIcon`）から作る。
+2. 形を変えたわらのベッド・職業の祭壇・鳥居のアイコン（Studioの `item-icons`）を新しい形に合わせて描き直した。
+3. 両ゲームの `tests/e2e/prop-models.test.mjs`（`test:ci` に含む）で、本編の `PropRenderer` が輪郭線と模様つきで作ること、扉の開閉とたいまつの炎の部品が残ることを確認する。
+4. 本編へ移したあとは、比較ページの左右が同じ形になる。原本を直したら、`--preview-game` を付けずに書き出して左右の差を確かめ、よければ本編へ書き出す。

@@ -37,7 +37,7 @@ const WEIGHT = { "chapter3.test.mjs": 70, "story.test.mjs": 65, "chapter2.test.m
 // ゲーム内時間に依存する重い通し（story/chapter2 等）は夜間/手動のフルスイートに任せ、
 // PR ではビルド健全性とスプライト框組みだけを速く確実に確認する。
 const FAST_ONLY = process.argv.includes("--fast");
-const FAST = new Set(["sheets.test.mjs", "smoke.test.mjs", "underwater-visuals.test.mjs", "item-icons.test.mjs"]);
+const FAST = new Set(["sheets.test.mjs", "smoke.test.mjs", "underwater-visuals.test.mjs", "item-icons.test.mjs", "prop-models.test.mjs"]);
 
 if (!fs.existsSync(path.join(ROOT, "dist", "index.html"))) {
   console.error("dist/ がありません。先に `npm run build` を実行してください（npm run test:e2e は自動で行います）。");

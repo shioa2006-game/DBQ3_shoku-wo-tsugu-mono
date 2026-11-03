@@ -61,6 +61,7 @@ npm.cmd run test:e2e
 - `tests/e2e/smoke.test.mjs`：サブシステム、ワールド寸法、ニューゲームの起動スモーク。
 - `tests/e2e/sheets.test.mjs`：8方向スプライトシートの境界と中心位置。
 - `tests/e2e/item-icons.test.mjs`：全アイテムがStudio製アイコン画像を使い、ホットバーとドロップに表示されること。
+- `tests/e2e/prop-models.test.mjs`：作り直した設置物が `src/world/prop-models.js` から輪郭線つきで作られ、扉の開閉・たいまつの炎の部品が残ること。
 
 ### ヘッドレステストの注意
 
@@ -68,7 +69,7 @@ npm.cmd run test:e2e
   ランナー負荷で不安定になりやすい。
 - 固定`waitForTimeout`の直後に判定せず、`tests/helpers.mjs`の`advanceToStage`、
   `waitForStage`、`waitForCond`で状態変化をポーリングする。
-- 高速確認は`npm.cmd run test:ci`（sheets・smoke・underwater-visuals・item-icons）、全回帰は
+- 高速確認は`npm.cmd run test:ci`（sheets・smoke・underwater-visuals・item-icons・prop-models）、全回帰は
   `npm.cmd run test:e2e`とする。新しい重い通しテストは全回帰へ追加し、
   常に守るべき不変条件だけを`tests/run.mjs`の`FAST`セットへ追加する。
 
@@ -108,6 +109,8 @@ npm.cmd run test:e2e
 - 章進行の変更では第1～3章の通しテストを確認する。
 
 ## アセットの生成と正規化
+
+- 作り直した設置物の3Dの原本はStudioの `prototypes/props-3d/models.mjs`。`src/world/prop-models.js` はStudioの `npm.cmd run export:props -- --preview-game` で書き出し、直接編集しない。
 
 - 手描き原画は`art_src/`、ゲーム読込用画像は`assets/`に置く。
 - 8方向キャラクターシートを追加・変更するときは、既存の正規化手順を使う。

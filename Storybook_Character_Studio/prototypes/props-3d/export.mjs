@@ -1,27 +1,39 @@
-// 設置物の3Dモデルの原本（models.mjs）を、ゲーム側の確認ページへ写す。
-//   dqb3-tsugumono-ch1-3/prototypes/props-3d/prop-models.js
-// 本編への移植（src/world/prop-models.js）は、ユーザーが決めた段階で別に行う。
+// 設置物の3Dモデルの原本（models.mjs）を写す。
+//   dqb3-tsugumono-ch1-3/prototypes/props-3d/prop-models.js   確認ページ用（右側の新しい形）
+// --preview-game で、本編の両ゲームにも書き出す。
+//   dqb3-tsugumono-ch1-3/src/world/prop-models.js
+//   dqb3-tsugumono-ch4-5/src/world/prop-models.js
+// 写しは原本の先頭に生成ファイルの注記を付けるだけで、コードは変えない。
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 
 const here = (p) => new URL(p, import.meta.url);
-const game = (p) => new URL(`../../../dqb3-tsugumono-ch1-3/${p}`, import.meta.url);
+const gameFile = (folder, p) => new URL(`../../../${folder}/${p}`, import.meta.url);
+
+export const PREVIEW_COPY = { folder: 'dqb3-tsugumono-ch1-3', path: 'prototypes/props-3d/prop-models.js' };
+export const GAME_COPIES = Object.freeze([
+  { folder: 'dqb3-tsugumono-ch1-3', path: 'src/world/prop-models.js' },
+  { folder: 'dqb3-tsugumono-ch4-5', path: 'src/world/prop-models.js' },
+]);
 
 export const GENERATED_HEADER = [
   '// 生成ファイル。直接編集しない。',
   '// 原本: Storybook_Character_Studio/prototypes/props-3d/models.mjs',
-  '// 更新: Storybook_Character_Studio で npm.cmd run export:props',
+  '// 更新: Storybook_Character_Studio で npm.cmd run export:props -- --preview-game',
   '',
 ].join('\n');
 
-// 写しの中身。原本の先頭に生成ファイルの注記を付けるだけで、コードは変えない。
 export async function generatedModule() {
   return GENERATED_HEADER + (await readFile(here('models.mjs'), 'utf8'));
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  if (process.argv.length > 2) throw Error('Unknown argument');
-  await mkdir(game('prototypes/props-3d/'), { recursive: true });
-  await writeFile(game('prototypes/props-3d/prop-models.js'), await generatedModule());
-  console.log('Prop models copied to dqb3-tsugumono-ch1-3/prototypes/props-3d/prop-models.js (game src unchanged).');
+  const toGame = process.argv.includes('--preview-game');
+  if (process.argv.slice(2).some((a) => a !== '--preview-game')) throw Error('Unknown argument');
+  const code = await generatedModule();
+  for (const { folder, path } of [PREVIEW_COPY, ...(toGame ? GAME_COPIES : [])]) {
+    await mkdir(gameFile(folder, path.slice(0, path.lastIndexOf('/') + 1)), { recursive: true });
+    await writeFile(gameFile(folder, path), code);
+  }
+  console.log(`Prop models copied to the comparison page${toGame ? ' and both games src/world/prop-models.js' : ' (game src unchanged)'}.`);
 }

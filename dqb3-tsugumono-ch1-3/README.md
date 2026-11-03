@@ -39,6 +39,12 @@ CH1～CH3の人型7人・基本モンスター5種は、Storybook Character Stud
 
 アイコンを直すときはStudioの `icons.mjs` を編集し、Studioで `npm.cmd run export:items -- --preview-game` を実行します。ゲーム側の画像を直接編集しないでください。
 
+## 設置物の3D
+
+かかし・たいまつ・わらのベッド・鳥居・木の扉・作業台・職業の祭壇・とげ罠は、Studioの [props-3d](../Storybook_Character_Studio/prototypes/props-3d/README.md) の原本から書き出した `src/world/prop-models.js` で作ります。基本形状に黒い輪郭線を付け、木・石・わらの面にはブロックの模様を貼っています。とげ罠は石のとげをスライムゼリーで固めた形です。ほかの設置物は `src/world/props.js` の `BUILDERS` のままです。
+
+形を直すときはStudioの `models.mjs` を編集し、Studioで `npm.cmd run export:props -- --preview-game` を実行します（第1～3章と第4～5章の両方へ書き出します）。`prop-models.js` は直接編集しないでください。今の本編の形と新しい形は、第1～3章の開発サーバーの `/builder_sprite_lab/prototypes/props-3d/` で並べて比べられます。
+
 ## 操作方法
 
 | 入力 | 動作 |
@@ -77,7 +83,8 @@ src/
 │   ├─ blocks.js      ブロック定義＋テクスチャアトラス（全てコード生成）
 │   ├─ world.js       ボクセルデータ・島の地形生成・DDAレイキャスト・セーブ差分
 │   ├─ mesher.js      チャンク単位のメッシュ結合（不可視面カリング）
-│   └─ props.js       設置物メッシュ（作業台・扉・たいまつ・稲・鳥居など）＋光源プール
+│   ├─ props.js       設置物メッシュ（稲・柵・かまどなど）＋光源プール
+│   └─ prop-models.js 作り直した設置物（Studio原本の書き出し。直接編集しない）
 ├─ entities/
 │   ├─ rig.js         2.5Dキャラリグ（8方向スプライト＋3D手足）※試作ラボから移植
 │   ├─ player.js      主人公（自由移動・ジャンプ・水泳・装備）
