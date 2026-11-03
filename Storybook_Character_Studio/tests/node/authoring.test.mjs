@@ -93,7 +93,7 @@ test('retained modules and documentation have no missing local imports or links'
     }
   }
   const dirs=(await readdir(path.join(root,'prototypes'),{withFileTypes:true})).filter(e=>e.isDirectory()).map(e=>e.name).sort();
-  assert.deepEqual(dirs,['adventurer-8dir','armored-scorpion-8dir','belk-8dir','dorotabo-8dir','field-rat-8dir','gonta-8dir','grom-8dir','inaho-8dir','item-icons','jinbei-8dir','kaya-8dir','mina-8dir','nagi-8dir','night-bat-8dir','pino-8dir','props-3d','rockhorn-goat-8dir','roku-8dir','shared','slime-8dir','small-rock-crab-8dir','squid-8dir','sumi-8dir','teru-8dir','volcano-lizard-8dir','watari-8dir','will-o-wisp-8dir','yomogi-8dir']);
+  assert.deepEqual(dirs,['adventurer-8dir','armored-scorpion-8dir','belk-8dir','dorotabo-8dir','field-rat-8dir','gargoyle-8dir','gonta-8dir','grom-8dir','inaho-8dir','item-icons','jinbei-8dir','kaya-8dir','mina-8dir','nagi-8dir','night-bat-8dir','pino-8dir','props-3d','rockhorn-goat-8dir','roku-8dir','shared','slime-8dir','small-rock-crab-8dir','squid-8dir','sumi-8dir','teru-8dir','volcano-lizard-8dir','watari-8dir','will-o-wisp-8dir','yomogi-8dir']);
 });
 
 test('Pino separates neck cloth from face and validates authoring inputs',()=>{

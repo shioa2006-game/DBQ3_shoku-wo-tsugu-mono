@@ -1,5 +1,5 @@
 // 4方向の設定画を比較用にだけ8セルへ配置する。コード生成側の作画には使わない。
-export async function fourViewReference(url) {
+export async function fourViewReference(url, { singleView = false, regions } = {}) {
   const source = new Image();
   source.src = url;
   await source.decode();
@@ -10,14 +10,17 @@ export async function fourViewReference(url) {
   const tile = document.createElement('canvas');
   tile.width = tile.height = 128;
   const ctx = tile.getContext('2d', { willReadFrequently: true });
-  const w = source.width / 2, h = source.height / 2;
+  const w = source.width / (singleView ? 1 : 2), h = source.height / (singleView ? 1 : 2);
+  const scale = 128 / (regions ? Math.max(...regions.map(([, ,rw,rh])=>Math.max(rw,rh))) : Math.max(w,h));
 
   // 正面・斜め前・横・背面。斜め後ろには背面を表示する。
   for (const [i, view] of [0,1,2,3,3,3,2,1].entries()) {
     ctx.clearRect(0,0,128,128);
     ctx.save();
-    if (i > 5) { ctx.translate(128,0); ctx.scale(-1,1); }
-    ctx.drawImage(source, view%2*w, Math.floor(view/2)*h,w,h, 0,0,128,128);
+    if (!singleView && i > 5) { ctx.translate(128,0); ctx.scale(-1,1); }
+    const index = singleView ? 0 : view;
+    const [sx,sy,sw,sh] = regions?.[index] ?? [index%2*w,Math.floor(index/2)*h,w,h];
+    ctx.drawImage(source,sx,sy,sw,sh,0,0,sw*scale,sh*scale);
     ctx.restore();
     const { data } = ctx.getImageData(0,0,128,128);
     let left = 128, right = -1, bottom = -1;

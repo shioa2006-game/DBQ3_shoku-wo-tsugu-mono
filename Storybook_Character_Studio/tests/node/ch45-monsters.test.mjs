@@ -7,6 +7,7 @@ import { createRequire } from 'node:module';
 import { buildWillOWispSheet } from '../../prototypes/will-o-wisp-8dir/character.mjs';
 import { buildArmoredScorpionSheet } from '../../prototypes/armored-scorpion-8dir/character.mjs';
 import { buildVolcanoLizardSheet } from '../../prototypes/volcano-lizard-8dir/character.mjs';
+import { buildFlightSheet, buildGroundSheet } from '../../prototypes/gargoyle-8dir/character.mjs';
 import { buildCrabSheet } from '../../prototypes/small-rock-crab-8dir/character.mjs';
 import { buildGromHeadSheet, buildGromBodySheet } from '../../prototypes/grom-8dir/character.mjs';
 
@@ -15,6 +16,8 @@ const { PNG } = require('pngjs');
 const MONSTERS = {
   will_o_wisp: ['will-o-wisp-8dir', buildWillOWispSheet],
   armored_scorpion: ['armored-scorpion-8dir', buildArmoredScorpionSheet],
+  gargoyle_flight: ['gargoyle-8dir', buildFlightSheet],
+  gargoyle_ground: ['gargoyle-8dir', buildGroundSheet],
   small_rock_crab: ['small-rock-crab-8dir', buildCrabSheet],
   volcano_lizard: ['volcano-lizard-8dir', buildVolcanoLizardSheet],
 };

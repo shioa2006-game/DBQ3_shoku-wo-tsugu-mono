@@ -25,6 +25,14 @@ const MONSTERS = {
     output: new URL('../../../prototypes/small-rock-crab-8dir/output/', import.meta.url),
     note: '採石洞の岩に紛れるカニ。Aは通常姿勢、Bは両方のハサミを構える姿勢。斜め後ろの参照には背面を使います。大岩ガニは同じ造形を拡大した試作です。',
     variants: [['小岩ガニ', 1, 0xffffff, false], ['大岩ガニ（拡大試作）', 2, 0xffffff, false]] },
+  gargoyle: { name: 'ガーゴイル', chapter: 'ダーマ再興編', art: 'gargoyle_flight',
+    design: new URL('../../../references/gargoyle-flight-4dir-v1.png', import.meta.url),
+    // 背面の左翼が原画の中央線をまたぐので、下段は翼間の余白で区切る。
+    regions: [[0,0,625,620],[625,0,636,620],[0,620,550,627],[550,620,711,627]],
+    landed: new URL('../../../references/gargoyle-landed-v2.png', import.meta.url),
+    output: new URL('../../../prototypes/gargoyle-8dir/output/', import.meta.url),
+    note: '第7章の神殿防衛。飛行は翼を広げて羽ばたき、地上は翼を背中に畳んで歩きます。',
+    variants: [['飛行',1,0xffffff,true], ['地上',1,0xffffff,false]] },
 };
 const ids = Object.keys(MONSTERS);
 const params = new URLSearchParams(location.search);
@@ -42,9 +50,12 @@ for (const other of ids) {
   $('characters').append(a);
 }
 m.variants.forEach(([label], i) => { const o = document.createElement('option'); o.value = i; o.textContent = label; $('variant').append(o); });
-const designSheet = m.design && await fourViewReference(m.design);
+const designSheet = m.design && await fourViewReference(m.design,{regions:m.regions});
+const studioSheets = art => ['a','b'].map(f => new URL(`${art}_code_idle_${f}_8dir.png`,m.output).href);
 const ref = designSheet ? [designSheet, designSheet] : sheets(m.art, false);
-const code = m.output ? ['a','b'].map(f => new URL(`${m.art}_code_idle_${f}_8dir.png`,m.output).href) : sheets(m.art, true);
+const code = m.output ? studioSheets(m.art) : sheets(m.art, true);
+const landedSheet = m.landed && await fourViewReference(m.landed,{singleView:true});
+const ground = landedSheet && [[landedSheet,landedSheet],studioSheets('gargoyle_ground')];
 if (m.design) {
   document.querySelector('.eyebrow').textContent = `MONSTER STUDY / ${m.chapter}`;
   $('reference-label').textContent = '4方向の参照画';
@@ -55,7 +66,6 @@ if (m.design) {
   }
   $('production-note').textContent = '第6章に向けてStudioで制作中。左は通常姿勢の参照画、右はコードで描いた8方向・2姿勢です。';
 }
-for (const [i, frame] of ['a', 'b'].entries()) { $(`ref-${frame}`).src = ref[i]; $(`code-${frame}`).src = code[i]; }
 
 const renderer = new THREE.WebGLRenderer({ canvas: $('scene'), antialias: true, alpha: true, preserveDrawingBuffer: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -68,7 +78,17 @@ function build() {
   for (const r of rigs) scene.remove(r.group);
   for (const s of shadows) scene.remove(s);
   const [, scale, tint, flying] = m.variants[state.variant];
-  rigs = [ref, code].map(s => { const r = new MonsterSprite({ sheetAUrl: s[0], sheetBUrl: s[1], scale, tint, yOffset: flying ? .4 : 0 }); scene.add(r.group); return r; });
+  const [original, drawn] = ground && !flying ? ground : [ref, code];
+  for (const [i, frame] of ['a','b'].entries()) {
+    $(`ref-${frame}`).src = original[i]; $(`code-${frame}`).src = drawn[i];
+  }
+  if (ground) {
+    const caption = flying ? '飛行の4方向参照画' : '着地の参照画（左斜め前・固定）';
+    $('reference-label').textContent = caption;
+    for (const f of ['a','b']) $('ref-'+f).previousElementSibling.textContent = caption;
+    $('production-note').textContent = flying ? '第7章の制作素材。斜め後ろの参照には背面を表示します。' : '第7章の制作素材。左は着地修正版の1方向、右はコードで描いた8方向です。';
+  }
+  rigs = [original, drawn].map(s => { const r = new MonsterSprite({ sheetAUrl: s[0], sheetBUrl: s[1], scale, tint, yOffset: flying ? .4 : 0 }); scene.add(r.group); return r; });
   shadows = rigs.map(() => {
     const s = new THREE.Mesh(new THREE.CircleGeometry(.3 * scale, 48), new THREE.MeshBasicMaterial({ color: 0x657966, transparent: true, opacity: .2, depthWrite: false }));
     s.rotation.x = -Math.PI / 2; s.position.y = .002; s.scale.y = .8; scene.add(s); return s;

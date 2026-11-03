@@ -46,7 +46,7 @@ export function normalizeCells(src) {
   return { out, report };
 }
 
-export async function exportMonster({ id, name, role, build, references, summary, runtime, studioFolder }) {
+export async function exportMonster({ id, name, role, build, references, summary, runtime, studioFolder, reportPrefix = '' }) {
   const character = studioFolder ? { folder: studioFolder, targets: [] } : CHARACTERS.find(c => c.id === id);
   if (!character) throw Error(`${id} is not listed in game-targets.mjs`);
   const previewGame = process.argv.includes('--preview-game');
@@ -89,8 +89,8 @@ export async function exportMonster({ id, name, role, build, references, summary
       <text x="28" y="62" font-family="sans-serif" font-size="14" fill="#60717b">${summary}</text>
       ${frames.flatMap((f, row) => [f.reference, f.png].map((bytes, col) => `<g transform="translate(28 ${84 + (row * 2 + col) * 276})"><rect width="1024" height="268" fill="#d8e1df"/><text x="10" y="16" font-family="sans-serif" font-size="13" fill="#203344">${col ? 'CODE' : 'REFERENCE'} / ${f.frame.toUpperCase()}</text><image href="${uri(bytes)}" x="0" y="12" width="1024" height="256" style="image-rendering:pixelated"/></g>`)).join('')}
     </svg>`;
-    await writeFile(here('output/comparison.png'), await rasterize(board));
-    await writeFile(here('output/manifest.json'), JSON.stringify({
+    await writeFile(here(`output/${reportPrefix}comparison.png`), await rasterize(board));
+    await writeFile(here(`output/${reportPrefix}manifest.json`), JSON.stringify({
       id, name, role, version: 1, status: 'prototype', source: '../character.mjs', format: 'game-monster-billboard',
       cellSize: 128, columns: 4, rows: 2, directions: DIRECTIONS, labels: LABELS, anchor: { centerU: .494, bottomFromTop: .945 },
       frames: frames.map(({ png, reference, ...f }) => f), runtime: { class: 'MonsterSprite', interval: .38, uv: { uMin: .02, uMax: .98, vMin: .02, vMax: .98 }, ...runtime },

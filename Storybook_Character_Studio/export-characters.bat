@@ -35,6 +35,8 @@ node prototypes/rockhorn-goat-8dir/export.mjs
 if errorlevel 1 goto failed
 node prototypes/small-rock-crab-8dir/export.mjs
 if errorlevel 1 goto failed
+node prototypes/gargoyle-8dir/export.mjs
+if errorlevel 1 goto failed
 echo All characters exported into their Studio output folders.
 pause
 exit /b 0
