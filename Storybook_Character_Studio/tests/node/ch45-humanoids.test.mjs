@@ -11,10 +11,12 @@ import { buildNagiSheet } from '../../prototypes/nagi-8dir/character.mjs';
 import { buildYomogiSheet } from '../../prototypes/yomogi-8dir/character.mjs';
 import { buildSumiSheet } from '../../prototypes/sumi-8dir/character.mjs';
 import { buildTeruSheet } from '../../prototypes/teru-8dir/character.mjs';
+// 主人公の新デザイン案（Studioのみ）も同じ頭・胴分離方式なので、同じ条件で確かめる。
+import { buildHero2Sheet } from '../../prototypes/hero2-8dir/character.mjs';
 
 const require = createRequire(new URL('../../../dqb3-tsugumono-ch4-5/package.json', import.meta.url));
 const { PNG } = require('pngjs');
-const BUILDERS = { belk: buildBelkSheet, roku: buildRokuSheet, kaya: buildKayaSheet, nagi: buildNagiSheet, yomogi: buildYomogiSheet, sumi: buildSumiSheet, teru: buildTeruSheet };
+const BUILDERS = { belk: buildBelkSheet, roku: buildRokuSheet, kaya: buildKayaSheet, nagi: buildNagiSheet, yomogi: buildYomogiSheet, sumi: buildSumiSheet, teru: buildTeruSheet, hero2: buildHero2Sheet };
 const output = (id, file) => new URL(`../../prototypes/${id}-8dir/output/${file}`, import.meta.url);
 const png = async (id, file) => PNG.sync.read(await readFile(output(id, file)));
 const alpha = (image, cell, x, y) => image.data[((Math.floor(cell / 4) * 128 + y) * 512 + (cell % 4) * 128 + x) * 4 + 3];

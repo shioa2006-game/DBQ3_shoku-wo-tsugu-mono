@@ -9,9 +9,14 @@ import { NAGI_RIG_PROFILE } from '../../../prototypes/nagi-8dir/rig-profile.mjs'
 import { YOMOGI_RIG_PROFILE } from '../../../prototypes/yomogi-8dir/rig-profile.mjs';
 import { SUMI_RIG_PROFILE } from '../../../prototypes/sumi-8dir/rig-profile.mjs';
 import { TERU_RIG_PROFILE } from '../../../prototypes/teru-8dir/rig-profile.mjs';
+import { HERO2_RIG_PROFILE } from '../../../prototypes/hero2-8dir/rig-profile.mjs';
+import { ADVENTURER_RIG_PROFILE } from '../../../prototypes/adventurer-8dir/rig-profile.mjs';
 
 const asset = file => new URL(`../../../games/ch4-5/assets/humanoids/${file}`, import.meta.url).href;
 const reference = file => new URL(`../../../references/humanoids/${file}`, import.meta.url).href;
+// Studio-only designs are read from their Studio output (not exported to the game yet).
+const studio = id => { const out = file => new URL(`../../../prototypes/${id}-8dir/output/${file}`, import.meta.url).href;
+  return { generated: out(`${id}_code_body_8dir.png`), head: out(`${id}_code_head_layer_8dir.png`), torso: out(`${id}_code_torso_layer_8dir.png`) }; };
 const code = id => ({ generated: asset(`${id}_code_body_8dir.png`), head: asset(`${id}_code_head_layer_8dir.png`), torso: asset(`${id}_code_torso_layer_8dir.png`) });
 const profiles = {
   belk: { name: 'ベルク', title: '鍛冶職人', original: reference('blacksmith_body_8dir.png'), ...code('belk'), tuning: BELK_RIG_PROFILE,
@@ -38,6 +43,12 @@ const profiles = {
     note: '新しくデザイン（元はカヤと同じ画像）。炭焼き小屋に隠れていた娘。茶色のおかっぱに錆色の鉢巻き、そばかすと煤、オリーブの作業着。',
     colors: { sleeve: 0x6b6b3a, hand: 0xeec39a, pants: 0x4f4436, boot: 0x332b20, headBack: 0x3c2c22, bodyBack: 0x565626 },
     generatedColors: { headBack: 0x3c2618 } },
+  // 主人公の新デザイン案。左は今の主人公（本編と同じ画像・手足の色・リグ設定）。
+  hero2: { name: '主人公案', title: '新デザイン案', original: asset('adventurer_code_body_8dir.png'), originalTuning: ADVENTURER_RIG_PROFILE, ...studio('hero2'), tuning: HERO2_RIG_PROFILE,
+    note: '主人公の新デザイン案（Studioのみ、本編は未変更）。ふわふわの金髪とアホ毛、青い瞳、生成りのケープに紺のチュニック、左腰の小物入れ。背中には小さめのかばんと、その上に紐で留めた紺の表紙の本。左は今の主人公。',
+    leftLabel: '今の主人公（本編）', rightLabel: '新デザイン案・頭胴分離とリグ設定',
+    colors: { sleeve: 0x2856a8, hand: 0x7b4a22, pants: 0xc9b78e, boot: 0x6b3f1d, headBack: 0x203f74, bodyBack: 0x24467e },
+    generatedColors: { sleeve: 0x2f4b95, hand: 0xf8d0a6, pants: 0x4a3226, boot: 0x8a5630, headBack: 0xd9a020, bodyBack: 0x6e4526 } },
 };
 const ids = Object.keys(profiles);
 const character = ids.includes(new URLSearchParams(location.search).get('c')) ? new URLSearchParams(location.search).get('c') : ids[0];
@@ -48,6 +59,9 @@ const $ = id => document.getElementById(id);
 document.title = `${p.name}の8方向試作｜職をつぐ者 火山島編`;
 $('title').textContent = `${p.name}（${p.title}）を、コードから。`;
 $('note').textContent = p.note;
+const stageLabels = document.querySelectorAll('.labels>span');
+if (p.leftLabel) stageLabels[0].firstChild.textContent = p.leftLabel;
+if (p.rightLabel) stageLabels[1].firstChild.textContent = p.rightLabel;
 for (const id of ids) {
   const a = document.createElement('a'); a.href = `?c=${id}`; a.textContent = profiles[id].name;
   if (id === character) a.setAttribute('aria-current', 'page');
@@ -67,7 +81,7 @@ const camera = new THREE.PerspectiveCamera(32, 1, .1, 30);
 camera.position.set(0, .45 + 3.1 * 8.2 / 11.5, 3.1); camera.lookAt(0, .45, 0);
 const rigs = [0, 1].map(index => {
   const rig = index === 0
-    ? new HumanoidRig({ sheetUrl: p.original, colors: p.colors })
+    ? new HumanoidRig({ sheetUrl: p.original, colors: p.colors, tuning: p.originalTuning })
     : new HumanoidRig({ sheetUrl: p.generated, headSheetUrl: p.head, bodySheetUrl: p.torso, colors: { ...p.colors, ...p.generatedColors }, tuning: p.tuning });
   rig.animTime = 0; scene.add(rig.group);
   const shadow = new THREE.Mesh(new THREE.CircleGeometry(.32, 48), new THREE.MeshBasicMaterial({ color: 0x657966, transparent: true, opacity: .2, depthWrite: false }));

@@ -11,12 +11,14 @@ import { normalize } from '../../../dqb3-tsugumono-ch4-5/tools/normalize_sheet.m
 const require = createRequire(new URL('../../../dqb3-tsugumono-ch4-5/package.json', import.meta.url));
 const { PNG } = require('pngjs');
 
-export async function exportHumanoid({ id, name, role, build, reference, summary, rigColors, rigTuning }) {
-  const character = CHARACTERS.find(c => c.id === id);
+// studioOnly: デザイン検討中の案。game-targets.mjs に載せず、出力はStudio内だけに置く。
+export async function exportHumanoid({ id, name, role, build, reference, summary, rigColors, rigTuning, studioOnly = false }) {
+  const character = studioOnly ? { id, folder: `${id}-8dir`, targets: [] } : CHARACTERS.find(c => c.id === id);
   if (!character) throw Error(`${id} is not listed in game-targets.mjs`);
   const previewGame = process.argv.includes('--preview-game');
   const unknown = process.argv.slice(2).filter(arg => arg !== '--preview-game');
   if (unknown.length) throw Error(`Unknown arguments: ${unknown.join(', ')}`);
+  if (previewGame && !character.targets.length) throw Error(`${id} is a Studio-only design and has no target game`);
   const here = file => new URL(`../${character.folder}/${file}`, import.meta.url);
   await mkdir(here('output/'), { recursive: true });
   const svg = build();

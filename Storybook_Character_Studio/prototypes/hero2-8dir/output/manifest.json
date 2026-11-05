@@ -1,0 +1,140 @@
+{
+  "id": "hero2",
+  "name": "主人公（新デザイン案）",
+  "role": "HERO REDESIGN",
+  "version": 1,
+  "status": "prototype",
+  "source": "../character.mjs",
+  "reference": "references/hero-redesign-4dir-v1.png",
+  "format": "game-humanoid-bust",
+  "cellSize": 128,
+  "columns": 4,
+  "rows": 2,
+  "directions": [
+    "front",
+    "front_left",
+    "left",
+    "back_left",
+    "back",
+    "back_right",
+    "right",
+    "front_right"
+  ],
+  "labels": [
+    "正面",
+    "左斜め前",
+    "左",
+    "左斜め後",
+    "背面",
+    "右斜め後",
+    "右",
+    "右斜め前"
+  ],
+  "anchor": {
+    "centerU": 0.494,
+    "bottomFromTop": 0.945
+  },
+  "normalization": [
+    {
+      "row": 0,
+      "col": 0,
+      "dx": 1,
+      "dy": 1,
+      "before": "0.480",
+      "after": "0.492"
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "dx": -1,
+      "dy": 1,
+      "before": "0.500",
+      "after": "0.492"
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "dx": -3,
+      "dy": 1,
+      "before": "0.516",
+      "after": "0.492"
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "dx": 2,
+      "dy": 1,
+      "before": "0.477",
+      "after": "0.492"
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "dx": -1,
+      "dy": 1,
+      "before": "0.500",
+      "after": "0.492"
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "dx": -1,
+      "dy": 1,
+      "before": "0.500",
+      "after": "0.492"
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "dx": 4,
+      "dy": 1,
+      "before": "0.461",
+      "after": "0.492"
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "dx": 1,
+      "dy": 1,
+      "before": "0.480",
+      "after": "0.492"
+    }
+  ],
+  "output": "hero2_code_body_8dir.png",
+  "runtime": "HumanoidRig with separate headSheetUrl/bodySheetUrl; limbs and equipment supplied by the game",
+  "runtimeSheets": {
+    "headSheetUrl": "hero2_code_head_layer_8dir.png",
+    "bodySheetUrl": "hero2_code_torso_layer_8dir.png"
+  },
+  "rigColors": {
+    "sleeve": 3099541,
+    "hand": 16306342,
+    "pants": 4862502,
+    "boot": 9066032,
+    "headBack": 14262304,
+    "bodyBack": 7226662
+  },
+  "rigTuning": {
+    "bodyTopV": 0.54,
+    "armSep": 0.142,
+    "armRestTilt": 0.22,
+    "shoulderLift": -0.008,
+    "sleeveY": -0.105,
+    "headForward": 0.02,
+    "headDepth": 0.024,
+    "headOffsetY": 0,
+    "headLiftByDirection": {
+      "front": 0.02,
+      "front_left": 0.03,
+      "left": 0.024,
+      "back_left": 0.024,
+      "back": 0.02,
+      "back_right": 0.024,
+      "right": 0.024,
+      "front_right": 0.03
+    },
+    "bodyDepth": -0.008
+  },
+  "rigProfile": "../rig-profile.mjs",
+  "targets": []
+}

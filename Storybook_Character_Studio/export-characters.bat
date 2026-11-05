@@ -9,6 +9,8 @@ if errorlevel 1 (
 )
 node prototypes/adventurer-8dir/export.mjs
 if errorlevel 1 goto failed
+node prototypes/hero2-8dir/export.mjs
+if errorlevel 1 goto failed
 node prototypes/mina-8dir/export.mjs
 if errorlevel 1 goto failed
 node prototypes/pino-8dir/export.mjs
