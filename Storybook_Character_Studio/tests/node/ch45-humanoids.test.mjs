@@ -16,6 +16,8 @@ import { buildHero2Sheet } from '../../prototypes/hero2-8dir/character.mjs';
 
 const require = createRequire(new URL('../../../dqb3-tsugumono-ch4-5/package.json', import.meta.url));
 const { PNG } = require('pngjs');
+// Drawn with the tunic on the art centre (exported with keepDrawnX); see prototypes/hero2-8dir/README.md.
+const DRAWN_X = new Set(['hero2']);
 const BUILDERS = { belk: buildBelkSheet, roku: buildRokuSheet, kaya: buildKayaSheet, nagi: buildNagiSheet, yomogi: buildYomogiSheet, sumi: buildSumiSheet, teru: buildTeruSheet, hero2: buildHero2Sheet };
 const output = (id, file) => new URL(`../../prototypes/${id}-8dir/output/${file}`, import.meta.url);
 const png = async (id, file) => PNG.sync.read(await readFile(output(id, file)));
@@ -55,8 +57,17 @@ test('composite sheets stay inside the rig windows with a fixed bottom', async (
         if (y > 78) assert.ok(x >= 31 && x <= 95, `${id}: torso clipped in direction ${cell} at ${x},${y}`);
       }
       assert.ok(top >= 5 && bottom === 121, `${id}: vertical anchoring in direction ${cell} (${top}..${bottom})`);
-      const center = (minX + maxX) / 2 / 128;
-      assert.ok(center >= .46 && center <= .53, `${id}: centred in direction ${cell} (${center})`);
+      if (DRAWN_X.has(id)) {
+        // Anchored on the tunic: the hem (the only art on the bottom row) is centred on u = .494,
+        // even where the back hair and the book make the whole figure lopsided.
+        let x0 = 128, x1 = -1;
+        for (let x = 0; x < 128; x++) if (alpha(sheet, cell, x, 121) > 24) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); }
+        const hem = (x0 + x1 + 1) / 2;
+        assert.ok(Math.abs(hem - 128 * .494) <= 1.5, `${id}: tunic centred in direction ${cell} (${hem})`);
+      } else {
+        const center = (minX + maxX) / 2 / 128;
+        assert.ok(center >= .46 && center <= .53, `${id}: centred in direction ${cell} (${center})`);
+      }
     }
   }
 });

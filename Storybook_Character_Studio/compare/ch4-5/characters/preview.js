@@ -43,12 +43,12 @@ const profiles = {
     note: '新しくデザイン（元はカヤと同じ画像）。炭焼き小屋に隠れていた娘。茶色のおかっぱに錆色の鉢巻き、そばかすと煤、オリーブの作業着。',
     colors: { sleeve: 0x6b6b3a, hand: 0xeec39a, pants: 0x4f4436, boot: 0x332b20, headBack: 0x3c2c22, bodyBack: 0x565626 },
     generatedColors: { headBack: 0x3c2618 } },
-  // 主人公の新デザイン案。左は今の主人公（本編と同じ画像・手足の色・リグ設定）。
-  hero2: { name: '主人公案', title: '新デザイン案', original: asset('adventurer_code_body_8dir.png'), originalTuning: ADVENTURER_RIG_PROFILE, ...studio('hero2'), tuning: HERO2_RIG_PROFILE,
-    note: '主人公の新デザイン案（Studioのみ、本編は未変更）。ふわふわの金髪とアホ毛、青い瞳、生成りのケープに紺のチュニック、左腰の小物入れ。背中には小さめのかばんと、その上に紐で留めた紺の表紙の本。左は今の主人公。',
-    leftLabel: '今の主人公（本編）', rightLabel: '新デザイン案・頭胴分離とリグ設定',
+  // 主人公シオンの新デザイン案（試作02、8方向の設定画が正本）。左は今の主人公（本編と同じ画像・手足の色・リグ設定）。
+  hero2: { name: 'シオン案', title: '新デザイン案・試作02', original: asset('adventurer_code_body_8dir.png'), originalTuning: ADVENTURER_RIG_PROFILE, ...studio('hero2'), tuning: HERO2_RIG_PROFILE,
+    note: '主人公シオンの新デザイン案・試作02（Studioのみ、本編は未変更）。正本は8方向の設定画 references/hero-redesign-8dir-v2.png。ふわふわの金髪とアホ毛、大きな青い瞳、生成りの肩掛けに紺のチュニック、左腰の小物入れ。背中の小さな革のホルダーに、金の「開いた本」の紋章の職業の書。左は今の主人公。',
+    leftLabel: '今の主人公（本編）', rightLabel: 'シオン新デザイン案・頭胴分離とリグ設定',
     colors: { sleeve: 0x2856a8, hand: 0x7b4a22, pants: 0xc9b78e, boot: 0x6b3f1d, headBack: 0x203f74, bodyBack: 0x24467e },
-    generatedColors: { sleeve: 0x2f4b95, hand: 0xf8d0a6, pants: 0x4a3226, boot: 0x8a5630, headBack: 0xd9a020, bodyBack: 0x6e4526 } },
+    generatedColors: { sleeve: 0x2c3b7e, hand: 0xf3c9a4, pants: 0x3b2a22, boot: 0x8a5428, headBack: 0xe1a432, bodyBack: 0x2c3b7e } },
 };
 const ids = Object.keys(profiles);
 const character = ids.includes(new URLSearchParams(location.search).get('c')) ? new URLSearchParams(location.search).get('c') : ids[0];

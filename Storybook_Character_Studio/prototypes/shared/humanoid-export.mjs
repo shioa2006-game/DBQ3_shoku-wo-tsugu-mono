@@ -12,7 +12,9 @@ const require = createRequire(new URL('../../../dqb3-tsugumono-ch4-5/package.jso
 const { PNG } = require('pngjs');
 
 // studioOnly: デザイン検討中の案。game-targets.mjs に載せず、出力はStudio内だけに置く。
-export async function exportHumanoid({ id, name, role, build, reference, summary, rigColors, rigTuning, studioOnly = false }) {
+// keepDrawnX: 横方向は描いた位置のまま（胴の中心を u=.494 に描いた作画用）。縦だけ下端121pxへ揃える。
+// boards: 比較画像を差し替える。({ reference, normalized, layers }) => { 'ファイル名.png': svg }
+export async function exportHumanoid({ id, name, role, build, reference, summary, rigColors, rigTuning, studioOnly = false, keepDrawnX = false, boards }) {
   const character = studioOnly ? { id, folder: `${id}-8dir`, targets: [] } : CHARACTERS.find(c => c.id === id);
   if (!character) throw Error(`${id} is not listed in game-targets.mjs`);
   const previewGame = process.argv.includes('--preview-game');
@@ -35,27 +37,32 @@ export async function exportHumanoid({ id, name, role, build, reference, summary
       } finally { URL.revokeObjectURL(url); }
     }, source), 'base64');
     const raw = await rasterize(svg);
-    const { out, report } = normalize(PNG.sync.read(raw));
-    const normalized = PNG.sync.write(out);
-    const files = { [`${id}_code_body_8dir`]: { raw, png: normalized } };
-    const layers = {};
-    for (const part of ['head', 'torso']) {
-      const partSvg = build({ part });
-      const partRaw = await rasterize(partSvg), source = PNG.sync.read(partRaw);
+    const normalizedSheet = normalize(PNG.sync.read(raw));
+    const report = keepDrawnX ? normalizedSheet.report.map(r => ({ ...r, dx: 0, after: r.before, horizontal: 'drawn' })) : normalizedSheet.report;
+    // 合成・頭・胴に同じ移動量を当てる。
+    const shift = (source, label) => {
       const target = new PNG({ width: 512, height: 256 });
       for (const { row, col, dx, dy } of report) {
         for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) {
           const si = ((row * 128 + y) * 512 + col * 128 + x) * 4;
           if (source.data[si + 3] <= 24) continue;
           const nx = x + dx, ny = y + dy;
-          if (nx < 0 || nx >= 128 || ny < 0 || ny >= 128) throw Error(`${part}: normalization clips artwork`);
+          if (nx < 0 || nx >= 128 || ny < 0 || ny >= 128) throw Error(`${label}: normalization clips artwork`);
           source.data.copy(target.data, ((row * 128 + ny) * 512 + col * 128 + nx) * 4, si, si + 4);
         }
       }
+      return PNG.sync.write(target);
+    };
+    const normalized = keepDrawnX ? shift(PNG.sync.read(raw), 'combined') : PNG.sync.write(normalizedSheet.out);
+    const files = { [`${id}_code_body_8dir`]: { raw, png: normalized } };
+    const layers = {};
+    for (const part of ['head', 'torso']) {
+      const partSvg = build({ part });
+      const partRaw = await rasterize(partSvg);
       const fileName = `${id}_code_${part}_layer_8dir`;
       layers[part] = `${fileName}.png`;
       await writeFile(here(`output/${fileName}.svg`), partSvg);
-      files[fileName] = { raw: partRaw, png: PNG.sync.write(target) };
+      files[fileName] = { raw: partRaw, png: shift(PNG.sync.read(partRaw), part) };
     }
     for (const [fileName, { raw: src, png }] of Object.entries(files)) {
       await writeFile(here(`output/${fileName}.src.png`), src);
@@ -72,12 +79,14 @@ export async function exportHumanoid({ id, name, role, build, reference, summary
       <text x="28" y="62" font-family="sans-serif" font-size="14" fill="#60717b">${summary}</text>
       ${[ref, normalized].map((bytes, i) => `<g transform="translate(28 ${84 + i * 288})"><rect width="1024" height="276" fill="#d8e1df"/><text x="10" y="18" font-family="sans-serif" font-size="13" fill="#203344">${i ? 'CODE' : 'REFERENCE'}</text><image href="${uri(bytes)}" x="0" y="20" width="1024" height="256" style="image-rendering:pixelated"/></g>`).join('')}
     </svg>`;
-    await writeFile(here('output/comparison.png'), await rasterize(board));
+    const extra = boards?.({ reference: ref, normalized, layers: Object.fromEntries(['head', 'torso'].map(part => [part, files[`${id}_code_${part}_layer_8dir`].png])) });
+    if (!extra?.['comparison.png']) await writeFile(here('output/comparison.png'), await rasterize(board));
+    for (const [file, boardSvg] of Object.entries(extra ?? {})) await writeFile(here(`output/${file}`), await rasterize(boardSvg));
     await writeFile(here('output/manifest.json'), JSON.stringify({
       id, name, role, version: 1, status: 'prototype',
       source: '../character.mjs', reference: `references/${reference}`,
       format: 'game-humanoid-bust', cellSize: 128, columns: 4, rows: 2, directions: DIRECTIONS, labels: LABELS,
-      anchor: { centerU: .494, bottomFromTop: .945 }, normalization: report,
+      anchor: { centerU: .494, bottomFromTop: .945, ...(keepDrawnX ? { horizontal: 'drawn tunic centre' } : {}) }, normalization: report,
       output: `${id}_code_body_8dir.png`, runtime: 'HumanoidRig with separate headSheetUrl/bodySheetUrl; limbs and equipment supplied by the game',
       runtimeSheets: { headSheetUrl: layers.head, bodySheetUrl: layers.torso },
       rigColors, rigTuning, rigProfile: '../rig-profile.mjs', targets: character.targets,
