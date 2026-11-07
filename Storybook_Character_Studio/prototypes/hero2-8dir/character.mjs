@@ -397,9 +397,9 @@ function turn(tag, xn, inner, s = .1) {
 
 const BODY = [
   'M262 221 Q305 213 348 221 Q362 230 364 252 L366 342 Q305 350 244 342 L246 252 Q248 230 262 221Z',
-  'M166 221 Q218 211 270 217 Q282 238 280 268 L284 342 Q250 346 218 346 Q184 346 146 342 L150 268 Q150 238 166 221Z',
+  'M152 214 Q170 205 200 207 Q236 209 270 217 Q282 238 280 268 L284 342 Q250 346 218 346 Q184 346 146 342 L150 268 Q148 232 152 214Z',
   'M120 222 Q150 214 188 222 Q196 250 194 290 L196 342 Q153.5 349 111 342 L114 290 Q112 250 120 222Z',
-  'M70 218 Q120 208 174 216 Q190 248 190 290 L193 342 Q158 345.5 121 345.5 Q88 345.5 60 342 L62 290 Q60 250 70 218Z',
+  'M70 218 Q120 204 168 205 Q190 207 192 228 L191 290 L193 342 Q158 345.5 121 345.5 Q88 345.5 60 342 L62 290 Q60 250 70 218Z',
   'M262 219 Q305 211 348 219 Q362 230 364 252 L366 342 Q305 350 244 342 L246 252 Q248 230 262 219Z',
 ];
 
@@ -426,7 +426,7 @@ const TORSOS = [
     + holder(272, 304, 264, 326)
     + neck('M196 196 H230 V216 H196Z')
     + vest(BODY[1])
-    + vestShade(tag, BODY[1], ['M236 216 Q262 218 290 236 L290 346 L234 346Z', 'M140 226 L156 222 L154 346 L140 346Z'])
+    + vestShade(tag, BODY[1], ['M236 216 Q262 218 290 236 L290 346 L234 346Z', 'M140 212 L158 208 L154 346 L140 346Z'])
     + opening(tag, BODY[1], 'M189 214 Q201 219 214 213 L212 346 Q195 349 179 345Z',
       [['M189 216 L179.5 344', 'M186.5 218 L177 344'], ['M214 215 L212 345', 'M216.5 217 L214.5 345']])
     + collar('M191 205 Q212 211 238 205 L240 218 Q226 222 212 227 Q200 222 189 218Z') + line('M212 214 L212 227', SINK, 1.8)
@@ -446,19 +446,21 @@ const TORSOS = [
     + strap('M140 222 Q184 210 196 240 Q202 256 202 272')
     + beltBand(111, 195, 285, 0) + P('M104 283 h12 v17 h-12Z', grad('gold'), 'var(--goldDark)', 1.8)
     + (mirror ? '' : pouch(138, 296, 30, 40)),
-  // 3 back-left: the vest's back; the cover (emblem) and the fore-edge on its left, in the holder.
+  // 3 back-left: the vest's back; the cover (emblem) and the fore-edge on its left, in the holder. The book
+  // is as tall as in the design sheet, so its far top corner meets the hair and the 3D far arm's shoulder
+  // (seen higher than the near one from the game camera) stays behind it.
   // Turned: the side plane (the near arm's side) on the left of the corner at the tunic centre, the back
   // plane, with the book and the holder, on the right toward the far shoulder (in shade at its far edge).
   (mirror, tag) => turn(tag, 121, neck('M88 194 H120 V214 H88Z')
     + vest(BODY[3])
-    + vestShade(tag, BODY[3], ['M54 224 L68 220 L66 346 L54 346Z', 'M170 216 L196 222 L198 346 L168 346Z'])
+    + vestShade(tag, BODY[3], ['M54 224 L68 220 L66 346 L54 346Z', 'M170 204 L196 206 L198 346 L168 346Z'])
     + collar('M84 203 Q106 198 130 203 L131 216 Q106 211 82 216Z')
     + beltBand(60, 192, 286, 0)
     + (mirror ? '' : pouch(52, 296, 20, 38))
     + strap('M76 222 Q100 234 106 272')
-    + P('M108 222 Q108 216 114 216 H130 V276 H108Z', grad('book'), BINK) + P('M112 219 H128 V276 H112Z', 'var(--paper)', '#a8946a', 1.2)
-    + line('M116 222 V274 M120.5 222 V274 M125 222 V274', '#d9c9a2', .9)
-    + bookCover(125, 213, 197, 276, 161, 246, .82, .9, true)
+    + P('M108 211 Q108 205 114 205 H130 V276 H108Z', grad('book'), BINK) + P('M112 208 H128 V276 H112Z', 'var(--paper)', '#a8946a', 1.2)
+    + line('M116 211 V274 M120.5 211 V274 M125 211 V274', '#d9c9a2', .9)
+    + bookCover(125, 203, 197, 276, 161, 241, .82, .9, true)
     + holder(105, 199, 270, 331)),
   // 4 back: the vest's back with the straps beside the book; the deep green cover with the gold
   // emblem and the page block's top edge; the holder covers only the book's lower part.
