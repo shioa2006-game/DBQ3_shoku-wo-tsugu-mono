@@ -1,5 +1,5 @@
 // 職業の書（データ駆動化された職業復活システム）の回帰テスト。
-// - 初期状態: 6冊（ビルダー/農民/料理人/船乗り=復活済み、鍛冶屋/僧侶=白紙）
+// - 初期状態: 6冊（職業の書/農民/料理人/船乗り=復活済み扱い、鍛冶屋/僧侶=白紙）
 // - 章の進行（施設完成・鍛造フラグ）に応じて鍛冶屋の書の進捗ゲージが伸びる
 // - revive() で復活演出→復活状態になる
 // - 復活状態がセーブ/ロードで保持される
@@ -16,7 +16,7 @@ try {
   // --- 初期状態 -------------------------------------------------------------------
   const initial = await page.evaluate(() => window.__game.jobs.bookData());
   expect(initial.length === 6, `書は6冊 (${initial.length})`);
-  expect(initial[0].revived === true && initial[0].name === "ビルダーの書", "ビルダーの書は最初から復活済み");
+  expect(initial[0].revived === true && initial[0].name === "職業の書", "持ち出した職業の書は最初から復活済み扱い");
   const blacksmith = initial[4];
   expect(blacksmith.name === "鍛冶屋の書" && blacksmith.revived === false && blacksmith.progress === 0, "鍛冶屋の書は白紙・進捗0");
   const priest = initial[5];

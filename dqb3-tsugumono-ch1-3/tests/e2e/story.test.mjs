@@ -4,14 +4,40 @@
 // 進行の早送りはデバッグフック(window.__game)を使うが、判定は必ずゲーム側の
 // 正規のイベント経路(onCrafted/onBlockPlaced/世界変更コールバック等)を通す。
 
-import { launchBrowser, openGame, newGame, dlg, stage, expect, advanceToStage, advanceToChoice, waitForStage, waitForCond } from "../helpers.mjs";
+import { launchBrowser, openGame, dlg, stage, expect, advanceToStage, advanceToChoice, waitForStage, waitForCond } from "../helpers.mjs";
 
 const errors = [];
 const browser = await launchBrowser();
 try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   await openGame(page, { collectErrors: errors });
-  await newGame(page);
+  await page.click(".btn-new");
+  await waitForCond(page, () => window.__game.ui.dialogue.open, undefined, { label: "導入会話" });
+  await page.setViewportSize({ width: 640, height: 720 });
+  const intro = await page.evaluate(() => {
+    const dialogue = window.__game.ui.dialogue;
+    const text = document.querySelector(".dlg-text");
+    const box = text.closest(".dialogue");
+    const lines = [];
+    while (dialogue.open && lines.length < 30) {
+      if (dialogue.typing) dialogue.advance();
+      const r = text.getBoundingClientRect();
+      const b = box.getBoundingClientRect();
+      lines.push({
+        text: text.textContent,
+        speaker: window.__game.ui.dialogueName.textContent,
+        fits: text.scrollWidth <= text.clientWidth && text.scrollHeight <= text.clientHeight &&
+          r.bottom <= b.bottom && b.bottom <= innerHeight && b.right <= innerWidth,
+      });
+      dialogue.advance();
+    }
+    return lines;
+  });
+  expect(intro.some((line) => line.text.includes("ゾーマ")) && intro.some((line) => line.text.includes("上の世界")), "導入でゾーマ討伐後の上の世界を説明する");
+  expect(intro.some((line) => line.text.includes("職業の書を抱えて") && line.text.includes("逃げ出した")), "シオンが書を携えて神殿から脱出したと語る");
+  expect(intro.some((line) => line.speaker === "職業の書"), "相棒の話者名は職業の書");
+  expect(intro.every((line) => line.fits), "導入の全文が幅640pxの会話枠に収まる");
+  await page.setViewportSize({ width: 1280, height: 720 });
   expect((await stage(page)) === "GATHER_WOOD", "イントロ後は GATHER_WOOD");
 
   // --- 木材集め → 作業台 -------------------------------------------------------
@@ -183,6 +209,8 @@ try {
   expect(dialogueFits, "書の予告全文が幅640pxの会話枠に収まる");
   await page.setViewportSize({ width: 1280, height: 720 });
   await dlg(page, 20);
+  const endingText = await page.locator(".ending").textContent();
+  expect(endingText.includes("ゾーマ") && endingText.includes("職業の書」を携えて神殿から脱出"), "第1章末も世界観と書の持ち出しを引き継ぐ");
   // エンディング演出はクリック用リスナが 4秒後に付く（ui.playEnding の setTimeout）。
   // 早すぎるクリックは無視されるので、POSTGAME になるまでクリックし続ける。
   await waitForCond(

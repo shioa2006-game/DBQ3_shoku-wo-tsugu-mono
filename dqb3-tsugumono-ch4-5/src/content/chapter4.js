@@ -5,7 +5,7 @@
 
 const D = (speaker, text) => ({ speaker, text });
 const HERO = "シオン";
-const BOOK = "ビルダーの書";
+const BOOK = "職業の書";
 
 export const CH4 = {
   // ステージごとのクエストログ（目標表示）。関数は game を受け取る。

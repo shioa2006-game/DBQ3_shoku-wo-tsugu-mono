@@ -12,13 +12,14 @@ import { SFX } from "./sfx.js";
 //   name          書の名前（UI表示・復活演出で使用）
 //   lockedDesc    未復活時の説明文
 //   revivedDesc   復活後の説明文
-//   startRevived  最初から復活済みか（原初の書＝ビルダーのみ true）
+//   startRevived  最初から読める状態か（シオンが持ち出した職業の書のみ true）
 //   progress(game) 復活までの進捗 0..1（職業の書UIのゲージ）
 export const JOBS = {
+  // 既存セーブとの互換性のため、話す職業の書の内部IDは builder を維持する。
   builder: {
-    name: "ビルダーの書",
+    name: "職業の書",
     lockedDesc: "",
-    revivedDesc: "すべての職業の根にある原初の書。建てることは、生きること。",
+    revivedDesc: "シオンがダーマ神殿から守り抜いた、話す書。暮らしを築き、職をつなぐ旅の相棒。",
     startRevived: true,
     progress(game) {
       const bp = game.blueprints.completed;

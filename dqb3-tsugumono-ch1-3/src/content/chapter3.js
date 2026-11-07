@@ -4,7 +4,7 @@
 
 const D = (speaker, text) => ({ speaker, text });
 const HERO = "シオン";
-const BOOK = "ビルダーの書";
+const BOOK = "職業の書";
 
 export const CH3 = {
   objectives: {
