@@ -395,6 +395,14 @@ function turn(tag, xn, inner, s = .1) {
   return half('l', `M-100 0 H${xn + .5} V520 H-100Z`, s) + half('r', `M${xn - .5} 0 H700 V520 H${xn - .5}Z`, -s);
 }
 
+// The book behind the shoulders in the front view: its back cover, in shadow (deep green, as dark as the
+// design sheet shows it), with a lighter top rim, and the cream page block's top edge above it.
+function backTop() {
+  return P('M246 204 Q246 198 252 198 H358 Q364 198 364 204 V262 H246Z', 'var(--paper)', '#a8946a', 1.4)
+    + P('M240 212 Q240 205 247 205 H363 Q370 205 370 212 V262 H240Z', 'var(--bookDark)', BINK)
+    + line('M246 209 H364', 'var(--book)', 1.8);
+}
+
 const BODY = [
   'M262 221 Q305 213 348 221 Q362 230 364 252 L366 342 Q305 350 244 342 L246 252 Q248 230 262 221Z',
   'M152 214 Q170 205 200 207 Q236 209 270 217 Q282 238 280 268 L284 342 Q250 346 218 346 Q184 346 146 342 L150 268 Q148 232 152 214Z',
@@ -404,16 +412,19 @@ const BODY = [
 ];
 
 const TORSOS = [
-  // 0 front: the shirt shows wide between the vest panels; the holder's straps run down the chest to the
-  // belt. The book is hidden right behind the body (in the 3D rig its top corners only showed as small
-  // green points beside the neck, between the hair and the arms, so they are not drawn).
-  (mirror, tag) => neck('M288 194 H320 V216 H288Z')
+  // 0 front: the shirt shows wide between the vest panels; the holder's straps run over the shoulders and
+  // down the chest to the belt. As in the design sheet, the top of the book (its back cover, with the page
+  // block's top edge seen from above) shows behind both shoulders. It is a little wider than the body so
+  // the tops of the 3D arms (about y 200, x 220-262 and 348-390 here) are seen against the book instead of
+  // standing above the sloping shoulders (which read as raised, squared shoulders).
+  (mirror, tag) => backTop()
+    + neck('M288 194 H320 V216 H288Z')
     + vest(BODY[0])
     + vestShade(tag, BODY[0], ['M236 226 L262 222 L258 346 L236 346Z', 'M374 226 L348 222 L352 346 L374 346Z'])
     + opening(tag, BODY[0], 'M284 214 Q305 220 326 214 L331 346 Q305 350 279 346Z',
       [['M284 216 L279.5 344', 'M281 218 L276.5 344'], ['M326 216 L330.5 344', 'M329 218 L333.5 344']])
     + collar('M284 205 Q305 211 326 205 L328 218 Q317 221 307 227 Q296 221 282 218Z') + line('M305 213 L307 227', SINK, 1.8)
-    + strap('M268 220 Q262 252 265 287') + strap('M342 220 Q348 252 345 287')
+    + strap('M266 205 Q260 250 265 287') + strap('M344 205 Q350 250 345 287')
     + beltBand(246, 366, 287) + buckle(306, 298)
     + (mirror ? '' : pouch(323, 297)),
   // 1 front-left: the shirt panel narrows and moves toward the far side; the near vest panel turns
