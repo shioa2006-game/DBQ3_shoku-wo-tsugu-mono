@@ -4,6 +4,7 @@ dist/
 .npm-cache/
 .vite/
 coverage/
+__pycache__/
 test-results/
 playwright-report/
 work/
@@ -27,6 +28,8 @@ Thumbs.db
 
 # Screenshots taken by the Studio comparison tests (npm.cmd run test:compare); retain the HTML/JS pages
 /Storybook_Character_Studio/compare/**/*.png
+# Screenshots taken by the prologue browser test (npm.cmd run test:prologue)
+/Storybook_Character_Studio/story-movies/**/screenshots/
 /quality-audit-*/
 
 # Machine-local migration/backup files must stay outside version control

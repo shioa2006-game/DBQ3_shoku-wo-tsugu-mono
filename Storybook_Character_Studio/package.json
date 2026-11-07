@@ -36,7 +36,9 @@
     "export:grom": "node prototypes/grom-8dir/export.mjs",
     "export:items": "node prototypes/item-icons/export.mjs",
     "export:props": "node prototypes/props-3d/export.mjs",
-    "sync:games": "node tools/sync-game-targets.mjs"
+    "sync:games": "node tools/sync-game-targets.mjs",
+    "build:prologue": "node story-movies/prologue/build.mjs",
+    "test:prologue": "node tests/movie/prologue.test.mjs"
   },
   "engines": {
     "node": ">=18"

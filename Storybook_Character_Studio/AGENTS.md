@@ -21,4 +21,6 @@
 - 2026-11-02にCH1～CH3の12種を本編へ移植済み。現在は `--preview-game` の出力画像を本編も使用する。リグ設定変更時はゲーム側 `src/content/rig-profiles/` にも同期する。ゲームの `docs/CHARACTER_ART.md` を参照。
 - 2026-11-03に主人公・ミナ・ゴンタ・ワタリ・おおこうもり・どろたぼうを第4～5章へも移植。両編が書き出し先のキャラクターは、書き出し後に `npm.cmd run sync:games` で `game-targets.mjs` の全ゲームへ写す。
 
+- `story-movies/prologue/` はプロローグのSVGムービー試作（ゲーム未組み込み）。`index.html`・`parts/` は生成物なので `src/` を直して `npm.cmd run build:prologue`。主人公の作画（hero2）を変えたら生成し直す。移植はユーザーが決める。
+
 - Gitは[親リポジトリ](../AGENTS.md)で一括管理する。Studio単体のremoteや `.git` は作らない。旧履歴は統合時の外部bundleから参照する。
