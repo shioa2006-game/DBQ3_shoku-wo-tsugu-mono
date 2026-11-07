@@ -12,6 +12,17 @@
 | 3 | 新しいモンスター3種（鬼火・火山トカゲ・鉄甲サソリ） | 2026-11-03 完了（本編へ移植） |
 | 4 | 竜グロムの頭と胴 | 2026-11-03 完了（本編へ移植） |
 | 5 | 以前の画像と3D比較のページをStudioへ移す（`references/`・`compare/`） | 2026-11-03 完了 |
+| 6 | 主人公を新しいデザイン `hero2` へ切り替え（両編） | 2026-11-07 完了 |
+
+## 段階6: 主人公の切り替え（2026-11-07）
+
+主人公シオンを、Studioの新しいデザイン `hero2`（[prototypes/hero2-8dir](../../Storybook_Character_Studio/prototypes/hero2-8dir/README.md)）へ切り替えた。ふわふわの金髪とアホ毛、大きな青い瞳、生成りの服に紺のベスト、左腰の小物入れ、背中の小さな革のホルダーに深緑の職業の書。両編とも同じ画像・リグ設定を使う。
+
+- 読込: `src/entities/player.js` が `assets/humanoids/hero2_code_{head,torso}_layer_8dir.png` を頭・胴に分けて `HumanoidRig` へ渡す（以前の主人公は合成シート1枚）。リグ設定は `src/content/rig-profiles/hero2.mjs`（Studioの写し）。腕の付け方は以前の主人公と同じリグの既定値で、右斜め前の攻撃だけ道具を頭の板の上に描く（`toolOverHead`）。
+- 手足の色: 紺の袖 `0x293d75`、素手 `0xf3c9a4`、焦げ茶のズボン `0x3b2a22`、茶色のブーツ `0x8a5428`。頭・胴の裏は `0xe1a432`・`0x293d75`。
+- 画像の配置: 胴（チュニック）の中心をセルの u=.494 に描き、横方向は正規化しない（大きな後ろ髪と背中の本で絵全体の中心が胴からずれるため）。`tests/e2e/sheets.test.mjs` は `hero2_code_body_8dir.png` だけ、外接枠の中心の代わりに裾の中心がセル中央にあることを確かめる。
+- 以前の主人公の画像 `assets/humanoids/adventurer_code_body_8dir.png` とリグ設定 `rig-profiles/adventurer.mjs` は、Studioの比較ページが読むため残す（ゲームからは読まない）。
+- セーブ形式・進行は変えていない。見た目のテストは `tests/e2e/character-art.test.mjs`（主人公を `hero2` として頭・胴の分離層・リグ設定・8方向・歩行・道具の振りを検査）。
 
 ## 段階0でそろえたもの
 

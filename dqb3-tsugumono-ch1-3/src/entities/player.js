@@ -3,17 +3,23 @@ import { Entity, GRAVITY } from "./entity.js";
 import { HumanoidRig, submersionAt } from "./rig.js";
 import { ITEMS } from "../game/items.js";
 
-import { ADVENTURER_RIG_PROFILE } from "../content/rig-profiles/adventurer.mjs";
+import { HERO2_RIG_PROFILE } from "../content/rig-profiles/hero2.mjs";
 
-const SHEET_URL = new URL("../../assets/humanoids/adventurer_code_body_8dir.png", import.meta.url).href;
+// シオン。Storybook Character Studio の主人公（prototypes/hero2-8dir、2026-11-07に以前の主人公
+// adventurer から切り替え）。頭・胴の分離画像とリグ設定・手足の色を使う（docs/CHARACTER_ART.md）。
+const HUMANOIDS = (file) => new URL(`../../assets/humanoids/${file}`, import.meta.url).href;
+const SHEET_URL = HUMANOIDS("hero2_code_body_8dir.png");
+const HEAD_SHEET_URL = HUMANOIDS("hero2_code_head_layer_8dir.png");
+const TORSO_SHEET_URL = HUMANOIDS("hero2_code_torso_layer_8dir.png");
 
+// 紺の袖、素手、焦げ茶のズボン、茶色のブーツ。頭・胴の裏は金髪と紺のベスト。
 const PLAYER_COLORS = {
-  sleeve: 0x2856a8,
-  hand: 0x7b4a22,
-  pants: 0xc9b78e,
-  boot: 0x6b3f1d,
-  headBack: 0x203f74,
-  bodyBack: 0x24467e,
+  sleeve: 0x293d75,
+  hand: 0xf3c9a4,
+  pants: 0x3b2a22,
+  boot: 0x8a5428,
+  headBack: 0xe1a432,
+  bodyBack: 0x293d75,
 };
 
 const WALK_SPEED = 4.4;
@@ -26,7 +32,10 @@ export class Player extends Entity {
     this.baseMaxHp = 20;
     this.maxHp = 20;
     this.hp = 20;
-    this.rig = new HumanoidRig({ sheetUrl: SHEET_URL, colors: PLAYER_COLORS, tuning: ADVENTURER_RIG_PROFILE });
+    this.rig = new HumanoidRig({
+      sheetUrl: SHEET_URL, headSheetUrl: HEAD_SHEET_URL, bodySheetUrl: TORSO_SHEET_URL,
+      colors: PLAYER_COLORS, tuning: HERO2_RIG_PROFILE,
+    });
     this.root = new THREE.Group();
     this.root.add(this.rig.group);
     scene.add(this.root);

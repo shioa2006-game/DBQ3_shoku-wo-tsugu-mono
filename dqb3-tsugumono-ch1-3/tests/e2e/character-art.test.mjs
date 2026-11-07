@@ -1,12 +1,13 @@
 import assert from 'node:assert/strict';
 import {mkdir,writeFile} from 'node:fs/promises';
 import {launchBrowser,openGame,newGame,waitForCond} from '../helpers.mjs';
+// The player is hero2 (the Studio hero, layered head/torso since 2026-11-07; previously adventurer).
 const villagers=['mina','pino','inaho','gonta','jinbei','watari'];
 const monsters=['slime','bat','field_rat','dorotabo','squid','boss','paddy_boss','kraken','kraken_arm'];
 const artNames=['slime','night_bat','field_rat','dorotabo','squid','slime','dorotabo','squid','squid'];
 const directions=['front','front_left','left','back_left','back','back_right','right','front_right'];
 const profiles={};
-for(const id of ['adventurer',...villagers]) profiles[id]=(await import(`../../src/content/rig-profiles/${id}.mjs`))[`${id.toUpperCase()}_RIG_PROFILE`];
+for(const id of ['hero2',...villagers]) profiles[id]=(await import(`../../src/content/rig-profiles/${id}.mjs`))[`${id.toUpperCase()}_RIG_PROFILE`];
 const browser=await launchBrowser(),errors=[];
 try {
  const page=await browser.newPage({viewport:{width:1280,height:720}});
@@ -43,7 +44,7 @@ try {
     r.setTool(null);r.attackT=0;r.animTime=0;r.update(0,false);
     return {direction,rest,walks,attacks,headUV:[...r.headTexture.offset,...r.headTexture.repeat],bodyUV:[...r.bodyTexture.offset,...r.bodyTexture.repeat]};
    });
-   return {id:i?villagers[i-1]:'adventurer',tuning:r.tuning,colors:r.colors,head:r.headTexture.image.src,body:r.bodyTexture.image.src,size:[r.headTexture.image.width,r.headTexture.image.height],poses};
+   return {id:i?villagers[i-1]:'hero2',tuning:r.tuning,colors:r.colors,head:r.headTexture.image.src,body:r.bodyTexture.image.src,size:[r.headTexture.image.width,r.headTexture.image.height],poses};
   });
   const mobs=monsters.map(id=>{
    const m=g.monsters.monsters.find(m=>m.type===id),s=m.sprite;
@@ -58,8 +59,8 @@ try {
  },{villagers,monsters,directions});
  for(const h of result.human){
   assert.deepEqual(h.tuning,profiles[h.id],`${h.id}: migrated rig profile`);
-  assert.match(h.head,new RegExp(`${h.id}_code_${h.id==='adventurer'?'body':'head_layer'}_8dir`));
-  assert.match(h.body,new RegExp(`${h.id}_code_${h.id==='adventurer'?'body':'torso_layer'}_8dir`));
+  assert.match(h.head,new RegExp(`${h.id}_code_head_layer_8dir`));
+  assert.match(h.body,new RegExp(`${h.id}_code_torso_layer_8dir`));
   assert.deepEqual(h.size,[512,256]);
   const base=h.poses[0].rest-(profiles[h.id].headLiftByDirection.front??0);
   for(const [i,p] of h.poses.entries()){
@@ -67,7 +68,7 @@ try {
    assert.ok(p.walks&&p.attacks.every(Boolean),`${h.id}/${p.direction}: walking and tool swing`);
    assert.ok(p.headUV.every(Number.isFinite)&&p.bodyUV.every(Number.isFinite));
    assert.ok(Math.abs(p.headUV[0]-(i%4+.494-.34)/4)<1e-8,'head direction UV');
-   assert.ok(Math.abs(p.bodyUV[3]-(h.id==='adventurer'?.2:.245))<1e-8,'separate torso includes collar');
+   assert.ok(Math.abs(p.bodyUV[3]-.245)<1e-8,'separate torso includes collar');
   }
  }
  assert.equal(result.human.find(h=>h.id==='jinbei').colors.headBack,0xa1aaa9);
@@ -90,10 +91,10 @@ try {
     for(const [i,direction] of directions.entries()){
      const scene=new g.scene.constructor();scene.background=g.scene.background.clone().setHex(0xdce4de);
      scene.add(g.hemiLight.clone(),g.sunLight.clone());
-     const ids=group==='humans'?['adventurer',...villagers]:group==='monsters'?['slime','bat','field_rat','dorotabo','squid']:['boss','paddy_boss','kraken','kraken_arm'];
+     const ids=group==='humans'?['hero2',...villagers]:group==='monsters'?['slime','bat','field_rat','dorotabo','squid']:['boss','paddy_boss','kraken','kraken_arm'];
      const spacing=group==='bosses'?3:group==='humans'?1:1.5;
      for(const [j,id] of ids.entries()){
-      const e=id==='adventurer'?g.player:villagers.includes(id)?g.villager(id):g.monsters.monsters.find(m=>m.type===id);
+      const e=id==='hero2'?g.player:villagers.includes(id)?g.villager(id):g.monsters.monsters.find(m=>m.type===id);
       if(e.rig){e.rig.setDirection(direction);e.rig.setTool(null);e.rig.attackT=0;e.rig.animTime=0;e.rig.update(0,false);}
       else {e.sprite.direction=direction;e.sprite.applyWindow();e.sprite.material.map=e.sprite.texA;}
       const clone=e.root.clone(true);clone.position.set((j-(ids.length-1)/2)*spacing,0,0);clone.rotation.set(0,0,0);

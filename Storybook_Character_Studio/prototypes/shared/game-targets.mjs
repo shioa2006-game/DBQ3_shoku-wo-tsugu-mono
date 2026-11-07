@@ -30,7 +30,10 @@ const dragon = (folder, id, targets) => ({
 });
 
 export const CHARACTERS = Object.freeze([
+  // 以前の主人公（合成シート1枚）。2026-11-07に hero2 へ切り替えたが、比較用に両編へ残す。
   humanoid('adventurer', 'humanoid', ['ch1-3', 'ch4-5']),
+  // 主人公シオン（2026-11-07から本編の主人公。頭・胴の分離、胴の中心を描いた位置のまま書き出す）。
+  humanoid('hero2', 'humanoid-layers', ['ch1-3', 'ch4-5']),
   humanoid('mina', 'humanoid-layers', ['ch1-3', 'ch4-5']),
   humanoid('pino', 'humanoid-layers', ['ch1-3']),
   humanoid('inaho', 'humanoid-layers', ['ch1-3']),

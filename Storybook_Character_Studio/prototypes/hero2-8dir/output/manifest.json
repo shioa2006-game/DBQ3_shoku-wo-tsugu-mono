@@ -1,7 +1,7 @@
 {
   "id": "hero2",
-  "name": "主人公シオン（新デザイン案）",
-  "role": "HERO REDESIGN 03",
+  "name": "主人公シオン",
+  "role": "HERO 03",
   "version": 1,
   "status": "prototype",
   "source": "../character.mjs",
@@ -148,5 +148,8 @@
     ]
   },
   "rigProfile": "../rig-profile.mjs",
-  "targets": []
+  "targets": [
+    "ch1-3",
+    "ch4-5"
+  ]
 }

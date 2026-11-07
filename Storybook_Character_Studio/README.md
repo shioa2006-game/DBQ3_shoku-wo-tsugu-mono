@@ -54,14 +54,14 @@ npm.cmd run export:dorotabo -- --preview-game
 npm.cmd run export:squid -- --preview-game
 ```
 
-`--preview-game` が書くのは第1～3章だけです。`prototypes/shared/game-targets.mjs` で両編を書き出し先にしたキャラクター（主人公・ミナ・ゴンタ・ワタリ・おおこうもり・どろたぼう）は、書き出しの後に次で第4～5章にも同じ画像・原画・リグ設定を写します。`npm.cmd test` は、書き出し先のゲームがStudioの出力と違うと失敗します。
+`--preview-game` が書くのは第1～3章だけです。`prototypes/shared/game-targets.mjs` で両編を書き出し先にしたキャラクター（主人公シオン `hero2`・以前の主人公・ミナ・ゴンタ・ワタリ・おおこうもり・どろたぼう）は、書き出しの後に次で第4～5章にも同じ画像・原画・リグ設定を写します。`npm.cmd test` は、書き出し先のゲームがStudioの出力と違うと失敗します。
 
 ```powershell
 npm.cmd run sync:games            # すべて
 npm.cmd run sync:games -- mina    # 指定したキャラクターだけ
 ```
 
-ミナ・ピノ・イナホ・ゴンタ・ジンベエ・ワタリは頭と胴を別々に読み込みます。比較用合成PNGだけを持ち出さず、2枚のPNGと `rig-profile.mjs` を一緒に扱ってください。主人公は従来の一枚シート方式ですが、方向別の頭の高さを指定する `rig-profile.mjs` も必要です。
+ミナ・ピノ・イナホ・ゴンタ・ジンベエ・ワタリは頭と胴を別々に読み込みます。比較用合成PNGだけを持ち出さず、2枚のPNGと `rig-profile.mjs` を一緒に扱ってください。主人公シオン（`hero2`、2026-11-07から本編の主人公）も頭・胴を分けて読み込みます。以前の主人公（`adventurer`）は一枚シート方式で、方向別の頭の高さを指定する `rig-profile.mjs` とともに比較用に残しています。
 
 ## 構成
 

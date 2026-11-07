@@ -1,6 +1,6 @@
-# 主人公シオンの新デザイン案・試作03
+# 主人公シオン・試作03
 
-主人公シオン（ダーマ神殿から「職業の書」を守って逃げ延びた神官見習い）の見た目の変更を検討するための案です。本編の主人公（[adventurer-8dir](../adventurer-8dir/README.md)）は変えていません。出力はStudio内だけで、`game-targets.mjs` にも載せていません。採用するかどうかはユーザーが比較結果を見て決めます。
+主人公シオン（ダーマ神殿から「職業の書」を守って逃げ延びた神官見習い）の8方向です。**2026-11-07から第1～3章・第4～5章の主人公**（以前の主人公 [adventurer-8dir](../adventurer-8dir/README.md) から切り替え。以前の主人公は比較用に残す）。`game-targets.mjs` で両編を書き出し先にしている。
 
 - **頭（顔・髪）**: 試作02のまま。正本は8方向の設定画 [`references/hero-redesign-8dir-v2.png`](../../references/hero-redesign-8dir-v2.png)。
 - **胴（服・職業の書）**: 試作03（2026-11-07）で「生成りの服＋紺のベスト」と深緑の職業の書に改めた。正本は [`references/hero-redesign-8dir-v3.png`](../../references/hero-redesign-8dir-v3.png)（v2と同じ位置・大きさで描かれた衣装違いの設定画）。
@@ -44,9 +44,9 @@
 ## 原本と出力
 
 - `character.mjs`: 方向ごとの作画。`hero2Local(view)` は比較ツール用に設定画の座標のまま描く。
-- `rig-profile.mjs`: 腕の位置、頭の前後位置と方向別の高さ。腕は今の主人公と同じ付け方（リグの既定値: 付け根 `armSep:.14`・傾き `armRestTilt:.34`・肩の高さ `shoulderLift:0`・袖 `sleeveY:-.12`）で、腕の長さ・手の位置・道具を振る位置がそろう。2026-11-06 に一度、設定画に合わせて腕を短く下げたが、手が短く見えたため今の主人公と同じ付け方に戻した。
-- 攻撃（2026-11-07）: 右斜め前は道具を持つ手が手前で、振り上げた道具が顔の前を横切る。平らな頭の板が3Dの道具を切ってめり込んで見えたため、`toolOverHead:['front_right']` でこの方向の攻撃中だけ道具を頭の板の上に描く（`rig.js` の任意設定。振る軌道・握り・道具の向きは今の主人公と同じ）。他の方向は、道具が頭の横か後ろを通るため指定しない。`test:compare -- hero2` が設定の効く方向・時間を検査し、`hero2-rig-swing-front-right.png`（今の主人公との振り上げの比較）を保存する。
-- `export.mjs`: 書き出しと比較画像。`studioOnly` のため `--preview-game` は使えない。
+- `rig-profile.mjs`: 腕の位置、頭の前後位置と方向別の高さ。腕は以前の主人公と同じ付け方（リグの既定値: 付け根 `armSep:.14`・傾き `armRestTilt:.34`・肩の高さ `shoulderLift:0`・袖 `sleeveY:-.12`）で、腕の長さ・手の位置・道具を振る位置がそろう。2026-11-06 に一度、設定画に合わせて腕を短く下げたが、手が短く見えたため以前の主人公と同じ付け方に戻した。
+- 攻撃（2026-11-07）: 右斜め前は道具を持つ手が手前で、振り上げた道具が顔の前を横切る。平らな頭の板が3Dの道具を切ってめり込んで見えたため、`toolOverHead:['front_right']` でこの方向の攻撃中だけ道具を頭の板の上に描く（`rig.js` の任意設定。振る軌道・握り・道具の向きは以前の主人公と同じ）。他の方向は、道具が頭の横か後ろを通るため指定しない。`test:compare -- hero2` が設定の効く方向・時間を検査し、`hero2-rig-swing-front-right.png`（以前の主人公との振り上げの比較）を保存する。
+- `export.mjs`: 書き出しと比較画像。`--preview-game` で両編の `assets/humanoids/`・`art_src/`・`src/content/rig-profiles/hero2.mjs` へも書き出す。
 - `output/hero2_code_head_layer_8dir.png`: 頭（髪・顔・耳）。首と襟は含めない。
 - `output/hero2_code_torso_layer_8dir.png`: 胴（首・襟・生成りの服・紺のベスト・肩紐・ベルト・小物入れ・ホルダー・職業の書）。
 - `output/hero2_code_body_8dir.png`: 比較用の合成。
@@ -63,23 +63,24 @@ npm.cmd test
 npm.cmd run test:compare -- hero2
 ```
 
-`test:compare -- hero2` は、比較ページ [`compare/ch4-5/characters/?c=hero2`](../../compare/ch4-5/characters/?c=hero2) を3Dリグで開いて8方向・歩行・攻撃（鉄の剣）を検査し、`compare/ch4-5/characters/hero2-rig-8dir.png`・`hero2-rig-actions.png`・`hero2-rig-old-new.png`（今の主人公との比較）を保存します（Git管理しない）。比較ページは左が今の主人公（本編の画像・手足の色・リグ設定）、右がこの案です。ページ下の「8方向を同時に見る（手足つき）」（[`#grid-section`](../../compare/ch4-5/characters/?c=hero2#grid-section)）では、8方向の3Dリグを4×2に並べて同時に動かし、待機・歩行・攻撃と道具を切り替えられます。この案と今の主人公も切り替えられます。テストはこの表示も検査し、`hero2-rig-grid-idle.png`・`hero2-rig-grid-walk.png`・`hero2-rig-grid-attack.png` を保存します。
+`test:compare -- hero2` は、比較ページ [`compare/ch4-5/characters/?c=hero2`](../../compare/ch4-5/characters/?c=hero2) を3Dリグで開いて8方向・歩行・攻撃（鉄の剣）を検査し、`compare/ch4-5/characters/hero2-rig-8dir.png`・`hero2-rig-actions.png`・`hero2-rig-old-new.png`（以前の主人公との比較）を保存します（Git管理しない）。比較ページは左が以前の主人公（合成シート・手足の色・リグ設定）、右がこの主人公です。ページ下の「8方向を同時に見る（手足つき）」（[`#grid-section`](../../compare/ch4-5/characters/?c=hero2#grid-section)）では、8方向の3Dリグを4×2に並べて同時に動かし、待機・歩行・攻撃と道具を切り替えられます。この主人公と以前の主人公も切り替えられます。テストはこの表示も検査し、`hero2-rig-grid-idle.png`・`hero2-rig-grid-walk.png`・`hero2-rig-grid-attack.png` を保存します。
 
 試作02との比較は [`compare/ch4-5/characters/?c=hero2v02`](../../compare/ch4-5/characters/?c=hero2v02)（左が試作02、右が試作03。8方向の同時表示も02と03を切り替えられる）。テストは `hero2-rig-v02-v03.png`（8方向の待機と、正面・左の歩行・攻撃を02と03で並べたもの）も保存します。
 
-## 採用する場合
+## 本編への採用（2026-11-07）
 
-本編へ移す段階はユーザーが決めます。採用時は次をまとめて行います。
+1. `game-targets.mjs` に `humanoid('hero2', 'humanoid-layers', ['ch1-3', 'ch4-5'])` を追加し、`export.mjs` の `studioOnly` を外して `npm.cmd run export:hero2 -- --preview-game` と `npm.cmd run sync:games` で両編へ書き出した。
+2. 両編の `src/entities/player.js` を、頭・胴の分離読込（`headSheetUrl` / `bodySheetUrl`）とこの主人公のリグ設定・手足の色へ切り替えた。
+3. 横方向を正規化しない書き出しなので、両編の `tests/e2e/sheets.test.mjs` は `hero2_code_body_8dir.png` だけ裾の中心で位置を確かめる。両編の `tests/e2e/character-art.test.mjs` は主人公を `hero2` として検査する。
+4. 両編の `test:ci`・`test:e2e`、Studioの `npm.cmd test` と比較テストで確認した。記録は両編の `docs/CHARACTER_ART.md`。
 
-1. `game-targets.mjs` に `humanoid('hero2', 'humanoid-layers', ['ch1-3', 'ch4-5'])` を追加し、`export.mjs` から `studioOnly` を外して `--preview-game` と `npm.cmd run sync:games` で両編へ書き出す。
-2. 両編の `src/entities/player.js` を `headSheetUrl` / `bodySheetUrl` の分離読込とこの案のリグ設定・手足の色へ切り替える（今の主人公は合成シート1枚）。横方向を正規化しない書き出しなので、ゲーム側のシート検査（`tests/e2e/sheets.test.mjs`）の中心判定との関係も確認する。
-3. 両編の `test:ci` と `test:e2e`、Studioの比較テストを実行し、道具を振る動作・水中色も確認する。
+作画を直したときは `npm.cmd run export:hero2 -- --preview-game`（と必要なら `npm.cmd run sync:games`）で両編へ写す。Studioの `npm.cmd test` は、両編の画像・リグ設定がStudioの出力と違うと失敗する。
 
 ## 残っている違い
 
 - 髪: 外形と主な毛束の線は設定画から測ったが、細かな毛束の線は128pxセルで潰れるため省いた（各方向16本前後）。つやは設定画のまだらな明るい部分を、つむじを囲む光の帯で置き換えている。
-- 3Dリグの正面では、今の主人公の袖がコートの肩に重なるのと同じく、紺の袖がベストの肩の外側に重なる（3Dの腕が胴の画像より手前にあり、腕の付け方を今の主人公にそろえたため）。同じ紺なのでつながって見える。素手の球は設定画の握りこぶしより大きい（リグ共通の大きさ）。
+- 3Dリグの正面では、以前の主人公の袖がコートの肩に重なるのと同じく、紺の袖がベストの肩の外側に重なる（3Dの腕が胴の画像より手前にあり、腕の付け方を以前の主人公にそろえたため）。同じ紺なのでつながって見える。素手の球は設定画の握りこぶしより大きい（リグ共通の大きさ）。
 - 設定画の短い袖のふくらみは描いていない（袖は3Dリグの紺の腕）。真横では前の縁の生成りの帯が、設定画より少しはっきり見える。
-- 斜め向きでは、奥の手が胴の奥側の縁から少し見える。リグは腕を全方向で同じ角度（`armRestTilt:.34`、今の主人公と同じ）だけ外へ開くため、奥の手の中心が胴の縁の近くに来る（今の主人公でも同じ見え方）。腕の開きを方向別に変える設定はリグにない。
+- 斜め向きでは、奥の手が胴の奥側の縁から少し見える。リグは腕を全方向で同じ角度（`armRestTilt:.34`、以前の主人公と同じ）だけ外へ開くため、奥の手の中心が胴の縁の近くに来る（以前の主人公でも同じ見え方）。腕の開きを方向別に変える設定はリグにない。
 - 真横と左斜め前の後ろ髪、全方向のアホ毛の上部は、頭の切り出し窓に収めるため設定画より少し短い。
 - 手（素手）は3Dの陰影で設定画より明るく黄みがかって見える。

@@ -47,15 +47,15 @@ const profiles = {
     note: '新しくデザイン（元はカヤと同じ画像）。炭焼き小屋に隠れていた娘。茶色のおかっぱに錆色の鉢巻き、そばかすと煤、オリーブの作業着。',
     colors: { sleeve: 0x6b6b3a, hand: 0xeec39a, pants: 0x4f4436, boot: 0x332b20, headBack: 0x3c2c22, bodyBack: 0x565626 },
     generatedColors: { headBack: 0x3c2618 } },
-  // 主人公シオンの新デザイン案（試作03）。左は今の主人公（本編と同じ画像・手足の色・リグ設定）。
-  hero2: { name: 'シオン案', title: '新デザイン案・試作03', original: asset('adventurer_code_body_8dir.png'), originalTuning: ADVENTURER_RIG_PROFILE, ...studio('hero2'), tuning: HERO2_RIG_PROFILE,
-    note: '主人公シオンの新デザイン案・試作03（Studioのみ、本編は未変更）。頭は試作02のまま（ふわふわの金髪とアホ毛、大きな青い瞳）。服を生成りの服＋紺のベストに改め（肩掛けは廃止）、背中の小さな革のホルダーに深緑の職業の書（金の「開いた本」の紋章）。設定画は references/hero-redesign-8dir-v3.png。左は今の主人公。試作02との比較は「シオン案02→03」。',
-    leftLabel: '今の主人公（本編）', rightLabel: 'シオン新デザイン案・試作03', gridLabels: { generated: 'シオン案（試作03）', original: '今の主人公（本編）' },
+  // 主人公シオン（試作03、2026-11-07から両編の主人公）。左は以前の主人公（合成シート・手足の色・リグ設定）。
+  hero2: { name: 'シオン', title: '主人公・試作03', original: asset('adventurer_code_body_8dir.png'), originalTuning: ADVENTURER_RIG_PROFILE, ...studio('hero2'), tuning: HERO2_RIG_PROFILE,
+    note: '主人公シオン・試作03（2026-11-07から第1～3章・第4～5章の主人公）。頭は試作02のまま（ふわふわの金髪とアホ毛、大きな青い瞳）。生成りの服＋紺のベスト、背中の小さな革のホルダーに深緑の職業の書（金の「開いた本」の紋章）。設定画は references/hero-redesign-8dir-v3.png。左は以前の主人公。試作02との比較は「シオン案02→03」。',
+    leftLabel: '以前の主人公', rightLabel: 'シオン（本編の主人公）・頭胴分離とリグ設定', gridLabels: { generated: 'シオン（本編）', original: '以前の主人公' },
     colors: { sleeve: 0x2856a8, hand: 0x7b4a22, pants: 0xc9b78e, boot: 0x6b3f1d, headBack: 0x203f74, bodyBack: 0x24467e },
     generatedColors: { sleeve: 0x293d75, hand: 0xf3c9a4, pants: 0x3b2a22, boot: 0x8a5428, headBack: 0xe1a432, bodyBack: 0x293d75 } },
   // 試作02（v02/ に保存した頭・胴とリグ設定・手足の色）と試作03を同じ3Dリグで並べる。
   hero2v02: { name: 'シオン案02→03', title: '試作02と試作03', ...saved('hero2', 'v02'), originalTuning: HERO2_V02_RIG_PROFILE, ...studio('hero2'), tuning: HERO2_RIG_PROFILE,
-    note: 'シオン案の試作02（左：生成りの肩掛け・紺のチュニック・紺の本）と試作03（右：生成りの服＋紺のベスト・深緑の本）。頭は同じ。どちらもStudioだけの試作で、本編は未変更。',
+    note: 'シオンの試作02（左：生成りの肩掛け・紺のチュニック・紺の本、Studioだけの試作）と試作03（右：生成りの服＋紺のベスト・深緑の本、2026-11-07から本編の主人公）。頭は同じ。',
     leftLabel: 'シオン案・試作02', rightLabel: 'シオン案・試作03', gridLabels: { generated: '試作03', original: '試作02' },
     colors: { sleeve: 0x2c3b7e, hand: 0xf3c9a4, pants: 0x3b2a22, boot: 0x8a5428, headBack: 0xe1a432, bodyBack: 0x2c3b7e },
     generatedColors: { sleeve: 0x293d75, bodyBack: 0x293d75 } },

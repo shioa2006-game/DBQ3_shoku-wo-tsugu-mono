@@ -151,7 +151,7 @@ try {
     const W = imgs[0].width / 2, H = imgs[0].height, cw = W * .5, ch = H * .72;
     const c = document.createElement('canvas'); c.width = cw * imgs.length; c.height = ch * 2 + 110; const g = c.getContext('2d');
     g.fillStyle = '#eee9df'; g.fillRect(0, 0, c.width, c.height);
-    g.fillStyle = '#203344'; g.font = 'bold 28px sans-serif'; g.fillText('右斜め前・石のハンマーの攻撃（上：今の主人公　下：シオン案）', 20, 42);
+    g.fillStyle = '#203344'; g.font = 'bold 28px sans-serif'; g.fillText('右斜め前・石のハンマーの攻撃（上：以前の主人公　下：シオン）', 20, 42);
     imgs.forEach((img, i) => { for (const half of [0, 1]) g.drawImage(img, half * W + (W - cw) / 2, H * .02, cw, ch, i * cw, 60 + half * ch, cw, ch);
       g.font = '22px sans-serif'; g.fillText(shots[i].label, i * cw + 12, 60 + ch * 2 + 34); });
     return c.toDataURL('image/png').split(',')[1];

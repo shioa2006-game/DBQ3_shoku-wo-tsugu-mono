@@ -22,6 +22,10 @@ const EDGE_MARGIN = 0.02; // 絵がセル左右端(この余白)に触れてい�
 //   ドリフトしており、警告どまりだったため CI を素通りして描画が崩れた（再発防止）。
 // - assets/ 直下(主人公) … 中心 0.33〜0.61 でもセル内に収まり描画は崩れない実績が
 //   あるため、従来どおり警告のみ。
+// 胴（チュニック）の中心をリグの絵の中心に描き、横方向を正規化せずに書き出したシート
+// （Studioの keepDrawnX。大きな後ろ髪や背中の本で絵全体の中心が胴からずれる）。外接枠の中心の
+// 代わりに、裾（絵の最下行）の中心がセル中央にあることを確かめる。
+const DRAWN_TUNIC = new Set(["hero2_code_body_8dir.png"]);
 const CENTER_MIN = 0.44;
 const CENTER_MAX = 0.56;
 const STRICT_CENTER_MIN = 0.46;
@@ -53,7 +57,9 @@ function cellArt(png, col, row) {
     }
   }
   if (cnt === 0) return null;
-  return { u0: (x0 - ox0) / cw, u1: (x1 - ox0 + 1) / cw, center: ((x0 + x1) / 2 - ox0) / cw, v0: (y0 - oy0) / chp, v1: (y1 - oy0 + 1) / chp };
+  let h0 = ox1, h1 = ox0;
+  for (let x = ox0; x <= ox1; x += 1) if (data[((y1 * W) + x) * 4 + 3] > ALPHA) { if (x < h0) h0 = x; if (x > h1) h1 = x; }
+  return { u0: (x0 - ox0) / cw, u1: (x1 - ox0 + 1) / cw, center: ((x0 + x1) / 2 - ox0) / cw, hem: ((h0 + h1 + 1) / 2 - ox0) / cw, v0: (y0 - oy0) / chp, v1: (y1 - oy0 + 1) / chp };
 }
 
 const DIRS = ["front", "front_left", "left", "back_left", "back", "back_right", "right", "front_right"];
@@ -68,7 +74,12 @@ function checkSheet(file, strictCenter) {
     // ハード要件: 絵がセル境界をはみ出さない(はみ出すと固定窓が誤ピクセルを拾い描画が崩れる)。
     expect(art.u0 >= EDGE_MARGIN && art.u1 <= 1 - EDGE_MARGIN, `${tag}: 絵がセル境界をはみ出さない (u[${art.u0.toFixed(2)},${art.u1.toFixed(2)}])`);
     expect(art.v0 >= 0 && art.v1 <= 0.99, `${tag}: 縦がセル内に収まる (v[${art.v0.toFixed(2)},${art.v1.toFixed(2)}])`);
-    if (strictCenter) {
+    if (strictCenter && DRAWN_TUNIC.has(name)) {
+      expect(
+        art.hem >= STRICT_CENTER_MIN && art.hem <= STRICT_CENTER_MAX,
+        `${tag}: 裾の中心がセル中央にある=胴を基準に配置済み (u=${art.hem.toFixed(3)})`,
+      );
+    } else if (strictCenter) {
       // humanoids/ は正規化済みが規約: 中心ズレ＝正規化し忘れなので FAIL。
       expect(
         art.center >= STRICT_CENTER_MIN && art.center <= STRICT_CENTER_MAX,

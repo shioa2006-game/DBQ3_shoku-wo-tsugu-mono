@@ -3,8 +3,8 @@ import { exportHumanoid } from '../shared/humanoid-export.mjs';
 import { buildHero2Sheet, HERO2_LAYOUT, LABELS } from './character.mjs';
 import { HERO2_RIG_PROFILE } from './rig-profile.mjs';
 
-// 主人公シオンの新デザイン案・試作03（頭は試作02のまま、胴を「生成りの服＋紺のベスト」と深緑の本に改めた）。
-// 本編へは書き出さない（採用はユーザーが判断する）。試作02の出力は v02/ に保存してあり、v02-v03.png で並べる。
+// 主人公シオン（試作03、2026-11-07に本編の主人公として採用）。頭は試作02のまま、胴は「生成りの服＋紺のベスト」と
+// 深緑の本。--preview-game で両編（game-targets.mjs）へ書き出す。試作02の出力は v02/ に保存してあり、v02-v03.png で並べる。
 // 胴の中心を u=.494 に描いているので、横方向は描いた位置のまま（keepDrawnX）。大きな後ろ髪や背中の本で
 // 外接枠の中心がずれても、3Dの腕・脚が胴の下に付く。
 const uri = bytes => `data:image/png;base64,${bytes.toString('base64')}`;
@@ -61,7 +61,7 @@ function versionsBoard({ before, after }) {
 
 const before = await readFile(new URL('./v02/hero2_code_body_8dir.png', import.meta.url));
 await exportHumanoid({
-  id: 'hero2', name: '主人公シオン（新デザイン案）', role: 'HERO REDESIGN 03', build: buildHero2Sheet, studioOnly: true,
+  id: 'hero2', name: '主人公シオン', role: 'HERO 03', build: buildHero2Sheet,
   reference: 'hero-redesign-8dir-v3.png', keepDrawnX: true,
   summary: 'Head from prototype 02 (fluffy golden hair, blue eyes); torso of prototype 03: cream shirt under a navy vest, left-hip pouch, the deep green Book of Jobs in a small back holder',
   rigColors: { sleeve: 0x293d75, hand: 0xf3c9a4, pants: 0x3b2a22, boot: 0x8a5428, headBack: 0xe1a432, bodyBack: 0x293d75 },
