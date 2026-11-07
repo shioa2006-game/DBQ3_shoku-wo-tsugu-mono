@@ -161,6 +161,28 @@ def boot(ankle, knee, flex=0, flip=False, toe=1.0, size=.9):
             '</g>')
 
 
+# 後ろから見たブーツ（足首を原点、筒は -y、かかとと靴底が下）。横向きの形を横に縮めると筒まで細くなるため、
+# 後ろ姿では筒の幅を保ったまま、かかと側から見た形で描く。
+_BOOT_BACK = "M-20,-36 L20,-36 L21.5,8 Q22.5,22 9,23.5 L-9,23.5 Q-22.5,22 -21.5,8Z"
+
+
+def boot_back(ankle, knee, size=1.0):
+    """後ろ姿のブーツ。筒を脛（knee→ankle）の向きに合わせる。"""
+    ax, ay = ankle
+    kx, ky = knee
+    ang = math.degrees(math.atan2(kx - ax, -(ky - ay)))
+    base, light, dark = LIMB["boot"]
+    return (f'<g transform="translate({n(ax)} {n(ay)}) rotate({n(ang)}) scale({n(size)})">'
+            f'<path d="{_BOOT_BACK}" fill="{base}" stroke="{LEATHER_INK}" stroke-width="3" stroke-linejoin="round"/>'
+            f'<path d="M-17,17.5 Q0,21 17,17.5" fill="none" stroke="{dark}" stroke-width="6" stroke-linecap="round"/>'
+            f'<path d="M13.5,-22 L14.5,9" fill="none" stroke="{dark}" stroke-width="5" stroke-linecap="round" opacity=".55"/>'
+            f'<path d="M-12.5,-22 L-13,5" fill="none" stroke="{light}" stroke-width="3" stroke-linecap="round" opacity=".75"/>'
+            f'<path d="M0,-4 L0,13" fill="none" stroke="{dark}" stroke-width="1.8" stroke-linecap="round" opacity=".5"/>'
+            f'<path d="{_CUFF}" fill="{light}" stroke="{LEATHER_INK}" stroke-width="3" stroke-linejoin="round"/>'
+            f'<path d="M-19,-35 Q0,-37.5 19,-35" fill="none" stroke="#d29a62" stroke-width="2" stroke-linecap="round"/>'
+            '</g>')
+
+
 def leg(pts, side=1):
     return limb(pts, 34, LIMB["pants"], ink=INK, side=side)
 
@@ -219,12 +241,12 @@ def _rotate(p, deg, c):
 
 def run_away():
     """第4場面の後半（近い画）：左斜め後ろ姿で駆けていく。背中の職業の書の表紙（深緑と金の紋章）を見せる。
-    手前の腕（画面右）は後ろへ振って肘が外へ張り、奥の腕は前へ振って体の陰に入る。
-    手前の脚（画面右）は奥へ踏み出し、奥の脚（画面左）は後ろへ蹴り上げる。"""
+    手前の腕（画面右）は後ろへ振って肘が外へ張り、左腕（画面左）は前へ振って、肘を下げ握りこぶしを左前へ出す。
+    手前の脚（画面右）は奥へ踏み出し、奥の脚（画面左）は後ろへ蹴り上げる。ブーツは後ろから見た形（boot_back）。"""
     v = PARTS["views"]["back_left"]
-    far_arm = arm([(74, 238), (50, 276), (60, 262)], side=-1, hand_angle=-10, thumb=0)
-    near_leg = leg([(150, 330), (158, 360), (158, 384)], side=1) + boot((158, 384), (158, 360), toe=.45)
-    far_leg = leg([(94, 330), (80, 370), (92, 404)], side=-1) + boot((92, 404), (80, 370), flex=-24, toe=.55)
+    far_arm = arm([(74, 238), (45, 278), (6, 261)], side=-1, hand_angle=-70, thumb=0)
+    near_leg = leg([(150, 330), (158, 366), (161, 402)], side=1) + boot_back((161, 402), (158, 366))
+    far_leg = leg([(94, 330), (82, 374), (93, 420)], side=-1) + boot_back((93, 420), (82, 374))
     # 手前の腕は肩の付け根を書とホルダーの後ろに通す（背中の書が腕より手前に出ているため）。
     near_arm = arm([(184, 240), (222, 268), (216, 304)], side=1, hand_angle=10, thumb=0)
     body = far_arm + near_leg + far_leg + near_arm + v["torso"] + v["head"]
