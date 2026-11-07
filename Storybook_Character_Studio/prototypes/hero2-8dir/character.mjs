@@ -3,10 +3,13 @@ import { DIRECTIONS, LABELS } from '../shared/sheet-format.mjs';
 import { definitions, clipped, buildSheet } from '../shared/humanoid-kit.mjs';
 export { DIRECTIONS, LABELS };
 
-// 主人公シオンの新デザイン案・試作02。正本は8方向の設定画 references/hero-redesign-8dir-v2.png。
+// 主人公シオンの新デザイン案・試作03。頭（顔・髪）は試作02のまま（正本は8方向の設定画
+// references/hero-redesign-8dir-v2.png）。胴は試作03で「生成りの服＋紺のベスト」と深緑の職業の書に
+// 改めた（正本は references/hero-redesign-8dir-v3.png。02と同じ位置・大きさで描かれている）。
 // 各向きの形は、設定画の各セル（443.5px四方）の座標で書き、セル128pxへ縮小して置く（設定画の画素は使わない）。
-// 頭（髪・顔・耳）と胴（首・襟・肩掛け・チュニック・ベルト・小物入れ・背中のホルダーと職業の書）を分ける。
+// 頭（髪・顔・耳）と胴（首・襟・生成りの服・紺のベスト・ベルト・小物入れ・背中のホルダーと職業の書）を分ける。
 // 腕・脚・手・足はゲームの3Dリグが描く（紺の袖・素手・焦げ茶のズボン・茶色のブーツ）。
+// 試作02の出力は v02/ に保存してある（比較用、再生成しない）。
 //
 // view: 0=正面 1=左斜め前 2=左 3=左斜め後 4=背面。右側の3方向は左側を反転する。
 // 左右非対称なのは左腰の小物入れだけで、反転した向きでは向こう側として描き分ける。
@@ -17,16 +20,16 @@ export const DEFAULT_PALETTE = Object.freeze({
   ink: '#3a2212',
   skin: '#fde0c4', skinLight: '#fff1e2', skinDark: '#efb995',
   hair: '#f8b646', hairLight: '#ffd77e', hairDark: '#d98f2c',
-  tunic: '#2c3b7e', tunicLight: '#41559e', tunicDark: '#1b2556',
-  cape: '#ecd7ae', capeLight: '#f9ebd0', capeDark: '#cdb083',
-  pack: '#8c5530', packLight: '#ad6f3f', packDark: '#5c3417',
-  belt: '#7a4826', gold: '#e1ae3d', goldLight: '#ffe08c', goldDark: '#9a6a18',
-  book: '#25336f', bookLight: '#37499a', bookDark: '#161f4c',
-  paper: '#f6ecd2',
+  vest: '#293d75', vestLight: '#34497f', vestDark: '#1a2652',
+  shirt: '#f1e3c4', shirtLight: '#fbf4e4', shirtDark: '#d8c49b',
+  pack: '#805536', packLight: '#a2714a', packDark: '#55361f',
+  belt: '#6e4224', gold: '#d6aa51', goldLight: '#f3d78f', goldDark: '#94701f',
+  book: '#365c47', bookLight: '#437056', bookDark: '#203b31',
+  paper: '#f4e8cc',
 });
 const EXTRA = `<linearGradient id="hairU" gradientUnits="userSpaceOnUse" x1="0" y1="25" x2="0" y2="205"><stop stop-color="var(--hairLight)"/><stop offset=".22" stop-color="var(--hair)"/><stop offset=".75" stop-color="var(--hair)"/><stop offset="1" stop-color="var(--hairDark)"/></linearGradient>
   <linearGradient id="iris2" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#14306e"/><stop offset=".48" stop-color="#2f78d6"/><stop offset="1" stop-color="#8fd2ff"/></linearGradient>`;
-const DEFS = definitions(['tunic', 'cape', 'pack', 'gold', 'book'], EXTRA);
+const DEFS = definitions(['vest', 'shirt', 'pack', 'gold', 'book'], EXTRA);
 
 // Reference cell -> game cell. Every view keeps the same scale; the tunic centre lands on the
 // rig's art centre (u = .494) so the 3D arms and legs attach under the drawn body.
@@ -36,8 +39,9 @@ const TOP = 6.5 - K * 12;
 const TUNIC_CENTER = [305, 218, 153, 121, 305];
 
 const INK = '#3a2212';      // hair, skin
-const TINK = '#141a3a';     // tunic, book
-const CINK = '#5e4426';     // capelet
+const TINK = '#141a3a';     // vest
+const SINK = '#6a5534';     // shirt collar
+const BINK = '#10211a';     // book
 const PINK = '#3e2210';     // leather
 const HAIR_LINE = '#7a3f12';  // lock lines inside the hair (dark brown, thinner than the outline)
 const W = 3;                // outline width in reference pixels (about 1px in the game cell)
@@ -317,15 +321,24 @@ const HEADS = [
 ];
 
 // ---------------------------------------------------------------- torso parts
-const tunic = d => P(d, grad('tunic'), TINK);
-const cape = (d, tag, shadeY) => P(d, grad('cape'), CINK) + clipped(`hero2-cp-${tag}`, d,
-  P(`M0 ${shadeY} Q300 ${shadeY + 18} 600 ${shadeY} L600 ${shadeY + 60} L0 ${shadeY + 60}Z`, 'var(--capeDark)', 'none', 0, 'opacity=".55"')
-  + line(`M0 ${shadeY - 34} Q300 ${shadeY - 46} 600 ${shadeY - 34}`, 'var(--capeLight)', 4));
+// Prototype 03: a cream shirt under a navy vest (no capelet). The vest's two front panels run straight down
+// and the shirt shows between them; the navy 3D sleeves meet the navy vest at the shoulder, so no
+// cream cloth lies between arm and body. A small cream stand collar; the book holder's leather straps
+// run over the shoulders.
+const vest = d => P(d, grad('vest'), TINK);
+const shirt = d => P(d, grad('shirt'), 'none', 0);
+// Shade the vest's sides (the body turning away) inside its outline.
+const vestShade = (tag, body, bands) => clipped(`hero2-vs-${tag}`, body, bands.map(d => P(d, 'var(--vestDark)', 'none', 0, 'opacity=".45"')).join(''));
+// The shirt between the vest panels: the cream panel, the panels' front edges (dark line + light rim).
+function opening(tag, body, panel, edges) {
+  return clipped(`hero2-sh-${tag}`, body, shirt(panel)
+    + edges.map(([d, rim]) => line(rim, 'var(--vestLight)', 1.6) + line(d, TINK, 2.4)).join(''));
+}
 const neck = d => P(d, grad('skin'), INK, 2.4);
-const collar = d => P(d, grad('tunic'), TINK, 2.6);
+const collar = d => P(d, grad('shirt'), SINK, 2.4);
 function beltBand(x0, x1, y, sag = 3) {
   return P(`M${x0} ${y} Q${(x0 + x1) / 2} ${y + sag * 2} ${x1} ${y} L${x1} ${y + 13} Q${(x0 + x1) / 2} ${y + 13 + sag * 2} ${x0} ${y + 13}Z`, 'var(--belt)', PINK, 2.4)
-    + line(`M${x0 + 2} ${y + 3} Q${(x0 + x1) / 2} ${y + 3 + sag * 2} ${x1 - 2} ${y + 3}`, '#a0683a', 1);
+    + line(`M${x0 + 2} ${y + 3} Q${(x0 + x1) / 2} ${y + 3 + sag * 2} ${x1 - 2} ${y + 3}`, '#9a6438', 1);
 }
 function buckle(x, y, w = 26, h = 21) {
   return P(`M${x - w / 2 + 3} ${y - h / 2} h${w - 6} q3 0 3 3 v${h - 6} q0 3 -3 3 h${-(w - 6)} q-3 0 -3 -3 v${-(h - 6)} q0 -3 3 -3Z`, grad('gold'), 'var(--goldDark)', 2)
@@ -338,24 +351,28 @@ function pouch(x, y, w = 35, h = 44) {
     + ellipse(x + w * .66, y + 15, 3.4, 3.4, grad('gold'), 'var(--goldDark)', 1.2)
     + line(`M${x + 4} ${y + h - 6} h${w - 8}`, 'var(--packLight)', 1.2);
 }
-// Open-book emblem of the Book of Jobs, in gold line on the navy cover.
+// Open-book emblem of the Book of Jobs, in gold line on the deep green cover.
 function emblem(x, y, s = 1, sx = 1) {
-  const g = `<g transform="translate(${x} ${y}) scale(${s * sx} ${s})">`
+  return `<g transform="translate(${x} ${y}) scale(${s * sx} ${s})">`
     + line('M-2 -9 Q-11 -14 -21 -11 L-21 9 Q-11 6 -2 11 Z M2 -9 Q11 -14 21 -11 L21 9 Q11 6 2 11 Z M-25 -6 L-25 13 Q-12 10 0 15 Q12 10 25 13 L25 -6', 'var(--gold)', 2.8 / s)
     + '</g>';
-  return g;
 }
-// The thick hardcover book: cover (navy) and the fore-edge (cream page block between two covers).
-function bookCover(x0, y0, x1, y1, ex, ey, es = 1, sx = 1) {
-  return P(`M${x0} ${y0 + 6} q0 -6 6 -6 h${x1 - x0 - 12} q6 0 6 6 V${y1} H${x0}Z`, grad('book'), TINK)
-    + line(`M${x0 + 5} ${y0 + 3.5} H${x1 - 5}`, 'var(--bookLight)', 1.6)
-    + emblem(ex, ey, es, sx);
+// The thick hardcover book. The cover (deep green, darker rim, small gold corner fittings and the gold
+// emblem); `top` shows the page block's top edge above the cover (seen from behind and above).
+function bookCover(x0, y0, x1, y1, ex, ey, es = 1, sx = 1, top = false) {
+  const corners = line(`M${x0 + 4} ${y0 + 13} V${y0 + 4} H${x0 + 13} M${x1 - 13} ${y0 + 4} H${x1 - 4} V${y0 + 13}`, 'var(--gold)', 1.8);
+  return (top ? P(`M${x0 + 5} ${y0 - 5} H${x1 - 5} V${y0 + 4} H${x0 + 5}Z`, 'var(--paper)', '#a8946a', 1.4) : '')
+    + P(`M${x0} ${y0 + 6} q0 -6 6 -6 h${x1 - x0 - 12} q6 0 6 6 V${y1} H${x0}Z`, grad('book'), BINK)
+    + P(`M${x0 + 4} ${y0 + 8} q0 -4 4 -4 h${x1 - x0 - 16} q4 0 4 4 V${y1} H${x0 + 4}Z`, 'none', 'var(--bookDark)', 1.6)
+    + line(`M${x0 + 7} ${y0 + 3} H${x1 - 7}`, 'var(--bookLight)', 1.6)
+    + corners + emblem(ex, ey, es, sx);
 }
+// The book seen from its fore-edge: the cream page block between the two green covers.
 function bookEdge(x0, y0, x1, y1, cover = 6) {
-  let s = P(`M${x0} ${y0 + 5} q0 -5 5 -5 h${x1 - x0 - 10} q5 0 5 5 V${y1} H${x0}Z`, grad('book'), TINK)
-    + P(`M${x0 + cover} ${y0 + 3} H${x1 - cover} V${y1} H${x0 + cover}Z`, 'var(--paper)', '#b9a57c', 1.2);
-  for (let x = x0 + cover + 4; x < x1 - cover - 2; x += 4.5) s += line(`M${f1(x)} ${y0 + 6} V${y1 - 2}`, '#dccca6', .9);
-  return s;
+  let s = P(`M${x0} ${y0 + 5} q0 -5 5 -5 h${x1 - x0 - 10} q5 0 5 5 V${y1} H${x0}Z`, grad('book'), BINK)
+    + P(`M${x0 + cover} ${y0 + 3} H${x1 - cover} V${y1} H${x0 + cover}Z`, 'var(--paper)', '#a8946a', 1.2);
+  for (let x = x0 + cover + 4; x < x1 - cover - 2; x += 4.5) s += line(`M${f1(x)} ${y0 + 6} V${y1 - 2}`, '#d9c9a2', .9);
+  return s + line(`M${x0 + 2.5} ${y0 + 8} V${y1 - 2} M${x1 - 2.5} ${y0 + 8} V${y1 - 2}`, 'var(--gold)', 1.2);
 }
 // Small leather holder that covers only the lower part of the book; a darker rim at the top.
 function holder(x0, x1, y0, y1, flare = 3) {
@@ -365,58 +382,76 @@ function holder(x0, x1, y0, y1, flare = 3) {
 }
 const strap = d => line(d, PINK, 10) + line(d, 'var(--pack)', 6.6) + line(d, 'var(--packLight)', 1.2);
 
+const BODY = [
+  'M262 221 Q305 213 348 221 Q362 230 364 252 L366 342 Q305 350 244 342 L246 252 Q248 230 262 221Z',
+  'M168 221 Q218 211 270 217 Q282 238 280 268 L284 342 Q218 350 152 342 L156 268 Q156 238 168 221Z',
+  'M120 222 Q150 214 188 222 Q196 250 194 290 L196 342 Q153.5 349 111 342 L114 290 Q112 250 120 222Z',
+  'M70 218 Q120 208 170 216 Q182 250 180 290 L182 342 Q121 349 60 342 L62 290 Q60 250 70 218Z',
+  'M262 219 Q305 211 348 219 Q362 230 364 252 L366 342 Q305 350 244 342 L246 252 Q248 230 262 219Z',
+];
+
 const TORSOS = [
-  // 0 front: the book's top corners show behind both shoulders.
-  (mirror, tag) => P('M252 216 Q252 208 260 208 H352 Q360 208 360 216 V250 H252Z', grad('book'), TINK)
-    + line('M258 211.5 H354', 'var(--bookLight)', 1.6)
-    + neck('M288 194 H320 V216 H288Z')
-    + tunic('M262 220 Q305 213 348 220 Q366 238 364 270 L367 342 Q305 350 243 342 L246 270 Q244 238 262 220Z')
-    + line('M256 306 Q254 324 256 338 M354 306 Q356 324 354 338', 'var(--tunicDark)', 2)
-    + collar('M281 205 Q305 212 331 205 L333 219 Q320 221 307 228 Q294 221 279 219Z') + line('M307 213 V227', TINK, 2)
-    + cape('M306 225 Q296 219 282 216 Q268 216 260 221 Q246 232 238 245 Q232 254 234 258 Q262 265 295 271 Q300 248 306 225Z', `${tag}a`, 262)
-    + cape('M308 225 Q318 219 332 216 Q346 216 354 221 Q368 232 376 245 Q382 254 380 258 Q352 265 319 271 Q314 248 308 225Z', `${tag}b`, 262)
+  // 0 front: the shirt shows wide between the vest panels; the holder's straps run down the chest to the
+  // belt. The book is hidden right behind the body (in the 3D rig its top corners only showed as small
+  // green points beside the neck, between the hair and the arms, so they are not drawn).
+  (mirror, tag) => neck('M288 194 H320 V216 H288Z')
+    + vest(BODY[0])
+    + vestShade(tag, BODY[0], ['M236 226 L262 222 L258 346 L236 346Z', 'M374 226 L348 222 L352 346 L374 346Z'])
+    + opening(tag, BODY[0], 'M284 214 Q305 220 326 214 L331 346 Q305 350 279 346Z',
+      [['M284 216 L279.5 344', 'M281 218 L276.5 344'], ['M326 216 L330.5 344', 'M329 218 L333.5 344']])
+    + collar('M284 205 Q305 211 326 205 L328 218 Q317 221 307 227 Q296 221 282 218Z') + line('M305 213 L307 227', SINK, 1.8)
+    + strap('M268 220 Q262 252 265 287') + strap('M342 220 Q348 252 345 287')
     + beltBand(246, 366, 287) + buckle(306, 298)
     + (mirror ? '' : pouch(323, 297)),
-  // 1 front-left: the book and holder behind the right shoulder; strap over the near shoulder.
+  // 1 front-left: the shirt panel narrows and moves toward the far side; the near vest panel turns
+  // round the side. Book and holder behind the right shoulder; near strap over the shoulder to the
+  // holder, far strap down the chest.
   (mirror, tag) => (mirror ? pouch(143, 298, 22, 40) : '')
     + bookEdge(258, 209, 302, 272, 7)
     + holder(272, 304, 264, 326)
     + neck('M196 196 H230 V216 H196Z')
-    + tunic('M168 220 Q220 210 272 216 Q284 240 280 270 L284 342 Q218 350 152 342 L156 270 Q156 240 168 220Z')
-    + collar('M191 205 Q214 212 247 205 L248 219 Q226 223 204 229 Q194 222 189 219Z') + line('M204 214 V228', TINK, 2)
-    + cape('M203 227 Q196 219 192 214 Q180 216 172 222 Q162 232 158 245 Q155 254 157 257 Q186 263 213 266 Q207 246 203 227Z', `${tag}a`, 262)
-    + cape('M205 227 Q218 216 240 212 Q262 210 274 216 Q281 230 279 258 Q248 264 215 266 Q208 246 205 227Z', `${tag}b`, 262)
-    + strap('M238 213 Q268 222 278 262')
+    + vest(BODY[1])
+    + vestShade(tag, BODY[1], ['M248 216 Q270 220 290 236 L290 346 L246 346Z', 'M146 226 L162 222 L160 346 L146 346Z'])
+    + opening(tag, BODY[1], 'M189 214 Q201 219 214 213 L212 346 Q195 349 179 345Z',
+      [['M189 216 L179.5 344', 'M186.5 218 L177 344'], ['M214 215 L212 345', 'M216.5 217 L214.5 345']])
+    + collar('M191 205 Q212 211 238 205 L240 218 Q226 222 212 227 Q200 222 189 218Z') + line('M212 214 L212 227', SINK, 1.8)
+    + strap('M176 221 Q171 252 174 287') + strap('M238 213 Q268 222 278 262')
     + beltBand(155, 282, 286) + buckle(197, 297, 24, 21)
     + (mirror ? '' : pouch(208, 297)),
-  // 2 left: the book's fore-edge (pages between the covers) in the holder on the back.
+  // 2 left: the vest covers the side; the shirt shows only as a narrow strip at the front edge.
+  // The book's fore-edge (pages between the green covers) in the holder on the back.
   (mirror, tag) => bookEdge(186, 216, 232, 276, 7)
     + holder(192, 240, 271, 330, 2.5)
     + neck('M142 196 H176 V216 H142Z')
-    + tunic('M120 222 Q150 214 188 222 Q196 250 194 290 L196 342 Q153.5 349 111 342 L114 290 Q112 250 120 222Z')
-    + collar('M138 207 Q158 203 180 207 L182 221 Q160 225 140 221Z')
-    + cape('M128 220 Q152 214 182 220 Q194 238 188 262 Q156 268 120 264 Q114 244 128 220Z', tag, 258)
+    + vest(BODY[2])
+    + vestShade(tag, BODY[2], ['M172 216 L200 226 L200 346 L174 346Z'])
+    + opening(tag, BODY[2], 'M104 220 L126 220 Q120 252 122 290 L120 346 L104 346Z',
+      [['M126 222 Q120.5 252 122 290 L120 344', 'M128.5 224 Q123 252 124.5 290 L122.5 344']])
+    + collar('M136 207 Q158 203 180 207 L182 220 Q160 224 138 220Z')
     + strap('M140 222 Q184 210 196 240 Q202 256 202 272')
     + beltBand(111, 195, 285, 0) + P('M104 283 h12 v17 h-12Z', grad('gold'), 'var(--goldDark)', 1.8)
     + (mirror ? '' : pouch(138, 296, 30, 40)),
-  // 3 back-left: the cover (with the emblem) and the fore-edge on its left, in the holder.
+  // 3 back-left: the vest's back; the cover (emblem) and the fore-edge on its left, in the holder.
   (mirror, tag) => neck('M88 194 H120 V214 H88Z')
-    + tunic('M70 218 Q120 208 170 216 Q182 250 180 290 L182 342 Q121 349 60 342 L62 290 Q60 250 70 218Z')
-    + collar('M82 203 Q105 197 130 203 L130 216 Q105 212 82 218Z')
-    + cape('M62 228 Q84 214 110 216 L176 218 Q186 232 184 252 Q140 262 60 262 Q54 244 62 228Z', tag, 256)
+    + vest(BODY[3])
+    + vestShade(tag, BODY[3], ['M54 224 L80 220 L76 346 L54 346Z'])
+    + collar('M84 203 Q106 198 130 203 L131 216 Q106 211 82 216Z')
+    + beltBand(60, 182, 286)
     + (mirror ? '' : pouch(52, 296, 20, 38))
     + strap('M76 222 Q100 234 106 272')
-    + P('M108 222 Q108 216 114 216 H130 V276 H108Z', grad('book'), TINK) + P('M112 219 H128 V276 H112Z', 'var(--paper)', '#b9a57c', 1.2)
-    + line('M116 222 V274 M120.5 222 V274 M125 222 V274', '#dccca6', .9)
-    + bookCover(125, 213, 197, 276, 161, 246, .82, .9)
+    + P('M108 222 Q108 216 114 216 H130 V276 H108Z', grad('book'), BINK) + P('M112 219 H128 V276 H112Z', 'var(--paper)', '#a8946a', 1.2)
+    + line('M116 222 V274 M120.5 222 V274 M125 222 V274', '#d9c9a2', .9)
+    + bookCover(125, 213, 197, 276, 161, 246, .82, .9, true)
     + holder(105, 199, 270, 331),
-  // 4 back: the navy cover with the gold open-book emblem; the holder covers only its lower part.
+  // 4 back: the vest's back with the straps beside the book; the deep green cover with the gold
+  // emblem and the page block's top edge; the holder covers only the book's lower part.
   (mirror, tag) => neck('M284 180 H326 V206 H284Z')
-    + tunic('M240 216 Q305 206 370 216 Q388 250 386 290 L388 342 Q305 349 222 342 L224 290 Q222 250 240 216Z')
-    + collar('M276 193 Q305 189 334 193 L336 208 Q305 204 274 208Z')
-    + cape('M240 214 Q305 200 370 214 Q390 230 386 256 Q305 266 224 256 Q220 230 240 214Z', tag, 250)
-    + beltBand(222, 388, 286)
-    + bookCover(255, 200, 355, 276, 305, 236, 1.05)
+    + vest(BODY[4])
+    + vestShade(tag, BODY[4], ['M236 226 L258 222 L256 346 L236 346Z', 'M374 226 L352 222 L354 346 L374 346Z'])
+    + collar('M278 193 Q305 189 332 193 L334 207 Q305 203 276 207Z')
+    + beltBand(244, 366, 286)
+    + strap('M262 214 Q250 236 252 262') + strap('M348 214 Q360 236 358 262')
+    + bookCover(255, 202, 355, 276, 305, 237, 1.05, 1, true)
     + holder(252, 358, 262, 330),
 ];
 

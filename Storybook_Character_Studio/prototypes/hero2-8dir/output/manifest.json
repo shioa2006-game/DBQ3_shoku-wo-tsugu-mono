@@ -1,11 +1,11 @@
 {
   "id": "hero2",
   "name": "主人公シオン（新デザイン案）",
-  "role": "HERO REDESIGN 02",
+  "role": "HERO REDESIGN 03",
   "version": 1,
   "status": "prototype",
   "source": "../character.mjs",
-  "reference": "references/hero-redesign-8dir-v2.png",
+  "reference": "references/hero-redesign-8dir-v3.png",
   "format": "game-humanoid-bust",
   "cellSize": 128,
   "columns": 4,
@@ -116,12 +116,12 @@
     "bodySheetUrl": "hero2_code_torso_layer_8dir.png"
   },
   "rigColors": {
-    "sleeve": 2898814,
+    "sleeve": 2702709,
     "hand": 15976868,
     "pants": 3877410,
     "boot": 9065512,
     "headBack": 14787634,
-    "bodyBack": 2898814
+    "bodyBack": 2702709
   },
   "rigTuning": {
     "bodyTopV": 0.54,

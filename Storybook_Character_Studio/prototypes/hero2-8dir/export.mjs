@@ -1,8 +1,10 @@
+import { readFile } from 'node:fs/promises';
 import { exportHumanoid } from '../shared/humanoid-export.mjs';
 import { buildHero2Sheet, HERO2_LAYOUT, LABELS } from './character.mjs';
 import { HERO2_RIG_PROFILE } from './rig-profile.mjs';
 
-// 主人公シオンの新デザイン案・試作02。本編へは書き出さない（採用はユーザーが判断する）。
+// 主人公シオンの新デザイン案・試作03（頭は試作02のまま、胴を「生成りの服＋紺のベスト」と深緑の本に改めた）。
+// 本編へは書き出さない（採用はユーザーが判断する）。試作02の出力は v02/ に保存してあり、v02-v03.png で並べる。
 // 胴の中心を u=.494 に描いているので、横方向は描いた位置のまま（keepDrawnX）。大きな後ろ髪や背中の本で
 // 外接枠の中心がずれても、3Dの腕・脚が胴の下に付く。
 const uri = bytes => `data:image/png;base64,${bytes.toString('base64')}`;
@@ -24,14 +26,14 @@ function comparison({ reference, normalized }) {
   }
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
     <rect width="${width}" height="${height}" fill="#eee9df"/>
-    <text x="24" y="40" font-family="sans-serif" font-size="24" font-weight="700" fill="#203344">HERO2 / シオン新デザイン案 試作02 / 8方向</text>
-    <text x="24" y="68" font-family="sans-serif" font-size="15" fill="#60717b">設定画 references/hero-redesign-8dir-v2.png（${REF_SCALE}倍）と、正規化後の128pxセル（${GEN_SCALE.toFixed(2)}倍）を同じ大きさで比較。生成画像は頭・胴だけで、腕・脚はゲームの3Dリグが描く。</text>
+    <text x="24" y="40" font-family="sans-serif" font-size="24" font-weight="700" fill="#203344">HERO2 / シオン新デザイン案 試作03 / 8方向</text>
+    <text x="24" y="68" font-family="sans-serif" font-size="15" fill="#60717b">設定画 references/hero-redesign-8dir-v3.png（${REF_SCALE}倍）と、正規化後の128pxセル（${GEN_SCALE.toFixed(2)}倍）を同じ大きさで比較。生成画像は頭・胴だけで、腕・脚はゲームの3Dリグが描く。</text>
     ${cells}</svg>`;
 }
 
 function layersBoard({ normalized, layers }) {
   const s = 1.75, w = 512 * s, h = 256 * s, gap = 54;
-  const rows = [['頭（hero2_code_head_layer_8dir.png）髪・顔・耳', layers.head], ['胴（hero2_code_torso_layer_8dir.png）首・襟・肩掛け・服・ベルト・小物入れ・ホルダー・職業の書', layers.torso], ['比較用の合成（hero2_code_body_8dir.png）', normalized]];
+  const rows = [['頭（hero2_code_head_layer_8dir.png）髪・顔・耳', layers.head], ['胴（hero2_code_torso_layer_8dir.png）首・襟・生成りの服・紺のベスト・ベルト・小物入れ・ホルダー・職業の書', layers.torso], ['比較用の合成（hero2_code_body_8dir.png）', normalized]];
   const height = 30 + rows.length * (h + gap);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w + 48}" height="${height}" viewBox="0 0 ${w + 48} ${height}">
     <defs><pattern id="checker" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#e9ece6"/><rect width="8" height="8" fill="#d9ddd6"/><rect x="8" y="8" width="8" height="8" fill="#d9ddd6"/></pattern></defs>
@@ -44,11 +46,25 @@ function layersBoard({ normalized, layers }) {
   </svg>`;
 }
 
+// 試作02（v02/ の保存画像）と試作03（今回の出力）を、同じ2倍で8方向並べる。
+function versionsBoard({ before, after }) {
+  const s = 2, cw = 100 * s, ch = 124 * s, top = 84, rowH = ch + 44, width = 24 + cw * 8 + 16, height = top + rowH * 2 + 6;
+  const row = (bytes, r, label) => LABELS.map((name, i) => `<rect x="${24 + i * cw + 4}" y="${top + r * rowH}" width="${cw - 8}" height="${ch}" rx="8" fill="#dfe6e1"/>`
+    + `<svg x="${24 + i * cw}" y="${top + r * rowH}" width="${cw}" height="${ch}" viewBox="${(i % 4) * 128 + 14} ${Math.floor(i / 4) * 128 + 2} 100 124"><image href="${uri(bytes)}" width="512" height="256"/></svg>`
+    + `<text x="${24 + i * cw + 10}" y="${top + r * rowH + ch + 24}" font-family="sans-serif" font-size="15" fill="#203344">${label}・${name}</text>`).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+    <rect width="${width}" height="${height}" fill="#eee9df"/>
+    <text x="24" y="40" font-family="sans-serif" font-size="24" font-weight="700" fill="#203344">シオン新デザイン案 / 試作02 → 試作03（頭・胴の合成、128pxセルを2倍）</text>
+    <text x="24" y="66" font-family="sans-serif" font-size="15" fill="#60717b">上：試作02（v02/hero2_code_body_8dir.png、肩掛け・紺のチュニック・紺の本）　下：試作03（生成りの服＋紺のベスト・深緑の本）。頭は同じ。</text>
+    ${row(before, 0, '試作02')}${row(after, 1, '試作03')}</svg>`;
+}
+
+const before = await readFile(new URL('./v02/hero2_code_body_8dir.png', import.meta.url));
 await exportHumanoid({
-  id: 'hero2', name: '主人公シオン（新デザイン案）', role: 'HERO REDESIGN 02', build: buildHero2Sheet, studioOnly: true,
-  reference: 'hero-redesign-8dir-v2.png', keepDrawnX: true,
-  summary: '8-direction design sheet: fluffy golden hair, blue eyes, cream capelet, navy tunic, left-hip pouch, the Book of Jobs in a small back holder',
-  rigColors: { sleeve: 0x2c3b7e, hand: 0xf3c9a4, pants: 0x3b2a22, boot: 0x8a5428, headBack: 0xe1a432, bodyBack: 0x2c3b7e },
+  id: 'hero2', name: '主人公シオン（新デザイン案）', role: 'HERO REDESIGN 03', build: buildHero2Sheet, studioOnly: true,
+  reference: 'hero-redesign-8dir-v3.png', keepDrawnX: true,
+  summary: 'Head from prototype 02 (fluffy golden hair, blue eyes); torso of prototype 03: cream shirt under a navy vest, left-hip pouch, the deep green Book of Jobs in a small back holder',
+  rigColors: { sleeve: 0x293d75, hand: 0xf3c9a4, pants: 0x3b2a22, boot: 0x8a5428, headBack: 0xe1a432, bodyBack: 0x293d75 },
   rigTuning: HERO2_RIG_PROFILE,
-  boards: data => ({ 'comparison.png': comparison(data), 'layers.png': layersBoard(data) }),
+  boards: data => ({ 'comparison.png': comparison(data), 'layers.png': layersBoard(data), 'v02-v03.png': versionsBoard({ before, after: data.normalized }) }),
 });

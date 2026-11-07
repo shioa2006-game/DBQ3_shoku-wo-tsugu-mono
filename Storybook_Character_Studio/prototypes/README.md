@@ -5,7 +5,7 @@
 | キャラクター | 制作原本・手順 | 出力 | 旧画像との対応（旧画像は比較用に保持） |
 |---|---|---|---|
 | 主人公 | [adventurer-8dir](adventurer-8dir/README.md) | [PNG](adventurer-8dir/output/adventurer_code_body_8dir.png) | `assets/adventurer_boy_body_8dir.png` |
-| 主人公シオン・新デザイン案 試作02（検討中、本編は未変更） | [hero2-8dir](hero2-8dir/README.md) | [頭](hero2-8dir/output/hero2_code_head_layer_8dir.png)・[胴体](hero2-8dir/output/hero2_code_torso_layer_8dir.png)・[比較用合成](hero2-8dir/output/hero2_code_body_8dir.png) | 8方向の設定画 `references/hero-redesign-8dir-v2.png` |
+| 主人公シオン・新デザイン案 試作03（検討中、本編は未変更。試作02は `hero2-8dir/v02/`） | [hero2-8dir](hero2-8dir/README.md) | [頭](hero2-8dir/output/hero2_code_head_layer_8dir.png)・[胴体](hero2-8dir/output/hero2_code_torso_layer_8dir.png)・[比較用合成](hero2-8dir/output/hero2_code_body_8dir.png) | 8方向の設定画 `references/hero-redesign-8dir-v2.png`（頭）・`hero-redesign-8dir-v3.png`（胴） |
 | ミナ／農家の少女 | [mina-8dir](mina-8dir/README.md) | [頭](mina-8dir/output/mina_code_head_layer_8dir.png)・[胴体](mina-8dir/output/mina_code_torso_layer_8dir.png)・[比較用合成](mina-8dir/output/mina_code_body_8dir.png) | `assets/humanoids/village_girl_body_8dir.png` |
 | ピノ／大工見習い | [pino-8dir](pino-8dir/README.md) | [頭](pino-8dir/output/pino_code_head_layer_8dir.png)・[胴体](pino-8dir/output/pino_code_torso_layer_8dir.png)・[比較用合成](pino-8dir/output/pino_code_body_8dir.png) | `assets/humanoids/village_apprentice_body_8dir.png` |
 | イナホ／料理見習い | [inaho-8dir](inaho-8dir/README.md) | [頭](inaho-8dir/output/inaho_code_head_layer_8dir.png)・[胴体](inaho-8dir/output/inaho_code_torso_layer_8dir.png)・[比較用合成](inaho-8dir/output/inaho_code_body_8dir.png) | `assets/humanoids/cook_body_8dir.png` |

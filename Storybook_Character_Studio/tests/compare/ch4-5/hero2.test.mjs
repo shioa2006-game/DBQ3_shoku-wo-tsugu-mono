@@ -1,4 +1,5 @@
-// 主人公シオンの新デザイン案（hero2）を、比較ページ compare/ch4-5/characters/?c=hero2 の3Dリグで確かめる。
+// 主人公シオンの新デザイン案（hero2、試作03）を、比較ページ compare/ch4-5/characters/?c=hero2 の3Dリグで確かめる。
+// ?c=hero2v02 では、保存した試作02と並べる。
 // 8方向と待機・歩行・攻撃で、Studioの頭・胴の分離画像が読み込まれ、向きと道具が切り替わることを検査し、
 // 確認用のスクリーンショットを compare/ch4-5/characters/ に保存する（Git管理しない）。
 import assert from 'node:assert/strict';
@@ -104,6 +105,33 @@ try {
   assert.ok(original.sheet.endsWith('/assets/humanoids/adventurer_code_body_8dir.png'), 'current hero in the grid');
   await page.click('[data-grid-side="generated"]');
 
+  // Prototype 02 (saved in prototypes/hero2-8dir/v02/) and prototype 03 side by side on the same rig:
+  // the 8 directions at rest, and walking / attacking from the front and the side.
+  await page.goto(new URL('compare/ch4-5/characters/?c=hero2v02', process.env.STUDIO_URL || 'http://127.0.0.1:8081/').href);
+  await page.waitForFunction(() => window.__heroPreview?.ready());
+  const versions = await page.evaluate(() => window.__heroPreview.rigs.map(r => [r.headTexture.image.src, r.bodyTexture.image.src]));
+  assert.ok(versions[0][0].endsWith('/prototypes/hero2-8dir/v02/hero2_code_head_layer_8dir.png'), 'left: prototype 02 head');
+  assert.ok(versions[0][1].endsWith('/prototypes/hero2-8dir/v02/hero2_code_torso_layer_8dir.png'), 'left: prototype 02 torso');
+  assert.ok(versions[1][1].endsWith('/prototypes/hero2-8dir/output/hero2_code_torso_layer_8dir.png'), 'right: prototype 03 torso');
+  const pairs = [];
+  for (const [i, direction] of DIRECTIONS.entries()) pairs.push({ ...(await shot(direction, 'idle')), label: `${LABELS[i]}（左：試作02　右：試作03）` });
+  for (const [direction, label] of [['front', '正面'], ['left', '左']]) {
+    pairs.push({ ...(await shot(direction, 'walk', .35)), label: `${label}・歩行（左：02　右：03）` });
+    pairs.push({ ...(await shot(direction, 'attack', 0, 'sword_iron')), label: `${label}・攻撃（左：02　右：03）` });
+  }
+  const pairBoard = await page.evaluate(async shots => {
+    const imgs = await Promise.all(shots.map(async s => { const i = new Image(); i.src = s.url; await i.decode(); return i; }));
+    const k = .5, w = imgs[0].width * k, h = imgs[0].height * .86 * k, cols = 4, rows = Math.ceil(imgs.length / cols);
+    const c = document.createElement('canvas'); c.width = cols * w + 40; c.height = rows * (h + 40) + 80;
+    const g = c.getContext('2d'); g.fillStyle = '#eee9df'; g.fillRect(0, 0, c.width, c.height);
+    g.fillStyle = '#203344'; g.font = 'bold 30px sans-serif'; g.fillText('シオン新デザイン案 / 試作02と試作03・同じ3Dリグ', 24, 48);
+    imgs.forEach((img, i) => { const x = 20 + (i % cols) * w, y = 70 + Math.floor(i / cols) * (h + 40);
+      g.drawImage(img, 0, img.height * .06, img.width, img.height * .86, x, y, w, h);
+      g.font = '22px sans-serif'; g.fillText(shots[i].label, x + 10, y + h + 28); });
+    return c.toDataURL('image/png').split(',')[1];
+  }, pairs);
+  await writeFile(out('hero2-rig-v02-v03.png'), Buffer.from(pairBoard, 'base64'));
+
   assert.deepEqual(errors, [], 'no page errors');
-  console.log('hero2: 8 directions, walk, attack and the 8-direction grid checked; screenshots saved to compare/ch4-5/characters/');
+  console.log('hero2: 8 directions, walk, attack, the 8-direction grid and prototype 02/03 checked; screenshots saved to compare/ch4-5/characters/');
 } finally { await browser.close(); }
