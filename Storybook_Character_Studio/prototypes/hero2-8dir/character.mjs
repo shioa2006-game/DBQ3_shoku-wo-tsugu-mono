@@ -118,17 +118,20 @@ function fringe(tag, edge, closeBack, lines = [], sheen = '') {
 
 // ---------------------------------------------------------------- face parts
 // Large chibi eye: rounded white, a big iris toward the nose, two highlights, a heavy upper lash.
-function eye(x, y, w, h, { inner = 1, tag }) {
+// The iris is a tall oval, as in the design sheet: `iris` is its half-width as a share of the eye's width
+// (narrow in the turned views), `shift` moves it toward the nose so the white shows on the outer side.
+// Highlights: a large one at the upper left of the iris and a small one at the lower right.
+function eye(x, y, w, h, { inner = 1, tag, iris = .38, shift = .1 }) {
   const id = `hero2-eye-${tag}`;
   const white = `M${f1(x - w / 2)} ${f1(y + h * .05)} C${f1(x - w / 2)} ${f1(y - h * .55)} ${f1(x + w / 2)} ${f1(y - h * .55)} ${f1(x + w / 2)} ${f1(y + h * .05)} C${f1(x + w / 2)} ${f1(y + h * .5)} ${f1(x - w / 2)} ${f1(y + h * .5)} ${f1(x - w / 2)} ${f1(y + h * .05)}Z`;
-  const ix = x + inner * w * .1;
+  const ix = x + inner * w * shift, iy = y + h * .06, rx = w * iris, ry = h * .42;
   return P(white, '#ffffff', 'none', 0)
     + clipped(id, white,
-      ellipse(f1(ix), f1(y + h * .06), f1(w * .38), f1(h * .44), 'url(#iris2)', '#10255a', 1.4)
-      + ellipse(f1(ix), f1(y + h * .1), f1(w * .17), f1(h * .22), '#0f2350', 'none', 0)
-      + ellipse(f1(ix + inner * w * .13), f1(y - h * .14), f1(w * .13), f1(h * .12), '#ffffff', 'none', 0)
-      + ellipse(f1(ix - inner * w * .14), f1(y + h * .25), f1(w * .06), f1(h * .05), '#ffffff', 'none', 0, 'opacity=".85"'))
-    + line(`M${f1(x - w / 2 - 1)} ${f1(y + h * .02)} C${f1(x - w / 2)} ${f1(y - h * .52)} ${f1(x + w / 2)} ${f1(y - h * .52)} ${f1(x + w / 2 + .5)} ${f1(y - h * .02)}`, '#2a1810', 4.2)
+      ellipse(f1(ix), f1(iy), f1(rx), f1(ry), 'url(#iris2)', '#10255a', 1.4)
+      + ellipse(f1(ix), f1(iy + h * .02), f1(rx * .42), f1(ry * .42), '#0f2350', 'none', 0)
+      + ellipse(f1(ix - rx * .25), f1(y - h * .18), f1(rx * .4), f1(rx * .44), '#ffffff', 'none', 0)
+      + ellipse(f1(ix + rx * .35), f1(y + h * .22), f1(rx * .18), f1(rx * .16), '#ffffff', 'none', 0, 'opacity=".85"'))
+    + line(`M${f1(x - w / 2 - 1)} ${f1(y + h * .02)} C${f1(x - w / 2)} ${f1(y - h * .52)} ${f1(x + w / 2)} ${f1(y - h * .52)} ${f1(x + w / 2 + .5)} ${f1(y - h * .02)}`, '#2a1810', 4.6)
     + line(`M${f1(x - inner * w / 2 - inner * .5)} ${f1(y - h * .08)} l${f1(-inner * 4)} ${f1(-2.5)}`, '#2a1810', 2.6)
     + line(`M${f1(x - w * .3)} ${f1(y + h * .47)} Q${f1(x)} ${f1(y + h * .54)} ${f1(x + w * .3)} ${f1(y + h * .47)}`, '#a8714f', 1.3);
 }
@@ -179,7 +182,7 @@ const HEADS = [
       + ear('M364 160 C374 152 386 160 384 174 C382 188 370 194 360 188Z', 'M368 167 Q377 172 372 183')
       + skin('M247 104 C240 128 239 160 245 181 C250 196 292 209 305 209 C318 209 360 196 365 181 C371 160 370 128 363 104 Q305 92 247 104Z')
       + blush(255, 184, 9.5, 5) + blush(355, 184, 9.5, 5)
-      + eye(273, 157, 31, 34, { inner: 1, tag: `${tag}a` }) + eye(337, 157, 31, 34, { inner: -1, tag: `${tag}b` })
+      + eye(273, 155, 28, 40, { inner: 1, tag: `${tag}a` }) + eye(337, 155, 28, 40, { inner: -1, tag: `${tag}b` })
       + brow('M259 121 Q272 114 286 118') + brow('M324 118 Q338 114 351 121')
       + line('M302 171 Q305 174 302 177', 'var(--skinDark)', 1.8) + mouth('M290 185 Q305 195 320 185')
       + fringe(tag, [[247, 171, 'c'], [250, 160], [253, 141], [256, 133, 'c'], [262, 121], [268, 112], [272, 108, 'c'], [277, 118], [281, 128],
@@ -215,7 +218,7 @@ const HEADS = [
       + skin('M157 104 C148 130 147 160 153 181 C160 199 178 208 199 208 C221 208 241 200 254 186 C262 170 264 140 260 104 Q208 92 157 104Z')
       + ear('M255 158 C262 148 278 151 278 168 C278 185 266 193 253 186Z', 'M262 161 Q271 167 266 180')
       + blush(223, 179, 9, 5) + blush(158, 177, 5, 4)
-      + eye(165, 153, 17, 30, { inner: 1, tag: `${tag}a` }) + eye(212, 155, 32, 34, { inner: -1, tag: `${tag}b` })
+      + eye(166, 154, 14, 38, { inner: 1, iris: .4, tag: `${tag}a` }) + eye(209.5, 154, 27, 40, { inner: -1, iris: .3, shift: .2, tag: `${tag}b` })
       + brow('M158 121 Q165 117 173 118') + brow('M198 118 Q212 112 227 117')
       + line('M180 170 Q176 173 179 176', 'var(--skinDark)', 1.8) + mouth('M169 185 Q181 194 194 186')
       + fringe(tag, [[152, 163, 'c'], [157, 148], [159, 135], [160, 125, 'c'], [168, 128], [178, 138], [186, 146, 'c'], [189, 134], [194, 121],
@@ -251,7 +254,7 @@ const HEADS = [
       + skin('M106 112 Q100 128 99 144 Q98 158 93 167 Q94 172 99 175 Q98 184 104 192 Q112 204 128 208 Q150 212 168 206 Q184 196 186 170 Q186 130 170 108 Q140 98 106 112Z')
       + ear('M170 160 C174 149 191 151 192 168 C193 186 180 194 167 188Z', 'M177 162 Q186 168 182 180')
       + blush(131, 180, 8, 4.5)
-      + eye(118, 158, 22, 36, { inner: -1, tag: `${tag}a` })
+      + eye(122, 156, 20, 40, { inner: -1, iris: .27, shift: .17, tag: `${tag}a` })
       + brow('M106 125 Q115 120 125 123') + mouth('M101 186 Q106 190 112 187')
       + fringe(tag, [[88, 116, 'c'], [95, 121], [101, 125, 'c'], [106, 116], [111, 109, 'c'], [115, 116], [118, 124, 'c'], [122, 115], [128, 106, 'c'], [134, 120], [140, 136],
         [145, 152], [147, 168, 'c'], [150, 150], [153, 133, 'c'], [160, 145], [166, 157, 'c'], [169, 150], [172, 145, 'c'], [179, 147], [186, 152, 'c'], [190, 140]],
@@ -382,11 +385,21 @@ function holder(x0, x1, y0, y1, flare = 3) {
 }
 const strap = d => line(d, PINK, 10) + line(d, 'var(--pack)', 6.6) + line(d, 'var(--packLight)', 1.2);
 
+// Diagonal views: the torso is turned 45 degrees. The near corner of the body (taken on the tunic centre,
+// so the hem's lowest point stays on the rig's art centre) splits it into two planes: front and side
+// (front diagonals), back and side (back diagonals). Seen from the game camera above, everything on each
+// plane rises from the corner toward that plane's far edge, so belt, hem, holder and book slant with the
+// turn instead of lying flat. Each half is drawn with its own vertical shear (`s` per unit of width).
+function turn(tag, xn, inner, s = .1) {
+  const half = (side, d, k) => clipped(`hero2-turn-${side}-${tag}`, d, `<g transform="matrix(1 ${k} 0 1 0 ${f1(-k * xn)})">${inner}</g>`);
+  return half('l', `M-100 0 H${xn + .5} V520 H-100Z`, s) + half('r', `M${xn - .5} 0 H700 V520 H${xn - .5}Z`, -s);
+}
+
 const BODY = [
   'M262 221 Q305 213 348 221 Q362 230 364 252 L366 342 Q305 350 244 342 L246 252 Q248 230 262 221Z',
-  'M168 221 Q218 211 270 217 Q282 238 280 268 L284 342 Q218 350 152 342 L156 268 Q156 238 168 221Z',
+  'M166 221 Q218 211 270 217 Q282 238 280 268 L284 342 Q250 346 218 346 Q184 346 146 342 L150 268 Q150 238 166 221Z',
   'M120 222 Q150 214 188 222 Q196 250 194 290 L196 342 Q153.5 349 111 342 L114 290 Q112 250 120 222Z',
-  'M70 218 Q120 208 170 216 Q182 250 180 290 L182 342 Q121 349 60 342 L62 290 Q60 250 70 218Z',
+  'M70 218 Q120 208 174 216 Q190 248 190 290 L193 342 Q158 345.5 121 345.5 Q88 345.5 60 342 L62 290 Q60 250 70 218Z',
   'M262 219 Q305 211 348 219 Q362 230 364 252 L366 342 Q305 350 244 342 L246 252 Q248 230 262 219Z',
 ];
 
@@ -406,18 +419,20 @@ const TORSOS = [
   // 1 front-left: the shirt panel narrows and moves toward the far side; the near vest panel turns
   // round the side. Book and holder behind the right shoulder; near strap over the shoulder to the
   // holder, far strap down the chest.
-  (mirror, tag) => (mirror ? pouch(143, 298, 22, 40) : '')
+  // Turned: the front plane runs from the far shoulder (left) to the corner at the tunic centre, the side
+  // plane (in shade) from there to the back.
+  (mirror, tag) => turn(tag, 218, (mirror ? pouch(143, 298, 22, 40) : '')
     + bookEdge(258, 209, 302, 272, 7)
     + holder(272, 304, 264, 326)
     + neck('M196 196 H230 V216 H196Z')
     + vest(BODY[1])
-    + vestShade(tag, BODY[1], ['M248 216 Q270 220 290 236 L290 346 L246 346Z', 'M146 226 L162 222 L160 346 L146 346Z'])
+    + vestShade(tag, BODY[1], ['M236 216 Q262 218 290 236 L290 346 L234 346Z', 'M140 226 L156 222 L154 346 L140 346Z'])
     + opening(tag, BODY[1], 'M189 214 Q201 219 214 213 L212 346 Q195 349 179 345Z',
       [['M189 216 L179.5 344', 'M186.5 218 L177 344'], ['M214 215 L212 345', 'M216.5 217 L214.5 345']])
     + collar('M191 205 Q212 211 238 205 L240 218 Q226 222 212 227 Q200 222 189 218Z') + line('M212 214 L212 227', SINK, 1.8)
     + strap('M176 221 Q171 252 174 287') + strap('M238 213 Q268 222 278 262')
-    + beltBand(155, 282, 286) + buckle(197, 297, 24, 21)
-    + (mirror ? '' : pouch(208, 297)),
+    + beltBand(149, 282, 286, 0) + buckle(196, 297, 24, 21)
+    + (mirror ? '' : pouch(206, 297))),
   // 2 left: the vest covers the side; the shirt shows only as a narrow strip at the front edge.
   // The book's fore-edge (pages between the green covers) in the holder on the back.
   (mirror, tag) => bookEdge(186, 216, 232, 276, 7)
@@ -432,17 +447,19 @@ const TORSOS = [
     + beltBand(111, 195, 285, 0) + P('M104 283 h12 v17 h-12Z', grad('gold'), 'var(--goldDark)', 1.8)
     + (mirror ? '' : pouch(138, 296, 30, 40)),
   // 3 back-left: the vest's back; the cover (emblem) and the fore-edge on its left, in the holder.
-  (mirror, tag) => neck('M88 194 H120 V214 H88Z')
+  // Turned: the side plane (the near arm's side) on the left of the corner at the tunic centre, the back
+  // plane, with the book and the holder, on the right toward the far shoulder (in shade at its far edge).
+  (mirror, tag) => turn(tag, 121, neck('M88 194 H120 V214 H88Z')
     + vest(BODY[3])
-    + vestShade(tag, BODY[3], ['M54 224 L80 220 L76 346 L54 346Z'])
+    + vestShade(tag, BODY[3], ['M54 224 L68 220 L66 346 L54 346Z', 'M170 216 L196 222 L198 346 L168 346Z'])
     + collar('M84 203 Q106 198 130 203 L131 216 Q106 211 82 216Z')
-    + beltBand(60, 182, 286)
+    + beltBand(60, 192, 286, 0)
     + (mirror ? '' : pouch(52, 296, 20, 38))
     + strap('M76 222 Q100 234 106 272')
     + P('M108 222 Q108 216 114 216 H130 V276 H108Z', grad('book'), BINK) + P('M112 219 H128 V276 H112Z', 'var(--paper)', '#a8946a', 1.2)
     + line('M116 222 V274 M120.5 222 V274 M125 222 V274', '#d9c9a2', .9)
     + bookCover(125, 213, 197, 276, 161, 246, .82, .9, true)
-    + holder(105, 199, 270, 331),
+    + holder(105, 199, 270, 331)),
   // 4 back: the vest's back with the straps beside the book; the deep green cover with the gold
   // emblem and the page block's top edge; the holder covers only the book's lower part.
   (mirror, tag) => neck('M284 180 H326 V206 H284Z')

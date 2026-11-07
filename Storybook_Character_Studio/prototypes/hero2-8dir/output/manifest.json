@@ -49,7 +49,7 @@
       "row": 0,
       "col": 1,
       "dx": 0,
-      "dy": 0,
+      "dy": -1,
       "before": "0.523",
       "after": "0.523",
       "horizontal": "drawn"
@@ -103,7 +103,7 @@
       "row": 1,
       "col": 3,
       "dx": 0,
-      "dy": 0,
+      "dy": -1,
       "before": "0.457",
       "after": "0.457",
       "horizontal": "drawn"
