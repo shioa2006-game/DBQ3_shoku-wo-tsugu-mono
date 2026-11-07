@@ -254,13 +254,15 @@ def run_away():
 
 
 def stand_dawn():
-    """第5場面：右斜め後ろ姿で立ち、朝日（画面右）を見る。背中の職業の書の表紙が見える。"""
+    """第5場面：右斜め後ろ姿で立ち、朝日（画面右）を見る。背中の職業の書の表紙が見える。
+    左腕（画面左）は胴の後ろに描き、背中の書とホルダーがその一部を隠す（書とかばんは背中から張り出しているため）。
+    ブーツは後ろから見た形（boot_back）。"""
     v = PARTS["views"]["back_right"]
     far_arm = arm([(174, 236), (188, 276), (192, 310)], side=1, hand_angle=8, thumb=0)
-    far_leg = leg([(146, 330), (149, 370), (151, 404)], side=1) + boot((151, 404), (149, 370), flip=True, toe=.72)
-    near_leg = leg([(98, 332), (95, 376), (94, 414)], side=-1) + boot((94, 414), (95, 376), flip=True, toe=.8)
+    far_leg = leg([(146, 330), (149, 370), (151, 404)], side=1) + boot_back((151, 404), (149, 370))
+    near_leg = leg([(98, 332), (95, 376), (94, 414)], side=-1) + boot_back((94, 414), (95, 376))
     near_arm = arm([(54, 238), (38, 278), (34, 312)], side=-1, hand_angle=-6, thumb=0)
-    body = far_arm + far_leg + near_leg + v["torso"] + v["head"] + near_arm
+    body = far_arm + far_leg + near_leg + near_arm + v["torso"] + v["head"]
     return body, (84, 240)
 
 
