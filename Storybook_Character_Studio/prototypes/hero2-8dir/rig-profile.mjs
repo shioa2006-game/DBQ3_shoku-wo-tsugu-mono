@@ -9,4 +9,7 @@ export const HERO2_RIG_PROFILE=Object.freeze({
     back:.012, back_right:.014, right:.014, front_right:.016,
   }),
   bodyDepth:-.008,
+  // Front-right: the tool hand is the near one and the swing crosses the face, so the swinging tool is
+  // drawn over the flat head card (rig.js, tuning.toolOverHead). The swing itself is the current hero's.
+  toolOverHead:Object.freeze(['front_right']),
 });

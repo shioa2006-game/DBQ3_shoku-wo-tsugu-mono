@@ -76,6 +76,17 @@ const OUTLINE_COLOR = 0x14110f;
 const outlineMaterial = new THREE.MeshBasicMaterial({ color: OUTLINE_COLOR, side: THREE.BackSide });
 const hiddenFaceMaterial = new THREE.MeshBasicMaterial({ visible: false });
 
+// Optional, per rig (tuning.toolOverHead: a list of directions; unset for every existing character).
+// The head is a flat card, so a 3D tool swung across the face is cut where it passes behind the card
+// plane and looks sunk into the face. In the listed directions the swinging tool is drawn after the head
+// card, ignoring only the head's depth: it is still hidden by the body, the arms and the gripping hand.
+// The head's depth is written again right after the tool (a depth-only copy), so the water veil and
+// later draws are still hidden behind the head. The swing path, grip and tool angle do not change.
+const TOOL_OVER_HEAD_ORDER = 1.5; // after the head card (1), before the depth-only head copy and water (2)
+const HEAD_DEPTH_COPY_ORDER = 1.8;
+const outlineOverHeadMaterial = outlineMaterial.clone();
+outlineOverHeadMaterial.transparent = true;
+
 const textureLoader = new THREE.TextureLoader();
 const sheetCache = new Map();
 const SHEET_RETRY_DELAYS_MS = [400, 1200]; // initial request + 2 retries = 3 attempts
@@ -411,7 +422,7 @@ function collectTintTargets(node) {
     if (!o.isMesh || !o.material) return;
     const mats = Array.isArray(o.material) ? o.material : [o.material];
     for (const m of mats) {
-      if (m === outlineMaterial || m === hiddenFaceMaterial || !m.color) continue;
+      if (m === outlineMaterial || m === outlineOverHeadMaterial || m === hiddenFaceMaterial || !m.color) continue;
       out.push({ m, base: m.color.clone() });
     }
   });
@@ -489,6 +500,18 @@ export class HumanoidRig {
     // so image faces and procedural 3D parts receive the same water veil.
     box.renderOrder = 1;
     group.add(box);
+    if (this.tuning.toolOverHead?.length) {
+      // Depth-only copy of the head card (see TOOL_OVER_HEAD_ORDER); shown only while a tool is drawn over the head.
+      const depthMat = new THREE.MeshBasicMaterial({ map: this.headTexture, transparent: true, alphaTest: 0.2, colorWrite: false });
+      const depthCopy = new THREE.Mesh(box.geometry, [
+        hiddenFaceMaterial, hiddenFaceMaterial, hiddenFaceMaterial, hiddenFaceMaterial, depthMat, hiddenFaceMaterial,
+      ]);
+      depthCopy.renderOrder = HEAD_DEPTH_COPY_ORDER;
+      depthCopy.visible = false;
+      group.add(depthCopy);
+      this._headFrontMaterial = box.material[4];
+      this._headDepthCopy = depthCopy;
+    }
     return group;
   }
 
@@ -551,6 +574,17 @@ export class HumanoidRig {
     this.toolKind = kind;
     if (kind) {
       this.tool = createToolMesh(kind);
+      if (this._headDepthCopy) {
+        // Draw this rig's tool in the transparent pass (opacity 1, so it looks the same), where its order
+        // against the head card can be switched (updateToolOverHead).
+        this.tool.traverse((o) => {
+          if (!o.isMesh) return;
+          if (o.material === outlineMaterial) o.material = outlineOverHeadMaterial;
+          else o.material.transparent = true;
+          o.userData.baseRenderOrder = o.renderOrder;
+        });
+      }
+      this._toolOverHead = false;
       this.inner.add(this.tool);
       this._toolTint = collectTintTargets(this.tool);
       if (this._submersion > 0) applyTint(this._toolTint, this._submersion);
@@ -700,6 +734,21 @@ export class HumanoidRig {
     this.leftArm.position.y = SHOULDER_Y + (this.tuning.shoulderLift ?? 0) + bob;
     this.rightArm.position.y = SHOULDER_Y + (this.tuning.shoulderLift ?? 0) + bob;
     this.updateToolAttachment(this.attackT > 0 ? chop * 0.9 : 0);
+    this.updateToolOverHead();
+  }
+
+  updateToolOverHead() {
+    if (!this._headDepthCopy) return;
+    const over = Boolean(this.tool) && this.attackT > 0 && this.tuning.toolOverHead.includes(this.direction);
+    this._headFrontMaterial.depthWrite = !over;
+    this._headDepthCopy.visible = over;
+    if (!this.tool || over === this._toolOverHead) return;
+    this._toolOverHead = over;
+    this.tool.traverse((o) => {
+      if (!o.isMesh) return;
+      const outline = o.material === outlineOverHeadMaterial;
+      o.renderOrder = over ? TOOL_OVER_HEAD_ORDER - (outline ? 0.1 : 0) : o.userData.baseRenderOrder;
+    });
   }
 }
 

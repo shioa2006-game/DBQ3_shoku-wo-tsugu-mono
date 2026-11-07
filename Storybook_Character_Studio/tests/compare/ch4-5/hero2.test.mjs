@@ -105,6 +105,59 @@ try {
   assert.ok(original.sheet.endsWith('/assets/humanoids/adventurer_code_body_8dir.png'), 'current hero in the grid');
   await page.click('[data-grid-side="generated"]');
 
+  // Front-right swing (tuning.toolOverHead): the near hand's tool crosses the face, so while attacking
+  // it is drawn over the flat head card (then the head's depth is written again). Other directions, the
+  // idle pose and the current hero keep the normal order; the swing path is the same on both rigs.
+  const overHead = await page.evaluate(() => {
+    const h = window.__heroPreview, [hero, rig] = h.rigs, state = [];
+    h.state.paused = true;
+    for (const [direction, attackT] of [['front_right', .56], ['front_right', 0], ['front_left', .56], ['front', .56]]) {
+      h.setState({ direction, action: 'attack', tool: 'hammer_stone', auto: false });
+      for (const r of h.rigs) { r.attackT = attackT; r.update(0, false); }
+      const orders = []; rig.tool.traverse(o => { if (o.isMesh) orders.push(o.renderOrder); });
+      const heroTip = new hero.tool.position.constructor(), rigTip = heroTip.clone();
+      hero.tool.getWorldPosition(heroTip); rig.tool.getWorldPosition(rigTip);
+      state.push({ direction, attackT, over: orders.every(o => o >= 1.4), depthCopy: rig._headDepthCopy.visible,
+        headDepthWrite: rig._headFrontMaterial.depthWrite, heroPlain: !hero._headDepthCopy, sameGrip: heroTip.distanceTo(rigTip) < .05 });
+    }
+    for (const r of h.rigs) r.attackT = 0;
+    return state;
+  });
+  const expect = { 'front_right/0.56': true, 'front_right/0': false, 'front_left/0.56': false, 'front/0.56': false };
+  for (const s of overHead) {
+    const want = expect[`${s.direction}/${s.attackT}`];
+    assert.equal(s.over, want, `tool drawn over the head: ${s.direction} attackT ${s.attackT}`);
+    assert.equal(s.depthCopy, want, `head depth copy: ${s.direction} attackT ${s.attackT}`);
+    assert.equal(s.headDepthWrite, !want, `head depth write: ${s.direction} attackT ${s.attackT}`);
+    assert.ok(s.heroPlain, 'the current hero keeps the normal order');
+    assert.ok(s.sameGrip, `same grip as the current hero: ${s.direction}`);
+  }
+  const swing = [];
+  for (const t of [.92, .8, .68, .56, .44, .3]) swing.push({ ...(await page.evaluate(t => {
+    const h = window.__heroPreview, r = h.renderer;
+    h.state.paused = true; h.camera.zoom = 1.9; h.camera.updateProjectionMatrix();
+    h.setState({ direction: 'front_right', action: 'attack', tool: 'hammer_stone', auto: false });
+    for (const x of h.rigs) { x.walkTime = 0; x.animTime = 0; x.attackT = t; x.update(0, false); }
+    const v = { x: 0, y: 0, set(a, b) { this.x = a; this.y = b; return this; } }; r.getSize(v);
+    r.setScissorTest(true);
+    h.rigs.forEach((x, i) => { h.rigs.forEach((y, j) => { y.group.visible = y.shadow.visible = i === j; });
+      r.setViewport(i * v.x / 2, 0, v.x / 2, v.y); r.setScissor(i * v.x / 2, 0, v.x / 2, v.y); r.render(h.scene, h.camera); });
+    r.setScissorTest(false); h.rigs.forEach(y => { y.group.visible = y.shadow.visible = true; });
+    for (const x of h.rigs) x.attackT = 0;
+    return { url: r.domElement.toDataURL('image/png') };
+  }, t)), label: `振り上げ ${t}` });
+  const swingBoard = await page.evaluate(async shots => {
+    const imgs = await Promise.all(shots.map(async s => { const i = new Image(); i.src = s.url; await i.decode(); return i; }));
+    const W = imgs[0].width / 2, H = imgs[0].height, cw = W * .5, ch = H * .72;
+    const c = document.createElement('canvas'); c.width = cw * imgs.length; c.height = ch * 2 + 110; const g = c.getContext('2d');
+    g.fillStyle = '#eee9df'; g.fillRect(0, 0, c.width, c.height);
+    g.fillStyle = '#203344'; g.font = 'bold 28px sans-serif'; g.fillText('右斜め前・石のハンマーの攻撃（上：今の主人公　下：シオン案）', 20, 42);
+    imgs.forEach((img, i) => { for (const half of [0, 1]) g.drawImage(img, half * W + (W - cw) / 2, H * .02, cw, ch, i * cw, 60 + half * ch, cw, ch);
+      g.font = '22px sans-serif'; g.fillText(shots[i].label, i * cw + 12, 60 + ch * 2 + 34); });
+    return c.toDataURL('image/png').split(',')[1];
+  }, swing);
+  await writeFile(out('hero2-rig-swing-front-right.png'), Buffer.from(swingBoard, 'base64'));
+
   // Prototype 02 (saved in prototypes/hero2-8dir/v02/) and prototype 03 side by side on the same rig:
   // the 8 directions at rest, and walking / attacking from the front and the side.
   await page.goto(new URL('compare/ch4-5/characters/?c=hero2v02', process.env.STUDIO_URL || 'http://127.0.0.1:8081/').href);

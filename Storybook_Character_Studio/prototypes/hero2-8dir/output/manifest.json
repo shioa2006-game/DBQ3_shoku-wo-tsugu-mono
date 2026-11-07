@@ -142,7 +142,10 @@
       "right": 0.014,
       "front_right": 0.016
     },
-    "bodyDepth": -0.008
+    "bodyDepth": -0.008,
+    "toolOverHead": [
+      "front_right"
+    ]
   },
   "rigProfile": "../rig-profile.mjs",
   "targets": []
