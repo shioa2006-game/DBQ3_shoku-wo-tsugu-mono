@@ -184,9 +184,10 @@ def run_expression(head):
                     ['<path d="M173 190 Q181.5 183.5 190 189.5 Q187 196 181.5 196 Q175.5 196 173 190Z" fill="#7c3428" '
                      'stroke="#6a2c20" stroke-width="2.2" stroke-linejoin="round"/>'
                      '<path d="M177 194 Q181.5 191.5 186 194 Q184 196 181.5 196 Q179 196 177 194Z" fill="#d9776c"/>'], "口")
-    sweat = ('<path d="M146 128 Q139 140 140 146 Q141 152 147 152 Q153 151 152 145 Q151 139 146 128Z" fill="#dff3ff" '
-             'stroke="#5a86b8" stroke-width="2" stroke-linejoin="round"/>'
-             '<path d="M144 142 Q144 147 147 148" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>')
+    # 汗は耳の上のこめかみ（髪の上）に置く。頬の端では顔の輪郭に紛れて見えにくいため。
+    sweat = ('<path d="M252 118 Q244 131 245 138 Q246 145 253 145 Q260 144 259 137 Q258 130 252 118Z" fill="#dff3ff" '
+             'stroke="#5a86b8" stroke-width="2.2" stroke-linejoin="round"/>'
+             '<path d="M249.5 133 Q249.5 139 253 140.5" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>')
     return head + sweat
 
 
@@ -201,7 +202,8 @@ def run_left():
     far_arm = arm([(166, 238), (139, 276), (108, 254)], side=-1, hand_angle=-30, thumb=1)
     far_leg = leg([(202, 326), (232, 364), (280, 366)], side=1) + boot((280, 366), (232, 364), flex=6)
     near_leg = leg([(236, 326), (190, 356), (172, 410)], side=-1) + boot((172, 410), (190, 356), flex=-18)
-    near_arm = arm([(257, 240), (281, 282), (318, 272)], side=1, hand_angle=20, thumb=-1)
+    # 手前の左腕：肘を後ろへ大きく引き、握りこぶしを腰の横に置く（手首を外へ跳ね上げると女の子走りに見えるため）。
+    near_arm = arm([(257, 238), (301, 262), (273, 300)], side=1, hand_angle=-30, thumb=-1)
     body = far_arm + far_leg + near_leg + v["torso"] + head + near_arm
     return f'<g transform="rotate({LEAN} 200 430)">{body}</g>', _rotate((282, 236), LEAN, (200, 430))
 
