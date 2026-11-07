@@ -70,27 +70,48 @@ for (const id of ids) {
 $('original-sheet').src = p.original; $('generated-sheet').src = p.generated;
 $('head-sheet').src = p.head; $('torso-sheet').src = p.torso;
 
-const renderer = new THREE.WebGLRenderer({ canvas: $('scene'), antialias: true, alpha: true, preserveDrawingBuffer: true });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-const scene = new THREE.Scene();
-scene.add(new THREE.HemisphereLight(0xfff6df, 0x72827e, 2.5));
-const light = new THREE.DirectionalLight(0xfff1d2, 3); light.position.set(-3, 6, 5); scene.add(light);
-const camera = new THREE.PerspectiveCamera(32, 1, .1, 30);
-// Same vertical/radial ratio as the gameplay camera (8.2 / 11.5).
-camera.position.set(0, .45 + 3.1 * 8.2 / 11.5, 3.1); camera.lookAt(0, .45, 0);
-const rigs = [0, 1].map(index => {
-  const rig = index === 0
+// One stage = renderer + scene (same lights and floor) + camera at the gameplay camera's angle.
+function makeStage(canvas) {
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  const scene = new THREE.Scene();
+  scene.add(new THREE.HemisphereLight(0xfff6df, 0x72827e, 2.5));
+  const light = new THREE.DirectionalLight(0xfff1d2, 3); light.position.set(-3, 6, 5); scene.add(light);
+  const camera = new THREE.PerspectiveCamera(32, 1, .1, 30);
+  // Same vertical/radial ratio as the gameplay camera (8.2 / 11.5).
+  camera.position.set(0, .45 + 3.1 * 8.2 / 11.5, 3.1); camera.lookAt(0, .45, 0);
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.MeshBasicMaterial({ color: 0xdce4de }));
+  floor.rotation.x = -Math.PI / 2; floor.position.y = -.13; scene.add(floor);
+  return { renderer, scene, camera };
+}
+// kind 'original': the earlier image, its limb colours and rig settings; 'generated': the code-drawn
+// head/torso layers with this design's rig settings and limb colours.
+function makeRig(kind, scene) {
+  const rig = kind === 'original'
     ? new HumanoidRig({ sheetUrl: p.original, colors: p.colors, tuning: p.originalTuning })
     : new HumanoidRig({ sheetUrl: p.generated, headSheetUrl: p.head, bodySheetUrl: p.torso, colors: { ...p.colors, ...p.generatedColors }, tuning: p.tuning });
   rig.animTime = 0; scene.add(rig.group);
   const shadow = new THREE.Mesh(new THREE.CircleGeometry(.32, 48), new THREE.MeshBasicMaterial({ color: 0x657966, transparent: true, opacity: .2, depthWrite: false }));
   shadow.rotation.x = -Math.PI / 2; shadow.position.y = -.125; shadow.scale.y = .8; scene.add(shadow); rig.shadow = shadow;
   return rig;
-});
-const floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.MeshBasicMaterial({ color: 0xdce4de }));
-floor.rotation.x = -Math.PI / 2; floor.position.y = -.13; scene.add(floor);
-const state = { direction: 'front', action: 'idle', auto: false, tool: '', water: false, paused: false };
+}
+const { renderer, scene, camera } = makeStage($('scene'));
+const rigs = ['original', 'generated'].map(kind => makeRig(kind, scene));
+
+// 8 directions at once: one rig per direction for each side, drawn in a 4 x 2 grid (2 x 4 on a phone).
+const sideLabels = { generated: `${p.name}（コード生成）`, original: p.leftLabel ?? '以前の画像' };
+const grid = { ...makeStage($('grid')), side: 'generated' };
+grid.sets = Object.fromEntries(['generated', 'original'].map(kind => [kind, directions.map(direction => {
+  const rig = makeRig(kind, grid.scene); rig.setDirection(direction); return rig;
+})]));
+for (const side of ['generated', 'original']) {
+  const button = document.createElement('button'); button.textContent = sideLabels[side]; button.dataset.gridSide = side;
+  button.onclick = () => setState({ gridSide: side }); $('grid-sides').append(button);
+}
+$('grid-labels').innerHTML = labels.map(label => `<span>${label}</span>`).join('');
+const gridColumns = () => matchMedia('(max-width:650px)').matches ? 2 : 4;
+const state = { direction: 'front', action: 'idle', auto: false, tool: '', water: false, paused: false, gridSide: 'generated' };
 for (let i = 0; i < directions.length; i++) {
   const button = document.createElement('button'); button.textContent = labels[i]; button.dataset.direction = directions[i];
   button.onclick = () => setState({ direction: directions[i], auto: false }); $('directions').append(button);
@@ -98,6 +119,10 @@ for (let i = 0; i < directions.length; i++) {
 function setState(next) {
   Object.assign(state, next);
   for (const rig of rigs) { rig.setDirection(state.direction); rig.setTool(state.tool || null); rig.setSubmersion(state.water ? 1 : 0); }
+  grid.side = state.gridSide;
+  for (const rig of Object.values(grid.sets).flat()) { rig.setTool(state.tool || null); rig.setSubmersion(state.water ? 1 : 0); }
+  document.querySelectorAll('[data-grid-side]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.gridSide === state.gridSide)));
+  $('grid-tool').value = state.tool;
   document.querySelectorAll('[data-direction]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.direction === state.direction)));
   document.querySelectorAll('[data-action]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.action === state.action)));
   $('rotate').setAttribute('aria-pressed', String(state.auto));
@@ -105,8 +130,10 @@ function setState(next) {
 }
 document.querySelectorAll('[data-action]').forEach(b => b.onclick = () => setState({ action: b.dataset.action }));
 $('rotate').onclick = () => setState({ auto: !state.auto }); $('tool').onchange = () => setState({ tool: $('tool').value }); $('water').onchange = () => setState({ water: $('water').checked });
+$('grid-tool').onchange = () => setState({ tool: $('grid-tool').value });
 let last = 0, rotationTime = 0, attackTime = 1;
-const ready = () => rigs.every(r => r.headTexture.image?.width && r.bodyTexture.image?.width);
+const loaded = r => r.headTexture.image?.width && r.bodyTexture.image?.width;
+const ready = () => rigs.every(loaded) && Object.values(grid.sets).flat().every(loaded);
 // Each half of the canvas has its own view centred on its model. With one camera for both,
 // the left model was seen slightly from its right and the right one from its left, so the
 // same boots looked turned differently. Both are now seen from the same angle, as in the game.
@@ -114,6 +141,10 @@ function resize() {
   const c = $('scene'); renderer.setSize(c.clientWidth, c.clientHeight, false);
   camera.aspect = c.clientWidth / 2 / c.clientHeight;
   camera.zoom = camera.aspect < .78 ? .76 : 1; camera.updateProjectionMatrix();
+  const g = $('grid'), cols = gridColumns(); grid.renderer.setSize(g.clientWidth, g.clientHeight, false);
+  grid.camera.aspect = g.clientWidth / cols / (g.clientHeight / (8 / cols));
+  // Larger than the two-figure stage: one figure per cell, with room left for a raised tool.
+  grid.camera.zoom = grid.camera.aspect < .78 ? 1.25 : 1.5; grid.camera.updateProjectionMatrix();
 }
 function draw() {
   const { width, height } = renderer.getSize(new THREE.Vector2());
@@ -125,20 +156,38 @@ function draw() {
   });
   renderer.setScissorTest(false);
   rigs.forEach(r => { r.group.visible = r.shadow.visible = true; });
+  drawGrid();
+}
+function drawGrid() {
+  const { width, height } = grid.renderer.getSize(new THREE.Vector2());
+  const cols = gridColumns(), rows = 8 / cols, w = width / cols, h = height / rows, all = Object.values(grid.sets).flat();
+  grid.renderer.setScissorTest(true);
+  grid.sets[grid.side].forEach((rig, i) => {
+    all.forEach(r => { r.group.visible = r.shadow.visible = r === rig; });
+    const x = (i % cols) * w, y = (rows - 1 - Math.floor(i / cols)) * h;
+    grid.renderer.setViewport(x, y, w, h); grid.renderer.setScissor(x, y, w, h);
+    grid.renderer.render(grid.scene, grid.camera);
+  });
+  grid.renderer.setScissorTest(false);
 }
 function renderFrame(now) {
   const dt = state.paused ? 0 : Math.min(.05, last ? (now - last) / 1000 : 0); last = now;
   if (state.auto && (rotationTime += dt) > 1.1) { rotationTime = 0; setState({ direction: directions[(directions.indexOf(state.direction) + 1) % 8] }); }
-  if (state.action === 'attack' && (attackTime += dt) > .85) { attackTime = 0; rigs.forEach(r => r.startAttack()); }
+  const gridRigs = Object.values(grid.sets).flat();
+  if (state.action === 'attack' && (attackTime += dt) > .85) { attackTime = 0; rigs.forEach(r => r.startAttack()); gridRigs.forEach(r => r.startAttack()); }
   rigs.forEach(r => r.update(dt, state.action === 'walk'));
+  gridRigs.forEach(r => r.update(dt, state.action === 'walk'));
   draw();
   $('status').textContent = ready() ? `${labels[directions.indexOf(state.direction)]} / ${state.action === 'walk' ? '歩行' : state.action === 'attack' ? '攻撃' : '待機'} · 同じ照明・同じ3D手足 / 右：頭・胴の分離画像とリグ設定` : '画像を読み込んでいます…';
   requestAnimationFrame(renderFrame);
 }
 // Only exposed by this dedicated prototype page for visual checks.
 window.__heroPreview = { setState, ready, rigs, renderer, scene, camera, state, character,
-  pose(time = 0) { rigs.forEach(r => { r.walkTime = time; r.animTime = time; r.attackT = state.action === 'attack' ? .6 : 0; r.update(0, state.action === 'walk'); }); draw(); },
+  grid: { sets: grid.sets, renderer: grid.renderer, camera: grid.camera, get side() { return grid.side; },
+    snapshot: () => ({ side: grid.side, directions: grid.sets[grid.side].map(r => r.direction), tools: grid.sets[grid.side].map(r => r.toolKind), columns: gridColumns() }) },
+  pose(time = 0) { [...rigs, ...Object.values(grid.sets).flat()].forEach(r => { r.walkTime = time; r.animTime = time; r.attackT = state.action === 'attack' ? .6 : 0; r.update(0, state.action === 'walk'); }); draw(); },
   snapshot() { return { ...state, character, ready: ready(), textureSizes: rigs.map(r => [r.headTexture.image?.width, r.headTexture.image?.height]), directions: rigs.map(r => r.direction), tools: rigs.map(r => r.toolKind) }; },
 };
 window.addEventListener('error', event => $('error').textContent = event.message);
-new ResizeObserver(resize).observe($('scene')); setState({}); resize(); requestAnimationFrame(renderFrame);
+const observer = new ResizeObserver(resize); observer.observe($('scene')); observer.observe($('grid'));
+setState({}); resize(); requestAnimationFrame(renderFrame);

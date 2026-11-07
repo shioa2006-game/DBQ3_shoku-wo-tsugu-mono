@@ -79,6 +79,31 @@ try {
   }, sideBySide);
   await writeFile(out('hero2-rig-old-new.png'), Buffer.from(data, 'base64'));
 
+  // 8 directions at once (the grid below the stage): one rig per direction, the same action and tool,
+  // switched with the page's own buttons.
+  const gridShot = async (action, time, tool) => page.evaluate(({ action, time, tool }) => {
+    const h = window.__heroPreview; h.state.paused = true;
+    h.setState({ action, tool, auto: false }); h.pose(time);
+    return { url: h.grid.renderer.domElement.toDataURL('image/png'), grid: h.grid.snapshot() };
+  }, { action, time, tool });
+  await page.click('#grid-bar [data-action="walk"]');
+  assert.equal(await page.evaluate(() => window.__heroPreview.state.action), 'walk', 'grid buttons switch the action');
+  assert.deepEqual(await page.$$eval('[data-action="walk"]', bs => bs.map(b => b.getAttribute('aria-pressed'))), ['true', 'true'], 'both button rows show the action');
+  await page.selectOption('#grid-tool', 'sword_iron');
+  assert.equal(await page.$eval('#tool', s => s.value), 'sword_iron', 'grid tool follows the page tool');
+  for (const [action, time, tool, file] of [['idle', 0, '', 'hero2-rig-grid-idle.png'], ['walk', .35, '', 'hero2-rig-grid-walk.png'], ['attack', 0, 'sword_iron', 'hero2-rig-grid-attack.png']]) {
+    const { url, grid } = await gridShot(action, time, tool);
+    assert.deepEqual(grid.directions, DIRECTIONS, `grid shows the 8 directions (${action})`);
+    assert.equal(grid.side, 'generated');
+    assert.deepEqual(grid.tools, DIRECTIONS.map(() => tool || null), `grid tools (${action})`);
+    await writeFile(out(file), Buffer.from(url.split(',')[1], 'base64'));
+  }
+  await page.click('[data-grid-side="original"]');
+  const original = await page.evaluate(() => { const h = window.__heroPreview; return { side: h.grid.side, sheet: h.grid.sets.original[0].bodyTexture.image.src }; });
+  assert.equal(original.side, 'original', 'grid switches to the current hero');
+  assert.ok(original.sheet.endsWith('/assets/humanoids/adventurer_code_body_8dir.png'), 'current hero in the grid');
+  await page.click('[data-grid-side="generated"]');
+
   assert.deepEqual(errors, [], 'no page errors');
-  console.log('hero2: 8 directions, walk and attack checked; screenshots saved to compare/ch4-5/characters/');
+  console.log('hero2: 8 directions, walk, attack and the 8-direction grid checked; screenshots saved to compare/ch4-5/characters/');
 } finally { await browser.close(); }

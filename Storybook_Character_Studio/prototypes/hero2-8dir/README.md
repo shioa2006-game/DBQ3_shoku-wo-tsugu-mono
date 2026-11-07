@@ -46,7 +46,7 @@ npm.cmd test
 npm.cmd run test:compare -- hero2
 ```
 
-`test:compare -- hero2` は、比較ページ [`compare/ch4-5/characters/?c=hero2`](../../compare/ch4-5/characters/?c=hero2) を3Dリグで開いて8方向・歩行・攻撃（鉄の剣）を検査し、`compare/ch4-5/characters/hero2-rig-8dir.png`・`hero2-rig-actions.png`・`hero2-rig-old-new.png`（今の主人公との比較）を保存します（Git管理しない）。比較ページは左が今の主人公（本編の画像・手足の色・リグ設定）、右がこの案です。
+`test:compare -- hero2` は、比較ページ [`compare/ch4-5/characters/?c=hero2`](../../compare/ch4-5/characters/?c=hero2) を3Dリグで開いて8方向・歩行・攻撃（鉄の剣）を検査し、`compare/ch4-5/characters/hero2-rig-8dir.png`・`hero2-rig-actions.png`・`hero2-rig-old-new.png`（今の主人公との比較）を保存します（Git管理しない）。比較ページは左が今の主人公（本編の画像・手足の色・リグ設定）、右がこの案です。ページ下の「8方向を同時に見る（手足つき）」（[`#grid-section`](../../compare/ch4-5/characters/?c=hero2#grid-section)）では、8方向の3Dリグを4×2に並べて同時に動かし、待機・歩行・攻撃と道具を切り替えられます。この案と今の主人公も切り替えられます。テストはこの表示も検査し、`hero2-rig-grid-idle.png`・`hero2-rig-grid-walk.png`・`hero2-rig-grid-attack.png` を保存します。
 
 ## 採用する場合
 
