@@ -18,7 +18,7 @@ try {
       // Pre-fix grip-to-tip trajectory: only the blade's axial roll may change.
       const angles={front:-Math.PI/2,front_left:-Math.PI/4,left:0,back_left:0,back:-Math.PI/2,back_right:-Math.PI*3/4,right:Math.PI,front_right:-Math.PI*3/4};
       let checked=0;const failures=[];
-      for(const [direction,[fx,fz]] of Object.entries(facing))for(const tool of ['sword_copper','sword_stone','hammer_wood','hammer_stone','club']){
+      for(const [direction,[fx,fz]] of Object.entries(facing))for(const tool of ['sword_copper','sword_stone','sword_iron','machete','hammer_wood','hammer_stone','hammer_iron','club']){
         p.setState({direction,tool,paused:true,water:false});
         for(const action of ['idle','walk','attack'])for(const phase of action==='idle'?[0,.7]:Array.from({length:17},(_,i)=>i/16)){
           p.setState({action});p.pose(phase);
@@ -36,10 +36,12 @@ try {
             const phaseSwing=action==='walk'?Math.sin(r.walkTime*11)*.5:Math.sin(r.animTime*2.2)*.05;
             const oldArm=new THREE.Quaternion().setFromAxisAngle(axis,r.attackT>0?chop:-phaseSwing);
             if(1-Math.abs(oldArm.dot(r.leftArm.quaternion))>1e-10)failures.push({direction,tool,action,phase,index,error:'arm swing changed'});
-            if(tool.startsWith('sword_')){
+            if(tool.startsWith('sword_')||tool==='machete'){
               const tangent=new THREE.Vector3().crossVectors(axis,lengthAxis).normalize();
               const edge=new THREE.Vector3(0,1,0).applyQuaternion(r.tool.quaternion);
               if(Math.abs(edge.dot(tangent))<1-1e-7)failures.push({direction,tool,action,phase,index,error:'broad face leads swing'});
+              // The machete is single-edged (edge on local -Y): the edge, not the spine, leads the swing back down.
+              if(tool==='machete'&&edge.dot(tangent)<1-1e-7)failures.push({direction,tool,action,phase,index,error:'machete spine leads swing'});
             }else if(1-Math.abs(original.dot(r.tool.quaternion))>1e-10){
               failures.push({direction,tool,action,phase,index,error:'non-sword orientation changed'});
             }
@@ -58,7 +60,7 @@ try {
     });
     assert.deepEqual(result.failures,[],`${character}: blade roll / unchanged grip and swing`);
     await writeFile(new URL(`${character}/sword-edge-preview.png`,pages),Buffer.from(result.image,'base64'));
-    console.log(`PASS ${character}: ${result.checked} poses, cutting edge aligned; original hand, tip path and non-sword orientation preserved`);
+    console.log(`PASS ${character}: ${result.checked} poses, cutting edge aligned (swords, machete edge leading); original hand, tip path and other tools' orientation preserved`);
   }
   assert.deepEqual(errors,[]);
 }finally{await browser.close();}

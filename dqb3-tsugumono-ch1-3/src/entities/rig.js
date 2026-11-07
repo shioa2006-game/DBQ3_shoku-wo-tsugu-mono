@@ -673,17 +673,20 @@ export class HumanoidRig {
     this.tool.position.copy(tmpMount);
     const theta = TOOL_DIRECTION_ANGLE[this.direction];
     this.tool.rotation.set(0.08, 0, theta);
-    if (this.toolKind.startsWith("sword_")) {
+    if (this.toolKind.startsWith("sword_") || this.toolKind === "machete") {
       // Local -X is the blade's length and local Z its broad-face normal.
       // Roll about the grip-to-tip axis so the blade plane contains the swing
       // tangent. This changes edge alignment, never the tip path or hand pose.
+      // The machete is single-edged (the edge on local -Y, the spine on +Y): its
+      // edge leads the swing back down, where the tip whips toward the facing side.
       const [fx, fz] = FACING[this.direction];
       tmpHandleDir.set(-1, 0, 0).applyQuaternion(this.tool.quaternion);
       tmpAxis.set(-fz, 0, fx).normalize();
       tmpAxis.addScaledVector(tmpHandleDir, -tmpAxis.dot(tmpHandleDir)).normalize();
       tmpQuat.copy(this.tool.quaternion).invert();
       tmpAxis.applyQuaternion(tmpQuat);
-      if (tmpAxis.z < 0) tmpAxis.negate(); // Same cutting plane, shortest roll.
+      if (this.toolKind === "machete") tmpAxis.negate(); // Broad face normal against the swing axis: -Y leads.
+      else if (tmpAxis.z < 0) tmpAxis.negate(); // Same cutting plane, shortest roll.
       const roll = Math.atan2(-tmpAxis.y, tmpAxis.z);
       tmpAxis.set(1, 0, 0);
       tmpQuat.setFromAxisAngle(tmpAxis, roll);

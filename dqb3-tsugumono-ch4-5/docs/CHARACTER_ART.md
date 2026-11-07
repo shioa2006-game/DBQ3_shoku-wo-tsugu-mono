@@ -15,7 +15,7 @@
 
 ## 段階0でそろえたもの
 
-- `src/entities/rig.js` は第1～3章と同じ内容にした。頭・胴の分離画像（`headSheetUrl`・`bodySheetUrl`）と、リグの個別設定（`headOffsetY`・`headLiftByDirection`・`bodyTopV`・`armSep`・`armRestTilt`・`shoulderLift`・`sleeveY`・`headForward`・`headDepth`・`bodyDepth`・`toolOverHead`）、剣の刃の向きの補正が使える。設定を渡さない住民は従来と同じ姿勢のまま。`toolOverHead`（方向の一覧）は、その方向の攻撃中だけ道具を頭の板の上に描く（平らな頭の板が、顔の前を横切る3Dの道具を切ってめり込んで見えるのを防ぐ。体・腕・握る手との前後は保ち、頭の奥行きは道具の直後に書き戻す）。2026-11-07 時点で使うのはStudioの試作 `hero2`（右斜め前）だけ。第4～5章の道具（鉄のハンマー・山刀・鉄の剣）も同じファイルにあり、第1～3章側でも使える。
+- `src/entities/rig.js` は第1～3章と同じ内容にした。頭・胴の分離画像（`headSheetUrl`・`bodySheetUrl`）と、リグの個別設定（`headOffsetY`・`headLiftByDirection`・`bodyTopV`・`armSep`・`armRestTilt`・`shoulderLift`・`sleeveY`・`headForward`・`headDepth`・`bodyDepth`・`toolOverHead`）、剣と山刀の刃の向きの補正（山刀は片刃なので刃が振り戻す方向を向く。2026-11-07に山刀へ追加）が使える。設定を渡さない住民は従来と同じ姿勢のまま。`toolOverHead`（方向の一覧）は、その方向の攻撃中だけ道具を頭の板の上に描く（平らな頭の板が、顔の前を横切る3Dの道具を切ってめり込んで見えるのを防ぐ。体・腕・握る手との前後は保ち、頭の奥行きは道具の直後に書き戻す）。2026-11-07 時点で使うのはStudioの試作 `hero2`（右斜め前）だけ。第4～5章の道具（鉄のハンマー・山刀・鉄の剣）も同じファイルにあり、第1～3章側でも使える。
 - 両編の `rig.js` は同じ内容に保つ。Studioのテスト（`tests/node/game-targets.test.mjs`）が一致を確かめる。
 - Studioの `prototypes/shared/game-targets.mjs` に、各キャラクターの書き出し先のゲームを書く。Studioのテストは、書き出し先のゲームの画像（`assets/`）・原画（`art_src/`）・リグ設定（`src/content/rig-profiles/`）がStudioの出力と同じであることを確かめる。
 
