@@ -1,6 +1,8 @@
 import { path, ellipse, line, grad } from './svg.mjs';
 import { EYE_OPENINGS, eye, nose } from './face-parts.mjs';
 import { DIRECTIONS } from './sheet-format.mjs';
+import { WAIST_BELT, waistOutline, waistShade, waistBeltBand, waistBeltStitch } from './waist.mjs';
+export { WAIST_BELT };
 
 // 第4～5章の人型（ベルク・ロク・カヤ・ナギ・ヨモギ・スミ・テル）の共通部品。
 // 描画の土台（グラデーション・顔の部品・胴の外形・ベルト・左右反転・シート組み立て）だけを共有し、
@@ -211,6 +213,29 @@ export function belt(view, l, r, o = {}) {
     s += path(`M${c - w} ${top + 1} h${w * 2} v8 h${-w * 2}Z`, o.buckleFill ?? grad('gold'), o.buckleInk ?? 'var(--goldDark)', .85)
       + path(`M${c - w + 1.4} ${top + 3} h${w * 2 - 2.8} v4 h${2.8 - w * 2}Z`, leather, 'none')
       + line(`M${c} ${top + 2.5} v5`, o.buckleLight ?? 'var(--goldLight)', .8);
+  }
+  return s;
+}
+
+// 腰まで描く胴（2026-11-08。shared/waist.mjs）：肩の形は shell() と同じで、ベルトの位置で少し絞り、その下に
+// 上着の裾を今までの裾の高さまで描く。脇は腕の線の代わりに輪郭の内側の陰影。id は切り抜きの id。
+export function waistShell(id, view, widths, fill, stroke = 'var(--ink)', { shade = 'var(--clothDark)', pinch = 1, belt = WAIST_BELT, top = 78 } = {}) {
+  const w = widths[view], l = 63 - w, r = 63 + w;
+  const d = waistOutline(l, r, { top, crown: top - 6, inset: 5, bulge: 2, belt, pinch });
+  return { l, r, d, belt, pinch, s: path(d, fill, stroke, 1) + waistShade(id, d, l, r, view, { color: shade, belt }) };
+}
+// 帯・袴などで腰が描けている人物の、脇の陰影だけ（腕の線の代わり）。d は shell() の外形。
+export const sideShade = (id, view, d, l, r, color, belt = 100) => waistShade(id, d, l, r, view, { color, belt, skirt: false });
+
+// 腰のベルト（waistShell() と組で使う）。belt() と同じ革・縫い目・留め金で、高さ6・反り3。
+export function waistBelt(view, l, r, o = {}) {
+  const top = o.top ?? WAIST_BELT, a = l + (o.pinch ?? 1), b = r - (o.pinch ?? 1), leather = o.leather ?? 'var(--leather)';
+  let s = path(waistBeltBand(a, b, top), leather, o.ink ?? '#3a2a1a', .9) + line(waistBeltStitch(a, b, top), o.stitch ?? '#ab7c3e', .6);
+  if (view <= 2 && o.buckle !== false) {
+    const c = [63, 55, 48][view], w = view === 2 ? 2.4 : 4.6;
+    s += path(`M${c - w} ${top + .5} h${w * 2} v8 h${-w * 2}Z`, o.buckleFill ?? grad('gold'), o.buckleInk ?? 'var(--goldDark)', .85)
+      + path(`M${c - w + 1.4} ${top + 2.5} h${w * 2 - 2.8} v4 h${2.8 - w * 2}Z`, leather, 'none')
+      + line(`M${c} ${top + 2} v5`, o.buckleLight ?? 'var(--goldLight)', .8);
   }
   return s;
 }

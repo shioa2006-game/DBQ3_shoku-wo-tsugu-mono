@@ -30,11 +30,24 @@ function button(x,y,size=2.9) {
     + line(`M${x-.55} ${y-.5}L${x+.55} ${y+.5}`, 'var(--goldLight)', .65);
 }
 
+// Prototype 06 (2026-11-08): the belt sits at the waist (as on the hero) and the blouse's short skirt
+// shows below it down to the old hem, so the figure has hips when it is enlarged. The 3D arms hang at
+// the sides, so the torso draws no arm lines; the sides turn away with a soft shade instead. The hem,
+// the width and the neck are unchanged, so the rig settings and the game's leg joint stay as they were.
+const BELT=100;
 function torso(view) {
   const width=[24,22,17,22,24][view],l=63-width,r=63+width,c=view===0?63:view===1?53:49;
-  let s=path(`M${l+6} 76 Q63 71 ${r-6} 76 Q${r+1} 83 ${r} 101 L${r-1} 118 Q63 123 ${l+1} 118 L${l} 99 Q${l-1} 83 ${l+6} 76Z`,grad('cloth'));
-  s+=line(`M${l+7} 85 Q${l+4} 97 ${l+7} 110 M${r-7} 85 Q${r-4} 99 ${r-7} 110`,'var(--clothDark)',.9);
-  s+=line(`M${l+10} 93 Q${l+8} 103 ${l+11} 109`,'var(--clothLight)',.8);
+  // Blouse: chest, a waist taken in by the belt, and the skirt flaring a little to the old hem.
+  const body=`M${l+6} 76 Q63 71 ${r-6} 76 Q${r+1} 82 ${r} 92 Q${r-1} 97 ${r-2} ${BELT} L${r-2} ${BELT+6} Q${r} ${BELT+11} ${r+1} 118 Q63 123 ${l-1} 118 Q${l} ${BELT+11} ${l+2} ${BELT+6} L${l+2} ${BELT} Q${l+1} 97 ${l} 92 Q${l-1} 82 ${l+6} 76Z`;
+  let s=path(body,grad('cloth'));
+  // Sides turning away (the far side of the diagonal views is the darker one), and the skirt in the
+  // shadow of the belt.
+  const [near,far]=[[7,7],[4,10],[3,9],[4,10],[7,7]][view];
+  s+=`<defs><clipPath id="mina-body-${view}"><path d="${body}"/></clipPath></defs><g clip-path="url(#mina-body-${view})">`
+    +path(`M${l-3} 76 Q${l+near} 88 ${l+near-1} ${BELT} L${l+near-2} 124 L${l-3} 124Z`,'var(--clothDark)','none',0,'opacity=".4"')
+    +path(`M${r+3} 76 Q${r-far} 88 ${r-far+1} ${BELT} L${r-far+2} 124 L${r+3} 124Z`,'var(--clothDark)','none',0,'opacity=".4"')
+    +path(`M${l} ${BELT+6} Q63 ${BELT+9} ${r} ${BELT+6} L${r} ${BELT+9} Q63 ${BELT+12} ${l} ${BELT+9}Z`,'var(--clothDark)','none',0,'opacity=".25"')
+    +'</g>';
   if(view===0) {
     s+='<g transform="translate(0 -3)">';
     s+=path(`M${c-10} 72 Q${c} 70 ${c+12} 73 L${c+9} 81 Q${c} 86 ${c-8} 79Z`,grad('skin'),'none');
@@ -43,8 +56,8 @@ function torso(view) {
     s+=line(`M${c-10} 74 Q${c} 85 ${c+9} 74`,'var(--goldDark)',.7);
     s+=path(`M${c} 81 l2.4 2.6-2.4 3-2.4-3Z`,grad('gold'),'var(--goldDark)',.7);
     s+='</g>';
-    s+=line(`M${c} 88 V110`,'var(--clothDark)',.65);
-    s+=button(c,94)+button(c,105);
+    s+=line(`M${c} 85 V${BELT}`,'var(--clothDark)',.65);
+    s+=button(c,88.5,2.6)+button(c,95,2.6);
   } else if(view===1) {
     // The throat sits behind the chin; the collar opens diagonally toward the
     // front placket, with a small far leaf and a wider near leaf.
@@ -52,8 +65,8 @@ function torso(view) {
     s+=path('M76 68 Q69 72 59 76 C60 79 62 81 65 82 Q76 80 81 73Z',grad('ivory'));
     s+=line('M54 72 Q59 78 74 70','var(--goldDark)',.7);
     s+=path('M57 77 l2.1 2.4-2.5 2.7-2-2.6Z',grad('gold'),'var(--goldDark)',.7);
-    s+=line(`M${c} 88 V110`,'var(--clothDark)',.65);
-    s+=button(c,94)+button(c,105);
+    s+=line(`M${c} 85 V${BELT}`,'var(--clothDark)',.65);
+    s+=button(c,88.5,2.6)+button(c,95,2.6);
   } else if(view===2) {
     // Profile collar climbs toward the nape, instead of a horizontal ring.
     s+=path('M53 73 Q64 71 74 67 L78 72 Q70 79 59 82 Q55 82 53 78Z',grad('ivory'));
@@ -61,20 +74,23 @@ function torso(view) {
     s+=line('M55 76 Q65 73 73 69','var(--ivoryDark)',.65);
     s+=line('M53 76 Q53 80 49 83','var(--goldDark)',.75);
     s+=ellipse(49.5,84,1.4,2,grad('gold'),'var(--goldDark)',.6);
-    s+=button(48.5,94,1.8)+button(48.5,105,1.8);
-    s+=line('M63 85 Q69 93 65 108','var(--clothLight)',.85);
+    s+=button(48.5,88.5,1.7)+button(48.5,95,1.7);
   } else {
     s+=path('M43 75 Q63 69 84 75 L81 80 Q64 85 46 80Z',grad('ivory'));
     s+=line('M49 79 Q64 82 78 78','var(--ivoryDark)',.7);
-    s+=line('M63 84 Q62 98 64 110','var(--clothDark)',.85);
-    s+=line(`M${l+9} 104 Q63 109 ${r-9} 104`,'var(--clothLight)',.65);
+    s+=line(`M63 84 Q62 92 63 ${BELT}`,'var(--clothDark)',.85);
   }
-  s+=path(`M${l+1} 111 Q63 116 ${r-1} 111 L${r-1} 118 Q63 123 ${l+1} 118Z`,'var(--leather)');
-  s+=line(`M${l+2} 113 Q63 118 ${r-2} 113 M${l+2} 117 Q63 122 ${r-2} 117`,'var(--gold)',.65);
-  for(const x of [l+6,l+14,r-14,r-6]) s+=line(`M${x} 114 v4`,'var(--goldDark)',.7);
-  if(view<=1) s+=path(`M${c-4} 112 h8 v8 h-8Z`,grad('gold'),'var(--goldDark)',.8)
-    +path(`M${c-2.3} 114 h4.6 v4 h-4.6Z`,'var(--leather)','var(--goldDark)',.5)
-    +line(`M${c} 113.5 v5`,'var(--goldLight)',.8);
+  // The skirt below the belt: the front opening (or the back seam), two folds and the hem's stitching.
+  if(view!==2) s+=line(`M${view<=1?c:63} ${BELT+9} V120`,'var(--clothDark)',.65);
+  s+=line(view===2?`M66 ${BELT+9} Q67 114 69 119`:`M${l+9} ${BELT+9} Q${l+8} 114 ${l+6} 119 M${r-9} ${BELT+9} Q${r-8} 114 ${r-6} 119`,'var(--clothDark)',.6);
+  s+=line(`M${l} 116.5 Q63 121.5 ${r} 116.5`,'var(--clothLight)',.55);
+  // Belt: a little flatter than before, as it now goes round the waist instead of the bust's lower edge.
+  s+=path(`M${l+2} ${BELT} Q63 ${BELT+3} ${r-2} ${BELT} L${r-2} ${BELT+6} Q63 ${BELT+9} ${l+2} ${BELT+6}Z`,'var(--leather)');
+  s+=line(`M${l+3} ${BELT+1.6} Q63 ${BELT+4.6} ${r-3} ${BELT+1.6} M${l+3} ${BELT+4.6} Q63 ${BELT+7.6} ${r-3} ${BELT+4.6}`,'var(--gold)',.65);
+  for(const x of [l+7,l+15,r-15,r-7]) s+=line(`M${x} ${BELT+2} v3`,'var(--goldDark)',.7);
+  if(view<=1) s+=path(`M${c-4} ${BELT+.5} h8 v8 h-8Z`,grad('gold'),'var(--goldDark)',.8)
+    +path(`M${c-2.3} ${BELT+2.5} h4.6 v4 h-4.6Z`,'var(--leather)','var(--goldDark)',.5)
+    +line(`M${c} ${BELT+2} v5`,'var(--goldLight)',.8);
   return s;
 }
 

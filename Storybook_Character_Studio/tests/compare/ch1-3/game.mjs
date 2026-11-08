@@ -3,6 +3,9 @@
 import { createRequire } from 'node:module';
 
 export const gameRoot = new URL('../../../../dqb3-tsugumono-ch1-3/', import.meta.url);
+// 人型の比較ページはStudioの出力（prototypes/<名前>-8dir/output/）を表示するので、テストも同じ画像を検査する。
+// ゲームが同じ画像を使っていることは tests/node/game-targets.test.mjs が確かめる。
+export const studioOutput = id => new URL(`../../../prototypes/${id}-8dir/output/`, import.meta.url);
 // 比較ページのフォルダ。テストが撮るスクリーンショットもここへ保存する（Git管理しない）。
 export const pages = new URL('../../../compare/ch1-3/', import.meta.url);
 export const { PNG } = createRequire(new URL('package.json', gameRoot))('pngjs');

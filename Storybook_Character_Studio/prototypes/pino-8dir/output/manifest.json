@@ -2,7 +2,7 @@
   "id": "pino",
   "name": "ピノ",
   "role": "大工見習い",
-  "version": 1,
+  "version": 2,
   "status": "prototype",
   "source": "../character.mjs",
   "reference": "references/humanoids/village_apprentice_body_8dir.png",

@@ -1,6 +1,6 @@
 import { path, ellipse, line, grad } from '../shared/svg.mjs';
 import { DIRECTIONS, LABELS } from '../shared/sheet-format.mjs';
-import { definitions, clipped, face, shell, neck, compose, buildSheet } from '../shared/humanoid-kit.mjs';
+import { definitions, clipped, face, shell, neck, sideShade, compose, buildSheet } from '../shared/humanoid-kit.mjs';
 export { DIRECTIONS, LABELS };
 
 // Sumi: a motherly townswoman (no dedicated original art; shared Kaya's sheet before).
@@ -19,9 +19,10 @@ const DEFS = definitions(['hair', 'cloth', 'ivory', 'apron', 'sash', 'iris']);
 const LINE = '#8a5c3e';
 
 function torso(view) {
-  const { l, r, s: kimono } = shell(view, [25, 23, 17, 23, 25], grad('cloth'), '#1e2832');
-  let s = neck(view, { line: LINE }) + kimono;
-  s += line(`M${l + 5} 82 Q${l + 2} 92 ${l + 4} 100 M${r - 5} 82 Q${r - 2} 92 ${r - 4} 100`, 'var(--clothDark)', .9);
+  const { l, r, d, s: kimono } = shell(view, [25, 23, 17, 23, 25], grad('cloth'), '#1e2832');
+  let s = neck(view, { line: LINE }) + kimono
+    // The 3D arms hang at the sides, so the sides are shaded instead of drawn with arm lines (2026-11-08).
+    + sideShade(`sumi-body-${view}`, view, d, l, r, 'var(--clothDark)');
   if (view === 0) {
     s += path('M50 73 L55 72 L65.5 87 L63 91Z', grad('ivory'), 'var(--ivoryDark)', .8)
       + path('M76 73 L71 72 L60.5 87 L63 91Z', grad('ivory'), 'var(--ivoryDark)', .8)

@@ -1,4 +1,5 @@
 import { path, ellipse, line, grad } from '../shared/svg.mjs';
+import { WAIST_BELT, waistOutline, waistShade, waistBeltBand, waistBeltStitch } from '../shared/waist.mjs';
 import { EYE_OPENINGS, eye, nose } from '../shared/face-parts.mjs';
 import { DIRECTIONS, LABELS } from '../shared/sheet-format.mjs';
 export { DIRECTIONS, LABELS };
@@ -41,15 +42,19 @@ function neckcloth(view){
     +line('M-12 0 L-4 3 M4 2 L11-1 M-5 9 L-6 12 M5 8 L8 12','#ff9860',.8)
     +path('M-3-2 Q0-4 3-1 L3 5 Q0 7-3 5Z',grad('red'),'#64281c',.8)+'</g>';
 }
+// Prototype 02 (2026-11-08): the belt sits at the waist; below it the vest's skirt shows down to the old hem, with
+// the cream shirt still showing between its fronts (shared/waist.mjs). No apron (decided 2026-11-08). The 3D
+// arms hang at the sides, so the torso draws no arm or side lines; the sides are shaded.
 function torso(view){
-  const width=[23,21,16,21,23][view],l=63-width,r=63+width;
+  const width=[23,21,16,21,23][view],l=63-width,r=63+width,B=WAIST_BELT;
   const neck=[
     'M55 65 H71 L74 77 Q63 83 52 77Z',
     'M60 65 L73 62 L75 75 L55 81 L51 76Z',
     'M61 64 L71 62 L74 73 L56 80 L52 75Z',
   ][view]??'M53 64 H74 L77 78 Q63 82 50 78Z';
-  let s=path(neck,grad('skin'),'#765036',.8)
-    +path(`M${l+4} 77 Q63 73 ${r-4} 77 Q${r+1} 87 ${r} 99 L${r-1} 118 Q63 123 ${l+1} 118 L${l} 99 Q${l-1} 86 ${l+4} 77Z`,grad('cloth'));
+  const body=waistOutline(l,r,{top:77,crown:73,inset:4,bulge:1,pinch:2});
+  let s=path(neck,grad('skin'),'#765036',.8)+path(body,grad('cloth'))
+    +waistShade(`inaho-body-${view}`,body,l,r,view,{color:'var(--clothDark)'});
   // Ivory shoulder tabs belong to the garment, and overlap the 3D sleeves.
   if(view<=1){
     s+=path(`M${r-8} 78 Q${r+2} 77 ${r} 89 L${r-5} 93 L${r-8} 85Z`,grad('cream'),'#84643d',.8);
@@ -58,16 +63,20 @@ function torso(view){
   const c=[63,55,49][view];
   if(view<=2){
     const w=view===2?4:9;
-    s+=path(`M${c-w} 80 Q${c} 83 ${c+w} 80 L${c+w-1} 111 Q${c} 114 ${c-w+1} 111Z`,grad('cream'),'#aa7732',.8)
-      +line(`M${c+2} 88 V111`,'#c4a476',.6);
-    for(const y of [94,104])s+=button(c+2,y,view===2?1.1:1.7);
-    s+=line(`M${l+4} 97 L${l+5} 109 M${r-4} 97 L${r-5} 109`,'var(--clothDark)',.8);
-  }else s+=line('M63 83 Q61 96 64 110 M47 102 Q63 108 79 102','var(--clothDark)',.8);
+    // The shirt between the vest's fronts, above and below the belt.
+    s+=path(`M${c-w} 80 Q${c} 83 ${c+w} 80 L${c+w-1} ${B+1} Q${c} ${B+4} ${c-w+1} ${B+1}Z`,grad('cream'),'#aa7732',.8)
+      +path(`M${c-w+1} ${B+5} L${c+w-1} ${B+5} L${c+w-.5} 119 Q${c} 121 ${c-w+.5} 119Z`,grad('cream'),'#aa7732',.8)
+      +line(`M${c+2} 88 V${B} M${c+2} ${B+7} V119.5`,'#c4a476',.6);
+    for(const y of [96,112])s+=button(c+2,y,view===2?1.1:1.7);
+  }else s+=line(`M63 83 Q61 92 63 ${B} M63 ${B+9} V120`,'var(--clothDark)',.8);
   s+=neckcloth(view);
-  s+=path(`M${l+1} 111 Q63 116 ${r-1} 111 L${r-1} 118 Q63 122 ${l+1} 118Z`,'var(--leather)')
-    +line(`M${l+3} 113 Q63 118 ${r-3} 113`,'var(--gold)',.8);
-  if(view<=2)s+=path(`M${c-3.5} 113 h7 v6 h-7Z`,grad('gold'),'var(--goldDark)',.8)
-    +path(`M${c-1.8} 114.5 h3.6 v3 h-3.6Z`,'var(--leather)','none')+line(`M${c} 114 v4`,'var(--goldLight)',.7);
+  // Two folds and the hem's stitching.
+  s+=line(view===2?`M66 ${B+9} Q67 114 69 119`:`M${l+8} ${B+9} Q${l+7} 114 ${l+5} 119 M${r-8} ${B+9} Q${r-7} 114 ${r-5} 119`,'var(--clothDark)',.6)
+    +line(`M${l} 116.5 Q63 121.5 ${r} 116.5`,'var(--clothLight)',.55)
+    +path(waistBeltBand(l+2,r-2,B),'var(--leather)')
+    +line(`M${l+3} ${B+2} Q63 ${B+5} ${r-3} ${B+2}`,'var(--gold)',.8);
+  if(view<=2)s+=path(`M${c-3.5} ${B+.5} h7 v7 h-7Z`,grad('gold'),'var(--goldDark)',.8)
+    +path(`M${c-1.8} ${B+2.5} h3.6 v3 h-3.6Z`,'var(--leather)','none')+line(`M${c} ${B+2} v4`,'var(--goldLight)',.7);
   return s;
 }
 const HAIR=[

@@ -2,7 +2,7 @@
   "id": "yomogi",
   "name": "ヨモギ",
   "role": "HERBALIST",
-  "version": 1,
+  "version": 2,
   "status": "prototype",
   "source": "../character.mjs",
   "reference": "references/humanoids/herbalist_body_8dir.png",

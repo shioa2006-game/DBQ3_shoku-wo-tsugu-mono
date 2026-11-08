@@ -2,7 +2,7 @@
   "id": "belk",
   "name": "ベルク",
   "role": "BLACKSMITH",
-  "version": 1,
+  "version": 2,
   "status": "prototype",
   "source": "../character.mjs",
   "reference": "references/humanoids/blacksmith_body_8dir.png",

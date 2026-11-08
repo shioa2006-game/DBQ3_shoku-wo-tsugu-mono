@@ -66,13 +66,13 @@ try {
     <rect width="1200" height="920" rx="24" fill="#eee9df"/>
     <text x="48" y="55" font-family="sans-serif" font-size="27" font-weight="700" fill="#203344">GONTA / VILLAGE YOUNG MAN / 8 DIRECTIONS</text>
     <text x="48" y="86" font-family="sans-serif" font-size="16" fill="#60717b">Swept brown hair · strong brows · cream collar · forest green tunic</text>
-    ${[reference,normalized].map((bytes,i)=>`<g transform="translate(${40+i*570} 112)"><rect width="550" height="322" rx="16" fill="#d8e1df"/><text x="24" y="33" font-family="sans-serif" font-size="18" fill="#203344">${i?'CODE / PROTOTYPE 01':'REFERENCE / VILLAGER'}</text><image href="${uri(bytes)}" x="19" y="50" width="512" height="256"/></g>`).join('')}
+    ${[reference,normalized].map((bytes,i)=>`<g transform="translate(${40+i*570} 112)"><rect width="550" height="322" rx="16" fill="#d8e1df"/><text x="24" y="33" font-family="sans-serif" font-size="18" fill="#203344">${i?'CODE / PROTOTYPE 02':'REFERENCE / VILLAGER'}</text><image href="${uri(bytes)}" x="19" y="50" width="512" height="256"/></g>`).join('')}
     <text x="48" y="478" font-family="sans-serif" font-size="18" fill="#203344">GENERATED / ENLARGED</text>
     <image href="${uri(normalized)}" x="200" y="502" width="800" height="400"/>
     </svg>`;
   await writeFile(here('output/comparison.png'),await rasterize(board));
   await writeFile(here('output/manifest.json'),JSON.stringify({
-    id:'gonta',name:'ゴンタ',role:'村の若者',version:1,status:'prototype',
+    id:'gonta',name:'ゴンタ',role:'村の若者',version:2,status:'prototype',
     source:'../character.mjs',reference:'references/humanoids/adult_male_villager_body_8dir.png',
     format:'game-humanoid-bust',cellSize:128,columns:4,rows:2,directions:DIRECTIONS,labels:LABELS,
     anchor:{centerU:.494,bottomFromTop:.945},normalization:report,

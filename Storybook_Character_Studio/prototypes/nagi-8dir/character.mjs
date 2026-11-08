@@ -1,6 +1,6 @@
 import { path, ellipse, line, grad } from '../shared/svg.mjs';
 import { DIRECTIONS, LABELS } from '../shared/sheet-format.mjs';
-import { definitions, clipped, face, shell, neck, compose, buildSheet } from '../shared/humanoid-kit.mjs';
+import { definitions, clipped, face, shell, neck, sideShade, compose, buildSheet } from '../shared/humanoid-kit.mjs';
 export { DIRECTIONS, LABELS };
 
 // Nagi: keeper of the bamboo-grove shrine, drawn as a shrine maiden. Long black hair
@@ -17,11 +17,11 @@ const DEFS = definitions(['hair', 'robe', 'red', 'iris']);
 const LINE = '#94644a';
 
 function torso(view) {
-  const { l, r, s: robe } = shell(view, [25, 23, 17, 23, 25], grad('robe'), '#8a8270');
+  const { l, r, d, s: robe } = shell(view, [25, 23, 17, 23, 25], grad('robe'), '#8a8270');
   // Three-quarter: a slimmer neck set under the chin, so it does not look long beside the collar.
-  let s = (view === 1 ? path('M53 64 L66 62 L68 74 Q60 79 51 75Z', grad('skin'), LINE, .8) : neck(view, { line: LINE })) + robe;
-  // Soft folds of the white robe.
-  s += line(`M${l + 5} 82 Q${l + 2} 92 ${l + 4} 100 M${r - 5} 82 Q${r - 2} 92 ${r - 4} 100`, 'var(--robeDark)', .9);
+  let s = (view === 1 ? path('M53 64 L66 62 L68 74 Q60 79 51 75Z', grad('skin'), LINE, .8) : neck(view, { line: LINE })) + robe
+    // The 3D arms hang at the sides, so the sides are shaded instead of drawn with arm lines (2026-11-08).
+    + sideShade(`nagi-body-${view}`, view, d, l, r, 'var(--robeDark)');
   if (view === 0) {
     s += path('M51 73 L56 72 L65 87 L63 91Z', grad('robe'), 'var(--robeDark)', .8)
       + path('M75 73 L70 72 L61 87 L63 91Z', grad('robe'), 'var(--robeDark)', .8)

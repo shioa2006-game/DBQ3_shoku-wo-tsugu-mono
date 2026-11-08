@@ -4,12 +4,12 @@ import assert from 'node:assert/strict';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { gameRoot, pages, pageUrl, PNG, launchBrowser } from './game.mjs';
+import { studioOutput, pages, pageUrl, PNG, launchBrowser } from './game.mjs';
 
 export async function checkHumanoidPrototype({character,asset,verifyPose}) {
-const root=gameRoot;
-const png=PNG.sync.read(await readFile(new URL(`assets/humanoids/${asset}_body_8dir.png`,root)));
-const raw=PNG.sync.read(await readFile(new URL(`art_src/${asset}_body_8dir.src.png`,root)));
+const root=studioOutput(character);
+const png=PNG.sync.read(await readFile(new URL(`${asset}_body_8dir.png`,root)));
+const raw=PNG.sync.read(await readFile(new URL(`${asset}_body_8dir.src.png`,root)));
 assert.equal(png.width,512);assert.equal(png.height,256);
 const solidCount=p=>{let n=0;for(let i=3;i<p.data.length;i+=4)if(p.data[i]>24)n++;return n;};
 assert.equal(solidCount(png),solidCount(raw),'Normalization must not clip artwork');
@@ -109,6 +109,29 @@ try{
   },views);
   await writeFile(new URL(`${character}/${name}-comparison.png`,pages),Buffer.from(profiles,'base64'));
   }
+  // 8 directions at once (with limbs): one rig per direction, following the page's action and tool,
+  // showing the Studio output, and switching to the reference image.
+  await page.click('#grid-bar [data-action="walk"]');
+  assert.equal(await page.evaluate(()=>window.__heroPreview.state.action),'walk','grid buttons switch the action');
+  assert.deepEqual(await page.$$eval('[data-action="walk"]',bs=>bs.map(b=>b.getAttribute('aria-pressed'))),['true','true'],'both button rows show the action');
+  await page.selectOption('#grid-tool','hammer_wood');
+  assert.equal(await page.$eval('#tool',s=>s.value),'hammer_wood','grid tool follows the page tool');
+  for(const [action,time,tool,file] of [['idle',0,'','rig-grid-idle.png'],['walk',.35,'','rig-grid-walk.png'],['attack',0,'hammer_wood','rig-grid-attack.png']]){
+    const {url,grid}=await page.evaluate(({action,time,tool})=>{
+      const h=window.__heroPreview;h.state.paused=true;h.setState({action,tool,auto:false});h.pose(time);
+      return {url:h.grid.renderer.domElement.toDataURL('image/png'),grid:h.grid.snapshot()};
+    },{action,time,tool});
+    assert.deepEqual(grid.directions,directions,`grid shows the 8 directions (${action})`);
+    assert.equal(grid.side,'generated');
+    assert.deepEqual(grid.tools,directions.map(()=>tool||null),`grid tools (${action})`);
+    await writeFile(new URL(`${character}/${file}`,pages),Buffer.from(url.split(',')[1],'base64'));
+  }
+  const gridSheet=await page.evaluate(()=>window.__heroPreview.grid.sets.generated[0].bodyTexture.image.src);
+  assert.ok(gridSheet.includes(`/prototypes/${character}-8dir/output/`),`grid shows the Studio output (${gridSheet})`);
+  await page.click('[data-grid-side="original"]');
+  assert.equal(await page.evaluate(()=>window.__heroPreview.grid.side),'original','grid switches to the reference image');
+  await page.click('[data-grid-side="generated"]');
+  console.log('PASS: 8 directions at once from the Studio output; actions and tools follow the page; reference side');
   await page.setViewportSize({width:390,height:844});
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'No mobile horizontal overflow');
   assert.deepEqual(errors,[],'No runtime or texture loading errors');

@@ -2,7 +2,7 @@
   "id": "jinbei",
   "name": "ジンベエ",
   "role": "村の長老",
-  "version": 1,
+  "version": 2,
   "status": "prototype",
   "source": "../character.mjs",
   "reference": "references/humanoids/middle_aged_male_villager_body_8dir.png",

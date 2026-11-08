@@ -2,7 +2,7 @@
   "id": "mina",
   "name": "ミナ",
   "role": "農家の少女",
-  "version": 5,
+  "version": 6,
   "status": "prototype",
   "source": "../character.mjs",
   "reference": "references/humanoids/village_girl_body_8dir.png",

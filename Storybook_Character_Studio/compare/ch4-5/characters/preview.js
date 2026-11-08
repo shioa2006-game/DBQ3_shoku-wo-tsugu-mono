@@ -15,35 +15,35 @@ import { HERO2_V02_RIG_PROFILE } from '../../../prototypes/hero2-8dir/v02/rig-pr
 
 const asset = file => new URL(`../../../games/ch4-5/assets/humanoids/${file}`, import.meta.url).href;
 const reference = file => new URL(`../../../references/humanoids/${file}`, import.meta.url).href;
-// Studio-only designs are read from their Studio output (not exported to the game yet).
+// The code-drawn designs are read from their Studio output, so a change shows here before it is exported to
+// the game (tests/node/game-targets.test.mjs checks the game uses the same files).
 const studio = id => { const out = file => new URL(`../../../prototypes/${id}-8dir/output/${file}`, import.meta.url).href;
   return { generated: out(`${id}_code_body_8dir.png`), head: out(`${id}_code_head_layer_8dir.png`), torso: out(`${id}_code_torso_layer_8dir.png`) }; };
 // A saved earlier prototype (head/torso layers kept in prototypes/<id>-8dir/<version>/).
 const saved = (id, version) => { const out = file => new URL(`../../../prototypes/${id}-8dir/${version}/${file}`, import.meta.url).href;
   return { original: out(`${id}_code_body_8dir.png`), originalHead: out(`${id}_code_head_layer_8dir.png`), originalTorso: out(`${id}_code_torso_layer_8dir.png`) }; };
-const code = id => ({ generated: asset(`${id}_code_body_8dir.png`), head: asset(`${id}_code_head_layer_8dir.png`), torso: asset(`${id}_code_torso_layer_8dir.png`) });
 const profiles = {
-  belk: { name: 'ベルク', title: '鍛冶職人', original: reference('blacksmith_body_8dir.png'), ...code('belk'), tuning: BELK_RIG_PROFILE,
+  belk: { name: 'ベルク', title: '鍛冶職人', original: reference('blacksmith_body_8dir.png'), ...studio('belk'), tuning: BELK_RIG_PROFILE,
     note: 'くせのある茶髪、短いあごひげ、えんじの立ち襟、使い込んだ革の胴着と鉄の留め金。',
     colors: { sleeve: 0x6b3a26, hand: 0xc98f66, pants: 0x4a4440, boot: 0x2e2a26, headBack: 0x3a332e, bodyBack: 0x54301f } },
-  roku: { name: 'ロク', title: '鉱夫兼炭焼き', original: reference('miner_body_8dir.png'), ...code('roku'), tuning: ROKU_RIG_PROFILE,
+  roku: { name: 'ロク', title: '鉱夫兼炭焼き', original: reference('miner_body_8dir.png'), ...studio('roku'), tuning: ROKU_RIG_PROFILE,
     note: '逆立つ黒髪、無精ひげと小さなあごひげ、黒い立ち襟のシャツに錆色の縁取りの革ベスト。',
     colors: { sleeve: 0x5c5a52, hand: 0xd0a074, pants: 0x4f4436, boot: 0x332b20, headBack: 0x44403a, bodyBack: 0x4a483f } },
-  kaya: { name: 'カヤ', title: '町へ帰る住民', original: reference('volcano_villager_body_8dir.png'), ...code('kaya'), tuning: KAYA_RIG_PROFILE,
+  kaya: { name: 'カヤ', title: '町へ帰る住民', original: reference('volcano_villager_body_8dir.png'), ...studio('kaya'), tuning: KAYA_RIG_PROFILE,
     note: '真ん中分けの茶髪と低いまとめ髪、からし色の上着に青い着物、生成りの襟と帯の結び目。',
     colors: { sleeve: 0x8a4a3a, hand: 0xeec39a, pants: 0x6b5233, boot: 0x4a3320, headBack: 0x3c2c22, bodyBack: 0x6e392c },
     generatedColors: { sleeve: 0x4d6d98, headBack: 0x3e2618, bodyBack: 0xa7782a } },
-  nagi: { name: 'ナギ', title: '竹林の社守り', original: reference('shrine_keeper_body_8dir.png'), ...code('nagi'), tuning: NAGI_RIG_PROFILE,
+  nagi: { name: 'ナギ', title: '竹林の社守り', original: reference('shrine_keeper_body_8dir.png'), ...studio('nagi'), tuning: NAGI_RIG_PROFILE,
     note: '巫女として描き直し。長い黒髪と切りそろえた前髪、白衣に赤い半襟、赤い袴。元画像は水色の着物で、台詞・手足の色と合っていなかった。',
     colors: { sleeve: 0xf2ecdc, hand: 0xeec39a, pants: 0xa03024, boot: 0x3a2f26, headBack: 0x2b2b33, bodyBack: 0xd8d2c2 } },
-  yomogi: { name: 'ヨモギ', title: '薬草の知恵を持つ住民', original: reference('herbalist_body_8dir.png'), ...code('yomogi'), tuning: YOMOGI_RIG_PROFILE,
+  yomogi: { name: 'ヨモギ', title: '薬草の知恵を持つ住民', original: reference('herbalist_body_8dir.png'), ...studio('yomogi'), tuning: YOMOGI_RIG_PROFILE,
     note: '銀髪のまとめ髪、葉の刺繍の緑の頭巾、丸い眼鏡、生成りのベストに緑の立ち襟。',
     colors: { sleeve: 0x6a7a4a, hand: 0xd8b08a, pants: 0x57503f, boot: 0x3a2f26, headBack: 0x5a6a42, bodyBack: 0xcfc4a4 } },
-  sumi: { name: 'スミ', title: '鉱山町の住民', original: reference('volcano_villager_body_8dir.png'), ...code('sumi'), tuning: SUMI_RIG_PROFILE,
+  sumi: { name: 'スミ', title: '鉱山町の住民', original: reference('volcano_villager_body_8dir.png'), ...studio('sumi'), tuning: SUMI_RIG_PROFILE,
     note: '新しくデザイン（元はカヤと同じ画像）。白髪まじりの髪を上でまとめて櫛を挿し、青鼠の着物に藍の帯と前掛け。',
     colors: { sleeve: 0x4a5a6b, hand: 0xd8b08a, pants: 0x57503f, boot: 0x3a2f26, headBack: 0x3c2c22, bodyBack: 0x3c4a58 },
     generatedColors: { sleeve: 0x4b5c6e, headBack: 0x3c2e26 } },
-  teru: { name: 'テル', title: '鉱山町の住民', original: reference('volcano_villager_body_8dir.png'), ...code('teru'), tuning: TERU_RIG_PROFILE,
+  teru: { name: 'テル', title: '鉱山町の住民', original: reference('volcano_villager_body_8dir.png'), ...studio('teru'), tuning: TERU_RIG_PROFILE,
     note: '新しくデザイン（元はカヤと同じ画像）。炭焼き小屋に隠れていた娘。茶色のおかっぱに錆色の鉢巻き、そばかすと煤、オリーブの作業着。',
     colors: { sleeve: 0x6b6b3a, hand: 0xeec39a, pants: 0x4f4436, boot: 0x332b20, headBack: 0x3c2c22, bodyBack: 0x565626 },
     generatedColors: { headBack: 0x3c2618 } },

@@ -2,7 +2,7 @@
   "id": "watari",
   "name": "ワタリ",
   "role": "船乗り",
-  "version": 1,
+  "version": 2,
   "status": "prototype",
   "source": "../character.mjs",
   "reference": "references/humanoids/sailor_body_8dir.png",

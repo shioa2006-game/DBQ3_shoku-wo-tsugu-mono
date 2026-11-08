@@ -26,7 +26,7 @@
 
 12種とも本編へ移植済みです。本編は `_code_` 画像を直接読み、住民6人は頭・胴の分離画像、主人公を含む7人は `src/content/rig-profiles/` の設定を使用します。旧画像はゲームから外し、比較用としてStudioの `references/` に残しています。`shared/` は目・鼻・SVG部品・方向順の共通処理です。主人公の共用化では生成SVGが変更前と完全一致することを確認しています。
 
-Studioの `compare/ch1-3/` の各ページは実際のリグとの比較用です。Studioのサーバーで [主人公](../compare/ch1-3/adventurer/)／[ミナ](../compare/ch1-3/mina/)／[ピノ](../compare/ch1-3/pino/)／[イナホ](../compare/ch1-3/inaho/)／[ゴンタ](../compare/ch1-3/gonta/)／[ジンベエ](../compare/ch1-3/jinbei/)／[ワタリ](../compare/ch1-3/watari/) から確認できます。
+Studioの `compare/ch1-3/` の各ページは実際のリグとの比較用です。Studioのサーバーで [主人公](../compare/ch1-3/adventurer/)／[ミナ](../compare/ch1-3/mina/)／[ピノ](../compare/ch1-3/pino/)／[イナホ](../compare/ch1-3/inaho/)／[ゴンタ](../compare/ch1-3/gonta/)／[ジンベエ](../compare/ch1-3/jinbei/)／[ワタリ](../compare/ch1-3/watari/) から確認できます。各ページはStudioの出力を表示し、8方向を手足つきで同時に見る欄があります。
 
 ## 移植後も揃えて更新するもの
 

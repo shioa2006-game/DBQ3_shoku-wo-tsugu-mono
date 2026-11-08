@@ -1,10 +1,18 @@
-# ベルクの8方向コード生成・試作01
+# ベルクの8方向コード生成・試作02
 
 第4～5章の「ベルク」（鍛冶職人、NPC ID `belk`）を、第4～5章で使っていた `references/humanoids/blacksmith_body_8dir.png` を参照して制作しました。くせのある茶髪、短いあごひげ、えんじの立ち襟、革の胴着。
 
 町一番の鍛冶職人。髪は毛先の細かい輪郭と短い毛束で描き、あごひげ・口ひげは頭、立ち襟は胴に置きます。元画像に合わせて頭全体をあごを基準に少し大きくしています。
 
 [制作ガイド](../../docs/CHARACTER_AUTHORING.md)の頭・胴の分離と出力方式に従います。第4～5章の新しい人型に共通する描画の土台（顔の部品、胴の外形、ベルト、ぼさぼさ髪の輪郭、左右反転）は `../shared/humanoid-kit.mjs`、書き出しは `../shared/humanoid-export.mjs` にあります。
+
+## 試作02（2026-11-08）
+
+ムービーで拡大したときに腰から下がなく見えることと、胴に描いた腕の線が3Dの腕と重なることを直しました（ミナの試作06と同じ直し方。共通部品は `../shared/waist.mjs`）。
+
+- ベルトを腰の位置（セルの100px付近。主人公と同じ高さ）へ上げ、その下に革の胴着の裾を描きました。ベルトの下の前の合わせに鉄のボタンを2つ付けました。前掛けは付けません（2026-11-08に決定）。袖ぐりの縁取りは、腕の線に見えないよう脇の下までにしました。共通部品の `waistShell()`・`waistBelt()`（`../shared/humanoid-kit.mjs`）を使います。
+- 胴の脇の腕のような線を消し、脇は輪郭の内側の陰影で丸みを出します。腕は3Dで付きます。
+- 胴の下端（裾）・幅・首・襟は変えていないので、リグの設定とゲームの脚の付け根は今までどおりです。
 
 ## 原本と出力
 
@@ -24,4 +32,4 @@ npm.cmd run export:belk -- --preview-game
 npm.cmd test
 ```
 
-`--preview-game` は第4～5章の `assets/humanoids/belk_code_*.png`、`art_src/belk_code_*.src.png`、`src/content/rig-profiles/belk.mjs` を更新します。本編の住民の設定（`src/entities/villagers.js`）は変えません。3Dリグでの比較は、第4～5章の開発サーバーで `prototypes/characters/?c=belk` を開きます。
+`--preview-game` は第4～5章の `assets/humanoids/belk_code_*.png`、`art_src/belk_code_*.src.png`、`src/content/rig-profiles/belk.mjs` を更新します。本編の住民の設定（`src/entities/villagers.js`）は変えません。3Dリグでの比較は、Studioのサーバーで `compare/ch4-5/characters/?c=belk` を開きます（Studioの出力を表示するので、ゲームへ移す前の変更も見られます）。

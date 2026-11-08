@@ -2,7 +2,7 @@
   "id": "inaho",
   "name": "イナホ",
   "role": "料理見習い",
-  "version": 1,
+  "version": 2,
   "status": "prototype",
   "source": "../character.mjs",
   "reference": "references/humanoids/cook_body_8dir.png",

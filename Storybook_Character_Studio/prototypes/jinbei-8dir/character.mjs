@@ -1,4 +1,5 @@
 import { path, ellipse, line, grad } from '../shared/svg.mjs';
+import { WAIST_BELT, waistOutline, waistShade, waistBeltBand, waistBeltStitch } from '../shared/waist.mjs';
 import { EYE_OPENINGS, eye, nose } from '../shared/face-parts.mjs';
 import { DIRECTIONS, LABELS } from '../shared/sheet-format.mjs';
 export { DIRECTIONS, LABELS };
@@ -23,46 +24,54 @@ function button(x,y,rx=3.4){
     +ellipse(x,y,rx*.56,1.9,'var(--leather)','var(--goldLight)',.65)
     +line(`M${x-.5} ${y-.6} l1 1.2`,'var(--goldLight)',.7);
 }
+// Prototype 02 (2026-11-08): the belt sits at the waist, a little higher than on the young ones, and the long
+// tunic shows below it down to the old hem (shared/waist.mjs). The 3D arms hang at the sides, so the torso
+// draws no arm lines; the sides are shaded.
 function torso(view){
-  const width=[27,26,22,26,27][view],l=63-width,r=63+width;
+  const width=[27,26,22,26,27][view],l=63-width,r=63+width,B=WAIST_BELT-2;
   const neck=[
     'M53 63 H73 L77 79 Q64 89 50 78Z',
     'M60 64 L75 61 L78 75 L58 86 L50 77Z',
     'M61 64 L73 61 L76 73 Q65 81 55 84 L51 77Z',
   ][view]??'M52 63 H75 L79 79 Q63 85 48 78Z';
-  let s=path(neck,grad('skin'),'#755135',.85)
-    +path(`M${l+5} 78 Q63 72 ${r-5} 78 Q${r+2} 84 ${r} 99 L${r-1} 118 Q63 123 ${l+1} 118 L${l} 99 Q${l-2} 85 ${l+5} 78Z`,grad('cloth'));
+  const body=waistOutline(l,r,{top:78,crown:72,inset:5,bulge:2,belt:B,pinch:1});
+  let s=path(neck,grad('skin'),'#755135',.85)+path(body,grad('cloth'))
+    +waistShade(`jinbei-body-${view}`,body,l,r,view,{color:'var(--clothDark)',belt:B});
   // Folded cream collar is owned solely by the torso, including its neck.
   if(view===0){
     s+=path('M51 72 L63 80 L75 72 L80 77 L70 88 L64 83 L58 89 L47 77Z',grad('ivory'),'#695332',.9)
       +path('M54 75 L63 81 L72 75 L66 85 L63 88 L60 84Z',grad('skin'),'#927044',.6)
       +line('M51 75 L58 85 L62 82 M75 75 L70 84 L65 82','var(--ivoryDark)',.8)
-      +line('M63 94 V112','var(--clothDark)',1)+button(63,98)+button(63,108);
+      +line(`M63 88 V${B}`,'var(--clothDark)',1)+button(63,93,2.5);
   }else if(view===1){
     s+=path('M50 73 L58 79 L74 70 L80 75 L64 87 L58 82 L53 89 L46 77Z',grad('ivory'),'#695332',.9)
       +path('M54 76 L59 79 L71 73 L60 85 L57 87Z',grad('skin'),'#927044',.6)
       +line('M50 76 L53 85 L57 81 M75 74 L64 84 L60 81','var(--ivoryDark)',.8)
-      +line('M56 94 V112','var(--clothDark)',1)+button(56,98,3)+button(56,108,3);
+      +line(`M56 88 V${B}`,'var(--clothDark)',1)+button(56,93,2.5);
   }else if(view===2){
     s+=path('M50 76 Q61 75 74 69 L78 74 Q63 81 55 86 L52 89 L48 85 L47 80Z',grad('ivory'),'#695332',.85)
       +line('M53 79 Q63 77 74 72 M50 82 L51 90','var(--ivoryDark)',.8)
-      +button(49,98,1.8)+button(49,108,1.8);
+      +button(49,93,1.7);
   }else{
     s+=path('M45 74 Q63 69 82 74 L80 80 Q64 84 47 80Z',grad('ivory'),'#695332',.85)
       +line('M49 77 Q63 81 78 77','var(--ivoryDark)',.75)
-      +line('M63 83 Q61 97 64 110','var(--clothDark)',.8)
-      +line('M48 102 Q62 107 78 103','var(--clothLight)',.7);
+      +line(`M63 83 Q61 91 63 ${B}`,'var(--clothDark)',.8);
   }
-  s+=line(`M${l+6} 84 Q${l+1} 94 ${l+6} 105 M${r-6} 83 Q${r-1} 94 ${r-6} 105`,'var(--clothDark)',1)
-    +line(`M${l+8} 90 Q${l+5} 97 ${l+8} 103 M${r-8} 91 Q${r-5} 97 ${r-8} 102`,'var(--clothLight)',.65)
-    +path(`M${l+1} 111 Q63 116 ${r-1} 111 L${r-1} 118 Q63 123 ${l+1} 118Z`,'var(--leather)')
-    +line(`M${l+2} 113 Q63 118 ${r-2} 113 M${l+2} 117 Q63 122 ${r-2} 117`,'#ab7c3e',.7);
-  for(const x of [l+7,l+15,r-15,r-7])s+=line(`M${x} 115 v4`,'#362a19',.8);
+  // The long tunic below the belt: the front opening with two more buttons (the back seam), two folds and
+  // the hem's stitching.
+  const c=[63,56,49,63,63][view];
+  if(view!==2)s+=line(`M${c} ${B+9} V120`,'var(--clothDark)',1);
+  if(view<=2)for(const y of [110,116])s+=button(c,y,view===2?1.6:2.4);
+  s+=line(view===2?`M66 ${B+9} Q67 113 69 119`:`M${l+10} ${B+9} Q${l+9} 113 ${l+7} 119 M${r-10} ${B+9} Q${r-9} 113 ${r-7} 119`,'var(--clothDark)',.6)
+    +line(`M${l} 116.5 Q63 121.5 ${r} 116.5`,'var(--clothLight)',.55)
+    +path(waistBeltBand(l+1,r-1,B),'var(--leather)')
+    +line(waistBeltStitch(l+1,r-1,B),'#ab7c3e',.7);
+  for(const x of [l+7,l+15,r-15,r-7])s+=line(`M${x} ${B+2} v3`,'#362a19',.8);
   if(view<=2){
-    const c=[63,56,49][view],w=view===2?2.5:4.5;
-    s+=path(`M${c-w} 112 h${w*2} v8 h${-w*2}Z`,grad('gold'),'var(--goldDark)',.85)
-      +path(`M${c-w+1.4} 114 h${w*2-2.8} v4 h${2.8-w*2}Z`,'var(--leather)','none')
-      +line(`M${c} 113.5 v5`,'var(--goldLight)',.8);
+    const w=view===2?2.5:4.5;
+    s+=path(`M${c-w} ${B+.5} h${w*2} v8 h${-w*2}Z`,grad('gold'),'var(--goldDark)',.85)
+      +path(`M${c-w+1.4} ${B+2.5} h${w*2-2.8} v4 h${2.8-w*2}Z`,'var(--leather)','none')
+      +line(`M${c} ${B+2} v5`,'var(--goldLight)',.8);
   }
   return s;
 }

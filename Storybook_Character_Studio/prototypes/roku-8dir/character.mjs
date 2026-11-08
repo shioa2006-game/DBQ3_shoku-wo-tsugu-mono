@@ -1,6 +1,6 @@
 import { path, ellipse, line, grad } from '../shared/svg.mjs';
 import { DIRECTIONS, LABELS } from '../shared/sheet-format.mjs';
-import { definitions, clipped, noise, poly, spikyArc, spikyLine, tufts, scaleAt, face, shell, neck, belt, compose, buildSheet } from '../shared/humanoid-kit.mjs';
+import { definitions, clipped, noise, poly, spikyArc, spikyLine, tufts, scaleAt, face, waistShell, sideShade, neck, waistBelt, WAIST_BELT, compose, buildSheet } from '../shared/humanoid-kit.mjs';
 export { DIRECTIONS, LABELS };
 
 // Roku: miner and charcoal burner. Spiky black hair, sun-darkened skin, thick brows,
@@ -18,42 +18,51 @@ export const DEFAULT_PALETTE = Object.freeze({
 const DEFS = definitions(['hair', 'cloth', 'shirt', 'rust', 'iron', 'iris'], '<linearGradient id="hairU" gradientUnits="userSpaceOnUse" x1="40" y1="8" x2="86" y2="70"><stop stop-color="var(--hairLight)"/><stop offset=".48" stop-color="var(--hair)"/><stop offset="1" stop-color="var(--hairDark)"/></linearGradient>');
 const LINE = '#663a1e';
 
+// Prototype 02 (2026-11-08): the belt sits at the waist and the vest's skirt shows below it down to the old hem
+// (humanoid-kit waistShell / waistBelt). The 3D arms hang at the sides, so the armhole piping stops at the
+// armpit and the sides are shaded.
 function torso(view) {
-  const { l, r, d: outline, s: body } = shell(view, [28, 25, 18, 25, 28], grad('cloth'), '#1a110b');
+  const { l, r, d: outline, s: body } = waistShell(`roku-body-${view}`, view, [28, 25, 18, 25, 28], grad('cloth'), '#1a110b');
+  const B = WAIST_BELT;
   let s = neck(view, { line: LINE }) + body;
   let wear = '';
-  for (let i = 0; i < 40; i++) {
-    const x = l + 3 + noise(i * 5 + 2) * (r - l - 6), y = 84 + noise(i * 9 + 1) * 26;
+  for (let i = 0; i < 48; i++) {
+    const x = l + 3 + noise(i * 5 + 2) * (r - l - 6), y = 84 + noise(i * 9 + 1) * 34;
     wear += ellipse(x.toFixed(1), y.toFixed(1), (.8 + noise(i) * 1.6).toFixed(1), (.6 + noise(i * 2) * 1).toFixed(1), i % 3 ? 'var(--clothDark)' : 'var(--clothLight)', 'none', 0, 'opacity=".22"');
   }
   s += clipped(`roku-wear-${view}`, outline, wear);
   // Rust piping on the armholes and on the vest's front edges.
-  if (view !== 2) s += line(`M${l + 4} 79 Q${l - 1} 90 ${l + 1} 108 M${r - 4} 79 Q${r + 1} 90 ${r - 1} 108`, 'var(--rust)', 1.5);
-  else s += line('M70 80 Q76 92 73 108', 'var(--rust)', 1.5);
+  if (view !== 2) s += line(`M${l + 4} 79 Q${l} 86 ${l + 1.5} 93 M${r - 4} 79 Q${r} 86 ${r - 1.5} 93`, 'var(--rust)', 1.5);
+  else s += line('M70 80 Q75 87 74 93', 'var(--rust)', 1.5);
   if (view === 0) {
-    // Black stand collar with a small notch; the vest opens in a deep V over the shirt.
+    // Black stand collar with a small notch; the vest opens in a deep V over the shirt down to the belt.
     s += path('M50 82 L63 100 L76 82 L74 78 Q63 80 52 78Z', grad('shirt'), '#0c0b0a', .8)
       + path('M50 70 Q63 66 76 70 L77 79 Q70 77 66 80 L63 85 L60 80 Q56 77 49 79Z', grad('shirt'), '#0c0b0a', .9)
       + line('M52 73 Q63 70 74 73', 'var(--shirtLight)', .7) + line('M63 85 V98', '#0c0b0a', .8)
-      + line('M48 79 Q55 90 63 101 Q71 90 78 79', 'var(--rust)', 1.5)
-      + line('M63 101 V111', '#120c08', .9);
+      + line('M48 79 Q55 90 63 101 Q71 90 78 79', 'var(--rust)', 1.5);
   } else if (view === 1) {
     s += path('M45 82 L55 99 L70 80 L68 76 Q57 79 47 77Z', grad('shirt'), '#0c0b0a', .8)
       + path('M44 71 Q58 65 74 68 L75 77 Q67 76 62 79 L58 84 L55 79 Q51 76 44 79Z', grad('shirt'), '#0c0b0a', .9)
       + line('M46 73 Q59 68 72 70', 'var(--shirtLight)', .7)
-      + line('M43 79 Q49 90 55 100 Q64 89 72 77', 'var(--rust)', 1.5)
-      + line('M55 100 V111', '#120c08', .9);
+      + line('M43 79 Q49 90 55 100 Q64 89 72 77', 'var(--rust)', 1.5);
   } else if (view === 2) {
     s += path('M46 77 Q60 73 74 66 L77 73 Q66 80 54 87 L47 86Z', grad('shirt'), '#0c0b0a', .9)
       + line('M49 79 Q62 75 73 69', 'var(--shirtLight)', .7)
-      + line('M46 87 Q48 99 47 111', 'var(--rust)', 1.5);
+      + line(`M46 87 Q47.5 94 47 ${B}`, 'var(--rust)', 1.5);
   } else {
     s += path('M45 72 Q63 65 81 72 L80 80 Q63 75 46 80Z', grad('shirt'), '#0c0b0a', .9)
       + line('M48 75 Q63 70 78 75', 'var(--shirtLight)', .7)
       + line(`M${l + 3} 82 Q63 77 ${r - 3} 82`, 'var(--rust)', 1.4)
-      + line('M63 84 Q61 97 64 110', 'var(--clothDark)', 1);
+      + line(`M63 84 Q61 92 63 ${B}`, 'var(--clothDark)', 1);
   }
-  return s + belt(view, l, r, { leather: 'var(--leather)', stitch: '#8a5a32', buckleFill: grad('iron'), buckleInk: 'var(--ironDark)', buckleLight: 'var(--ironLight)' });
+  // The vest below the belt: its front edges with rust piping (the back seam), two folds.
+  if (view <= 1) {
+    const c = [63, 55][view];
+    s += line(`M${c} ${B + 7} V120.5`, '#120c08', .9) + line(`M${c - 2} ${B + 7} Q${c - 3} 114 ${c - 3} 120 M${c + 2} ${B + 7} Q${c + 3} 114 ${c + 3} 120`, 'var(--rust)', 1.3);
+  } else if (view === 2) s += line(`M47 ${B + 7} Q46.5 114 46 120`, 'var(--rust)', 1.5);
+  else s += line(`M63 ${B + 8} V120.5`, 'var(--clothDark)', 1);
+  s += line(view === 2 ? `M66 ${B + 9} Q67 114 69 119` : `M${l + 10} ${B + 9} Q${l + 9} 114 ${l + 7} 119 M${r - 10} ${B + 9} Q${r - 9} 114 ${r - 7} 119`, 'var(--clothDark)', .7);
+  return s + waistBelt(view, l, r, { leather: 'var(--leather)', stitch: '#8a5a32', buckleFill: grad('iron'), buckleInk: 'var(--ironDark)', buckleLight: 'var(--ironLight)' });
 }
 
 // Spiky black hair: longer, sharper tips than Belk's, swept up and back.

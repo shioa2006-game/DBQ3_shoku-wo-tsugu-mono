@@ -1,14 +1,14 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { checkHumanoidPrototype } from './humanoid-prototype.mjs';
-import { gameRoot, PNG, normalize } from './game.mjs';
-const root=gameRoot;
-const head=PNG.sync.read(await readFile(new URL('assets/humanoids/gonta_code_head_layer_8dir.png',root)));
-const torso=PNG.sync.read(await readFile(new URL('assets/humanoids/gonta_code_torso_layer_8dir.png',root)));
-const combinedRaw=PNG.sync.read(await readFile(new URL('art_src/gonta_code_body_8dir.src.png',root)));
+import { studioOutput, PNG, normalize } from './game.mjs';
+const root=studioOutput('gonta');
+const head=PNG.sync.read(await readFile(new URL('gonta_code_head_layer_8dir.png',root)));
+const torso=PNG.sync.read(await readFile(new URL('gonta_code_torso_layer_8dir.png',root)));
+const combinedRaw=PNG.sync.read(await readFile(new URL('gonta_code_body_8dir.src.png',root)));
 const {report}=normalize(combinedRaw);
 for(const [name,image] of [['head',head],['torso',torso]]) {
-  const raw=PNG.sync.read(await readFile(new URL(`art_src/gonta_code_${name}_layer_8dir.src.png`,root)));
+  const raw=PNG.sync.read(await readFile(new URL(`gonta_code_${name}_layer_8dir.src.png`,root)));
   const expected=new PNG({width:512,height:256});
   for(const {row,col,dx,dy} of report)for(let y=0;y<128;y++)for(let x=0;x<128;x++) {
     const si=((row*128+y)*512+col*128+x)*4;

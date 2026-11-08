@@ -1,6 +1,6 @@
 import { path, ellipse, line, grad } from '../shared/svg.mjs';
 import { DIRECTIONS, LABELS } from '../shared/sheet-format.mjs';
-import { definitions, clipped, noise, poly, spikyArc, spikyLine, tufts, scaleAt, face, shell, neck, belt, compose, buildSheet } from '../shared/humanoid-kit.mjs';
+import { definitions, clipped, noise, poly, spikyArc, spikyLine, tufts, scaleAt, face, waistShell, sideShade, neck, waistBelt, WAIST_BELT, compose, buildSheet } from '../shared/humanoid-kit.mjs';
 export { DIRECTIONS, LABELS };
 
 // Belk: weathered blacksmith. Tousled brown hair, short full beard, heavy brows,
@@ -18,49 +18,56 @@ export const DEFAULT_PALETTE = Object.freeze({
 const DEFS = definitions(['hair', 'beard', 'cloth', 'red', 'iron', 'iris'], '<linearGradient id="hairU" gradientUnits="userSpaceOnUse" x1="40" y1="8" x2="86" y2="70"><stop stop-color="var(--hairLight)"/><stop offset=".48" stop-color="var(--hair)"/><stop offset="1" stop-color="var(--hairDark)"/></linearGradient>');
 const LINE = '#6b4028';
 
+// Prototype 02 (2026-11-08): the belt sits at the waist and the jerkin's skirt shows below it down to the old hem,
+// buttoned with iron (humanoid-kit waistShell / waistBelt). No apron (decided 2026-11-08). The 3D arms hang at the
+// sides, so the armhole piping stops at the armpit and the sides are shaded.
 function torso(view) {
-  const { l, r, d: outline, s: body } = shell(view, [29, 26, 19, 26, 29], grad('cloth'), '#1f140c');
+  const { l, r, d: outline, s: body } = waistShell(`belk-body-${view}`, view, [29, 26, 19, 26, 29], grad('cloth'), '#1f140c');
+  const B = WAIST_BELT;
   let s = neck(view, { line: LINE }) + body;
   // Worn leather: mottled patches clipped to the jerkin.
   let wear = '';
-  for (let i = 0; i < 40; i++) {
-    const x = l + 3 + noise(i * 5) * (r - l - 6), y = 84 + noise(i * 9) * 26;
+  for (let i = 0; i < 48; i++) {
+    const x = l + 3 + noise(i * 5) * (r - l - 6), y = 84 + noise(i * 9) * 34;
     wear += ellipse(x.toFixed(1), y.toFixed(1), (.8 + noise(i) * 1.6).toFixed(1), (.6 + noise(i * 2) * 1).toFixed(1), i % 3 ? 'var(--clothDark)' : 'var(--clothLight)', 'none', 0, 'opacity=".22"');
   }
   s += clipped(`belk-wear-${view}`, outline, wear);
-  // Burgundy piping along the armholes, where the 3D sleeves meet the jerkin.
-  if (view !== 2) s += line(`M${l + 4} 79 Q${l - 1} 90 ${l + 1} 108 M${r - 4} 79 Q${r + 1} 90 ${r - 1} 108`, 'var(--red)', 1.6);
-  else s += line('M71 80 Q77 92 74 108', 'var(--red)', 1.6);
+  // Burgundy piping round the armholes, where the 3D sleeves meet the jerkin.
+  if (view !== 2) s += line(`M${l + 4} 79 Q${l} 86 ${l + 1.5} 93 M${r - 4} 79 Q${r} 86 ${r - 1.5} 93`, 'var(--red)', 1.6);
+  else s += line('M71 80 Q76 87 75 93', 'var(--red)', 1.6);
   if (view === 0) {
-    // Stand collar opens in a V over a dark red shirt; the jerkin buttons below it.
+    // Stand collar opens in a V over a dark red shirt; the jerkin buttons below the belt.
     s += path('M50 70 Q63 66 76 70 L77 76 Q63 72 49 76Z', 'var(--redDark)', '#2a0c0a', .8)
       + path('M56 76 L63 95 L70 76 Q63 79 56 76Z', 'var(--redDark)', '#2a0c0a', .7)
       + path('M57 75 Q63 78 69 75 L66 82 Q63 84 60 82Z', grad('skin'), 'none')
       + path('M48 72 L55 71 L63 95 L58 97 Q50 88 45 78Z', grad('red'), 'var(--redDark)', .85)
       + path('M78 72 L71 71 L63 95 L68 97 Q76 88 81 78Z', grad('red'), 'var(--redDark)', .85)
-      + line('M51 75 L59 90 M75 75 L67 90', 'var(--redLight)', .65)
-      + line('M60 97 Q61 104 60 111 M66 97 Q65 104 66 111', '#1a110b', .9);
-    for (const y of [100, 106]) s += ellipse(63, y, 1.4, 1.4, 'var(--ironLight)', 'var(--ironDark)', .5);
+      + line('M51 75 L59 90 M75 75 L67 90', 'var(--redLight)', .65);
   } else if (view === 1) {
     s += path('M44 72 Q58 66 74 68 L75 74 Q59 71 44 78Z', 'var(--redDark)', '#2a0c0a', .8)
       + path('M50 76 L56 94 L64 74 Q56 77 50 76Z', 'var(--redDark)', '#2a0c0a', .7)
       + path('M51 75 Q57 77 63 74 L59 81 Q56 83 54 81Z', grad('skin'), 'none')
       + path('M43 74 L49 73 L56 94 L52 95 Q45 86 41 79Z', grad('red'), 'var(--redDark)', .85)
       + path('M75 70 L66 71 L56 94 L61 96 Q71 86 78 76Z', grad('red'), 'var(--redDark)', .85)
-      + line('M46 77 L53 89 M71 73 L60 90', 'var(--redLight)', .65)
-      + line('M54 96 Q55 104 54 111 M59 97 Q58 104 59 111', '#1a110b', .9);
-    for (const y of [101, 107]) s += ellipse(56.5, y, 1.3, 1.3, 'var(--ironLight)', 'var(--ironDark)', .5);
+      + line('M46 77 L53 89 M71 73 L60 90', 'var(--redLight)', .65);
   } else if (view === 2) {
     // Profile collar climbs toward the nape instead of a flat ring.
     s += path('M47 77 Q60 74 74 66 L78 72 Q67 81 54 88 L48 88Z', grad('red'), 'var(--redDark)', .9)
       + line('M50 80 Q62 77 74 69', 'var(--redLight)', .7)
-      + line('M48 89 Q49 100 48 111', '#1a110b', .9);
+      + line(`M48 89 Q49 95 48 ${B}`, '#1a110b', .9);
   } else {
     s += path('M45 72 Q63 65 81 72 L80 80 Q63 75 46 80Z', grad('red'), 'var(--redDark)', .9)
       + line('M48 75 Q63 70 78 75', 'var(--redLight)', .7)
-      + line('M63 81 Q61 96 64 110', 'var(--clothDark)', 1);
+      + line(`M63 81 Q61 91 63 ${B}`, 'var(--clothDark)', 1);
   }
-  return s + belt(view, l, r, { leather: 'var(--leather)', stitch: '#8a6238', buckleFill: grad('iron'), buckleInk: 'var(--ironDark)', buckleLight: 'var(--ironLight)' });
+  // The jerkin below the belt: its two front edges (one in profile; the back seam), iron buttons, two folds.
+  const c = [63, 56.5, 48, 63, 63][view];
+  if (view <= 1) {
+    s += line(`M${c - 3} ${B + 7} Q${c - 2} 113 ${c - 3} 120.5 M${c + 3} ${B + 7} Q${c + 2} 113 ${c + 3} 120.5`, '#1a110b', .9);
+    for (const y of [111, 116]) s += ellipse(c, y, 1.4, 1.4, 'var(--ironLight)', 'var(--ironDark)', .5);
+  } else s += line(`M${c} ${B + 8} V120.5`, view === 2 ? '#1a110b' : 'var(--clothDark)', view === 2 ? .9 : 1);
+  s += line(view === 2 ? `M67 ${B + 9} Q68 114 70 119` : `M${l + 10} ${B + 9} Q${l + 9} 114 ${l + 7} 119 M${r - 10} ${B + 9} Q${r - 9} 114 ${r - 7} 119`, 'var(--clothDark)', .7);
+  return s + waistBelt(view, l, r, { leather: 'var(--leather)', stitch: '#8a6238', buckleFill: grad('iron'), buckleInk: 'var(--ironDark)', buckleLight: 'var(--ironLight)' });
 }
 
 // Tousled hair: a spiky crown outline plus strands radiating from the whorl.

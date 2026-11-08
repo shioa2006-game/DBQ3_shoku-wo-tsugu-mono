@@ -2,7 +2,7 @@
   "id": "kaya",
   "name": "カヤ",
   "role": "TOWNSWOMAN",
-  "version": 1,
+  "version": 2,
   "status": "prototype",
   "source": "../character.mjs",
   "reference": "references/humanoids/volcano_villager_body_8dir.png",

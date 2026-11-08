@@ -2,7 +2,7 @@
   "id": "gonta",
   "name": "ゴンタ",
   "role": "村の若者",
-  "version": 1,
+  "version": 2,
   "status": "prototype",
   "source": "../character.mjs",
   "reference": "references/humanoids/adult_male_villager_body_8dir.png",

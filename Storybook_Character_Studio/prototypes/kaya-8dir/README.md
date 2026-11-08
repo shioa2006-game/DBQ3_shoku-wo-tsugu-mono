@@ -1,10 +1,17 @@
-# カヤの8方向コード生成・試作01
+# カヤの8方向コード生成・試作02
 
 第4～5章の「カヤ」（町へ帰る住民、NPC ID `kaya`）を、第4～5章で使っていた `references/humanoids/volcano_villager_body_8dir.png` を参照して制作しました。真ん中分けの茶髪と低いまとめ髪、からし色の上着、青い着物、帯の結び目。
 
 鉱山町の生き残り。まとめ髪は前向きでは頭の後ろ、後ろ向きでは髪の上に描きます。
 
 [制作ガイド](../../docs/CHARACTER_AUTHORING.md)の頭・胴の分離と出力方式に従います。第4～5章の新しい人型に共通する描画の土台（顔の部品、胴の外形、ベルト、ぼさぼさ髪の輪郭、左右反転）は `../shared/humanoid-kit.mjs`、書き出しは `../shared/humanoid-export.mjs` にあります。
+
+## 試作02（2026-11-08）
+
+ムービーで拡大したときに、胴に描いた腕のような線が3Dの腕と重なることを直しました。
+
+- 帯と青い着物で腰はもう描けているので、胴の脇の腕のような線だけを消し、脇は輪郭の内側の陰影で丸みを出しました（`../shared/humanoid-kit.mjs` の `sideShade()`）。腕は3Dで付きます。
+- 胴の外形・帯から下・首・襟は変えていないので、リグの設定とゲームの脚の付け根は今までどおりです。
 
 ## 原本と出力
 
@@ -24,4 +31,4 @@ npm.cmd run export:kaya -- --preview-game
 npm.cmd test
 ```
 
-`--preview-game` は第4～5章の `assets/humanoids/kaya_code_*.png`、`art_src/kaya_code_*.src.png`、`src/content/rig-profiles/kaya.mjs` を更新します。本編の住民の設定（`src/entities/villagers.js`）は変えません。3Dリグでの比較は、第4～5章の開発サーバーで `prototypes/characters/?c=kaya` を開きます。
+`--preview-game` は第4～5章の `assets/humanoids/kaya_code_*.png`、`art_src/kaya_code_*.src.png`、`src/content/rig-profiles/kaya.mjs` を更新します。本編の住民の設定（`src/entities/villagers.js`）は変えません。3Dリグでの比較は、Studioのサーバーで `compare/ch4-5/characters/?c=kaya` を開きます（Studioの出力を表示するので、ゲームへ移す前の変更も見られます）。

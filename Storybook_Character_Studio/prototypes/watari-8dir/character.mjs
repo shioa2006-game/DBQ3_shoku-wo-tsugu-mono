@@ -1,4 +1,5 @@
 import { path, ellipse, line, grad } from '../shared/svg.mjs';
+import { WAIST_BELT, waistOutline, waistShade, waistBeltBand, waistBeltStitch } from '../shared/waist.mjs';
 import { EYE_OPENINGS, eye, nose } from '../shared/face-parts.mjs';
 import { DIRECTIONS, LABELS } from '../shared/sheet-format.mjs';
 export { DIRECTIONS, LABELS };
@@ -20,8 +21,11 @@ function definitions(){
   return `<defs>${Object.entries(EYE_OPENINGS).map(([id,d])=>`<clipPath id="eye-${id}"><path d="${d}"/></clipPath>`).join('')}${['hair','cap','red','cloth','ivory','gold','iris'].map(gradient).join('')}
   <radialGradient id="skin" cx="40%" cy="30%" r="85%"><stop stop-color="var(--skinLight)"/><stop offset=".65" stop-color="var(--skin)"/><stop offset="1" stop-color="var(--skinDark)"/></radialGradient></defs>`;
 }
+// Prototype 02 (2026-11-08): the belt sits at the waist; below it the coat's two fronts part, each with its gold
+// edge, down to the old hem (shared/waist.mjs). The lapels and the shirt end at the belt. The 3D arms hang at
+// the sides, so the torso draws no arm lines; the sides are shaded.
 function torso(view){
-  const w=[26,24,20,24,26][view],l=63-w,r=63+w;
+  const w=[26,24,20,24,26][view],l=63-w,r=63+w,B=WAIST_BELT;
   const neck=[
     'M54 64 H72 L75 78 L63 85 L51 78Z',
     'M58 64 L73 61 L76 75 L56 85 L49 77Z',
@@ -29,36 +33,43 @@ function torso(view){
     'M53 64 H74 L78 78 H48Z',
     'M53 64 H74 L78 78 H48Z',
   ][view];
-  let s=path(neck,grad('skin'),'#755135',.8)
-    +path(`M${l+5} 78 Q63 72 ${r-5} 78 Q${r+1} 84 ${r} 98 L${r-1} 118 Q63 123 ${l+1} 118 L${l} 98 Q${l-1} 85 ${l+5} 78Z`,grad('cloth'),'#172b32',1);
+  const body=waistOutline(l,r,{top:78,crown:72,inset:5,bulge:1,pinch:1});
+  let s=path(neck,grad('skin'),'#755135',.8)+path(body,grad('cloth'),'#172b32',1)
+    +waistShade(`watari-body-${view}`,body,l,r,view,{color:'var(--clothDark)'});
+  const c=[63,56,47][view];
   if(view<3){
-    const c=[63,56,47][view],sw=[12,10,5][view];
-    s+=path(`M${c-sw} 75 Q${c} 80 ${c+sw} 74 L${c+sw-2} 111 Q${c} 114 ${c-sw+2} 111Z`,grad('ivory'),'#827052',.7);
+    const sw=[12,10,5][view];
+    s+=path(`M${c-sw} 75 Q${c} 80 ${c+sw} 74 L${c+sw-2} ${B+1} Q${c} ${B+4} ${c-sw+2} ${B+1}Z`,grad('ivory'),'#827052',.7);
     const lapels=[
-      ['M49 74 L40 82 L48 85 L44 92 L58 111 L53 85Z','M77 74 L86 82 L78 85 L82 92 L68 111 L73 85Z'],
-      ['M48 74 L40 81 L46 85 L42 90 L52 109 L51 84Z','M73 71 L82 80 L72 85 L76 92 L61 110 L65 84Z'],
-      ['M49 76 L44 80 L47 84 L44 90 L47 108 L51 83Z','M73 70 L78 78 L65 84 L68 91 L52 110 L57 83Z'],
+      ['M49 74 L40 82 L48 85 L44 92 L58 100 L53 85Z','M77 74 L86 82 L78 85 L82 92 L68 100 L73 85Z'],
+      ['M48 74 L40 81 L46 85 L42 90 L52 99 L51 84Z','M73 71 L82 80 L72 85 L76 92 L61 100 L65 84Z'],
+      ['M49 76 L44 80 L47 84 L44 90 L47 99 L51 83Z','M73 70 L78 78 L65 84 L68 91 L52 100 L57 83Z'],
     ][view];
     for(const p of lapels)s+=path(p,grad('cloth'),'var(--goldLight)',.9);
     s+=path(`M${c-sw+1} 75 L${c} 81 L${c+sw-1} 75 L${c+6} 88 L${c} 83 L${c-5} 89Z`,grad('ivory'),'#8a7854',.65)
       +path(`M${c-3} 82 L${c+3} 82 L${c+4} 87 L${c} 91 L${c-4} 87Z`,grad('red'),'var(--redDark)',.75)
-      +path(`M${c-2} 88 Q${c-9} 91 ${c-8} 100 Q${c-2} 98 ${c} 91Z`,grad('red'),'var(--redDark)',.7)
-      +path(`M${c+2} 88 Q${c+10} 91 ${c+8} 99 Q${c+2} 98 ${c} 91Z`,grad('red'),'var(--redDark)',.7)
-      +line(`M${c-3} 91 L${c-6} 97 M${c+3} 91 L${c+6} 96`,'var(--redLight)',.6);
+      +path(`M${c-2} 88 Q${c-9} 90 ${c-8} 97 Q${c-2} 96 ${c} 91Z`,grad('red'),'var(--redDark)',.7)
+      +path(`M${c+2} 88 Q${c+10} 90 ${c+8} 96 Q${c+2} 96 ${c} 91Z`,grad('red'),'var(--redDark)',.7)
+      +line(`M${c-3} 91 L${c-6} 95 M${c+3} 91 L${c+6} 94`,'var(--redLight)',.6);
+    // Below the belt the two fronts part over the dark trousers, each with its gold edge.
+    const k=view===2?.5:1,open=`M${c} ${B+6} L${c+4*k} 120.5 L${c-4*k} 120.5Z`;
+    s+=path(open,'#2f2a24','none',0)+line(`M${c} ${B+6} L${c-4*k} 120.5 M${c} ${B+6} L${c+4*k} 120.5`,'var(--goldLight)',.9);
   }else{
     s+=path('M46 74 Q63 70 81 74 L83 81 Q63 78 44 82Z',grad('cloth'),'#172b32',.9)
       +line('M48 75 Q63 72 79 75','var(--gold)',.7)
-      +line('M63 83 Q61 96 64 110','var(--clothDark)',.7)
-      +line('M48 101 Q62 105 79 101','var(--clothLight)',.7);
+      +line(`M63 83 Q61 92 63 ${B}`,'var(--clothDark)',.7)
+      +line(`M63 ${B+8} V120.5`,'var(--clothDark)',.8);
   }
-  s+=line(`M${l+6} 85 Q${l+2} 95 ${l+6} 104 M${r-6} 85 Q${r-2} 95 ${r-6} 104`,'var(--clothDark)',.9)
-    +path(`M${l+1} 111 Q63 116 ${r-1} 111 L${r-1} 118 Q63 123 ${l+1} 118Z`,'var(--leather)','#3d2c1b',.9)
-    +line(`M${l+2} 113 Q63 118 ${r-2} 113 M${l+2} 117 Q63 122 ${r-2} 117`,'#aa7940',.65);
-  for(const x of [l+6,l+13,r-13,r-6])s+=line(`M${x} 115 v4`,'#38291c',.7);
+  // Two folds and the hem's gold edge.
+  s+=line(view===2?`M64 ${B+9} Q65 114 67 119`:`M${l+10} ${B+9} Q${l+9} 114 ${l+7} 119 M${r-10} ${B+9} Q${r-9} 114 ${r-7} 119`,'var(--clothDark)',.6)
+    +line(`M${l} 116.5 Q63 121.5 ${r} 116.5`,'var(--gold)',.55)
+    +path(waistBeltBand(l+1,r-1,B),'var(--leather)','#3d2c1b',.9)
+    +line(waistBeltStitch(l+1,r-1,B),'#aa7940',.65);
+  for(const x of [l+6,l+13,r-13,r-6])s+=line(`M${x} ${B+2} v3`,'#38291c',.7);
   if(view<3){
-    const c=[63,56,47][view],w=view===2?2:4;
-    s+=path(`M${c-w} 112 h${w*2} v8 h${-w*2}Z`,grad('gold'),'var(--goldDark)',.8)
-      +path(`M${c-w+1.2} 114 h${w*2-2.4} v4 h${2.4-w*2}Z`,'var(--leather)','none');
+    const bw=view===2?2:4;
+    s+=path(`M${c-bw} ${B+.5} h${bw*2} v8 h${-bw*2}Z`,grad('gold'),'var(--goldDark)',.8)
+      +path(`M${c-bw+1.2} ${B+2.5} h${bw*2-2.4} v4 h${2.4-bw*2}Z`,'var(--leather)','none');
   }
   return s;
 }

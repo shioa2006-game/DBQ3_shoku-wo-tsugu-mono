@@ -14,7 +14,7 @@ const { PNG } = require('pngjs');
 // studioOnly: デザイン検討中の案。game-targets.mjs に載せず、出力はStudio内だけに置く。
 // keepDrawnX: 横方向は描いた位置のまま（胴の中心を u=.494 に描いた作画用）。縦だけ下端121pxへ揃える。
 // boards: 比較画像を差し替える。({ reference, normalized, layers }) => { 'ファイル名.png': svg }
-export async function exportHumanoid({ id, name, role, build, reference, summary, rigColors, rigTuning, studioOnly = false, keepDrawnX = false, boards }) {
+export async function exportHumanoid({ id, name, role, build, reference, summary, rigColors, rigTuning, studioOnly = false, keepDrawnX = false, boards, version = 1 }) {
   const character = studioOnly ? { id, folder: `${id}-8dir`, targets: [] } : CHARACTERS.find(c => c.id === id);
   if (!character) throw Error(`${id} is not listed in game-targets.mjs`);
   const previewGame = process.argv.includes('--preview-game');
@@ -83,7 +83,7 @@ export async function exportHumanoid({ id, name, role, build, reference, summary
     if (!extra?.['comparison.png']) await writeFile(here('output/comparison.png'), await rasterize(board));
     for (const [file, boardSvg] of Object.entries(extra ?? {})) await writeFile(here(`output/${file}`), await rasterize(boardSvg));
     await writeFile(here('output/manifest.json'), JSON.stringify({
-      id, name, role, version: 1, status: 'prototype',
+      id, name, role, version, status: 'prototype',
       source: '../character.mjs', reference: `references/${reference}`,
       format: 'game-humanoid-bust', cellSize: 128, columns: 4, rows: 2, directions: DIRECTIONS, labels: LABELS,
       anchor: { centerU: .494, bottomFromTop: .945, ...(keepDrawnX ? { horizontal: 'drawn tunic centre' } : {}) }, normalization: report,

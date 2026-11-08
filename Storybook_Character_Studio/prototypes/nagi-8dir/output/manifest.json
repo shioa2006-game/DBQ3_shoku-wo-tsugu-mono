@@ -2,7 +2,7 @@
   "id": "nagi",
   "name": "ナギ",
   "role": "SHRINE MAIDEN",
-  "version": 1,
+  "version": 2,
   "status": "prototype",
   "source": "../character.mjs",
   "reference": "references/humanoids/shrine_keeper_body_8dir.png",

@@ -1,6 +1,6 @@
 import { path, ellipse, line, grad } from '../shared/svg.mjs';
 import { DIRECTIONS, LABELS } from '../shared/sheet-format.mjs';
-import { definitions, clipped, face, shell, neck, compose, buildSheet } from '../shared/humanoid-kit.mjs';
+import { definitions, clipped, face, shell, neck, sideShade, compose, buildSheet } from '../shared/humanoid-kit.mjs';
 export { DIRECTIONS, LABELS };
 
 // Teru: a young woman who hid in the charcoal-kiln hut (no dedicated original art;
@@ -19,9 +19,10 @@ const DEFS = definitions(['hair', 'cloth', 'ivory', 'band', 'sash', 'iris']);
 const LINE = '#8a5a38';
 
 function torso(view) {
-  const { l, r, s: coat } = shell(view, [24, 22, 17, 22, 24], grad('cloth'), '#2a2a14');
-  let s = neck(view, { line: LINE }) + coat;
-  s += line(`M${l + 5} 82 Q${l + 2} 92 ${l + 4} 100 M${r - 5} 82 Q${r - 2} 92 ${r - 4} 100`, 'var(--clothDark)', .9);
+  const { l, r, d, s: coat } = shell(view, [24, 22, 17, 22, 24], grad('cloth'), '#2a2a14');
+  let s = neck(view, { line: LINE }) + coat
+    // The 3D arms hang at the sides, so the sides are shaded instead of drawn with arm lines (2026-11-08).
+    + sideShade(`teru-body-${view}`, view, d, l, r, 'var(--clothDark)');
   // Work jacket crossing over a cream under-collar; dark olive collar bands.
   if (view === 0) {
     s += path('M53 74 Q63 79 73 74 L63 90Z', grad('ivory'), 'var(--ivoryDark)', .7)

@@ -1,6 +1,6 @@
 import { path, ellipse, line, grad } from '../shared/svg.mjs';
 import { DIRECTIONS, LABELS } from '../shared/sheet-format.mjs';
-import { definitions, clipped, face, shell, neck, compose, buildSheet } from '../shared/humanoid-kit.mjs';
+import { definitions, clipped, face, shell, neck, sideShade, compose, buildSheet } from '../shared/humanoid-kit.mjs';
 export { DIRECTIONS, LABELS };
 
 // Kaya: young woman of the mining town. Centre-parted brown hair with side locks
@@ -21,8 +21,10 @@ const LINE = '#8a5a3a';
 // Wrapped kimono front: cream collar crossing left over right, blue under-kimono,
 // a wide sash with a front bow, and the blue skirt with cream stripes below.
 function torso(view) {
-  const { l, r, s: coat } = shell(view, [25, 23, 17, 23, 25], grad('vest'), '#5c3e14');
-  let s = neck(view, { line: LINE }) + coat;
+  const { l, r, d, s: coat } = shell(view, [25, 23, 17, 23, 25], grad('vest'), '#5c3e14');
+  let s = neck(view, { line: LINE }) + coat
+    // The 3D arms hang at the sides, so the sides are shaded instead of drawn with arm lines (2026-11-08).
+    + sideShade(`kaya-body-${view}`, view, d, l, r, 'var(--vestDark)');
   s += path(`M${l + 1} 108 Q63 112 ${r - 1} 108 L${r - 1} 118 Q63 123 ${l + 1} 118Z`, grad('blue'), 'var(--blueDark)', .9);
   for (const x of [l + 6, l + 14, r - 14, r - 6]) s += line(`M${x} 110 L${x} 120`, 'var(--ivory)', 1);
   if (view === 0) {
@@ -56,7 +58,7 @@ function torso(view) {
       + path(`M${c + 1.5} 105 L${c + 5 * k} 116 L${c + 1 * k} 117 L${c} 106Z`, grad('sash'), 'var(--sashDark)', .75)
       + ellipse(c, 104.5, 2.4 * k + .6, 2.6, grad('sash'), 'var(--sashDark)', .8);
   }
-  return s + line(`M${l + 5} 82 Q${l + 2} 92 ${l + 4} 99 M${r - 5} 82 Q${r - 2} 92 ${r - 4} 99`, 'var(--vestDark)', .9);
+  return s;
 }
 
 // Hair behind the face: crown and the side locks that fall to the jaw.

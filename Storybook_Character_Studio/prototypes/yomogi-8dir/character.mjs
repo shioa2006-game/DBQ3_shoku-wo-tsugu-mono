@@ -1,6 +1,6 @@
 import { path, ellipse, line, grad } from '../shared/svg.mjs';
 import { DIRECTIONS, LABELS } from '../shared/sheet-format.mjs';
-import { definitions, clipped, face, shell, neck, belt, compose, buildSheet } from '../shared/humanoid-kit.mjs';
+import { definitions, clipped, face, waistShell, sideShade, neck, waistBelt, WAIST_BELT, compose, buildSheet } from '../shared/humanoid-kit.mjs';
 export { DIRECTIONS, LABELS };
 
 // Yomogi: elderly herbalist. Silver hair in a low bun under a green headscarf with
@@ -23,34 +23,49 @@ const leaf = (x, y, a = 0, s = 1, color = 'var(--scarfLight)') =>
 const sprig = (x, y, a, s = 1, color) =>
   `<g transform="translate(${x} ${y}) rotate(${a}) scale(${s})">${line('M0 6 V-6', 'var(--shirt)', .7)}${[-4, -1, 2].map((k, i) => leaf(-1.6, k, -35, .62, color) + leaf(1.6, k + 1, 35, .62, color)).join('')}</g>`;
 
+// Prototype 02 (2026-11-08): the belt sits at the waist and the vest goes on below it down to the old hem
+// (humanoid-kit waistShell / waistBelt). The vest panels are clipped to the body's outline, so they follow the
+// waist and the hem. The 3D arms hang at the sides, so the sides are shaded instead of lined.
 function torso(view) {
-  const { l, r, s: shirt } = shell(view, [25, 23, 17, 23, 25], grad('shirt'), '#26331d');
+  const { l, r, d: outline, s: shirt } = waistShell(`yomogi-body-${view}`, view, [25, 23, 17, 23, 25], grad('shirt'), '#26331d', { shade: 'var(--shirtDark)', pinch: 1.5 });
+  const B = WAIST_BELT;
   let s = neck(view, { line: LINE }) + shirt;
+  const vest = d => path(d, grad('vest'), 'var(--vestDark)', .85);
   if (view === 0) {
     // Cream vest panels leave the green placket showing down the front.
-    s += path(`M${l + 4} 79 Q${l} 90 ${l + 1} 110 L58 110 L57 84 Q55 77 51 75 Q${l + 8} 76 ${l + 4} 79Z`, grad('vest'), 'var(--vestDark)', .85)
-      + path(`M${r - 4} 79 Q${r} 90 ${r - 1} 110 L68 110 L69 84 Q71 77 75 75 Q${r - 8} 76 ${r - 4} 79Z`, grad('vest'), 'var(--vestDark)', .85)
-      + sprig(48, 96, -12, 1, 'var(--scarf)') + sprig(78, 96, 12, 1, 'var(--scarf)')
+    s += clipped(`yomogi-vest-${view}`, outline,
+      vest(`M${l + 4} 79 Q${l} 90 ${l - 3} 104 L${l - 3} 124 L58 124 L57 84 Q55 77 51 75 Q${l + 8} 76 ${l + 4} 79Z`)
+      + vest(`M${r - 4} 79 Q${r} 90 ${r + 3} 104 L${r + 3} 124 L68 124 L69 84 Q71 77 75 75 Q${r - 8} 76 ${r - 4} 79Z`));
+  } else if (view === 1) {
+    s += clipped(`yomogi-vest-${view}`, outline,
+      vest(`M${l + 4} 79 Q${l} 90 ${l - 3} 104 L${l - 3} 124 L51 124 L50 84 Q48 77 45 75 Q${l + 8} 76 ${l + 4} 79Z`)
+      + vest(`M${r - 4} 79 Q${r} 90 ${r + 3} 104 L${r + 3} 124 L61 124 L62 84 Q64 77 70 73 Q${r - 8} 75 ${r - 4} 79Z`));
+  } else if (view === 2) {
+    s += clipped(`yomogi-vest-${view}`, outline, vest(`M50 80 Q47 92 48 104 L48 124 L${r + 3} 124 L${r + 3} 100 Q${r} 90 ${r - 4} 80 Q63 76 50 80Z`));
+  } else {
+    s += clipped(`yomogi-vest-${view}`, outline, vest(`M${l + 3} 79 Q${l} 90 ${l - 3} 104 L${l - 3} 124 L${r + 3} 124 L${r + 3} 104 Q${r} 90 ${r - 3} 79 Q63 74 ${l + 3} 79Z`));
+  }
+  s += sideShade(`yomogi-vest-shade-${view}`, view, outline, l, r, 'var(--vestDark)', B) + path(outline, 'none', '#26331d', 1);
+  if (view === 0) {
+    s += sprig(48, 91, -12, 1, 'var(--scarf)') + sprig(78, 91, 12, 1, 'var(--scarf)')
       + path('M53 69 Q63 66 73 69 L74 76 Q63 74 52 76Z', grad('shirt'), 'var(--shirtDark)', .85)
-      + line('M63 76 V110', 'var(--shirtDark)', .8)
+      + line(`M63 76 V${B} M63 ${B + 7} V120.5`, 'var(--shirtDark)', .8)
       + ellipse(63, 79, 1.8, 1.8, grad('gold'), 'var(--goldDark)', .6) + ellipse(63, 90, 1.6, 1.6, grad('gold'), 'var(--goldDark)', .6);
   } else if (view === 1) {
-    s += path(`M${l + 4} 79 Q${l} 90 ${l + 1} 110 L51 110 L50 84 Q48 77 45 75 Q${l + 8} 76 ${l + 4} 79Z`, grad('vest'), 'var(--vestDark)', .85)
-      + path(`M${r - 4} 79 Q${r} 90 ${r - 1} 110 L61 110 L62 84 Q64 77 70 73 Q${r - 8} 75 ${r - 4} 79Z`, grad('vest'), 'var(--vestDark)', .85)
-      + sprig(73, 96, 12, 1, 'var(--scarf)')
+    s += sprig(73, 91, 12, 1, 'var(--scarf)')
       + path('M46 69 Q58 64 70 66 L71 73 Q58 71 46 76Z', grad('shirt'), 'var(--shirtDark)', .85)
-      + line('M56 75 V110', 'var(--shirtDark)', .8)
+      + line(`M56 75 V${B} M56 ${B + 7} V120.5`, 'var(--shirtDark)', .8)
       + ellipse(56, 79, 1.7, 1.7, grad('gold'), 'var(--goldDark)', .6) + ellipse(56, 90, 1.5, 1.5, grad('gold'), 'var(--goldDark)', .6);
   } else if (view === 2) {
-    s += path(`M50 80 Q47 92 48 110 L${r - 1} 110 Q${r} 90 ${r - 4} 80 Q63 76 50 80Z`, grad('vest'), 'var(--vestDark)', .85)
-      + sprig(64, 96, 6, 1, 'var(--scarf)')
+    s += sprig(64, 91, 6, 1, 'var(--scarf)')
       + path('M48 75 Q60 72 74 65 L77 71 Q64 78 51 82Z', grad('shirt'), 'var(--shirtDark)', .85);
   } else {
-    s += path(`M${l + 3} 79 Q${l} 90 ${l + 1} 110 L${r - 1} 110 Q${r} 90 ${r - 3} 79 Q63 74 ${l + 3} 79Z`, grad('vest'), 'var(--vestDark)', .85)
-      + path('M47 71 Q63 66 79 71 L78 77 Q63 73 48 77Z', grad('shirt'), 'var(--shirtDark)', .85)
-      + line('M63 80 Q62 95 63 109', 'var(--vestDark)', .8);
+    s += path('M47 71 Q63 66 79 71 L78 77 Q63 73 48 77Z', grad('shirt'), 'var(--shirtDark)', .85)
+      + line(`M63 80 Q62 91 63 ${B} M63 ${B + 8} V120.5`, 'var(--vestDark)', .8);
   }
-  return s + belt(view, l, r, { leather: 'var(--leather)', stitch: '#a77c48' });
+  // Two folds of the vest below the belt.
+  s += line(view === 2 ? `M66 ${B + 9} Q67 114 69 119` : `M${l + 9} ${B + 9} Q${l + 8} 114 ${l + 6} 119 M${r - 9} ${B + 9} Q${r - 8} 114 ${r - 6} 119`, 'var(--vestDark)', .6);
+  return s + waistBelt(view, l, r, { leather: 'var(--leather)', stitch: '#a77c48', pinch: 1.5 });
 }
 
 // Silver hair: soft waves at the temples and a low bun at the nape.
