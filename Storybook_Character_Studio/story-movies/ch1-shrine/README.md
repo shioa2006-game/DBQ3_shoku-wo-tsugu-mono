@@ -1,6 +1,6 @@
 # 小さな社 ― 第1章の結び（SVGストーリームービー試作・M1）
 
-『職をつぐ者』第1章の章末に入れる、約15秒・全3場面のストーリームービーの試作です。**Studio内の試作で、ゲーム本編には組み込んでいません。** 採用と移植はユーザーが確認してから決めます。
+『職をつぐ者』第1章の章末に入れる、約15秒・全3場面のストーリームービーの試作です。**2026-11-08にゲーム本編（第1～3章）へ組み込みました。** ゲームでの扱いは[下の節](#game)を参照。
 
 - 確認URL: Studioを起動（`npm.cmd start`）して http://127.0.0.1:8081/story-movies/ch1-shrine/ 。[ムービーの一覧](../index.html)（`/story-movies/`）からも開けます。
 - 計画: [SVGストーリームービーの挿入計画](../../../docs/story/planned/story-movies.md) の M1（優先度B）。物語は [第1章の記録](../../../docs/story/implemented/chapter1.md)。
@@ -73,10 +73,13 @@ npm.cmd run test:movie -- ch1-shrine
 
 `npm.cmd test` は、人物の部品が作画コードと一致すること、字幕が今の章末の文の第1章の行と順番どおりに一致し、プロローグと重なる行を使っていないこと、祭壇に二冊の表紙があること、4人が場面②に出ること、id の接頭辞、Pythonでの再生成が同じ内容になることを確かめます。
 
-## ゲームへ移植するときの注意
+<a id="game"></a>
 
-- 入る場所は、`SHRINE_DONE` で祭壇に祈った会話の後（`quests.js` の `onAltarPrayed()` → `playEnding()`）。今の文字の章末（既定の文）を置き換え、ムービーを再生できないときの代わりに残す。
-- 文字の章末を残す場合も、プロローグと重なる前半の行は外すのがよい（計画の注意）。
+## ゲームでの扱い（2026-11-08に組み込み）
+
+- Studioの `npm.cmd run sync:movies` で `dqb3-tsugumono-ch1-3/assets/movies/` の `ch1-shrine.html` へ写し、両編共通の `game-shared/story-movies.mjs` が全画面で再生する（[組み込みの仕組み](../../../docs/story/planned/story-movies.md#integration)）。このムービーを生成し直したら、写し直す（Studioのテストが写しと生成物の一致を確かめる）。
+- 入る場所は、`SHRINE_DONE` で祭壇に祈った会話の後（`quests.js` の `onAltarPrayed()`）。文字の章末（`playEnding()` の既定の文）を置き換え、ムービーを流せないときだけ文字の章末を出す。
+- 祭壇の会話は変えていない。会話の最後の書の台詞と結びの字幕が重なるのは、従来の文字の章末と同じ。
 
 ## 残っている課題
 

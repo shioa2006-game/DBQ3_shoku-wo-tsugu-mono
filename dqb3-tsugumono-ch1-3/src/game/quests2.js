@@ -158,12 +158,30 @@ export class Chapter2 {
     return false;
   }
 
+  // 勝利会話の後に第2章の結びのムービー（M9）。書の最後の台詞はムービーの字幕（③～⑤）と同じなので、
+  // ムービーを流すときは会話から外し、最後まで見なかったときだけムービーの後に流す
+  //（docs/story/inconsistencies.md の STORY-008）。ムービーの有無で進行は変わらない。
+  playVictory(done) {
+    const g = this.game;
+    const talk = CH2.dialogues.paddyDefenseWin;
+    if (!g.movies.willPlay("ch2-harvest")) {
+      g.ui.dialogue.play(talk, done);
+      return;
+    }
+    g.ui.dialogue.play(talk.slice(0, -1), () => {
+      g.movies.play("ch2-harvest").then(({ shown, skipped }) => {
+        if (shown && !skipped) done();
+        else g.ui.dialogue.play(talk.slice(-1), done);
+      });
+    });
+  }
+
   onRaidEnd(win) {
     if (this.stage !== "PADDY_DEFENSE") return false;
     if (win) {
       this.quests.busy = true;
       SFX.quest();
-      this.game.ui.dialogue.play(CH2.dialogues.paddyDefenseWin, () => {
+      this.playVictory(() => {
         this.quests.busy = false;
         this.quests.setStage("CH2_DONE");
       });

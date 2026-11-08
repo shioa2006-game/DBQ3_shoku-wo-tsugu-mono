@@ -81,6 +81,7 @@ node tools/normalize_sheet.mjs art_src/<name>_body_8dir.src.png assets/humanoids
 - キャラクターの作り直しと移植は [docs/CHARACTER_ART.md](docs/CHARACTER_ART.md) に記録する。`src/entities/rig.js` は第1～3章と同じ内容に保ち（Studioのテストが一致を確かめる）、片方だけを直さない。
 - アイテムアイコンの原本はStudioの `prototypes/item-icons/`。`assets/items/` はStudioの `npm.cmd run export:items -- --preview-game` で更新し、直接編集しない。`tests/e2e/item-icons.test.mjs`（`test:ci` に含む）で全アイテムが画像のアイコンを使うことを確認する。
 - 作り直した設置物の3Dの原本はStudioの `prototypes/props-3d/models.mjs`。`src/world/prop-models.js` はStudioの `npm.cmd run export:props -- --preview-game` で書き出し、直接編集しない。`tests/e2e/prop-models.test.mjs`（`test:ci` に含む）で、作り直した設置物が作られ、扉・炎・旗・作物の動く部品が残り、柵が隣とつながることを確認する。
+- SVGストーリームービー（`assets/movies/*.html`：火山島編の始まりと終わり、鍛冶屋・僧侶の書の復活）の原本はStudioの `story-movies/`。直接編集せず、Studioで生成してから `npm.cmd run sync:movies` で写す。名前とファイルの対応は `src/content/movies.js`、再生は `game-shared/story-movies.mjs`。`tests/e2e/movies.test.mjs`（`test:ci` に含む）で、再生中の世界停止、最後まで見たとき／スキップしたときの導入会話、全ムービーの読み込み、読み込めないときの文字の演出への切り替えを確認する。他のテストは `openGame` の既定でムービーを止める。
 
 ## 親リポジトリのGitHub運用
 

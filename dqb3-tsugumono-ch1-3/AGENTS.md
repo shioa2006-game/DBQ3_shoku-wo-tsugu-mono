@@ -62,6 +62,7 @@ npm.cmd run test:e2e
 - `tests/e2e/sheets.test.mjs`：8方向スプライトシートの境界と中心位置。
 - `tests/e2e/item-icons.test.mjs`：全アイテムがStudio製アイコン画像を使い、ホットバーとドロップに表示されること。
 - `tests/e2e/prop-models.test.mjs`：作り直した設置物が `src/world/prop-models.js` から作られ、扉の開閉・炎・旗・稲の揺れの部品が残り、柵が隣とつながること。
+- `tests/e2e/movies.test.mjs`：SVGストーリームービー（プロローグ・章の結び・書の復活）の再生中の世界停止、最後まで見たとき／スキップしたときの会話、全ムービーの読み込み、読み込めないときの文字の演出への切り替え。他のテストは`openGame`の既定でムービーを止める。
 
 ### ヘッドレステストの注意
 
@@ -69,7 +70,7 @@ npm.cmd run test:e2e
   ランナー負荷で不安定になりやすい。
 - 固定`waitForTimeout`の直後に判定せず、`tests/helpers.mjs`の`advanceToStage`、
   `waitForStage`、`waitForCond`で状態変化をポーリングする。
-- 高速確認は`npm.cmd run test:ci`（sheets・smoke・underwater-visuals・item-icons・prop-models）、全回帰は
+- 高速確認は`npm.cmd run test:ci`（sheets・smoke・underwater-visuals・item-icons・prop-models・movies）、全回帰は
   `npm.cmd run test:e2e`とする。新しい重い通しテストは全回帰へ追加し、
   常に守るべき不変条件だけを`tests/run.mjs`の`FAST`セットへ追加する。
 
@@ -110,6 +111,7 @@ npm.cmd run test:e2e
 
 ## アセットの生成と正規化
 
+- SVGストーリームービー（`assets/movies/*.html`）の原本はStudioの `story-movies/`。直接編集せず、Studioで生成してから `npm.cmd run sync:movies` で写す。名前とファイルの対応は `src/content/movies.js`、再生は `game-shared/story-movies.mjs`。
 - 作り直した設置物の3Dの原本はStudioの `prototypes/props-3d/models.mjs`。`src/world/prop-models.js` はStudioの `npm.cmd run export:props -- --preview-game` で書き出し、直接編集しない。
 
 - 手描き原画は`art_src/`、ゲーム読込用画像は`assets/`に置く。

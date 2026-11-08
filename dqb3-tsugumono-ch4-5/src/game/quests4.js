@@ -61,8 +61,14 @@ export class Chapter4 {
     g.spawnVillager("gonta", s.x + 3, s.z);
     g.spawnVillager("watari", s.x + 1, s.z - 2);
     g.spawnVillager("kaya", 36, 8); // 船の入り江・壊れた船着き場のそば
-    this.play(CH4.dialogues.intro, () => {
-      this.quests.setStage("CH4_ARRIVAL"); // ！マーカーは updateQuestMarkers が導出
+    // 火山島編の始まりのムービー（M5）の後に導入会話。最後まで見たときは、字幕と同じ行を省く。
+    this.quests.busy = true;
+    g.movies.play("ch4-arrival").then(({ shown, skipped }) => {
+      const { intro, introCoveredByMovie } = CH4.dialogues;
+      const lines = shown && !skipped ? intro.filter((_, i) => !introCoveredByMovie.includes(i)) : intro;
+      this.play(lines, () => {
+        this.quests.setStage("CH4_ARRIVAL"); // ！マーカーは updateQuestMarkers が導出
+      });
     });
   }
 

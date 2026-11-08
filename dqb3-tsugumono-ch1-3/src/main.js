@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { cellInReach, pickBlueprintCell } from "../../game-shared/blueprint-target.mjs";
+import { StoryMovies } from "../../game-shared/story-movies.mjs";
 import { Input } from "./core/input.js";
 import { cellKey } from "./core/utils.js";
 import { B, BLOCK_DEFS } from "./world/blocks.js";
@@ -30,6 +31,7 @@ import { Villager } from "./entities/villagers.js";
 import { MonsterManager } from "./entities/monsters.js";
 import { ItemDrop } from "./entities/entity.js";
 import { UI, BUILD_ID } from "./ui/ui.js";
+import { MOVIES } from "./content/movies.js";
 
 const CAMERA_HEIGHT = 8.2;
 const CAMERA_RADIUS = 11.5;
@@ -66,6 +68,9 @@ class Game {
     this.world.generate();
     this.input = new Input(this.renderer.domElement);
     this.ui = new UI();
+    // SVGストーリームービー。再生中は ui.modalOpen が true になり、入力と世界が止まる。
+    this.movies = new StoryMovies(MOVIES);
+    this.ui.movies = this.movies;
     this.inventory = new Inventory();
     this.pendingRewards = [];
     this.daynight = new DayNight();
@@ -1057,7 +1062,8 @@ class Game {
     this.chunks.flushDirty();
     this.updateCamera(dt);
     this.input.endFrame();
-    this.renderer.render(this.scene, this.camera);
+    // ムービーは不透明な全画面の iframe で覆うので、その間は3Dを描かない。
+    if (!this.movies.open) this.renderer.render(this.scene, this.camera);
   }
 
   // 世界停止中（会話・メニュー）の見た目だけの同期。スプライトのビルボードを

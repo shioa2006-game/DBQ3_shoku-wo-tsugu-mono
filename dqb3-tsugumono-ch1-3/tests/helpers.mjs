@@ -43,7 +43,9 @@ export const BASE_URL = process.env.BASE_URL ?? "http://localhost:4174/builder_s
 export const SAVE_KEY = "shoku_wo_tsugumono_save_v1"; // src/game/save.js と一致させる
 
 // Boots the game to the title screen with a clean localStorage.
-export async function openGame(page, { collectErrors } = {}) {
+// SVGストーリームービーは既定で流さない（文字の演出・全文の会話に戻る）。movies: true で流す（movies.test.mjs）。
+export async function openGame(page, { collectErrors, movies = false } = {}) {
+  if (!movies) await page.addInitScript(() => { window.__SHOKU_SKIP_MOVIES__ = true; });
   if (collectErrors) {
     page.on("console", (m) => m.type() === "error" && collectErrors.push(m.text()));
     page.on("pageerror", (e) => collectErrors.push(e.message));

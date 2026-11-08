@@ -52,6 +52,12 @@ npm run test:e2e # 全テスト（第4章の通し・ロード復元を含む）
 
 形を直すときはStudioの `models.mjs` を編集し、Studioで `npm.cmd run export:props -- --preview-game` を実行します（第1～3章と第4～5章の両方へ書き出します）。`prop-models.js` は直接編集しないでください。今の本編の形と新しい形は、この編の開発サーバーの `/dqb3-tsugumono-ch4-5/prototypes/props-3d/` で並べて比べられます。
 
+## ストーリームービー
+
+物語の節目に、SVGで描いたストーリームービーが全画面で流れます：「はじめから」の後の火山島編の始まり、第5章の結末、鍛冶屋・僧侶の書の復活。クリック・Space・Enter で次の場面、Esc・「スキップ」で終わります。再生中はゲームの世界が止まります。
+
+ムービーの原本はStudioの [story-movies](../Storybook_Character_Studio/story-movies/) で、Studioの `npm.cmd run sync:movies` で `assets/movies/` へ写します（直接編集しない）。読み込めないときは今までの文字の演出に戻ります。始まりのムービーを最後まで見たときは、導入会話から字幕と同じ行（地の文と書の振り返り）を省きます（[不整合一覧のSTORY-008](../docs/story/inconsistencies.md#story-008)）。テストでは `tests/helpers.mjs` の `openGame` がムービーを止め、`tests/e2e/movies.test.mjs` だけがムービーを流します。
+
 ## 主要な技術メモ
 
 | 項目 | 値 |

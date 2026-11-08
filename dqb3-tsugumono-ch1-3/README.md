@@ -45,6 +45,12 @@ CH1～CH3の人型7人・基本モンスター5種は、Storybook Character Stud
 
 形を直すときはStudioの `models.mjs` を編集し、Studioで `npm.cmd run export:props -- --preview-game` を実行します（第1～3章と第4～5章の両方へ書き出します）。`prop-models.js` は直接編集しないでください。今の本編の形と新しい形は、開発サーバーの `/builder_sprite_lab/prototypes/props-3d/` で並べて比べられます（第4～5章だけの設備は第4～5章の開発サーバーで比べる）。
 
+## ストーリームービー
+
+物語の節目に、SVGで描いたストーリームービーが全画面で流れます：「はじめから」の後のプロローグ、第1章の結び（社で祈った後）、第2章の結び（田んぼ防衛戦の勝利会話の後）、旅立ち（ワタリに旅立ちを告げた後。クリア後の再演でも）、農民・料理人・船乗りの書の復活。クリック・Space・Enter で次の場面、Esc・「スキップ」で終わります。再生中はゲームの世界が止まります。
+
+ムービーの原本はStudioの [story-movies](../Storybook_Character_Studio/story-movies/) で、Studioの `npm.cmd run sync:movies` で `assets/movies/` へ写します（直接編集しない）。読み込めないときは今までの文字の演出に戻ります。プロローグを最後まで見たときは、導入会話の冒頭の語り（ムービーと同じ内容）を省きます（[不整合一覧のSTORY-008](../docs/story/inconsistencies.md#story-008)）。テストでは `tests/helpers.mjs` の `openGame` がムービーを止め、`tests/e2e/movies.test.mjs` だけがムービーを流します。
+
 ## 操作方法
 
 | 入力 | 動作 |

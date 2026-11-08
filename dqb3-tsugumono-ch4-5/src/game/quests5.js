@@ -387,11 +387,12 @@ export class Chapter5 {
     SFX.levelup();
     g.setBaseLevel(6);
     this.quests.busy = true;
-    g.ui.playEnding(() => {
+    // 火山島編の結びのムービー（M7）。流せないときは文字のエンディング。
+    g.movies.playOr("ch5-return", (done) => g.ui.playEnding(done, { lines: CH5.ending }), () => {
       this.quests.busy = false;
       this.quests.setStage("CH5_DONE");
       g.autosave();
-    }, { lines: CH5.ending });
+    });
   }
 
   // ロード後の正規化: 章の進行から導出される状態を復元する。

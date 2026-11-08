@@ -4,7 +4,7 @@
 
 2026-11-07のユーザー提示案を記録した制作計画です。世界観とシオンが書を持ち出した設定は、第1章の導入会話・章末説明へ反映済みです。この5場面を描く映像、音声、場面転換はゲームにはまだ実装していません。
 
-2026-11-08: 5場面・約31秒のSVGストーリームービーの試作をStudioに作成しました（[試作のREADME](../../../Storybook_Character_Studio/story-movies/prologue/README.md)、Studioの `/story-movies/prologue/`）。正式デザインのシオン（hero2）が登場します。音声はなく、ゲームには組み込んでいません。採用と移植はユーザーの確認後に判断します。
+2026-11-08: 5場面・約31秒のSVGストーリームービーの試作をStudioに作成しました（[試作のREADME](../../../Storybook_Character_Studio/story-movies/prologue/README.md)、Studioの `/story-movies/prologue/`）。正式デザインのシオン（hero2）が登場します。音声はありません。同日、第1～3章の「はじめから」の後に流すよう組み込みました（[組み込みの仕組み](story-movies.md#integration)）。
 
 ## 5場面の構成
 

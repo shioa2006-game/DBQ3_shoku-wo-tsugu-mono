@@ -2,6 +2,7 @@
 // 物語の内容・入る場所・長さ・優先度・作る順番の正本は、親リポジトリの docs/story/planned/story-movies.md。
 // 計画を変えたらここも直す（tests/node/story-movies.test.mjs が計画資料の表・作る順番と照合する）。
 // 新しいムービーを作ったら、story-movies/<slug>/index.html を置き、status を 'prototype' にして thumb を指定する。
+// ゲームへ組み込んだら（game-targets.mjs に書き出し先を足し、npm.cmd run sync:movies で写す）status を 'game' にする。
 
 /** 制作の状態。 */
 export const STATUS = {
@@ -33,7 +34,7 @@ export const BUILD_STEPS = [
  */
 export const MOVIES = [
   {
-    id: 'M0', slug: 'prologue', title: 'プロローグ「職をつぐ者」', saga: 'zipangu', status: 'prototype', buildStep: 0,
+    id: 'M0', slug: 'prologue', title: 'プロローグ「職をつぐ者」', saga: 'zipangu', status: 'game', buildStep: 0,
     when: '第1～3章・開始', place: '「はじめから」の後、第1章の導入会話の前', length: '大・31秒', priority: null,
     summary: '勇者の勝利から、魔物の再来、ダーマ神殿の崩壊、職業の書を背負ったシオンの脱出、ジパングへの漂着まで。',
     scenes: ['平和の終わり', '異変', 'ダーマ神殿の崩壊', 'シオンの脱出', 'ジパングへの漂着とタイトル'],
@@ -43,7 +44,7 @@ export const MOVIES = [
     links: [{ label: '制作メモ', href: 'prologue/README.md' }, { label: '絵コンテ', href: 'prologue/reference/storyboard.md' }],
   },
   {
-    id: 'M1', slug: 'ch1-shrine', title: '第1章の結び「小さな社」', saga: 'zipangu', status: 'prototype', buildStep: 4,
+    id: 'M1', slug: 'ch1-shrine', title: '第1章の結び「小さな社」', saga: 'zipangu', status: 'game', buildStep: 4,
     when: '第1章・章末', place: '社の祭壇で祈った後（文字の章末を置き換え）', length: '中・15秒', priority: 'B',
     summary: '最初の章を締めくくり、シオンが「職をつぐ者」と呼ばれる場面を印象づける。今の章末の文のうち第1章の行だけを使い、プロローグとの重なりを解消した。',
     scenes: ['夜の社。祭壇に職業の書と農民の書が並び、石灯籠に灯りがともる', '社を見上げるミナ・ピノ・ゴンタ・ジンベエ（後ろ姿）',
@@ -54,7 +55,7 @@ export const MOVIES = [
     links: [{ label: '制作メモ', href: 'ch1-shrine/README.md' }, { label: '絵コンテ', href: 'ch1-shrine/reference/storyboard.md' }],
   },
   {
-    id: 'M9', slug: 'ch2-harvest', title: '第2章の結び「収穫祭の夜」', saga: 'zipangu', status: 'prototype', buildStep: 4,
+    id: 'M9', slug: 'ch2-harvest', title: '第2章の結び「収穫祭の夜」', saga: 'zipangu', status: 'game', buildStep: 4,
     when: '第2章・章末', place: '田んぼ防衛戦の勝利会話の後（章末の演出を新しく足す）', length: '中・約18秒', priority: 'B',
     summary: '「食卓が戻る」収穫祭で第2章を締めくくり、沖の嵐で第3章の海と船へつなぐ。ワタリの漂着とクラーケンの全身は見せない。',
     scenes: ['守った田：月夜、泥の跡の残る田で実った稲が揺れる', '収穫祭：食堂の前で膳を囲む五人と、料理を運ぶイナホ',
@@ -66,7 +67,7 @@ export const MOVIES = [
     links: [{ label: '制作メモ', href: 'ch2-harvest/README.md' }, { label: '絵コンテ', href: 'ch2-harvest/reference/storyboard.md' }],
   },
   {
-    id: 'M4', slug: 'ch3-departure', title: '旅立ち「ジパング復興編・完」', saga: 'zipangu', status: 'prototype', buildStep: 1,
+    id: 'M4', slug: 'ch3-departure', title: '旅立ち「ジパング復興編・完」', saga: 'zipangu', status: 'game', buildStep: 1,
     when: '第3章・結末', place: 'ワタリに旅立ちを告げた後（文字の結末を置き換え。クリア後の再演でも再生）', length: '大・30～35秒', priority: 'A',
     summary: '第1～3章の総まとめと、島からの船出。第2章の結びの荒れた夜の海と対になる、晴れた朝の海へ。火山島編（M5）へつなぐ。',
     scenes: ['復興した島（田・食堂・灯台・社）を朝の光で見渡す', '島に残るピノ・イナホ・ジンベエ', '船に乗る四人と、桟橋で見送る人々', '灯台の光の先、水平線へ進む帆', 'タイトル「ジパング復興編・完」'],
@@ -76,7 +77,7 @@ export const MOVIES = [
     links: [{ label: '制作メモ', href: 'ch3-departure/README.md' }, { label: '絵コンテ', href: 'ch3-departure/reference/storyboard.md' }],
   },
   {
-    id: 'M5', slug: 'ch4-arrival', title: '火山島編の始まり「海を越えて」', saga: 'volcano', status: 'prototype', buildStep: 1,
+    id: 'M5', slug: 'ch4-arrival', title: '火山島編の始まり「海を越えて」', saga: 'volcano', status: 'game', buildStep: 1,
     when: '第4～5章・開始', place: '「はじめから」の後、第4章の導入会話の前', length: '大・25～30秒', priority: 'A',
     summary: '別のゲームとして始まる火山島編の入口。プロローグとM4の絵を思い出の額にしてこれまでの旅を短く振り返り、火山島への到着を見せる。',
     scenes: ['これまでの旅①：神殿から逃れた見習い（プロローグの絵を額に）', 'これまでの旅②：ジパングの復興と、島に残る三人（M4の絵を額に）',
@@ -87,7 +88,7 @@ export const MOVIES = [
     links: [{ label: '制作メモ', href: 'ch4-arrival/README.md' }, { label: '絵コンテ', href: 'ch4-arrival/reference/storyboard.md' }],
   },
   {
-    id: 'M7', slug: 'ch5-return', title: '帰るべき場所へ「火山島編・完」', saga: 'volcano', status: 'prototype', buildStep: 2,
+    id: 'M7', slug: 'ch5-return', title: '帰るべき場所へ「火山島編・完」', saga: 'volcano', status: 'game', buildStep: 2,
     when: '第5章・結末', place: '清めの泉の完成後（文字の結末を置き換え）', length: '大・30～35秒', priority: 'A',
     summary: '第4～5章を締めくくり、旧ダーマ神殿へ戻る決意を見せる。夜の海の向こうに、プロローグと同じ形の崩れた神殿の影。',
     scenes: ['澄んだ水が戻る清めの泉と、火の戻った鉱山町', '町の人々（ベルク・ナギ・ヨモギと、ロク・カヤ・スミ・テル）',
@@ -98,7 +99,7 @@ export const MOVIES = [
     links: [{ label: '制作メモ', href: 'ch5-return/README.md' }, { label: '絵コンテ', href: 'ch5-return/reference/storyboard.md' }],
   },
   {
-    id: 'M2', slug: 'book-revival', title: '書の復活（共通の型）', saga: 'common', status: 'prototype', buildStep: 3,
+    id: 'M2', slug: 'book-revival', title: '書の復活（共通の型）', saga: 'common', status: 'game', buildStep: 3,
     when: '第1～5章（5回）', place: '農民・料理人・船乗り・鍛冶屋・僧侶の書が復活するとき（復活の小窓を置き換え）', length: '小・6～8秒', priority: 'B',
     summary: '職が戻る瞬間を、毎回同じ型で見せる。書の色・紋章・道具の絵だけを差し替える。5冊の書の意匠（表紙の色・紋章）はこの試作で案を作った（shared/books.py）。',
     scenes: ['白紙の書が開く', 'ページに光の文字が戻る', 'その職の道具が光の中に浮かぶ（鍬・鍋・舵輪・槌・薬草）', '書の名前を表示する'],

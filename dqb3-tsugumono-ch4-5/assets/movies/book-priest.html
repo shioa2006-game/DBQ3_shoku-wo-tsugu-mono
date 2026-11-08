@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>職をつぐ者 書の復活 ― 僧侶の書（SVG試作）</title>
+<link rel="icon" href="data:,">
+<!--
+  『職をつぐ者』書の復活（共通の型）SVGストーリームービー試作：僧侶の書
+  - 生成物：Storybook_Character_Studio/story-movies/book-revival/src/build.py が書き出す。直接編集しない。
+  - 完全自己完結（外部ファイル・ライブラリ・通信なし）。再生エンジンは story-movies/shared/engine.py（プロローグと共通）
+  - 5冊とも同じ型。表紙の色・紋章・道具の絵だけを story-movies/shared/books.py から差し替える。
+  - 非公式ファン企画用。イラストはすべてコードで描いたオリジナルSVG。
+  - URLパラメータ：?autoplay=1（ボタンなしで再生） ?still=1&t=3000（その時刻で静止） ?reduced=1（モーション軽減を強制）
+-->
+<style>
+:root{
+  /* 共通トップ（portal/styles.css）とゲーム（src/style.css）と同じ書体。Macはヒラギノ丸ゴ、WindowsはBIZ UDゴシック */
+  --font:"Hiragino Maru Gothic ProN","BIZ UDGothic","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  --gold:#f2cf7c; --gold-deep:#c9913f; --paper:#f6efe1; --night:#0a0a22;
+  --sx:0px; --sy:0px; --sw:100vw; --sh:56.25vw; --vh:100vh;
+  --overscan:1.12;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+.movie{position:fixed;inset:0;background:#000;color:var(--paper);font-family:var(--font);
+  -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;outline:none}
+.movie[data-state="playing"],.movie[data-state="finishing"]{cursor:pointer}
+
+/* ---- ステージ（16:9固定、JSで配置） ---- */
+.stage{position:absolute;left:var(--sx);top:var(--sy);width:var(--sw);height:var(--sh);overflow:hidden;background:#000;contain:strict}
+.scenes{position:absolute;inset:0}
+.scene{position:absolute;inset:0;opacity:0}
+.scene-cam{position:absolute;left:calc((1 - var(--overscan)) * 50%);top:calc((1 - var(--overscan)) * 50%);
+  width:calc(var(--overscan) * 100%);height:calc(var(--overscan) * 100%);
+  transform:scale(calc(1 / var(--overscan)));transform-origin:50% 50%;will-change:transform}
+.scene-art{display:block;width:100%;height:100%}
+.grain{position:absolute;inset:0;pointer-events:none;opacity:.13;mix-blend-mode:overlay;background-size:240px 240px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='.33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.vignette{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 75% 70% at 50% 46%,transparent 58%,rgba(0,0,0,.5) 100%)}
+.caption-shade{position:absolute;left:0;right:0;bottom:0;height:34%;pointer-events:none;opacity:0;transition:opacity .9s ease;
+  background:linear-gradient(to top,rgba(3,2,10,.78),rgba(3,2,10,.38) 48%,rgba(3,2,10,0))}
+.has-caption .caption-shade{opacity:1}
+.is-portrait .caption-shade{display:none}
+
+/* ---- タイトル ---- */
+.title-card{position:absolute;left:0;right:0;top:15%;text-align:center;pointer-events:none;opacity:0;transition:opacity 1.6s ease}
+.title-card.is-shown{opacity:1}
+/* 共通トップのタイトルと同じ見た目（黄色・極太・茶色の影）。影の大きさは文字の大きさに比例させる */
+.title-main{margin:0;font-weight:900;font-size:calc(var(--sw) * .072);line-height:1.3;letter-spacing:.3em;padding-left:.3em;
+  color:#ffd94a;text-shadow:0 .048em 0 #8a5a00,0 .095em .286em rgba(0,0,0,.8);
+  transition:letter-spacing 2.6s cubic-bezier(.2,.7,.2,1),padding-left 2.6s cubic-bezier(.2,.7,.2,1)}
+.title-card.is-shown .title-main{letter-spacing:.04em;padding-left:.04em}
+.title-orn{display:flex;align-items:center;justify-content:center;gap:calc(var(--sw) * .012);margin:calc(var(--sw) * .012) auto 0;
+  width:calc(var(--sw) * .3);color:var(--gold);opacity:.9}
+.title-orn span{flex:1;height:1px;background:linear-gradient(90deg,transparent,currentColor)}
+.title-orn span:last-child{background:linear-gradient(270deg,transparent,currentColor)}
+.title-orn svg{width:calc(var(--sw) * .02);height:calc(var(--sw) * .02);fill:currentColor}
+.no-anim,.no-anim *{transition:none !important}
+.is-still .caption-line,.is-still .caption-shade,.is-still .title-card,.is-still .title-main,.is-still .panel{transition:none !important}
+
+/* ---- 字幕 ---- */
+.captions{position:absolute;z-index:5;display:grid;pointer-events:none;
+  left:calc(var(--sx) + var(--sw) * .07);width:calc(var(--sw) * .86);
+  bottom:calc(var(--vh) - var(--sy) - var(--sh) + var(--sh) * .07);
+  font-size:clamp(14px,calc(var(--sw) * .0265),34px)}
+.is-portrait .captions{left:18px;width:calc(100% - 36px);bottom:auto;top:calc(var(--sy) + var(--sh) + 26px);
+  font-size:clamp(15px,4.5vw,22px)}
+.caption-group{grid-area:1/1;align-self:end;text-align:center}
+.is-portrait .caption-group{align-self:start}
+.caption-line{margin:0;line-height:1.6;letter-spacing:.06em;font-weight:700;color:#f8f1e2;
+  word-break:keep-all;overflow-wrap:anywhere;
+  text-shadow:0 0 .6em rgba(0,0,0,.95),0 .06em .14em rgba(0,0,0,.95);
+  opacity:0;transform:translateY(.3em);transition:opacity .7s ease,transform 1s cubic-bezier(.2,.7,.2,1)}
+.caption-line.is-shown{opacity:1;transform:none}
+.is-portrait .caption-line + .caption-line{margin-top:.55em}
+
+/* ---- HUD ---- */
+.hud{position:absolute;z-index:8;pointer-events:none;left:var(--sx);top:var(--sy);width:var(--sw);height:var(--sh);
+  opacity:0;transition:opacity .6s ease}
+.is-portrait .hud{left:0;top:0;width:100%;height:100%}
+.movie[data-state="playing"] .hud{opacity:1}
+.pips{position:absolute;margin:0;padding:0;list-style:none;display:flex;align-items:center;gap:10px;
+  top:max(16px,env(safe-area-inset-top));left:max(18px,env(safe-area-inset-left))}
+.pips li{width:9px;height:9px;transform:rotate(45deg);border:1px solid rgba(242,207,124,.65);transition:background .5s,border-color .5s,box-shadow .5s}
+.pips li.is-done{background:rgba(242,207,124,.45);border-color:transparent}
+.pips li.is-current{background:var(--gold);border-color:var(--gold);box-shadow:0 0 10px rgba(242,207,124,.8)}
+.skip-btn{pointer-events:auto;position:absolute;top:max(10px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));
+  font:inherit;font-size:14px;letter-spacing:.12em;color:rgba(246,239,225,.82);background:rgba(8,8,20,.35);
+  border:1px solid rgba(246,239,225,.28);border-radius:999px;padding:9px 16px 9px 18px;min-height:40px;cursor:pointer;
+  -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);transition:color .3s,border-color .3s,background .3s}
+@media (pointer:coarse){.skip-btn{min-height:46px;min-width:96px;font-size:15px}.skip-btn kbd{display:none}}
+.skip-btn:hover{color:#fff;border-color:rgba(242,207,124,.8);background:rgba(20,16,30,.55)}
+.skip-btn kbd{font:inherit;font-size:11px;opacity:.6;margin-left:6px}
+.skip-btn:focus-visible,.btn:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+
+/* ---- 開始・終了パネル ---- */
+.panel{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:22px;padding:24px;text-align:center;opacity:0;visibility:hidden;transition:opacity .6s ease,visibility 0s .6s;
+  background:radial-gradient(ellipse 60% 55% at 50% 52%,rgba(52,38,112,.42),rgba(0,0,0,0) 70%),#000}
+.movie[data-state="idle"] .start-panel,.movie[data-state="ended"] .end-panel{opacity:1;visibility:visible;transition:opacity 1s ease}
+.emblem{width:min(120px,26vw);height:auto;overflow:visible}
+.movie[data-state="idle"] .emblem .glow{animation:emb 3.2s ease-in-out infinite}
+@keyframes emb{0%,100%{opacity:.55}50%{opacity:1}}
+.panel-kicker{margin:0;font-size:clamp(15px,2.2vw,19px);font-weight:700;letter-spacing:.6em;padding-left:.6em;color:rgba(242,207,124,.85)}
+.end-title{margin:0;font-size:clamp(40px,8vw,76px);font-weight:900;line-height:1.3;letter-spacing:.04em;padding-left:.04em;
+  color:#ffd94a;text-shadow:0 .048em 0 #8a5a00,0 .095em .286em rgba(0,0,0,.8)}
+.end-note{margin:0;font-size:clamp(13px,1.8vw,15px);letter-spacing:.08em;color:rgba(246,239,225,.55);line-height:1.8}
+.btn{font:inherit;font-weight:700;font-size:clamp(16px,2.4vw,20px);letter-spacing:.16em;padding:14px 34px 14px calc(34px + .16em);
+  color:#fff6e0;cursor:pointer;border-radius:2px;border:1px solid rgba(242,207,124,.75);
+  background:linear-gradient(180deg,rgba(60,44,110,.55),rgba(20,14,40,.7));
+  box-shadow:0 0 0 4px rgba(0,0,0,.6),0 0 0 5px rgba(242,207,124,.22),0 0 26px rgba(160,120,255,.25);
+  transition:box-shadow .4s,background .4s,transform .2s}
+.btn:hover{background:linear-gradient(180deg,rgba(84,62,150,.7),rgba(28,20,56,.8));
+  box-shadow:0 0 0 4px rgba(0,0,0,.6),0 0 0 5px rgba(242,207,124,.5),0 0 34px rgba(242,207,124,.35)}
+.btn:active{transform:translateY(1px)}
+.hint{margin:0;font-size:clamp(12px,1.7vw,14px);letter-spacing:.06em;color:rgba(246,239,225,.5);line-height:1.9}
+
+/* ---- モーション軽減 ---- */
+@media (prefers-reduced-motion: reduce){
+  .scene .mv{animation:none !important}
+  .movie .emblem .glow{animation:none}
+  .caption-line{transform:none}
+}
+.is-reduced .scene .mv{animation:none !important}
+
+.movie .title-main{font-size:calc(var(--sw) * .062)}
+.movie .end-title{font-size:clamp(30px,6vw,60px)}
+.end-note a{color:var(--gold)}
+</style>
+</head>
+<body>
+
+<div id="movie" class="movie" data-state="idle" tabindex="-1">
+  <div class="stage">
+    <div class="scenes" data-role="scenes"></div>
+    <div class="title-card" data-role="title" aria-hidden="true">
+      <h1 class="title-main">僧侶の書</h1>
+      <div class="title-orn"><span></span><svg viewBox="-10 -10 20 20"><path d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z"/></svg><span></span></div>
+    </div>
+    <div class="caption-shade"></div>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+  </div>
+  <div class="captions" data-role="captions" aria-live="polite"></div>
+  <div class="hud">
+    <ol class="pips" data-role="pips" aria-label="ムービーの進行"></ol>
+    <button type="button" class="skip-btn" data-action="skip">スキップ<kbd>Esc</kbd></button>
+  </div>
+  <section class="panel start-panel" aria-label="ムービーの開始">
+    <svg class="emblem" viewBox="-60 -60 120 120" aria-hidden="true">
+<defs><radialGradient id="emb-g" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffe7a8" stop-opacity=".9"/>
+<stop offset="1" stop-color="#f2cf7c" stop-opacity="0"/></radialGradient></defs>
+<circle class="glow" r="58" fill="url(#emb-g)"/>
+<circle r="40" fill="none" stroke="#f2cf7c" stroke-width="1.5" opacity=".8"/>
+<circle r="34" fill="none" stroke="#f2cf7c" stroke-width=".8" opacity=".5"/>
+<path d="M-18,8 Q-9,1 0,5 Q9,1 18,8 L18,-4 Q9,-11 0,-7 Q-9,-11 -18,-4Z" fill="#f2cf7c" transform="translate(0 9) scale(1.25)"/>
+<path d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" fill="#fff1c8" transform="translate(0 -12) scale(1.05)"/>
+</svg>
+    <p class="panel-kicker">書の復活　第5章</p>
+    <button type="button" class="btn" data-action="play">ムービーを見る</button>
+    <p class="hint">クリック・タップ・Space・Enter で書の名前まで進む<br>Esc でスキップ</p>
+  </section>
+  <section class="panel end-panel" aria-label="ムービーの終了">
+    <p class="end-title">僧侶の書</p>
+    <p class="end-note">5冊とも同じ型で、表紙・紋章・道具だけが変わります。<br><a href='../'>農民の書</a>　<a href='../cook/'>料理人の書</a>　<a href='../sailor/'>船乗りの書</a>　<a href='../blacksmith/'>鍛冶屋の書</a>　<strong>僧侶の書</strong></p>
+    <button type="button" class="btn" data-action="replay">もう一度見る</button>
+  </section>
+</div>
+
+<!-- ===================== SVGアセット（シーンごとに自己完結：defs・style込み） ===================== -->
+<template id="tpl-scene-1">
+<svg class="scene-art" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="暗がりに浮かぶ白紙の僧侶の書が開き、ページに光の文字が戻る。光の柱の中に薬草が浮かび上がる"><style>
+.s1-shift{transform:translateX(0)}
+.is-active .s1-shift{animation:s1-shift .9s .9s cubic-bezier(.4,0,.2,1) both}
+.s1-cover{transform-box:view-box;transform-origin:0 0}
+.is-active .s1-cover{animation:s1-cover .45s .9s ease-in both}
+.s1-open{transform-box:view-box;transform-origin:0 0}
+.is-active .s1-open{animation:s1-open .45s 1.35s ease-out both}
+.is-active .s1-float{animation:s1-float 2.4s ease-in-out infinite alternate}
+.s1-line{stroke-dasharray:1;stroke-dashoffset:0}
+.is-active .s1-line{animation:s1-line .5s calc(1.7s + var(--i) * .11s) ease-out both}
+.s1-pemblem{opacity:1}
+.is-active .s1-pemblem{animation:s1-in .7s 2.6s ease-out both}
+.is-active .s1-eglow{animation:s1-pulse 1.4s 2.6s ease-in-out infinite alternate both}
+.s1-beam{opacity:.8}
+.is-active .s1-beam{animation:s1-beam 4s 3s ease-out both}
+.s1-toolin{opacity:1}
+.is-active .s1-toolin{animation:s1-in .5s 3.1s ease-out both}
+.is-active .s1-rise{animation:s1-rise 1.1s 3.1s cubic-bezier(.2,.7,.3,1) both}
+.is-active .s1-bob{animation:s1-bob 2.2s 4.2s ease-in-out infinite alternate}
+.s1-flash{opacity:0}
+.is-active .s1-flash{animation:s1-flash .9s 3.7s ease-out both}
+.is-active .s1-rays{animation:s1-rays 7s linear both}
+.s1-raysin{opacity:.85}
+.is-active .s1-raysin{animation:s1-in 1.2s 3s ease-out both}
+.is-active .s1-spark{animation:s1-tw 1.6s ease-in-out infinite alternate}
+.s1-mote{opacity:0}
+.is-active .s1-mote{animation:s1-mote 3.2s ease-out infinite}
+@keyframes s1-shift{from{transform:translateX(-150px)}to{transform:translateX(0)}}
+@keyframes s1-cover{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+@keyframes s1-open{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes s1-float{from{transform:translateY(-6px)}to{transform:translateY(6px)}}
+@keyframes s1-line{from{stroke-dashoffset:1;opacity:.2}to{stroke-dashoffset:0;opacity:1}}
+@keyframes s1-in{from{opacity:0}to{opacity:1}}
+@keyframes s1-pulse{from{opacity:.45}to{opacity:1}}
+@keyframes s1-beam{0%{opacity:0}25%{opacity:1}100%{opacity:.75}}
+@keyframes s1-rise{from{transform:translateY(150px) scale(.4)}to{transform:none}}
+@keyframes s1-bob{from{transform:translateY(-5px)}to{transform:translateY(5px)}}
+@keyframes s1-flash{0%{opacity:0}25%{opacity:.85}100%{opacity:0}}
+@keyframes s1-rays{from{transform:rotate(0)}to{transform:rotate(14deg)}}
+@keyframes s1-tw{from{opacity:.25}to{opacity:1}}
+@keyframes s1-mote{0%{transform:translate(0,0);opacity:0}20%{opacity:.9}100%{transform:translate(var(--dx),var(--dy));opacity:0}}
+</style><defs><radialGradient id="s1-bg" cx=".5" cy=".55" r=".75"><stop offset="0" stop-color="#3a2f2a"/><stop offset=".6" stop-color="#1a1416"/><stop offset="1" stop-color="#0b090c"/></radialGradient><radialGradient id="s1-halo" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff0d4" stop-opacity=".55"/><stop offset=".5" stop-color="#fff0d4" stop-opacity=".15"/><stop offset="1" stop-color="#fff0d4" stop-opacity="0"/></radialGradient><linearGradient id="s1-beamg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#fff6d8" stop-opacity=".9"/><stop offset="1" stop-color="#fff6d8" stop-opacity="0"/></linearGradient><linearGradient id="s1-cover" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbf7ee"/><stop offset=".55" stop-color="#e8e1d0"/><stop offset="1" stop-color="#b9b09c"/></linearGradient><radialGradient id="s1-eglow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#c8402c" stop-opacity=".7"/><stop offset="1" stop-color="#c8402c" stop-opacity="0"/></radialGradient></defs><rect width="1600" height="900" fill="url(#s1-bg)"/><g class="s1-raysin"><g transform="translate(800 432)"><g class="s1-rays mv" opacity=".14"><path d="M0,0 L900,0 L896.4,80.9Z" fill="#fff0d4"/><path d="M0,0 L810.9,390.5 L772.5,461.8Z" fill="#fff0d4"/><path d="M0,0 L561.1,703.6 L495.6,751.2Z" fill="#fff0d4"/><path d="M0,0 L200.3,877.4 L120.6,891.9Z" fill="#fff0d4"/><path d="M0,0 L-200.3,877.4 L-278.3,855.9Z" fill="#fff0d4"/><path d="M0,0 L-561.1,703.6 L-622.1,650.4Z" fill="#fff0d4"/><path d="M0,0 L-810.9,390.5 L-842.7,316Z" fill="#fff0d4"/><path d="M0,0 L-900,0 L-896.4,-80.9Z" fill="#fff0d4"/><path d="M0,0 L-810.9,-390.5 L-772.5,-461.8Z" fill="#fff0d4"/><path d="M0,0 L-561.1,-703.7 L-495.6,-751.2Z" fill="#fff0d4"/><path d="M0,0 L-200.3,-877.4 L-120.6,-891.9Z" fill="#fff0d4"/><path d="M0,0 L200.3,-877.4 L278.3,-855.9Z" fill="#fff0d4"/><path d="M0,0 L561.1,-703.6 L622.1,-650.4Z" fill="#fff0d4"/><path d="M0,0 L810.9,-390.5 L842.7,-316Z" fill="#fff0d4"/></g></g></g><circle cx="800" cy="492" r="520" fill="url(#s1-halo)"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(769.6 399) scale(1)" fill="#fff3c8" style="animation-delay:-1.3s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(172.2 692.3) scale(0.9)" fill="#fff3c8" style="animation-delay:-0.6s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(1279.1 635.1) scale(0.8)" fill="#fff3c8" style="animation-delay:-0.6s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(1051.9 189) scale(0.7)" fill="#fff3c8" style="animation-delay:-0.9s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(280.8 95.3) scale(0.8)" fill="#fff3c8" style="animation-delay:-1.4s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(1096.8 69.8) scale(0.9)" fill="#fff3c8" style="animation-delay:-0.1s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(592 327.9) scale(0.9)" fill="#fff3c8" style="animation-delay:-1s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(113.9 598.3) scale(0.8)" fill="#fff3c8" style="animation-delay:-1.2s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(550.4 585.2) scale(0.9)" fill="#fff3c8" style="animation-delay:-0.3s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(580.6 805.6) scale(0.9)" fill="#fff3c8" style="animation-delay:-0.5s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(566.5 534.3) scale(0.7)" fill="#fff3c8" style="animation-delay:-0.4s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(552.6 478.5) scale(0.7)" fill="#fff3c8" style="animation-delay:-1.2s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(109.6 143.9) scale(1)" fill="#fff3c8" style="animation-delay:-1.5s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(493.8 626.3) scale(0.6)" fill="#fff3c8" style="animation-delay:-0.7s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(1300.2 610.5) scale(0.9)" fill="#fff3c8" style="animation-delay:-0.4s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(341.1 158.1) scale(0.4)" fill="#fff3c8" style="animation-delay:-1.4s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(217.1 248.6) scale(0.5)" fill="#fff3c8" style="animation-delay:-0.9s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(516.3 612.7) scale(0.4)" fill="#fff3c8" style="animation-delay:-0.7s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(1302.1 662.1) scale(0.6)" fill="#fff3c8" style="animation-delay:-1.5s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(1082 819.4) scale(0.5)" fill="#fff3c8" style="animation-delay:-1.4s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(1096.2 721.9) scale(0.6)" fill="#fff3c8" style="animation-delay:-1.1s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(376.5 297.7) scale(0.7)" fill="#fff3c8" style="animation-delay:-0s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(648.2 741.2) scale(1)" fill="#fff3c8" style="animation-delay:-1.6s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(1427.9 328.6) scale(0.7)" fill="#fff3c8" style="animation-delay:-0s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(1107.1 233.8) scale(0.7)" fill="#fff3c8" style="animation-delay:-0.4s"/><path class="s1-spark" d="M0,-10C1.2,-2.4 2.4,-1.2 10,0C2.4,1.2 1.2,2.4 0,10C-1.2,2.4 -2.4,1.2 -10,0C-2.4,-1.2 -1.2,-2.4 0,-10Z" transform="translate(640.2 799.8) scale(0.9)" fill="#fff3c8" style="animation-delay:-1.2s"/><g class="s1-motes mv"><circle class="s1-mote mv" cx="638.6" cy="597.2" r="3.8" fill="#fff0b8" style="--dx:-13.4px;--dy:-205.4px;animation-delay:-0.5s"/><circle class="s1-mote mv" cx="768.4" cy="560.9" r="2.3" fill="#fff0b8" style="--dx:52.8px;--dy:-204.4px;animation-delay:-2s"/><circle class="s1-mote mv" cx="738.7" cy="559" r="2" fill="#fff0b8" style="--dx:21.3px;--dy:-213.9px;animation-delay:-0s"/><circle class="s1-mote mv" cx="630.6" cy="749.4" r="3.1" fill="#fff0b8" style="--dx:16.6px;--dy:-253.6px;animation-delay:-2.5s"/><circle class="s1-mote mv" cx="821.1" cy="554" r="2.4" fill="#fff0b8" style="--dx:57.2px;--dy:-142.9px;animation-delay:-1.8s"/><circle class="s1-mote mv" cx="708.7" cy="613.7" r="4.1" fill="#fff0b8" style="--dx:-48.3px;--dy:-213.2px;animation-delay:-0.6s"/><circle class="s1-mote mv" cx="970.2" cy="577.7" r="3.8" fill="#fff0b8" style="--dx:-35.1px;--dy:-251.8px;animation-delay:-3.2s"/><circle class="s1-mote mv" cx="646" cy="550.3" r="2.8" fill="#fff0b8" style="--dx:-37.6px;--dy:-173.9px;animation-delay:-1.1s"/><circle class="s1-mote mv" cx="715" cy="671.5" r="3.7" fill="#fff0b8" style="--dx:-24.6px;--dy:-223.2px;animation-delay:-1.7s"/><circle class="s1-mote mv" cx="937.6" cy="653.1" r="3.8" fill="#fff0b8" style="--dx:-13.6px;--dy:-183.6px;animation-delay:-2.9s"/><circle class="s1-mote mv" cx="737.2" cy="710.1" r="3.9" fill="#fff0b8" style="--dx:47.5px;--dy:-259.3px;animation-delay:-0.5s"/><circle class="s1-mote mv" cx="677.4" cy="734" r="3.3" fill="#fff0b8" style="--dx:56.2px;--dy:-252.7px;animation-delay:-3s"/><circle class="s1-mote mv" cx="976.1" cy="574.2" r="2.4" fill="#fff0b8" style="--dx:19.9px;--dy:-154.6px;animation-delay:-3s"/><circle class="s1-mote mv" cx="1037.1" cy="564.7" r="3.7" fill="#fff0b8" style="--dx:13.4px;--dy:-185.4px;animation-delay:-3.2s"/><circle class="s1-mote mv" cx="1030" cy="603.7" r="3.6" fill="#fff0b8" style="--dx:-17.5px;--dy:-186.4px;animation-delay:-0.1s"/><circle class="s1-mote mv" cx="648.7" cy="646.1" r="3.5" fill="#fff0b8" style="--dx:-23.4px;--dy:-189.7px;animation-delay:-2.4s"/><circle class="s1-mote mv" cx="773.8" cy="520.7" r="3.4" fill="#fff0b8" style="--dx:60px;--dy:-258px;animation-delay:-0.7s"/><circle class="s1-mote mv" cx="655.6" cy="589.7" r="2.8" fill="#fff0b8" style="--dx:-27.2px;--dy:-248.7px;animation-delay:-1.9s"/><circle class="s1-mote mv" cx="565.2" cy="666.3" r="3.3" fill="#fff0b8" style="--dx:1.2px;--dy:-194.4px;animation-delay:-3.1s"/><circle class="s1-mote mv" cx="960.9" cy="658.3" r="3" fill="#fff0b8" style="--dx:-1.9px;--dy:-153.4px;animation-delay:-2.3s"/><circle class="s1-mote mv" cx="709.2" cy="735.7" r="3.9" fill="#fff0b8" style="--dx:-55.9px;--dy:-217.8px;animation-delay:-1s"/><circle class="s1-mote mv" cx="626.1" cy="666" r="2.2" fill="#fff0b8" style="--dx:26.3px;--dy:-145.3px;animation-delay:-3s"/><circle class="s1-mote mv" cx="730.9" cy="520.3" r="3.6" fill="#fff0b8" style="--dx:3.9px;--dy:-150.7px;animation-delay:-0s"/><circle class="s1-mote mv" cx="696.9" cy="606.1" r="2.6" fill="#fff0b8" style="--dx:42.6px;--dy:-162.8px;animation-delay:-1.1s"/><circle class="s1-mote mv" cx="976.9" cy="726.7" r="2.9" fill="#fff0b8" style="--dx:-45.4px;--dy:-178.9px;animation-delay:-1.3s"/><circle class="s1-mote mv" cx="971" cy="712.8" r="4.1" fill="#fff0b8" style="--dx:-33.4px;--dy:-201.9px;animation-delay:-0s"/><circle class="s1-mote mv" cx="753.7" cy="520.8" r="3.6" fill="#fff0b8" style="--dx:-43.3px;--dy:-197.5px;animation-delay:-2.2s"/><circle class="s1-mote mv" cx="675" cy="580.4" r="3.1" fill="#fff0b8" style="--dx:51.1px;--dy:-160.8px;animation-delay:-2.5s"/><circle class="s1-mote mv" cx="861.1" cy="617.6" r="2.6" fill="#fff0b8" style="--dx:-15.1px;--dy:-199.6px;animation-delay:-3s"/><circle class="s1-mote mv" cx="620.9" cy="753.2" r="3" fill="#fff0b8" style="--dx:4.6px;--dy:-190.1px;animation-delay:-1.2s"/></g><path class="s1-beam" d="M710,600 L890,600 L1020,-40 L580,-40Z" fill="url(#s1-beamg)"/><defs><clipPath id="s1-rightpage"><rect x="0" y="-390" width="320" height="780"/></clipPath><clipPath id="s1-leftpage"><rect x="-320" y="-390" width="320" height="780"/></clipPath></defs><g transform="translate(800 640) scale(0.84)"><g class="s1-float mv"><g class="s1-shift mv"><g class="s1-open"><rect x="-310" y="-201.0" width="310" height="402" rx="14" fill="#b9b09c" stroke="#2a1f16" stroke-width="4"/><rect x="-296" y="-189.0" width="290" height="378" rx="6" fill="#e8e1d0" opacity=".55"/></g><g clip-path="url(#s1-rightpage)"><path d="M0,-189.0 Q-150.0,-205.0 -292,-193.0 L-292,191.0 Q-150.0,179.0 0,195.0 Z" fill="#fbf6e6" stroke="#2a1f16" stroke-width="3"/><path d="M0,-189.0 Q150.0,-205.0 292,-193.0 L292,191.0 Q150.0,179.0 0,195.0 Z" fill="#fdf9ec" stroke="#2a1f16" stroke-width="3"/><path d="M0,-189.0 L0,195.0" stroke="#c9bfa3" stroke-width="4"/><path d="M-286,193.0 Q-150.0,183.0 -4,199.0 M286,193.0 Q150.0,183.0 4,199.0" fill="none" stroke="#d8ccae" stroke-width="2.4"/></g><g class="s1-open"><g clip-path="url(#s1-leftpage)"><path d="M0,-189.0 Q-150.0,-205.0 -292,-193.0 L-292,191.0 Q-150.0,179.0 0,195.0 Z" fill="#fbf6e6" stroke="#2a1f16" stroke-width="3"/><path d="M0,-189.0 Q150.0,-205.0 292,-193.0 L292,191.0 Q150.0,179.0 0,195.0 Z" fill="#fdf9ec" stroke="#2a1f16" stroke-width="3"/><path d="M0,-189.0 L0,195.0" stroke="#c9bfa3" stroke-width="4"/><path d="M-286,193.0 Q-150.0,183.0 -4,199.0 M286,193.0 Q150.0,183.0 4,199.0" fill="none" stroke="#d8ccae" stroke-width="2.4"/></g></g><path class="s1-line" d="M-256,-135 q9,-5 18,0 M-229,-135 q19.5,-2 39,0 M-181,-135 q12.5,1 25,0 M-147,-135 q23,-5 46,0 M-92,-135 q16,-2 32,0 M-51,-135 q9,1 18,0" fill="none" stroke="#d9a83a" stroke-width="4" stroke-linecap="round" pathLength="1" style="--i:0"/><path class="s1-line" d="M-256,-93 q16,-5 32,0 M-215,-93 q9,-2 18,0 M-188,-93 q19.5,1 39,0 M-140,-93 q12.5,-5 25,0 M-106,-93 q23,-2 46,0 M-51,-93 q16,1 32,0" fill="none" stroke="#d9a83a" stroke-width="4" stroke-linecap="round" pathLength="1" style="--i:1"/><path class="s1-line" d="M-256,-51 q23,-5 46,0 M-201,-51 q16,-2 32,0 M-160,-51 q9,1 18,0 M-133,-51 q19.5,-5 39,0 M-85,-51 q12.5,-2 25,0 M-51,-51 q23,1 46,0" fill="none" stroke="#d9a83a" stroke-width="4" stroke-linecap="round" pathLength="1" style="--i:2"/><path class="s1-line" d="M-256,-9 q12.5,-5 25,0 M-222,-9 q23,-2 46,0 M-167,-9 q16,1 32,0 M-126,-9 q9,-5 18,0 M-99,-9 q19.5,-2 39,0 M-51,-9 q12.5,1 25,0" fill="none" stroke="#d9a83a" stroke-width="4" stroke-linecap="round" pathLength="1" style="--i:3"/><path class="s1-line" d="M-256,33 q19.5,-5 39,0 M-208,33 q12.5,-2 25,0 M-174,33 q23,1 46,0 M-119,33 q16,-5 32,0 M-78,33 q9,-2 18,0 M-51,33 q19.5,1 39,0" fill="none" stroke="#d9a83a" stroke-width="4" stroke-linecap="round" pathLength="1" style="--i:4"/><path class="s1-line" d="M-256,75 q9,-5 18,0 M-229,75 q19.5,-2 39,0 M-181,75 q12.5,1 25,0 M-147,75 q23,-5 46,0 M-92,75 q16,-2 32,0 M-51,75 q9,1 18,0" fill="none" stroke="#d9a83a" stroke-width="4" stroke-linecap="round" pathLength="1" style="--i:5"/><path class="s1-line" d="M-256,117 q16,-5 32,0 M-215,117 q9,-2 18,0 M-188,117 q19.5,1 39,0 M-140,117 q12.5,-5 25,0 M-106,117 q23,-2 46,0 M-51,117 q16,1 32,0" fill="none" stroke="#d9a83a" stroke-width="4" stroke-linecap="round" pathLength="1" style="--i:6"/><path class="s1-line" d="M30,-135 q9,-5 18,0 M57,-135 q19.5,-2 39,0 M105,-135 q12.5,1 25,0 M139,-135 q23,-5 46,0 M194,-135 q16,-2 32,0 M235,-135 q9,1 18,0" fill="none" stroke="#d9a83a" stroke-width="4" stroke-linecap="round" pathLength="1" style="--i:7"/><path class="s1-line" d="M30,-93 q16,-5 32,0 M71,-93 q9,-2 18,0 M98,-93 q19.5,1 39,0 M146,-93 q12.5,-5 25,0 M180,-93 q23,-2 46,0 M235,-93 q16,1 32,0" fill="none" stroke="#d9a83a" stroke-width="4" stroke-linecap="round" pathLength="1" style="--i:8"/><path class="s1-line" d="M30,75 q9,-5 18,0 M57,75 q19.5,-2 39,0 M105,75 q12.5,1 25,0 M139,75 q23,-5 46,0 M194,75 q16,-2 32,0 M235,75 q9,1 18,0" fill="none" stroke="#d9a83a" stroke-width="4" stroke-linecap="round" pathLength="1" style="--i:12"/><path class="s1-line" d="M30,117 q16,-5 32,0 M71,117 q9,-2 18,0 M98,117 q19.5,1 39,0 M146,117 q12.5,-5 25,0 M180,117 q23,-2 46,0 M235,117 q16,1 32,0" fill="none" stroke="#d9a83a" stroke-width="4" stroke-linecap="round" pathLength="1" style="--i:13"/><g class="s1-pemblem"><circle cx="150.0" cy="0" r="90" class="s1-eglow" fill="url(#s1-eglow)"/><g transform="translate(150.0 -6) scale(1.05)"><path d="M0,-50 C14,-30 30,-12 30,8 C30,26 16,40 0,40 C-16,40 -30,26 -30,8 C-30,-12 -14,-30 0,-50Z" fill="none" stroke="#d9a83a" stroke-width="4.0" stroke-linecap="round" stroke-linejoin="round"/><path d="M-12,22 Q-2,-2 18,-14 Q14,12 -12,22Z" fill="#d9a83a"/><path d="M-12,22 Q0,8 10,-4" fill="none" stroke="#fff6ea" stroke-width="2"/><circle r="58" fill="none" stroke="#d9a83a" stroke-width="4.0" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/></g></g><g class="s1-cover"><g transform="translate(150.0 0)"><rect x="-156.0" y="-201.0" width="312" height="402" rx="14" fill="#b9b09c" stroke="#2a1f16" stroke-width="4"/><rect x="-150.0" y="-195.0" width="300" height="390" rx="10" fill="url(#s1-cover)" stroke="#2a1f16" stroke-width="3"/><rect x="-132.0" y="-177.0" width="264" height="354" rx="6" fill="none" stroke="#c8402c" stroke-width="3" opacity=".85"/><rect x="-124.0" y="-169.0" width="248" height="338" rx="4" fill="none" stroke="#c8402c" stroke-width="1.5" opacity=".6"/><path d="M-140.0,-191.0 L-140.0,191.0" stroke="#2a1f16" stroke-width="3" opacity=".5"/><g transform="scale(1.85)"><path d="M0,-50 C14,-30 30,-12 30,8 C30,26 16,40 0,40 C-16,40 -30,26 -30,8 C-30,-12 -14,-30 0,-50Z" fill="none" stroke="#c8402c" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M-12,22 Q-2,-2 18,-14 Q14,12 -12,22Z" fill="#c8402c"/><path d="M-12,22 Q0,8 10,-4" fill="none" stroke="#fff6ea" stroke-width="2"/><circle r="58" fill="none" stroke="#c8402c" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/></g></g></g></g></g></g><g class="s1-toolin"><g transform="translate(800 432)"><g class="s1-rise mv"><g class="s1-bob mv"><circle r="200" fill="url(#s1-halo)"/><g transform="scale(1.2)"><path d="M-8,90 Q-12,10 -4,-90 M4,90 Q8,0 10,-96 M0,90 Q-20,30 -26,-40" fill="none" stroke="#3f6e3a" stroke-width="7" stroke-linecap="round"/><path d="M-14,-20 q-18,-14 -34,-4 q--14,14 --34,4Z" fill="#6aa35a" stroke="#2f5a2a" stroke-width="3"/><path d="M-10,-48 q-18,-14 -34,-4 q--14,14 --34,4Z" fill="#6aa35a" stroke="#2f5a2a" stroke-width="3"/><path d="M-4,-74 q-18,-14 -34,-4 q--14,14 --34,4Z" fill="#6aa35a" stroke="#2f5a2a" stroke-width="3"/><path d="M12,-30 q18,-14 34,-4 q-14,14 -34,4Z" fill="#6aa35a" stroke="#2f5a2a" stroke-width="3"/><path d="M16,-58 q18,-14 34,-4 q-14,14 -34,4Z" fill="#6aa35a" stroke="#2f5a2a" stroke-width="3"/><path d="M8,-86 q18,-14 34,-4 q-14,14 -34,4Z" fill="#6aa35a" stroke="#2f5a2a" stroke-width="3"/><path d="M-22,4 q-18,-14 -34,-4 q--14,14 --34,4Z" fill="#6aa35a" stroke="#2f5a2a" stroke-width="3"/><path d="M20,-4 q18,-14 34,-4 q-14,14 -34,4Z" fill="#6aa35a" stroke="#2f5a2a" stroke-width="3"/><path d="M-22,52 Q0,62 24,52" fill="none" stroke="#c8402c" stroke-width="9" stroke-linecap="round"/><path d="M0,58 q-14,16 -8,30 M0,58 q14,16 8,30" fill="none" stroke="#c8402c" stroke-width="5" stroke-linecap="round"/></g></g></g></g></g><rect class="s1-flash" width="1600" height="900" fill="#fffbe8"/></svg>
+</template>
+<script>
+(function () {
+  'use strict';
+
+  /* =========================================================================
+   * 1. ストーリーデータ
+   *    演出（表示時間・字幕・カメラ・キュー）と、SVGアセットの参照だけを持つ。
+   *    将来は章ごとに prologue.story.js / chapter1.story.js などへ分離できる。
+   *    camera: s=倍率（1=全景）、x/y=ステージ幅・高さに対する移動量（%）
+   *    captions: in/out はシーン開始からの時刻（ミリ秒）。group が違う字幕は同じ場所に重ねて表示する
+   *              （前の組が消えてから次の組を出す。3行を一度に並べないため）。
+   * ======================================================================= */
+  const STORY = {
+    id: 'book-revival-priest',
+    title: '僧侶の書',
+    fadeIn: 700,
+    crossfade: 950,
+    quickCrossfade: 550,
+    finalFade: 900,
+    scenes: [
+      {
+        id: 'revival', label: '僧侶の書の復活', asset: 'tpl-scene-1', duration: 7000,
+        camera: { from: { s: 1.04, x: 0, y: 1 }, to: { s: 1.0, x: 0, y: 0 } },
+        captions: [
+          { text: '白紙のページに 光の文字が もどっていく……', in: 400, out: 3600 },
+          { text: 'ナギの手で よみがえった。傷ついた人を、再び暮らしへ戻す者の書。', in: 4300, out: 6700, group: 1 }
+        ],
+        cues: [{ at: 4000, action: 'title', stop: true }]
+      }
+    ]
+  };
+
+  /* =========================================================================
+   * 2. 再生エンジン（ストーリーに依存しない汎用部分）
+   *    将来は story-player.js として共通モジュール化する想定。
+   * ======================================================================= */
+  const reducedQuery = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+
+  // 既定のアセット解決：<template id="..."> を複製する。
+  // 章ごとに .svg ファイルを fetch して文字列で渡す方式にも差し替え可能。
+  function templateAsset(scene) {
+    if (scene.markup) {
+      const wrap = document.createElement('div');
+      wrap.innerHTML = scene.markup;
+      const frag = document.createDocumentFragment();
+      while (wrap.firstChild) frag.appendChild(wrap.firstChild);
+      return frag;
+    }
+    const tpl = document.getElementById(scene.asset);
+    if (!tpl) throw new Error('SVGアセットが見つかりません: ' + scene.asset);
+    return tpl.content.cloneNode(true);
+  }
+
+  class StoryPlayer {
+    constructor(root, story, options) {
+      this.root = root;
+      this.story = story;
+      this.opts = Object.assign({
+        overscan: 1.12,
+        resolveAsset: templateAsset,
+        forceReducedMotion: false,
+        onSceneChange: null,
+        onComplete: null
+      }, options || {});
+      this.el = {
+        scenes: root.querySelector('[data-role="scenes"]'),
+        captions: root.querySelector('[data-role="captions"]'),
+        title: root.querySelector('[data-role="title"]'),
+        pips: root.querySelector('[data-role="pips"]'),
+        stage: root.querySelector('.stage')
+      };
+      this.state = 'idle';
+      this.index = -1;
+      this.current = null;
+      this.live = [];             // DOM上に存在するシーン（クロスフェード中は2つ）
+      this.timers = new Set();
+      this.anims = new Set();     // プレイヤー全体のWeb Animations
+      this.raf = 0;
+      this.lastNext = 0;
+      this._tick = this._tick.bind(this);
+      root.style.setProperty('--overscan', String(this.opts.overscan));
+      this._buildPips();
+      this._updateReduced();
+      if (reducedQuery && reducedQuery.addEventListener) {
+        reducedQuery.addEventListener('change', () => this._updateReduced());
+      }
+    }
+
+    get isPlaying() { return this.state === 'playing' || this.state === 'finishing'; }
+
+    /* ---------- 公開API ---------- */
+    // from: 始めるシーンの番号（0始まり。確認用に途中から再生できる）
+    play(from) {
+      if (this.isPlaying) return;
+      this._cleanup();
+      this._setState('playing');
+      this._enter(Math.max(0, Math.min(this.story.scenes.length - 1, from | 0)), this.story.fadeIn);
+      this.raf = requestAnimationFrame(this._tick);
+    }
+
+    // 確認・撮影用：シーン i を時刻 t（ミリ秒）の状態で止めて表示する（字幕・タイトル・カメラ・絵の動きを含む）。
+    still(i, t) {
+      this._cleanup();
+      this._setState('still');
+      const data = this.story.scenes[i];
+      this._enter(i, 0);
+      const s = this.current;
+      const at = Math.max(0, Math.min(t, data.duration));
+      this.root.classList.add('is-still');
+      s.anims.concat(s.el.getAnimations({ subtree: true })).forEach(a => { a.pause(); a.currentTime = at; });
+      while (s.ev < s.events.length && s.events[s.ev].at <= at) this._fire(s, s.events[s.ev++]);
+      return { scene: data.id, t: at };
+    }
+
+    next() {
+      if (this.state === 'finishing') { this._complete(false); return; }
+      if (this.state !== 'playing' || !this.current) return;
+      const now = performance.now();
+      if (now - this.lastNext < 320) return;
+      this.lastNext = now;
+      const s = this.current;
+      const t = now - s.start;
+      const stop = s.events.find(e => e.type === 'cue' && e.cue.stop && e.at > t);
+      if (stop) { s.start = now - stop.at; return; }   // 停止点まで時間を進める
+      this._advance(this.story.quickCrossfade);
+    }
+
+    skip() {
+      if (!this.isPlaying) return;
+      this._setState('skipping');
+      cancelAnimationFrame(this.raf);
+      this._track(this.el.stage.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 380, easing: 'ease-in', fill: 'forwards' }));
+      this._later(380, () => this._complete(true));
+    }
+
+    destroy() { this._cleanup(); this._setState('idle'); }
+
+    /* ---------- 内部処理 ---------- */
+    _enter(i, transitionMs) {
+      const data = this.story.scenes[i];
+      const prev = this.current;
+      const el = document.createElement('div');
+      el.className = 'scene';
+      el.dataset.scene = data.id;
+      const cam = document.createElement('div');
+      cam.className = 'scene-cam';
+      cam.appendChild(this.opts.resolveAsset(data));
+      el.appendChild(cam);
+      this.el.scenes.appendChild(el);
+
+      const s = {
+        data, el, cam, anims: [], ev: 0, start: performance.now(),
+        events: this._buildEvents(data), groups: [], lines: []
+      };
+      this._buildCaptions(s);
+
+      void el.offsetWidth;                 // 初期状態を確定させてからアニメーション開始
+      el.classList.add('is-active');       // SVG内のCSSアニメーションはこのクラスで動き出す
+      s.anims.push(el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: transitionMs, easing: 'ease-out', fill: 'forwards' }));
+      const cf = this._camKey(data.camera && data.camera.from);
+      if (this.reduced || !data.camera) {
+        // モーション軽減時はカメラを動かさず、移動の中間位置で固定する
+        const a = (data.camera && data.camera.from) || {}, b = (data.camera && data.camera.to) || a;
+        const mid = k => (((a[k] != null ? a[k] : (k === 's' ? 1 : 0)) + (b[k] != null ? b[k] : (k === 's' ? 1 : 0))) / 2);
+        cam.style.transform = this._camKey({ s: mid('s'), x: mid('x'), y: mid('y') });
+      } else {
+        s.anims.push(cam.animate([{ transform: cf }, { transform: this._camKey(data.camera.to) }], {
+          duration: data.duration + this.story.crossfade, easing: data.camera.easing || 'cubic-bezier(.4,0,.6,1)', fill: 'forwards'
+        }));
+      }
+
+      this.live.push(s);
+      this.current = s;
+      this.index = i;
+      if (prev) {
+        prev.lines.forEach(l => l.classList.remove('is-shown'));
+        this._later(transitionMs + 80, () => this._dispose(prev));
+      }
+      this._updatePips();
+      this._updateCaptionShade();
+      if (this.opts.onSceneChange) this.opts.onSceneChange(i, data);
+      this.root.dispatchEvent(new CustomEvent('storyscene', { detail: { story: this.story.id, index: i, scene: data.id } }));
+    }
+
+    _advance(ms) {
+      if (this.index + 1 < this.story.scenes.length) this._enter(this.index + 1, ms);
+      else this._finish();
+    }
+
+    _finish() {
+      this._setState('finishing');
+      cancelAnimationFrame(this.raf);
+      this._track(this.el.stage.animate([{ opacity: 1 }, { opacity: 0 }], { duration: this.story.finalFade, easing: 'ease-in', fill: 'forwards' }));
+      this._later(this.story.finalFade, () => this._complete(false));
+    }
+
+    _complete(skipped) {
+      this._cleanup();
+      this._setState('ended');
+      if (this.opts.onComplete) this.opts.onComplete({ skipped });
+      this.root.dispatchEvent(new CustomEvent('storyend', { detail: { story: this.story.id, skipped } }));
+    }
+
+    _cleanup() {
+      cancelAnimationFrame(this.raf);
+      this.raf = 0;
+      this.timers.forEach(id => clearTimeout(id));
+      this.timers.clear();
+      this.live.slice().forEach(s => this._dispose(s));
+      this.live = [];
+      this.current = null;
+      this.index = -1;
+      this.anims.forEach(a => a.cancel());
+      this.anims.clear();
+      this.el.captions.textContent = '';
+      this.root.classList.remove('has-caption', 'is-still');
+      const t = this.el.title;
+      t.classList.add('no-anim');
+      t.classList.remove('is-shown');
+      void t.offsetWidth;
+      t.classList.remove('no-anim');
+      this._updatePips();
+    }
+
+    _dispose(s) {
+      s.anims.forEach(a => a.cancel());
+      s.anims.length = 0;
+      s.el.remove();
+      s.groups.forEach(g => g.remove());
+      this.live = this.live.filter(x => x !== s);
+    }
+
+    _tick() {
+      if (this.state !== 'playing') return;
+      const s = this.current;
+      const t = performance.now() - s.start;
+      while (s.ev < s.events.length && s.events[s.ev].at <= t) this._fire(s, s.events[s.ev++]);
+      if (t >= s.data.duration) this._advance(this.story.crossfade);
+      if (this.state === 'playing') this.raf = requestAnimationFrame(this._tick);
+    }
+
+    _buildEvents(data) {
+      const ev = [];
+      (data.captions || []).forEach((c, i) => {
+        ev.push({ at: c.in, type: 'caption-in', i });
+        ev.push({ at: c.out, type: 'caption-out', i });
+      });
+      (data.cues || []).forEach(c => ev.push({ at: c.at, type: 'cue', cue: c }));
+      return ev.sort((a, b) => a.at - b.at);
+    }
+
+    _fire(s, e) {
+      if (e.type === 'caption-in') s.lines[e.i].classList.add('is-shown');
+      else if (e.type === 'caption-out') s.lines[e.i].classList.remove('is-shown');
+      else if (e.type === 'cue' && e.cue.action === 'title') this.el.title.classList.add('is-shown');
+      this._updateCaptionShade();
+    }
+
+    _buildCaptions(s) {
+      const groups = [];
+      (s.data.captions || []).forEach(c => {
+        const k = c.group || 0;
+        if (!groups[k]) {
+          groups[k] = document.createElement('div');
+          groups[k].className = 'caption-group';
+        }
+        const p = document.createElement('p');
+        p.className = 'caption-line';
+        // 読点の後ろで折り返せるようにする（スマートフォン縦画面用）
+        c.text.replace(/、/g, '、\u0000').split('\u0000').forEach((part, k, arr) => {
+          p.appendChild(document.createTextNode(part));
+          if (k < arr.length - 1) p.appendChild(document.createElement('wbr'));
+        });
+        groups[k].appendChild(p);
+        s.lines.push(p);
+      });
+      groups.filter(Boolean).forEach(g => { this.el.captions.appendChild(g); s.groups.push(g); });
+    }
+
+    _updateCaptionShade() {
+      const on = !!(this.current && this.current.lines.some(l => l.classList.contains('is-shown')));
+      this.root.classList.toggle('has-caption', on);
+    }
+
+    _buildPips() {
+      this.el.pips.innerHTML = '';
+      this.story.scenes.forEach((sc, i) => {
+        const li = document.createElement('li');
+        li.setAttribute('aria-label', (i + 1) + '：' + sc.label);
+        this.el.pips.appendChild(li);
+      });
+    }
+
+    _updatePips() {
+      Array.from(this.el.pips.children).forEach((li, i) => {
+        li.classList.toggle('is-done', i < this.index);
+        li.classList.toggle('is-current', i === this.index);
+        if (i === this.index) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
+      });
+    }
+
+    // カメラ：ステージ基準の値を、オーバースキャンしたレイヤーの transform に変換する。
+    // 画面端が見えないよう、移動量は倍率に応じて自動的に制限する。
+    _camKey(c) {
+      const os = this.opts.overscan;
+      const s = Math.max(1, (c && c.s) || 1);
+      const lim = (s - 1) / 2 * 100;
+      const x = Math.max(-lim, Math.min(lim, (c && c.x) || 0));
+      const y = Math.max(-lim, Math.min(lim, (c && c.y) || 0));
+      return 'translate(' + (x / os).toFixed(3) + '%,' + (y / os).toFixed(3) + '%) scale(' + (s / os).toFixed(4) + ')';
+    }
+
+    _updateReduced() {
+      this.reduced = this.opts.forceReducedMotion || !!(reducedQuery && reducedQuery.matches);
+      this.root.classList.toggle('is-reduced', this.reduced);
+    }
+
+    _setState(st) { this.state = st; this.root.dataset.state = st; }
+    _track(a) { this.anims.add(a); return a; }
+    _later(ms, fn) {
+      const id = setTimeout(() => { this.timers.delete(id); fn(); }, ms);
+      this.timers.add(id);
+      return id;
+    }
+  }
+
+  /* =========================================================================
+   * 3. レイアウト（16:9を維持して画面に収める）
+   * ======================================================================= */
+  function layout(root) {
+    const vw = window.innerWidth, vh = window.innerHeight;
+    let sw = vw, sh = vw * 9 / 16;
+    if (sh > vh) { sh = vh; sw = vh * 16 / 9; }
+    const portrait = vh > vw * 1.1 && (vh - sh) > 220;
+    const sx = (vw - sw) / 2;
+    const sy = portrait ? Math.max(0, (vh - sh) * 0.4) : (vh - sh) / 2;
+    const st = root.style;
+    st.setProperty('--sw', sw + 'px');
+    st.setProperty('--sh', sh + 'px');
+    st.setProperty('--sx', sx + 'px');
+    st.setProperty('--sy', sy + 'px');
+    st.setProperty('--vh', vh + 'px');
+    root.classList.toggle('is-portrait', portrait);
+  }
+
+  /* =========================================================================
+   * 4. 起動と入力
+   * ======================================================================= */
+  const root = document.getElementById('movie');
+  const params = new URLSearchParams(location.search);
+  const player = new StoryPlayer(root, STORY, {
+    forceReducedMotion: params.get('reduced') === '1',
+    onComplete: function () {
+      const btn = root.querySelector('[data-action="replay"]');
+      if (btn) btn.focus({ preventScroll: true });
+    }
+  });
+
+  layout(root);
+  window.addEventListener('resize', () => layout(root));
+  window.addEventListener('orientationchange', () => setTimeout(() => layout(root), 120));
+
+  function start(fromScene) {
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    root.focus({ preventScroll: true });
+    player.play(fromScene || 0);
+  }
+
+  root.addEventListener('click', (e) => {
+    const action = e.target.closest('[data-action]');
+    if (action) {
+      e.stopPropagation();
+      const a = action.dataset.action;
+      if (a === 'play' || a === 'replay') start();
+      else if (a === 'skip') player.skip();
+      return;
+    }
+    if (player.isPlaying) player.next();
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.repeat) return;
+    if (e.key === 'Escape') {
+      if (player.isPlaying) { e.preventDefault(); player.skip(); }
+      return;
+    }
+    if (e.key === ' ' || e.key === 'Enter') {
+      if (e.target.closest && e.target.closest('button')) return;   // ボタン自身の操作を優先
+      e.preventDefault();
+      if (player.isPlaying) player.next();
+      else if (player.state === 'idle') start();
+    }
+  });
+
+  // ゲーム組み込み・デバッグ用
+  //   ?autoplay=1          ボタンなしで再生
+  //   ?from=4              第4場面から再生（確認用）
+  //   ?still=4&t=3500      第4場面の3.5秒の状態で止める（撮影・静止画の確認用）
+  window.ShokuMovie = { player, story: STORY, StoryPlayer };
+  const from = Math.max(0, (parseInt(params.get('from'), 10) || 1) - 1);
+  if (params.has('still')) player.still(Math.max(0, Math.min(STORY.scenes.length - 1, (parseInt(params.get('still'), 10) || 1) - 1)),
+    parseInt(params.get('t'), 10) || 0);
+  else if (params.get('autoplay') === '1' || params.has('from')) start(from);
+})();
+</script>
+</body>
+</html>

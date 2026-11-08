@@ -45,6 +45,8 @@ export const STAGE_ORDER = [
 export const stageIndex = (s) => STAGE_ORDER.indexOf(s);
 
 const D = (speaker, text) => ({ speaker, text });
+// プロローグのムービー（M0）の字幕と同じ内容の、導入会話の先頭の地の文の行数。
+const INTRO_COVERED_BY_MOVIE = 3;
 const HERO = "シオン"; // the apprentice priest protagonist
 const BOOK = "職業の書";
 
@@ -119,29 +121,36 @@ export class QuestManager {
 
   // --- cutscenes -----------------------------------------------------------------
 
+  // プロローグのムービー（M0）の後に導入会話。ムービーを最後まで見たときは、
+  // ムービーと同じ内容の地の文（先頭の INTRO_COVERED_BY_MOVIE 行）を省く。
+  // スキップしたとき・流せなかったときは全文を流す（docs/story/inconsistencies.md の STORY-008）。
   startIntro() {
     this.busy = true;
-    this.game.ui.dialogue.play(
-      [
-        D("", "勇者がゾーマを倒した。世界には平和が訪れるはずだった。"),
-        D("", "しかし、上の世界には再び魔物があふれ、混乱が広がった。"),
-        D("", "職業を司るダーマ神殿も襲われ、多くの職業の書が焼かれ、散り散りになった。"),
-        D("", "……波の音が聞こえる。"),
-        D(HERO, "「ここは……どこだ？　そうだ、職業の書を抱えて、炎の中のダーマ神殿から逃げ出したんだ……」"),
-        D(HERO, "「あの時、神殿にいた人々の中で、神官見習いの私だけが生き残ってしまった……」"),
-        D(HERO, "「……この書だけは、離さずに持ってこられた。けれど、これからどうすれば……」"),
-        D(BOOK, "「嘆くな、シオン。わしは、おぬしが神殿から運び出した 職業の書 じゃ」"),
-        D(HERO, "「本が……話した！？」"),
-        D(BOOK, "「この島ジパングも魔物に荒らされ、人々は職を失い、暮らしを立て直せずにおる」"),
-        D(BOOK, "「職業の書は、人々が働き、町を作る時にこそ よみがえる。まずは暮らしの場所を作る、ビルダーの技を学ぶのじゃ！」"),
-        D(HERO, "「私が……ビルダーに……。わかった、やってみるよ！」"),
-        D(BOOK, "「うむ。まずは 木材 じゃ。ハンマーを持ち 木に向けて左ボタンを押し続けるのじゃ。木材を5つ 集めるぞ！」"),
-      ],
-      () => {
+    this.game.movies.play("prologue").then(({ shown, skipped }) => {
+      const lines = this.introLines();
+      this.game.ui.dialogue.play(shown && !skipped ? lines.slice(INTRO_COVERED_BY_MOVIE) : lines, () => {
         this.busy = false;
         this.setStage("GATHER_WOOD");
-      },
-    );
+      });
+    });
+  }
+
+  introLines() {
+    return [
+      D("", "勇者がゾーマを倒した。世界には平和が訪れるはずだった。"),
+      D("", "しかし、上の世界には再び魔物があふれ、混乱が広がった。"),
+      D("", "職業を司るダーマ神殿も襲われ、多くの職業の書が焼かれ、散り散りになった。"),
+      D("", "……波の音が聞こえる。"),
+      D(HERO, "「ここは……どこだ？　そうだ、職業の書を抱えて、炎の中のダーマ神殿から逃げ出したんだ……」"),
+      D(HERO, "「あの時、神殿にいた人々の中で、神官見習いの私だけが生き残ってしまった……」"),
+      D(HERO, "「……この書だけは、離さずに持ってこられた。けれど、これからどうすれば……」"),
+      D(BOOK, "「嘆くな、シオン。わしは、おぬしが神殿から運び出した 職業の書 じゃ」"),
+      D(HERO, "「本が……話した！？」"),
+      D(BOOK, "「この島ジパングも魔物に荒らされ、人々は職を失い、暮らしを立て直せずにおる」"),
+      D(BOOK, "「職業の書は、人々が働き、町を作る時にこそ よみがえる。まずは暮らしの場所を作る、ビルダーの技を学ぶのじゃ！」"),
+      D(HERO, "「私が……ビルダーに……。わかった、やってみるよ！」"),
+      D(BOOK, "「うむ。まずは 木材 じゃ。ハンマーを持ち 木に向けて左ボタンを押し続けるのじゃ。木材を5つ 集めるぞ！」"),
+    ];
   }
 
   // Called every frame by the game loop.
@@ -422,7 +431,8 @@ export class QuestManager {
         D(BOOK, "「この社を、島の暮らしを支える場所に育てるのじゃ。職をつぐ旅は、ここから続いていくぞ！」"),
       ],
       () => {
-        this.game.ui.playEnding(() => {
+        // 第1章の結びのムービー（M1）。流せないときは文字のエンディング。
+        this.game.movies.playOr("ch1-shrine", (done) => this.game.ui.playEnding(done), () => {
           this.busy = false;
           this.setStage("POSTGAME");
         });

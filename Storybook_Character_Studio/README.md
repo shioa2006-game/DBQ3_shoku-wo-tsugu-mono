@@ -82,8 +82,8 @@ npm.cmd run sync:games -- mina    # 指定したキャラクターだけ
 | `prototypes/shared/` | 目・鼻・SVG部品・方向順、各キャラクターの書き出し先のゲーム（`game-targets.mjs`） |
 | `story-movies/` | SVGストーリームービーの一覧ページ（`index.html`）と一覧データ（`catalog.mjs`） |
 | `story-movies/shared/` | ムービーの共通部品（再生エンジン、作画ヘルパー、人物の部品の書き出しと手足） |
-| `story-movies/prologue/` | プロローグのSVGストーリームービー試作（正式デザインのシオンが登場。ゲーム未組み込み） |
-| `story-movies/ch3-departure/` | 第3章の結末「旅立ち ― ジパング復興編・完」の試作（7人が登場。ゲーム未組み込み） |
+| `story-movies/<名前>/` | 採用した7本のムービー（プロローグ・第1～3章の結び・火山島編の始まりと終わり・書の復活）。2026-11-08に両編へ組み込み済み |
+| `story-movies/game-targets.mjs` | ムービーの書き出し先のゲーム（`npm.cmd run sync:movies` が各編の `assets/movies/` へ写す） |
 | `docs/` | 制作上の知見と整理記録 |
 | `index.html` | 人型7人とモンスター5体の制作入口 |
 | `tools/` | 起動とローカル静的配信 |
@@ -95,7 +95,9 @@ npm.cmd run sync:games -- mina    # 指定したキャラクターだけ
 
 2本目以降のムービーは、共通部品（[`story-movies/shared/`](story-movies/shared/README.md)：再生エンジン、人物の頭・胴を作画コードから取り出す仕組みと手足）を使います。生成は `npm.cmd run build:movie -- <フォルダ名>`、ブラウザーでの再生確認は `npm.cmd run test:movie -- <フォルダ名>`。2026-11-08に「旅立ち ― ジパング復興編・完」（[`story-movies/ch3-departure/`](story-movies/ch3-departure/README.md)）を試作しました。
 
-冒頭に挿入するSVGストーリームービー（約31秒・5場面）の試作が [`story-movies/prologue/`](story-movies/prologue/README.md) にあります。http://127.0.0.1:8081/story-movies/prologue/ で再生できます。主人公の頭・胴は `prototypes/hero2-8dir/character.mjs` から書き出して使い、手足と場面の絵はPythonで描きます（`npm.cmd run build:prologue`、Python 3.9以上が必要）。ブラウザーでの再生確認は `npm.cmd run test:prologue`。ゲームへの移植はユーザーが決めた段階で行います。
+冒頭に挿入するSVGストーリームービー（約31秒・5場面）の試作が [`story-movies/prologue/`](story-movies/prologue/README.md) にあります。http://127.0.0.1:8081/story-movies/prologue/ で再生できます。主人公の頭・胴は `prototypes/hero2-8dir/character.mjs` から書き出して使い、手足と場面の絵はPythonで描きます（`npm.cmd run build:prologue`、Python 3.9以上が必要）。ブラウザーでの再生確認は `npm.cmd run test:prologue`。
+
+2026-11-08に7本すべてを両編のゲームへ組み込みました。ムービーを生成し直したら、`npm.cmd run sync:movies`（指定したものだけなら `npm.cmd run sync:movies -- ch1-shrine`）で各編の `assets/movies/` へ写します。書き出し先は `story-movies/game-targets.mjs`、ゲームでの再生と会話との重なりの扱いは親リポジトリの `docs/story/planned/story-movies.md`（「ゲームへの組み込み」）を参照してください。`npm.cmd test` が写しと生成物の一致を確かめます。
 
 ## 確認する
 

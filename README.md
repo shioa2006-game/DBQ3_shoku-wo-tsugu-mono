@@ -11,7 +11,7 @@
 | [dqb3-tsugumono-ch1-3](dqb3-tsugumono-ch1-3/README.md) | ジパング復興編。制作した人型7人・基本モンスター5種を本編へ移植済み |
 | [dqb3-tsugumono-ch4-5](dqb3-tsugumono-ch4-5/README.md) | 火山島編。第4～5章の独立ゲーム |
 | [dqb3-tsugumono-ch6-7](dqb3-tsugumono-ch6-7/README.md) | ダーマ再興編の予定地。ゲーム実装は未作成 |
-| [game-shared](game-shared/) | 設計図、所持品・クラフト・収納、職業の書、防衛戦、セーブの共通実装 |
+| [game-shared](game-shared/) | 設計図、所持品・クラフト・収納、職業の書、防衛戦、セーブ、SVGストーリームービーの再生の共通実装 |
 | [Storybook_Character_Studio](Storybook_Character_Studio/README.md) | 8方向キャラクターの制作原本・生成画像・制作ガイド |
 | [docs/story](docs/story/README.md) | 実装基準のストーリー資料・第6～7章計画・不整合一覧 |
 | [docs](docs/GITHUB_WORKFLOW.md) | GitHub運用と統合記録 |

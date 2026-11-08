@@ -45,6 +45,7 @@ const FAST = new Set([
   "water-escape.test.mjs",
   "item-icons.test.mjs",
   "prop-models.test.mjs",
+  "movies.test.mjs",
 ]);
 
 if (!fs.existsSync(path.join(ROOT, "dist", "index.html"))) {

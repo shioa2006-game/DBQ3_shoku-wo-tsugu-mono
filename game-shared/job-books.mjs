@@ -12,6 +12,7 @@ export class JobBooks {
   }
 
   // 書の復活演出を再生して復活状態にする。二重復活は演出を飛ばして完了扱い。
+  // 演出は書の復活のムービー（各編の movies に book-<id> があれば。M2）、流せないときは復活の窓。
   revive(id, onDone) {
     if (this.revived.has(id)) {
       if (onDone) onDone();
@@ -19,9 +20,13 @@ export class JobBooks {
     }
     this.revived.add(id);
     this.sounds.book();
-    this.game.ui.showBookRevival(this.books[id].name, () => {
-      if (onDone) onDone();
-    });
+    const popup = (done) => this.game.ui.showBookRevival(this.books[id].name, done);
+    const movies = this.game.movies;
+    if (!movies) {
+      popup(() => onDone?.());
+      return;
+    }
+    movies.playOr(`book-${id}`, popup, () => onDone?.());
   }
 
   // 職業の書UI（showJobBook）用のデータ。JOBS の定義順に並ぶ。

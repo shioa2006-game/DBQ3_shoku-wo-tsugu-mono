@@ -112,6 +112,7 @@ export class UI {
 
   get modalOpen() {
     return (
+      Boolean(this.movies?.open) ||
       this.menuOpen ||
       this.storageOpen ||
       this.dialogue.open ||

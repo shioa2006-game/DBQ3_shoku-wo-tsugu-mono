@@ -1,6 +1,6 @@
 # プロローグ・SVGストーリームービー（試作）
 
-『職をつぐ者』の冒頭に挿入する、約31秒・全5場面のストーリームービーの試作です。**Studio内の試作で、ゲーム本編には組み込んでいません。** 採用と移植はユーザーが確認してから決めます。
+『職をつぐ者』の冒頭に挿入する、約31秒・全5場面のストーリームービーの試作です。**2026-11-08にゲーム本編（第1～3章）へ組み込みました。** ゲームでの扱いは[下の節](#game)を参照。
 
 - 確認URL: Studioを起動（`npm.cmd start`）して http://127.0.0.1:8081/story-movies/prologue/ 。Studioのトップページの「SVGストーリームービーの一覧」（`/story-movies/`）からも開けます。
 - 物語の基準: [冒頭ショートムービーの計画](../../../docs/story/planned/opening-movie.md)、[世界観と物語の始まり](../../../docs/story/overview.md)、[人物と職業の書](../../../docs/story/characters-and-jobs.md)、[第1章](../../../docs/story/implemented/chapter1.md)
@@ -134,14 +134,15 @@ npm.cmd run test:prologue
 
 ムービーをスキップした人、または見なかった人には、今の導入の3行がそのまま必要です。移植時は「ムービーを最後まで見たか」で冒頭3行を出し分ける案と、常に省いて初回だけムービーを強制する案があります。
 
-## 将来ゲームへ移植する場合の構成案
+<a id="game"></a>
 
-- `StoryPlayer` クラス → 両編で共用できるので `game-shared/`（例: `game-shared/story-player.js`）。
-- `PROLOGUE_STORY`（字幕・時間・カメラ）→ 第1～3章の `src/content/prologue.js` など。
-- 各場面のSVG → `.svg` ファイルとして書き出し、`import scene1 from './scene1.svg?raw'` のように文字列で読み込んで `markup` に渡す（`StoryPlayer` は `<template>` の id と SVG文字列の両方を受け付ける）。生成はこのStudioで行い、書き出し先を `game-targets.mjs` と同じ考え方で管理する。
-- 再生の場所: タイトル画面の「はじめから」の後、`INTRO` の導入会話の前。`storyend` イベント（または `onComplete`）で `startIntro()` を呼ぶ。スキップでも同じ。
-- セーブとの関係: 既存セーブの読み込みでは再生しない。「もう一度見る」はタイトル画面のメニューから。
-- 大きさ: 現在の `index.html` は約0.53MB（第4場面が約0.2MB）。ゲームに入れる場合は、使う方向だけの部品にする、縁の光の写しを省く、などで減らせる。
+## ゲームでの扱い（2026-11-08に組み込み）
+
+- Studioの `npm.cmd run sync:movies` で `dqb3-tsugumono-ch1-3/assets/movies/` の `prologue.html` へ写し、両編共通の `game-shared/story-movies.mjs` が全画面で再生する（[組み込みの仕組み](../../../docs/story/planned/story-movies.md#integration)）。このムービーを生成し直したら、写し直す（Studioのテストが写しと生成物の一致を確かめる）。
+- 場面ごとのSVGに分けず、このページ（自己完結HTML）をそのまま iframe で重ねる。ゲームは再生するときに読み込み、`?autoplay=1` で始めて `storyend` イベントで閉じる。
+- 入る場所は、タイトル画面の「はじめから」の後、`INTRO` の導入会話の前（`quests.js` の `startIntro()`）。セーブの読み込みでは流さない。
+- 最後まで見たときは、導入会話から字幕と同じ地の文の先頭3行を省き、「……波の音が聞こえる。」から始める。スキップしたとき・流せなかったときは全文（[STORY-008](../../../docs/story/inconsistencies.md#story-008)）。
+- タイトル画面からもう一度見る機能は未実装。
 
 ## 残っている課題
 
