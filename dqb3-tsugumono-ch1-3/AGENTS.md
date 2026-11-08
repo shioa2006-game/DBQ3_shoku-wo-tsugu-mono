@@ -53,7 +53,7 @@ npm.cmd run test:e2e
 - `tests/e2e/saveload.test.mjs`：セーブ・ロード、設計図`baseY`、旧形式互換。
 - `tests/e2e/jobs.test.mjs`：職業の書の進捗、復活、セーブ保持、旧セーブ互換。
 - `tests/e2e/worldversion.test.mjs`：ワールド生成バージョンの記録と不一致時の警告。
-- `tests/e2e/chapter2.test.mjs`：橋、見えない壁、料理、田んぼ防衛を含む第2章の通し回帰。
+- `tests/e2e/chapter2.test.mjs`：橋、見えない壁、料理、田んぼ防衛を含む第2章の通し回帰。食堂で住民がかまど・ちゃぶ台の上に立たないこと（`game-shared/villager-footing.mjs`）も確かめる。
 - `tests/e2e/chapter3.test.mjs`：桟橋、灯台、船、授職の儀、クラーケン、出航を含む第3章の通し回帰。
 - `tests/e2e/trees.test.mjs`：伐採跡の木の再生と建築跡での不再生。
 - `tests/e2e/routing.test.mjs`：住民が島を移動するとき海を泳がず橋を経由すること。

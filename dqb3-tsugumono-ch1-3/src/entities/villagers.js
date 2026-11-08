@@ -2,6 +2,8 @@ import * as THREE from "three";
 import { Entity, GRAVITY } from "./entity.js";
 import { HumanoidRig, submersionAt } from "./rig.js";
 import { PLACES, WORLD } from "../world/world.js";
+import { B, BLOCK_DEFS } from "../world/blocks.js";
+import { findStandCell, furnitureAhead, guardFurnitureTop, isStandCell } from "../../../game-shared/villager-footing.mjs";
 
 import { MINA_RIG_PROFILE } from "../content/rig-profiles/mina.mjs";
 import { PINO_RIG_PROFILE } from "../content/rig-profiles/pino.mjs";
@@ -22,6 +24,19 @@ const dockRoutes = {
   ship: { land: [shipGate, pierGate, dockLanding], pier: [shipGate, pierGate] },
 };
 const WAYPOINT_RADIUS = 0.15;
+// 床のマスの中央へ寄せた行き先は、体（半幅0.3）がそのマスに収まるまで歩き切る。
+// 半径0.5のままだと手前で止まり、体の端が隣の家具に掛かったまま上に立ってしまう。
+const POST_RADIUS = 0.12;
+
+// 家具＝固体の設置物（かまど・ちゃぶ台・収納箱・作業台・祭壇・舵輪・柵など）。住民はこの上に立たない。
+const isFurniture = (id) => !!BLOCK_DEFS[id]?.prop && BLOCK_DEFS[id]?.solid === true;
+export const VILLAGER_FOOTING = {
+  furniture: isFurniture,
+  isProp: (id) => !!BLOCK_DEFS[id]?.prop,
+  unsafe: (world, x, y, z) => world.get(x, y, z) === B.WATER,
+};
+// 跳び乗らない家具。柵だけは、囲われた畑へ入れるよう跳び越えてよい（行き先の床で降りる）。
+const noJumpOnto = (id) => id !== B.FENCE && isFurniture(id);
 
 function dockZone({ x, z }, completed) {
   const p = PLACES.pier;
@@ -252,13 +267,13 @@ export class Villager extends Entity {
             ctx.hurtMonster(best, dmg, this.pos, {});
           }
         } else {
-          desired = ctx.rallyPos ?? ctx.bannerPos;
+          desired = this.standPost(ctx.rallyPos ?? ctx.bannerPos, ctx.world);
         }
       } else {
         // Non-fighters rally at the banner; Mina cheers allies back to health.
         // 守る対象が水上（クラーケン戦の船）の防衛では、config の rally
         // （桟橋のデッキ）に集まり、海へ入らない。
-        desired = ctx.rallyPos ?? ctx.bannerPos;
+        desired = this.standPost(ctx.rallyPos ?? ctx.bannerPos, ctx.world);
         if (this.def.healer) {
           this.healPulse += dt;
           if (this.healPulse > 2.2) {
@@ -269,21 +284,27 @@ export class Villager extends Entity {
       }
     } else if (ctx.mealPos) {
       // 食事シーン: 食堂のちゃぶ台のまわりに集まる（1日1回の団らん）。
+      // 席はゲームが、ちゃぶ台のまわりの空いた床から1人1マスずつ割り当てる。
       this.rig.setTool(null);
       if (!this.mealSeat) {
-        const hash = [...this.id].reduce((n, c) => n + c.charCodeAt(0), 0);
-        const a = (hash % 8) * (Math.PI / 4);
-        this.mealSeat = new THREE.Vector3(ctx.mealPos.x + Math.cos(a) * 1.2, this.pos.y, ctx.mealPos.z + Math.sin(a) * 1.2);
+        const seat = ctx.mealSeatFor?.(this);
+        if (seat) {
+          this.mealSeat = new THREE.Vector3(seat.x, seat.y, seat.z);
+        } else {
+          const hash = [...this.id].reduce((n, c) => n + c.charCodeAt(0), 0);
+          const a = (hash % 8) * (Math.PI / 4);
+          this.mealSeat = new THREE.Vector3(ctx.mealPos.x + Math.cos(a) * 1.2, this.pos.y, ctx.mealPos.z + Math.sin(a) * 1.2);
+        }
       }
-      desired = this.mealSeat;
-      if (this.pos.distanceTo(this.mealSeat) < 0.8) {
+      desired = this.standPost(this.mealSeat, ctx.world);
+      if (Math.hypot(desired.x - this.pos.x, desired.z - this.pos.z) < 0.8) {
         this.facing.set(ctx.mealPos.x - this.pos.x, ctx.mealPos.z - this.pos.z);
       }
     } else if (this.id === "inaho" && ctx.kitchenPos) {
       // 料理人はかまどの前が持ち場。ときどき鍋をかき回す。
       this.rig.setTool(null);
       this.mealSeat = null;
-      desired = ctx.kitchenPos;
+      desired = this.standPost(ctx.kitchenPos, ctx.world);
       const d = Math.hypot(ctx.kitchenPos.x - this.pos.x, ctx.kitchenPos.z - this.pos.z);
       if (d < 1.4 && this.thinkTimer <= 0) {
         this.thinkTimer = 2.4 + Math.random() * 1.6;
@@ -299,7 +320,10 @@ export class Villager extends Entity {
       } else if (!this.moveTarget && this.thinkTimer <= 0) {
         const cell = ctx.pickFarmCell();
         this.thinkTimer = 2;
-        if (cell) this.moveTarget = new THREE.Vector3(cell.x + 0.5, cell.y, cell.z + 0.5);
+        if (cell) {
+          const crop = new THREE.Vector3(cell.x + 0.5, cell.y, cell.z + 0.5);
+          this.moveTarget = this.snapCell(crop, ctx.world, 1) ?? crop;
+        }
       }
       desired = this.moveTarget;
     } else {
@@ -309,11 +333,12 @@ export class Villager extends Entity {
         // 水に落ちたら立ち泳ぎで待機せず持ち場へ戻る。橋・桟橋のルーティングを
         // 経由するので、既存セーブで海に詰まっている住民も自力で上陸できる。
         this.moveTarget = null;
-        desired = this.home;
+        desired = this.standPost(this.home, ctx.world);
       } else {
         if (this.thinkTimer <= 0) {
           this.thinkTimer = 3 + Math.random() * 4;
-          this.moveTarget = Math.random() < 0.65 ? this.pickWanderTarget(ctx.world) : null;
+          const wander = Math.random() < 0.65 ? this.pickWanderTarget(ctx.world) : null;
+          this.moveTarget = wander && (this.snapCell(wander, ctx.world, 2) ?? wander);
         }
         desired = this.moveTarget;
       }
@@ -325,7 +350,7 @@ export class Villager extends Entity {
     // 住民は直線移動しかしないため、木の幹など飛び越えられない障害物に
     // 当たり続けたら、進行方向に対して横へ数ブロック外した一時目標で迂回する
     //（ジャンプは段差1マスまでしか越えられない。モンスターの sidestep と同趣旨）。
-    if (desired && this.walking && this.hitWall) this.blockedT += dt;
+    if (desired && this.walking && (this.hitWall || this.ledgeBlocked)) this.blockedT += dt;
     else this.blockedT = Math.max(0, this.blockedT - dt * 2);
     if (desired && this.blockedT > 1.0) {
       this.blockedT = 0;
@@ -355,7 +380,7 @@ export class Villager extends Entity {
       const dx = desired.x - this.pos.x;
       const dz = desired.z - this.pos.z;
       const d = Math.hypot(dx, dz);
-      const destinationRadius = ctx.raidActive && this.def.fighter ? 0.9 : 0.5;
+      const destinationRadius = destination?.snapped ? POST_RADIUS : ctx.raidActive && this.def.fighter ? 0.9 : 0.5;
       const arrive = desired === destination ? destinationRadius : WAYPOINT_RADIUS;
       if (d > arrive) {
         const speed = 2.3 * sprint;
@@ -376,12 +401,43 @@ export class Villager extends Entity {
       this.vel.z *= Math.max(0, 1 - dt * 8);
     }
 
+    // 家具の天板へは歩いて渡らない（切り株や低い壁の上から隣のかまど・ちゃぶ台へ移らず、迂回する）。
+    this.ledgeBlocked = guardFurnitureTop(ctx.world, this, dt, isFurniture);
+
     this.vel.y += GRAVITY * dt;
     this.hitWall = false;
     this.moveWithCollision(ctx.world, dt, this.inWater ? 1.05 : 0);
-    if (this.hitWall && this.onGround) this.vel.y = 7.2;
+    // 段差（地形・床・壁）は跳んで越えるが、家具には跳び乗らない。押し付け続けたら上の迂回で回り込む。
+    if (this.hitWall && this.onGround && !furnitureAhead(ctx.world, this, this.facing.x, this.facing.y, noJumpOnto)) {
+      this.vel.y = 7.2;
+    }
 
     this.rootSync(ctx);
+  }
+
+  // 決まった立ち位置（持ち場・食事の席・集合場所）を、近くの「足もとが床で家具の上でない」
+  // マスの中央へ寄せる。行き先が家具のマスの中や家具のすぐ隣でも、最後は床に立つ。
+  // 同じ行き先のあいだは、そのマスに立てる限り前回の結果を使う。見つからなければ元の位置。
+  standPost(p, world) {
+    if (!p) return p;
+    const key = `${p.x},${p.y},${p.z}`;
+    const cache = this.postCache;
+    if (cache?.key === key) {
+      const c = cache.cell;
+      if (c && isStandCell(world, Math.floor(c.x), c.y, Math.floor(c.z), VILLAGER_FOOTING)) return c;
+      if (!c && (cache.retry -= 1) > 0) return p;
+    }
+    this.postCache = { key, cell: this.snapCell(p, world, 3), retry: 30 };
+    return this.postCache.cell ?? p;
+  }
+
+  // p に近い、立てるマスの中央（snapped 付きの目標）。見つからなければ null。
+  snapCell(p, world, maxRadius) {
+    const s = findStandCell(world, p.x, p.z, p.y ?? world.terrainSurfaceY(p.x, p.z), VILLAGER_FOOTING, maxRadius);
+    if (!s) return null;
+    const cell = new THREE.Vector3(s.x, s.y, s.z);
+    cell.snapped = true;
+    return cell;
   }
 
   rootSync(ctx) {

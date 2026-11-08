@@ -31,7 +31,8 @@ import { SFX } from "./game/sfx.js";
 import { BGM } from "./game/bgm.js";
 import { hasSave, writeSave, readSave } from "./game/save.js";
 import { Player } from "./entities/player.js";
-import { Villager } from "./entities/villagers.js";
+import { Villager, VILLAGER_FOOTING } from "./entities/villagers.js";
+import { findStandCell, seatsAround } from "../../game-shared/villager-footing.mjs";
 import { MonsterManager } from "./entities/monsters.js";
 import { ItemDrop } from "./entities/entity.js";
 import { UI, BUILD_ID } from "./ui/ui.js";
@@ -420,10 +421,57 @@ class Game {
     }
   }
 
+  // 住民の1フレームぶんの行動に渡す文脈（テストからも同じものを使う）。
+  villagerContext(time = 0) {
+    return {
+      world: this.world,
+      cameraYaw: this.cameraYaw,
+      raidActive: this.defense.active || this.gromBattle.active,
+      monsters: this.monsters.monsters,
+      bannerPos: this.gromBattle.active
+        ? this.gromBattle.pos
+        : (this.defense.targetEntity ?? this.bannerEntity).pos,
+      farmWork: this.blueprints.completed.has("ash_farm"),
+      mealPos: this.cooking.mealPos(),
+      mealSeatFor: (v) => this.mealSeatFor(v),
+      kitchenPos: this.cookStandPos(), // カヤの持ち場（鍋の東隣）
+      forgePos: this.quests.flags.forgeLit
+        ? { x: PLACES.forge.x + 2.5, z: PLACES.forge.z + 2.5 }
+        : null,
+      minePos: this.quests.flags.rokuMining ? { x: 23.5, z: 36.5 } : null,
+      time,
+      hurtMonster: (m, dmg, from, attack) => this.hurtMonster(m, dmg, from, attack),
+      healAlliesNear: (pos, r, n) => this.healAlliesNear(pos, r, n),
+      pickFarmCell: () => this.pickFarmCell(),
+      boostCropsNear: (pos, r, d) => this.boostCropsNear(pos, r, d),
+    };
+  }
+
+  // 食事の席: ちゃぶ台のまわりの空いた床（家具の上でないマス）を近い順に、住民1人に1マスずつ。
+  // 以前はちゃぶ台を中心にした円の上に置いていて、北側の席が鉄鍋のマスの中に入り、3人が重なっていた。
+  mealSeatFor(v) {
+    const mp = this.cooking.mealPos();
+    if (!mp) return null;
+    const key = `${mp.x},${mp.z}`;
+    if (this.mealSeating?.key !== key) {
+      const y = this.world.terrainSurfaceY(mp.x, mp.z) - 1; // ちゃぶ台のマス＝住民が床に立つ高さ
+      this.mealSeating = { key, seats: seatsAround(this.world, mp, y, VILLAGER_FOOTING), byId: new Map() };
+    }
+    const s = this.mealSeating;
+    if (!s.byId.has(v.id)) s.byId.set(v.id, s.seats[s.byId.size] ?? null);
+    return s.byId.get(v.id);
+  }
+
   spawnVillager(id, x, z, y = null) {
     if (this.villager(id)) return this.villager(id);
     const gy = y ?? this.world.terrainSurfaceY(x, z) + 0.1;
     const v = new Villager(id, x + 0.001, gy, z + 0.001);
+    // 家具などに体が食い込む位置（金床の角に出るベルクなど）なら、近くの床のマスの中央へ。
+    // 食い込んだままだと、押し出されて家具の上に立ってしまう。
+    if (v.collides(this.world, v.pos.x, v.pos.y, v.pos.z)) {
+      const s = findStandCell(this.world, v.pos.x, v.pos.z, v.pos.y, VILLAGER_FOOTING);
+      if (s) v.pos.set(s.x, s.y + 0.001, s.z);
+    }
     this.villagers.push(v);
     this.scene.add(v.root);
     return v;
@@ -1199,27 +1247,7 @@ class Game {
       this.defense.update(dt, this.ui);
 
       // Villagers.
-      const vctx = {
-        world: this.world,
-        cameraYaw: this.cameraYaw,
-        raidActive: this.defense.active || this.gromBattle.active,
-        monsters: this.monsters.monsters,
-        bannerPos: this.gromBattle.active
-          ? this.gromBattle.pos
-          : (this.defense.targetEntity ?? this.bannerEntity).pos,
-        farmWork: this.blueprints.completed.has("ash_farm"),
-        mealPos: this.cooking.mealPos(),
-        kitchenPos: this.cookStandPos(), // カヤの持ち場（鍋の東隣）
-        forgePos: this.quests.flags.forgeLit
-          ? { x: PLACES.forge.x + 2.5, z: PLACES.forge.z + 2.5 }
-          : null,
-        minePos: this.quests.flags.rokuMining ? { x: 23.5, z: 36.5 } : null,
-        time,
-        hurtMonster: (m, dmg, from, attack) => this.hurtMonster(m, dmg, from, attack),
-        healAlliesNear: (pos, r, n) => this.healAlliesNear(pos, r, n),
-        pickFarmCell: () => this.pickFarmCell(),
-        boostCropsNear: (pos, r, d) => this.boostCropsNear(pos, r, d),
-      };
+      const vctx = this.villagerContext(time);
       for (const v of this.villagers) v.update(dt, vctx);
 
       // Drops.

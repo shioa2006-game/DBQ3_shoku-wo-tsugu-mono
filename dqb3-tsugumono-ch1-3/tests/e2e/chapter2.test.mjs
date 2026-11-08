@@ -1,9 +1,13 @@
 // 第2章「荒れた田の村」の通し回帰テスト。
-// POSTGAME翌朝の開始 → 見えない壁 → 橋 → イナホ → 田/用水路 → 食堂 →
+// POSTGAME翌朝の開始 → 見えない壁 → 橋 → イナホ → 田/用水路 → 食堂（住民が家具の上に立たない）→
 // 料理3回 → 料理人の書 → 田んぼ防衛戦（泥田の主）→ CH2_DONE → セーブ復元。
 
 import { launchBrowser, openGame, newGame, stage, expect, advanceToStage, advanceToChoice, waitForStage, waitForCond } from "../helpers.mjs";
 import { checkCookStand } from "../../../game-shared/tests/build-step-aside.mjs";
+import { furnitureIdsOf, mealSummary, stepVillagers } from "../../../game-shared/tests/villager-footing-check.mjs";
+import { BLOCK_DEFS } from "../../src/world/blocks.js";
+
+const FURNITURE = furnitureIdsOf(BLOCK_DEFS);
 
 const errors = [];
 const browser = await launchBrowser();
@@ -128,6 +132,24 @@ try {
   const kamado = await page.evaluate(() => window.__game.kamados.size);
   expect(kamado >= 1, `かまどが設置されている (${kamado})`);
 
+  // --- 住民が家具の上に立たない（料理番の持ち場・食事の席）------------------------------
+  // イナホは家から、ちゃぶ台を挟んだかまどの東隣の持ち場へ歩く（以前はかまどの端に乗っていた）。
+  const inahoPost = (await stepVillagers(page, {
+    ids: ["inaho"], seconds: 25, starts: { inaho: [38.5, 84.5] }, furnitureIds: FURNITURE,
+  })).inaho;
+  expect(
+    inahoPost.atPost && !inahoPost.onFurniture && inahoPost.post?.join(",") === `41.5,${kitchenY},81.5`,
+    `イナホはかまどの東隣の床に立つ (${JSON.stringify(inahoPost)})`,
+  );
+  expect(inahoPost.furnitureFrames < 120, `歩く途中もかまど・ちゃぶ台の上をほぼ通らない (${inahoPost.furnitureFrames}フレーム)`);
+  // 食事: 以前はピノの席がかまどのマスの中にあり、かまどの上に立っていた。
+  const kitchenMeal = mealSummary(await stepVillagers(page, {
+    ids: ["pino", "mina", "gonta", "jinbei", "inaho"], seconds: 45, meal: true, furnitureIds: FURNITURE,
+    starts: { pino: [37.5, 85.5], mina: [38.5, 86.5], gonta: [41.5, 86.5], jinbei: [39.5, 87.5], inaho: [38.5, 84.5] },
+  }));
+  expect(kitchenMeal.allSeated && kitchenMeal.distinct, `食事では全員が別々の席の床に着き、家具の上に立たない (${JSON.stringify(kitchenMeal.detail)})`);
+  expect(kitchenMeal.maxFurnitureFrames < 120, `食事へ歩く途中も家具の上をほぼ通らない (${JSON.stringify(kitchenMeal.detail)})`);
+
   // --- かまど料理×3 → 料理人の書 -------------------------------------------------------
   await page.evaluate(() => {
     const g = window.__game;
@@ -205,7 +227,8 @@ try {
   await page.evaluate(() => {
     const g = window.__game;
     const gonta = g.villager("gonta");
-    g.player.pos.set(gonta.pos.x + 1, gonta.pos.y, gonta.pos.z);
+    // 食事の席は隣り合うマスなので、1マス離れると隣の席の住民の方が近いことがある。ゴンタのすぐそばで話す。
+    g.player.pos.set(gonta.pos.x + 0.05, gonta.pos.y, gonta.pos.z);
   });
   await page.keyboard.press("f");
   await advanceToChoice(page); // 会話を進めて選択肢が出るまで待つ

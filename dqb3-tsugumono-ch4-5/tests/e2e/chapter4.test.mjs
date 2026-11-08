@@ -8,6 +8,10 @@ import {
   waitForCond, advanceToStage, advanceToChoice, completeActiveBlueprint, sleep,
 } from "../helpers.mjs";
 import { checkCookStand } from "../../../game-shared/tests/build-step-aside.mjs";
+import { furnitureIdsOf, mealSummary, stepVillagers } from "../../../game-shared/tests/villager-footing-check.mjs";
+import { BLOCK_DEFS } from "../../src/world/blocks.js";
+
+const FURNITURE = furnitureIdsOf(BLOCK_DEFS);
 
 const errors = [];
 const browser = await launchBrowser();
@@ -26,13 +30,20 @@ try {
   // ② 海岸拠点を完成 → CH4_COLD_FORGE。ベルクとロクが町に現れる。
   await completeActiveBlueprint(page);
   await advanceToStage(page, "CH4_COLD_FORGE");
-  const coldForge = await page.evaluate(() => ({
-    belk: !!window.__game.villager("belk"),
-    roku: !!window.__game.villager("roku"),
-    baseLevel: window.__game.baseLevel,
-    bannerZ: window.__game.bannerEntity.pos.z,
-  }));
+  const coldForge = await page.evaluate(() => {
+    const g = window.__game;
+    const belk = g.villager("belk");
+    return {
+      belk: !!belk,
+      roku: !!g.villager("roku"),
+      // 金床の角に出ると体が金床に食い込み、押し出されて金床の上に立っていた。
+      belkFree: !!belk && !belk.collides(g.world, belk.pos.x, belk.pos.y, belk.pos.z),
+      baseLevel: g.baseLevel,
+      bannerZ: g.bannerEntity.pos.z,
+    };
+  });
   expect(coldForge.belk && coldForge.roku, "ベルクとロクが配置される");
+  expect(coldForge.belkFree, "ベルクは金床に食い込まない床に出る");
   expect(coldForge.baseLevel === 1, `拠点レベル1 (${coldForge.baseLevel})`);
   expect(coldForge.bannerZ < 12, `旗はまず海岸に立つ (z=${coldForge.bannerZ.toFixed(1)})`);
 
@@ -138,6 +149,40 @@ try {
   expect(book.revived === true, "鍛冶屋の書が復活する");
   expect(book.progress === 1, "書の進捗が1になる");
   expect(book.baseLevel === 3, `拠点レベル3 (${book.baseLevel})`);
+
+  // 住民が家具の上に立たない: カヤ（鉄鍋の東隣）とベルク（金床・水桶・炉に囲まれた炉の前）の持ち場、
+  // 食事の席（以前はカヤ・ベルク・スミの席が鉄鍋のマスの中で重なり、全員が何かの上に立っていた）、
+  // 炉の防衛戦で戦わない住民が集まる場所（守る炉のマスの中心）。
+  const posts = await stepVillagers(page, {
+    ids: ["kaya", "belk"], seconds: 25, starts: { kaya: [33.5, 22.5], belk: [26.5, 25.5] }, furnitureIds: FURNITURE,
+  });
+  expect(
+    posts.kaya.atPost && !posts.kaya.onFurniture && posts.kaya.post?.[0] === 36.5 && posts.kaya.post?.[2] === 16.5,
+    `カヤは鉄鍋の東隣の床に立つ (${JSON.stringify(posts.kaya)})`,
+  );
+  expect(
+    posts.belk.atPost && !posts.belk.onFurniture && posts.belk.post?.[0] === 27.5 && posts.belk.post?.[2] === 23.5,
+    `ベルクは炉の前の床に立つ (${JSON.stringify(posts.belk)})`,
+  );
+  expect(posts.kaya.furnitureFrames < 120 && posts.belk.furnitureFrames < 120, `持ち場へ歩く途中も家具の上をほぼ通らない (${posts.kaya.furnitureFrames}/${posts.belk.furnitureFrames})`);
+  const townIds = await page.evaluate(() => window.__game.villagers.filter((v) => !v.down).map((v) => v.id));
+  const townStarts = { mina: [37.5, 21.5], gonta: [30.5, 18.5], watari: [34.5, 20.5], roku: [35.5, 22.5], sumi: [29.5, 24.5], teru: [36.5, 20.5], kaya: [33.5, 22.5], belk: [27.5, 25.5] };
+  const canteenMeal = mealSummary(await stepVillagers(page, {
+    ids: townIds, seconds: 45, meal: true, starts: townStarts, furnitureIds: FURNITURE,
+  }));
+  expect(canteenMeal.allSeated && canteenMeal.distinct, `食事では全員が別々の席の床に着き、家具の上に立たない (${JSON.stringify(canteenMeal.detail)})`);
+  expect(canteenMeal.maxFurnitureFrames < 120, `食事へ歩く途中も家具の上をほぼ通らない (${JSON.stringify(canteenMeal.detail)})`);
+  const rally = await page.evaluate((furniture) => {
+    const g = window.__game;
+    const v = g.villager("mina");
+    v.postCache = null;
+    const c = v.standPost({ x: 27.5, y: 6, z: 22.5 }, g.world); // 炉の防衛戦の守る対象（炉のマスの中心）
+    return { at: [c.x, c.y, c.z], snapped: !!c.snapped, under: g.world.get(Math.floor(c.x), c.y - 1, Math.floor(c.z)), furniture };
+  }, FURNITURE);
+  expect(
+    rally.snapped && !rally.furniture.includes(rally.under) && rally.at[1] === 6,
+    `防衛戦では守る炉のそばの床に集まる（炉の上に乗らない） (${JSON.stringify(rally.at)})`,
+  );
 
   // ⑨ ベルクに話して防衛開始 → CH4_DEFENSE。ゴンタが鉄の剣を受け取る。
   await page.evaluate(() => window.__game.quests.onTalk("belk"));

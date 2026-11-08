@@ -2,6 +2,8 @@ import * as THREE from "three";
 import { Entity, GRAVITY } from "./entity.js";
 import { HumanoidRig, submersionAt } from "./rig.js";
 import { PLACES, WORLD } from "../world/world.js";
+import { B, BLOCK_DEFS } from "../world/blocks.js";
+import { findStandCell, furnitureAhead, guardFurnitureTop, isStandCell } from "../../../game-shared/villager-footing.mjs";
 import { MINA_RIG_PROFILE } from "../content/rig-profiles/mina.mjs";
 import { GONTA_RIG_PROFILE } from "../content/rig-profiles/gonta.mjs";
 import { WATARI_RIG_PROFILE } from "../content/rig-profiles/watari.mjs";
@@ -14,6 +16,20 @@ import { SUMI_RIG_PROFILE } from "../content/rig-profiles/sumi.mjs";
 import { TERU_RIG_PROFILE } from "../content/rig-profiles/teru.mjs";
 
 const HUMANOIDS = (file) => new URL(`../../assets/humanoids/${file}`, import.meta.url).href;
+
+// 床のマスの中央へ寄せた行き先は、体（半幅0.3）がそのマスに収まるまで歩き切る。
+// 半径0.5のままだと手前で止まり、体の端が隣の家具に掛かったまま上に立ってしまう。
+const POST_RADIUS = 0.12;
+
+// 家具＝固体の設置物（鉄鍋・ちゃぶ台・炉・金床・水桶・炭焼き窯・収納箱・柵など）。住民はこの上に立たない。
+const isFurniture = (id) => !!BLOCK_DEFS[id]?.prop && BLOCK_DEFS[id]?.solid === true;
+export const VILLAGER_FOOTING = {
+  furniture: isFurniture,
+  isProp: (id) => !!BLOCK_DEFS[id]?.prop,
+  unsafe: (world, x, y, z) => world.get(x, y, z) === B.WATER || world.get(x, y - 1, z) === B.LAVA,
+};
+// 跳び乗らない家具。柵だけは、囲われた畑へ入れるよう跳び越えてよい（行き先の床で降りる）。
+const noJumpOnto = (id) => id !== B.FENCE && isFurniture(id);
 
 // 火山島編の登場人物。全員、Storybook Character Studio でコードから描いた頭・胴の分離画像と
 // リグ設定を使う（docs/CHARACTER_ART.md）。旅の仲間（ミナ・ゴンタ・ワタリ）は本島編と同じもの、
@@ -275,11 +291,12 @@ export class Villager extends Entity {
             ctx.hurtMonster(best, this.def.atk, this.pos, {});
           }
         } else {
-          desired = ctx.bannerPos;
+          desired = this.standPost(ctx.bannerPos, ctx.world);
         }
       } else {
         // Non-fighters rally at the banner; Mina cheers allies back to health.
-        desired = ctx.bannerPos;
+        // 守る対象が炉などの家具なら、そのそばの床に集まる（炉の上に乗らない）。
+        desired = this.standPost(ctx.bannerPos, ctx.world);
         if (this.def.healer) {
           this.healPulse += dt;
           if (this.healPulse > 2.2) {
@@ -290,20 +307,26 @@ export class Villager extends Entity {
       }
     } else if (ctx.mealPos) {
       // 食事シーン: 鉄鍋（かまど）のまわりに集まる（1日1回の団らん）。
+      // 席はゲームが、ちゃぶ台のまわりの空いた床から1人1マスずつ割り当てる。
       this.rig.setTool(null);
       if (!this.mealSeat) {
-        const hash = [...this.id].reduce((n, c) => n + c.charCodeAt(0), 0);
-        const a = (hash % 8) * (Math.PI / 4);
-        this.mealSeat = new THREE.Vector3(ctx.mealPos.x + Math.cos(a) * 1.2, this.pos.y, ctx.mealPos.z + Math.sin(a) * 1.2);
+        const seat = ctx.mealSeatFor?.(this);
+        if (seat) {
+          this.mealSeat = new THREE.Vector3(seat.x, seat.y, seat.z);
+        } else {
+          const hash = [...this.id].reduce((n, c) => n + c.charCodeAt(0), 0);
+          const a = (hash % 8) * (Math.PI / 4);
+          this.mealSeat = new THREE.Vector3(ctx.mealPos.x + Math.cos(a) * 1.2, this.pos.y, ctx.mealPos.z + Math.sin(a) * 1.2);
+        }
       }
-      desired = this.mealSeat;
-      if (this.pos.distanceTo(this.mealSeat) < 0.8) {
+      desired = this.standPost(this.mealSeat, ctx.world);
+      if (Math.hypot(desired.x - this.pos.x, desired.z - this.pos.z) < 0.8) {
         this.facing.set(ctx.mealPos.x - this.pos.x, ctx.mealPos.z - this.pos.z);
       }
     } else if (this.id === "belk" && ctx.forgePos) {
       // 鍛冶屋は炉の前が持ち場。ときどき槌を振る。
       this.mealSeat = null;
-      desired = ctx.forgePos;
+      desired = this.standPost(ctx.forgePos, ctx.world);
       const d = Math.hypot(ctx.forgePos.x - this.pos.x, ctx.forgePos.z - this.pos.z);
       if (d < 1.4) {
         this.rig.setTool(this.weapon);
@@ -321,18 +344,19 @@ export class Villager extends Entity {
       if (this.thinkTimer <= 0) {
         this.thinkTimer = 3 + Math.random() * 4;
         const a = Math.random() * Math.PI * 2;
-        this.moveTarget = new THREE.Vector3(
+        const spot = new THREE.Vector3(
           ctx.minePos.x + Math.cos(a) * 2.2,
           this.pos.y,
           ctx.minePos.z + Math.sin(a) * 1.6,
         );
+        this.moveTarget = this.snapCell(spot, ctx.world, 2) ?? spot;
       }
       desired = this.moveTarget;
     } else if (this.id === "kaya" && ctx.kitchenPos) {
       // カヤは鉄鍋の火の番。ときどき鍋をかき回す。
       this.rig.setTool(null);
       this.mealSeat = null;
-      desired = ctx.kitchenPos;
+      desired = this.standPost(ctx.kitchenPos, ctx.world);
       const d = Math.hypot(ctx.kitchenPos.x - this.pos.x, ctx.kitchenPos.z - this.pos.z);
       if (d < 1.4 && this.thinkTimer <= 0) {
         this.thinkTimer = 2.4 + Math.random() * 1.6;
@@ -348,7 +372,10 @@ export class Villager extends Entity {
       } else if (!this.moveTarget && this.thinkTimer <= 0) {
         const cell = ctx.pickFarmCell();
         this.thinkTimer = 2;
-        if (cell) this.moveTarget = new THREE.Vector3(cell.x + 0.5, cell.y, cell.z + 0.5);
+        if (cell) {
+          const crop = new THREE.Vector3(cell.x + 0.5, cell.y, cell.z + 0.5);
+          this.moveTarget = this.snapCell(crop, ctx.world, 1) ?? crop;
+        }
       }
       desired = this.moveTarget;
     } else {
@@ -359,11 +386,12 @@ export class Villager extends Entity {
         // 水没地形（濡れた砂）の上で立ち止まらず、乾いた陸まで歩き切る。
         // 峠のルーティングを経由するので、水に詰まっている住民も自力で上陸できる。
         this.moveTarget = null;
-        desired = this.home;
+        desired = this.standPost(this.home, ctx.world);
       } else {
         if (this.thinkTimer <= 0) {
           this.thinkTimer = 3 + Math.random() * 4;
-          this.moveTarget = Math.random() < 0.65 ? this.pickWanderTarget(ctx.world) : null;
+          const wander = Math.random() < 0.65 ? this.pickWanderTarget(ctx.world) : null;
+          this.moveTarget = wander && (this.snapCell(wander, ctx.world, 2) ?? wander);
         }
         desired = this.moveTarget;
       }
@@ -375,7 +403,7 @@ export class Villager extends Entity {
     // 住民は直線移動しかしないため、木の幹など飛び越えられない障害物に
     // 当たり続けたら、進行方向に対して横へ数ブロック外した一時目標で迂回する
     //（ジャンプは段差1マスまでしか越えられない。モンスターの sidestep と同趣旨）。
-    if (desired && this.walking && this.hitWall) this.blockedT += dt;
+    if (desired && this.walking && (this.hitWall || this.ledgeBlocked)) this.blockedT += dt;
     else this.blockedT = Math.max(0, this.blockedT - dt * 2);
     if (desired && this.blockedT > 1.0) {
       this.blockedT = 0;
@@ -400,7 +428,7 @@ export class Villager extends Entity {
       const dx = desired.x - this.pos.x;
       const dz = desired.z - this.pos.z;
       const d = Math.hypot(dx, dz);
-      const arrive = ctx.raidActive && this.def.fighter ? 0.9 : 0.5;
+      const arrive = desired.snapped ? POST_RADIUS : ctx.raidActive && this.def.fighter ? 0.9 : 0.5;
       if (d > arrive) {
         const speed = 2.3 * sprint;
         this.vel.x = (dx / d) * speed;
@@ -420,12 +448,43 @@ export class Villager extends Entity {
       this.vel.z *= Math.max(0, 1 - dt * 8);
     }
 
+    // 家具の天板へは歩いて渡らない（切り株や低い壁の上から隣の鉄鍋・ちゃぶ台へ移らず、迂回する）。
+    this.ledgeBlocked = guardFurnitureTop(ctx.world, this, dt, isFurniture);
+
     this.vel.y += GRAVITY * dt;
     this.hitWall = false;
     this.moveWithCollision(ctx.world, dt, this.inWater ? 1.05 : 0);
-    if (this.hitWall && this.onGround) this.vel.y = 7.2;
+    // 段差（地形・床・壁）は跳んで越えるが、家具には跳び乗らない。押し付け続けたら上の迂回で回り込む。
+    if (this.hitWall && this.onGround && !furnitureAhead(ctx.world, this, this.facing.x, this.facing.y, noJumpOnto)) {
+      this.vel.y = 7.2;
+    }
 
     this.rootSync(ctx);
+  }
+
+  // 決まった立ち位置（持ち場・食事の席・集合場所）を、近くの「足もとが床で家具の上でない」
+  // マスの中央へ寄せる。行き先が家具のマスの中や家具のすぐ隣でも、最後は床に立つ。
+  // 同じ行き先のあいだは、そのマスに立てる限り前回の結果を使う。見つからなければ元の位置。
+  standPost(p, world) {
+    if (!p) return p;
+    const key = `${p.x},${p.y},${p.z}`;
+    const cache = this.postCache;
+    if (cache?.key === key) {
+      const c = cache.cell;
+      if (c && isStandCell(world, Math.floor(c.x), c.y, Math.floor(c.z), VILLAGER_FOOTING)) return c;
+      if (!c && (cache.retry -= 1) > 0) return p;
+    }
+    this.postCache = { key, cell: this.snapCell(p, world, 3), retry: 30 };
+    return this.postCache.cell ?? p;
+  }
+
+  // p に近い、立てるマスの中央（snapped 付きの目標）。見つからなければ null。
+  snapCell(p, world, maxRadius) {
+    const s = findStandCell(world, p.x, p.z, p.y ?? world.terrainSurfaceY(p.x, p.z), VILLAGER_FOOTING, maxRadius);
+    if (!s) return null;
+    const cell = new THREE.Vector3(s.x, s.y, s.z);
+    cell.snapped = true;
+    return cell;
   }
 
   rootSync(ctx) {
