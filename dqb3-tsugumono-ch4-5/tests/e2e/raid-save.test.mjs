@@ -84,14 +84,17 @@ try {
   await completeActiveBlueprint(page);
   await guardedSave("spring purification dialogue");
   await reload("CH5_DRAGON"); // incomplete completion was not saved
+  // The chapter end is now only the M7 movie (the text ending was removed), so play it here
+  // and make sure saving while it plays cannot store an incomplete cutscene.
+  await page.evaluate(() => { window.__SHOKU_SKIP_MOVIES__ = false; });
   await completeActiveBlueprint(page); await dlg(page);
-  await waitForCond(page, () => !window.__game.ui.ending.classList.contains("hidden"));
-  await guardedSave("ending");
-  // Click until the ending accepts input (it deliberately has a short intro lock).
-  for(let i=0;i<60 && await page.evaluate(()=>!window.__game.ui.ending.classList.contains("hidden"));i++){
-    await page.locator(".ending").click();
-    await page.waitForTimeout(100);
-  }
+  await waitForCond(page, () => window.__game.movies.open, undefined, { label: "ending movie shown" });
+  await guardedSave("ending movie");
+  await waitForCond(page, () => {
+    const m = window.__game.movies;
+    if (m.current?.player) m.skip();
+    return !m.open;
+  }, undefined, { label: "ending movie closed" });
   await advanceToStage(page,"CH5_DONE");
   await reload("CH5_DONE");
   expect(await page.evaluate(() => window.__game.purification.springPurified && window.__game.passOpen), "ending save preserves purification and open pass");

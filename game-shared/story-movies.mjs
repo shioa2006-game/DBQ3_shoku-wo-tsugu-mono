@@ -3,9 +3,10 @@
 // - 各編は名前 → URL の対応（src/content/movies.js）を渡す。読み込むのは再生するときだけ。
 // - 再生中は open が true。各編の ui.modalOpen に含めて、入力と世界の時間を止める。
 // - ムービーの操作（クリック・Space・Enter で次の場面、Esc・「スキップ」で終わり）はムービー側のまま。
-// - 読み込めない・テストで無効にしたときは流さずに shown: false を返し、呼び出し側が文字の演出へ戻す。
+// - 読み込めない・テストで無効にしたときは流さずに shown: false を返す。章末・導入はそのまま先へ進み
+//  （文字の章末は2026-11-08に削除）、書の復活だけは playOr で復活の小窓を出す。
 //   無効にする方法: window.__SHOKU_SKIP_MOVIES__ = true、または localStorage の shoku_movies を "off"。
-const LOAD_TIMEOUT = 8000;   // 読み込みを待つ上限（ミリ秒）
+const LOAD_TIMEOUT = 15000;  // 読み込みを待つ上限（ミリ秒）。その間は黒い画面
 const SPARE_TIME = 20000;    // ムービーの長さを過ぎても終わらないときに閉じるまでの余裕
 
 export class StoryMovies {

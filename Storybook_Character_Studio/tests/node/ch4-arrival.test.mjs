@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { castParts, castPartsJson } from '../../story-movies/shared/cast.mjs';
 import { runPython } from '../../story-movies/shared/build-movie.mjs';
 import { CAST } from '../../story-movies/ch4-arrival/cast.mjs';
+import { removedEnding } from './removed-endings.mjs';
 
 const movies = fileURLToPath(new URL('../../story-movies/', import.meta.url));
 const dir = path.join(movies, 'ch4-arrival');
@@ -30,8 +31,7 @@ test('captions are existing lines: the prologue, the chapter 4 intro, the chapte
   const prologue = await source('Storybook_Character_Studio/story-movies/prologue/src/build.py');
   const chapter4 = await source('dqb3-tsugumono-ch4-5/src/content/chapter4.js');
   const intro = [...chapter4.match(/intro: \[([\s\S]*?)\n {4}\],/)[1].matchAll(/D\((?:BOOK|"")[^"]*"([^"]+)"\)/g)].map(m => m[1]);
-  const chapter3 = await source('dqb3-tsugumono-ch1-3/src/content/chapter3.js');
-  const ending = [...chapter3.match(/ending: \[([\s\S]*?)\]/)[1].matchAll(/"([^"]+)"/g)].map(m => m[1]);
+  const ending = await removedEnding('第3章の結末'); // 文字の結末は2026-11-08に削除（docs/story/reference/removed-text-endings.md）
   const titleCopy = (await source('dqb3-tsugumono-ch4-5/src/ui/ui.js')).match(/class="title-copy">([^<]+)</)[1];
   assert.equal(captions.length, 9);
   // ① プロローグの字幕

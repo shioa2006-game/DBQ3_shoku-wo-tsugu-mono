@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { castParts, castPartsJson } from '../../story-movies/shared/cast.mjs';
 import { runPython } from '../../story-movies/shared/build-movie.mjs';
 import { CAST } from '../../story-movies/ch1-shrine/cast.mjs';
+import { removedEnding } from './removed-endings.mjs';
 
 const dir = fileURLToPath(new URL('../../story-movies/ch1-shrine/', import.meta.url));
 const html = await readFile(path.join(dir, 'index.html'), 'utf8');
@@ -20,10 +21,10 @@ test('character parts are exported unchanged from the Studio authoring code', as
   assert.deepEqual(Object.keys(castParts(CAST).characters).sort(), ['gonta', 'jinbei', 'mina', 'pino']);
 });
 
-test('captions are the chapter 1 lines of the current chapter end, in order, without the lines the prologue tells', async () => {
-  const ui = await readFile(fileURLToPath(new URL('../../../dqb3-tsugumono-ch1-3/src/ui/ui.js', import.meta.url)), 'utf8');
-  const ending = [...ui.match(/playEnding\(cb, opts = \{\}\) \{[\s\S]*?: `([\s\S]*?)`;/)[1].matchAll(/<p>([^<]+)<\/p>/g)].map(m => m[1]).filter(l => l !== '&nbsp;');
-  // 今の章末の文の、第1章の行（ジパングで槌を取ってから文字が戻るまで）と、最後の行（前後の線を外す）
+test('captions are the chapter 1 lines of the removed text ending, in order, without the lines the prologue tells', async () => {
+  // 文字の章末は2026-11-08にゲームから削除し、全文を docs/story/reference/removed-text-endings.md に残した
+  const ending = await removedEnding('第1章の章末');
+  // 章末の文の、第1章の行（ジパングで槌を取ってから文字が戻るまで）と、最後の行（前後の線を外す）
   const from = ending.findIndex(l => l.includes('ジパングで槌を取った'));
   const to = ending.findIndex(l => l.includes('文字が戻った'));
   assert.ok(from > 0 && to > from);

@@ -252,11 +252,10 @@ try {
   // --- ⑩ 泉の祭壇・水門・導水路 → 浄化 → 火山島編・完 -------------------------------------
   await completeActiveBlueprint(page);
   await dlg(page); // springDone の会話
-  // エンディング（クリックで閉じる）。
-  await waitForCond(page, () => !window.__game.ui.ending.classList.contains("hidden"), undefined, { label: "ending shown", timeout: 30000 });
-  await sleep(4500);
-  await page.evaluate(() => window.__game.ui.ending.click());
+  // 結末は火山島編の結びのムービー（M7）だけ。このテストはムービーを止めているので、
+  // 文字の結末（2026-11-08に削除）を出さずに、そのまま CH5_DONE へ進む。
   await advanceToStage(page, "CH5_DONE", { timeout: 30000 });
+  expect(await page.evaluate(() => !document.querySelector(".ending")), "泉の浄化の後は、文字の結末を出さずにCH5_DONE");
   const done = await page.evaluate(() => {
     const g = window.__game;
     return {

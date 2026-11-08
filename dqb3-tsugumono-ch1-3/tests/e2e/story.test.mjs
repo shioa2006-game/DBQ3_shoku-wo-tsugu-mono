@@ -209,21 +209,11 @@ try {
   expect(dialogueFits, "書の予告全文が幅640pxの会話枠に収まる");
   await page.setViewportSize({ width: 1280, height: 720 });
   await dlg(page, 20);
-  const endingText = await page.locator(".ending").textContent();
-  expect(endingText.includes("ゾーマ") && endingText.includes("職業の書」を携えて神殿から脱出"), "第1章末も世界観と書の持ち出しを引き継ぐ");
-  // エンディング演出はクリック用リスナが 4秒後に付く（ui.playEnding の setTimeout）。
-  // 早すぎるクリックは無視されるので、POSTGAME になるまでクリックし続ける。
-  await waitForCond(
-    page,
-    () => {
-      if (window.__game.quests.stage === "POSTGAME") return true;
-      document.querySelector(".ending")?.click();
-      return false;
-    },
-    undefined,
-    { label: "エンディング→POSTGAME", timeout: 15000, interval: 500 },
-  );
-  expect((await stage(page)) === "POSTGAME", "エンディング後はPOSTGAME");
+  // 章末は第1章の結びのムービー（M1）だけ。このテストはムービーを止めているので、
+  // 文字の章末（2026-11-08に削除）を出さずに、そのまま自由行動へ進む。
+  await waitForStage(page, "POSTGAME", { timeout: 15000 });
+  expect(await page.evaluate(() => !document.querySelector(".ending") && !window.__game.ui.modalOpen),
+    "祭壇の会話の後は、文字の章末を出さずにPOSTGAME");
 
   // --- 夜間の常時スポーン ----------------------------------------------------------
   await page.evaluate(() => {

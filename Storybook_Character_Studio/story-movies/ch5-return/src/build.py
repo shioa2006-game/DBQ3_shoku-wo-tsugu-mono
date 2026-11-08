@@ -5,7 +5,7 @@
 1つの自己完結HTMLにまとめて書き出す。人物の頭・胴は ../parts/cast.json（Studioの正式デザインから
 ../../shared/cast.mjs が書き出したもの）を読む。通常は Studio ルートの npm.cmd run build:movie -- ch5-return から呼ばれる。
 
-字幕は、第5章の結末文（dqb3-tsugumono-ch4-5/src/content/chapter5.js の ending）の行をそのまま、順番どおりに使う。
+字幕は、第5章の結末文（以前の chapter5.js の ending。2026-11-08にゲームから削除し、全文は docs/story/reference/removed-text-endings.md）の行をそのまま、順番どおりに使う。
 最後の「―― 火山島編・完 ――」はタイトルで表す。
 
 使い方:

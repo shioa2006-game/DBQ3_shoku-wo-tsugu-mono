@@ -22,7 +22,7 @@
 
 ## 字幕の出どころ
 
-今の第1章の章末の文（[`ui.js`](../../../dqb3-tsugumono-ch1-3/src/ui/ui.js) の `playEnding()` の既定の文）のうち、第1章の出来事の行だけを、順番どおりそのまま使っています。
+第1章の章末の文（以前の `ui.js` の `playEnding()` の既定の文。2026-11-08にゲームから削除し、全文を[削除した文字の章末](../../../docs/story/reference/removed-text-endings.md)に記録）のうち、第1章の出来事の行だけを、順番どおりそのまま使っています。
 
 - 使わない行: 勇者・魔物・ダーマ神殿の崩壊・シオンの脱出を語る前半と、「これは、勇者のいない上の世界で…」の2行。プロローグ（M0）と重なるため（計画の注意どおり）。
 - 最後の「― 職をつぐ旅は、ここから続いていく ―」は、前後の線を外して字幕にしました。
@@ -78,8 +78,8 @@ npm.cmd run test:movie -- ch1-shrine
 ## ゲームでの扱い（2026-11-08に組み込み）
 
 - Studioの `npm.cmd run sync:movies` で `dqb3-tsugumono-ch1-3/assets/movies/` の `ch1-shrine.html` へ写し、両編共通の `game-shared/story-movies.mjs` が全画面で再生する（[組み込みの仕組み](../../../docs/story/planned/story-movies.md#integration)）。このムービーを生成し直したら、写し直す（Studioのテストが写しと生成物の一致を確かめる）。
-- 入る場所は、`SHRINE_DONE` で祭壇に祈った会話の後（`quests.js` の `onAltarPrayed()`）。文字の章末（`playEnding()` の既定の文）を置き換え、ムービーを流せないときだけ文字の章末を出す。
-- 祭壇の会話は変えていない。会話の最後の書の台詞と結びの字幕が重なるのは、従来の文字の章末と同じ。
+- 入る場所は、`SHRINE_DONE` で祭壇に祈った会話の後（`quests.js` の `onAltarPrayed()`）。以前の文字の章末（`playEnding()` の既定の文）を置き換え、その文字の章末は2026-11-08に削除した（全文は[削除した文字の章末](../../../docs/story/reference/removed-text-endings.md)）。ムービーを流せないときは、文字を出さずに自由行動へ進む。
+- 祭壇の会話は変えていない。会話の最後の書の台詞と結びの字幕が重なるのは、削除した文字の章末でも同じだった。
 
 ## 残っている課題
 

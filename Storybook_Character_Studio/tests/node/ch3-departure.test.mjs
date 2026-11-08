@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { castParts, castPartsJson } from '../../story-movies/shared/cast.mjs';
 import { runPython } from '../../story-movies/shared/build-movie.mjs';
 import { CAST } from '../../story-movies/ch3-departure/cast.mjs';
+import { removedEnding } from './removed-endings.mjs';
 
 const dir = fileURLToPath(new URL('../../story-movies/ch3-departure/', import.meta.url));
 const html = await readFile(path.join(dir, 'index.html'), 'utf8');
@@ -32,8 +33,8 @@ test('character parts are exported unchanged from the Studio authoring code', as
 });
 
 test('captions are the lines of the chapter 3 ending, in order, and the title is the saga end', async () => {
-  const chapter3 = await readFile(fileURLToPath(new URL('../../../dqb3-tsugumono-ch1-3/src/content/chapter3.js', import.meta.url)), 'utf8');
-  const ending = [...chapter3.match(/ending: \[([\s\S]*?)\]/)[1].matchAll(/"([^"]+)"/g)].map(m => m[1]).filter(l => l !== '&nbsp;');
+  // 文字の結末は2026-11-08にゲームから削除し、全文を docs/story/reference/removed-text-endings.md に残した
+  const ending = await removedEnding('第3章の結末');
   // 結末文の行を順番どおりに使う（―― ジパング復興編・完 ―― はタイトルで表す）
   assert.deepEqual(captions, ending.filter(l => !l.includes('ジパング復興編・完')));
   assert.ok(html.includes('<h1 class="title-main">ジパング復興編・完</h1>'));

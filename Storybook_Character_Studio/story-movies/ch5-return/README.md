@@ -4,7 +4,7 @@
 
 - 確認URL: Studioを起動（`npm.cmd start`）して http://127.0.0.1:8081/story-movies/ch5-return/ 。[ムービーの一覧](../index.html)（`/story-movies/`）からも開けます。
 - 計画: [SVGストーリームービーの挿入計画](../../../docs/story/planned/story-movies.md) の M7（優先度A）。物語は [第5章の記録](../../../docs/story/implemented/chapter5.md)。
-- 字幕: 第5章の結末文（[`chapter5.js`](../../../dqb3-tsugumono-ch4-5/src/content/chapter5.js) の `ending`）の行を、順番どおりそのまま使います。最後の「―― 火山島編・完 ――」はタイトルで表します。
+- 字幕: 第5章の結末文（以前の `chapter5.js` の `ending`。2026-11-08にゲームから削除し、全文を[削除した文字の章末](../../../docs/story/reference/removed-text-endings.md)に記録）の行を、順番どおりそのまま使います。最後の「―― 火山島編・完 ――」はタイトルで表します。
 - 場面ごとの時間・カメラ・字幕・絵の内容: [絵コンテ](reference/storyboard.md)
 
 イラストはすべてコードで描いたSVGで、音声はありません。非公式ファン企画用です。
@@ -74,7 +74,7 @@ npm.cmd run test:movie -- ch5-return
 ## ゲームでの扱い（2026-11-08に組み込み）
 
 - Studioの `npm.cmd run sync:movies` で `dqb3-tsugumono-ch4-5/assets/movies/` の `ch5-return.html` へ写し、両編共通の `game-shared/story-movies.mjs` が全画面で再生する（[組み込みの仕組み](../../../docs/story/planned/story-movies.md#integration)）。このムービーを生成し直したら、写し直す（Studioのテストが写しと生成物の一致を確かめる）。
-- 入る場所は、泉の建築完成後（`quests5.js` の `finishChapter()`）。文字の結末（`playEnding(CH5.ending)`）を置き換え、ムービーを流せないときだけ文字の結末を出す。
+- 入る場所は、泉の建築完成後（`quests5.js` の `finishChapter()`）。以前の文字の結末（`CH5.ending`）を置き換え、その文字の結末は2026-11-08に削除した（全文は[削除した文字の章末](../../../docs/story/reference/removed-text-endings.md)）。ムービーを流せないときは、文字を出さずに `CH5_DONE` へ進む。
 
 ## 残っている課題
 

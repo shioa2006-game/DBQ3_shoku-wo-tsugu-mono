@@ -97,7 +97,7 @@ try {
   await page.evaluate(()=>{window.__game.monsters.remove(window.inputTestTarget);delete window.inputTestTarget;});
 
   // Verify every modal's wheel is discarded, while wheel over the canvas still works.
-  for(const kind of ["inventory","storage","book","dialogue","pause","help","choice","ending","title"]){
+  for(const kind of ["inventory","storage","book","dialogue","pause","help","choice","movie","title"]){
     await page.evaluate(kind=>{
       const g=window.__game;g.inventory.selected=0;
       if(kind==="inventory")g.ui.openMenu(g.menuCtx());
@@ -107,7 +107,7 @@ try {
       if(kind==="pause")g.ui.showPause(()=>true,null);
       if(kind==="help")g.ui.showHelp();
       if(kind==="choice")g.ui.dialogue.choice("入力テスト",["続ける"],()=>{});
-      if(kind==="ending")g.ui.playEnding(()=>{});
+      if(kind==="movie"){window.__SHOKU_SKIP_MOVIES__=false;g.movies.play("ch5-return");} // 章末はムービー（文字の章末は削除）
       if(kind==="title")g.ui.showTitle({hasSave:false,onNew:()=>{},onContinue:()=>{}});
     },kind);
     await waitForCond(page,()=>!window.__game.input.enabled);
@@ -121,7 +121,7 @@ try {
       if(kind==="pause")u.hidePause();
       if(kind==="help")u.help.classList.add("hidden");
       if(kind==="choice")u.choiceBox.querySelector("button").click();
-      if(kind==="ending")u.ending.classList.add("hidden");
+      if(kind==="movie"){window.__game.movies.skip();window.__SHOKU_SKIP_MOVIES__=true;}
       if(kind==="title")u.title.classList.add("hidden");
     },kind);
     await waitForCond(page,()=>window.__game.input.enabled);

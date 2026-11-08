@@ -14,7 +14,7 @@
 - ✅ 第4章「鬼火の山」（CH4_ARRIVAL 〜 CH4_DONE、鍛冶屋の書、炉の防衛戦）
 - ✅ 第5章「眠る竹林の社」（CH5_INTRO 〜 CH5_DONE、峠の開通、宿坊・薬草園・外社、
   僧侶の書、瘴気と浄化、穢れ石3か所、双頭ドラゴン「瘴泉竜グロム」討伐、泉の浄化、
-  「火山島編・完」エンディングとクリア後の自由建築）
+  「火山島編・完」のムービーとクリア後の自由建築）
 
 ## 起動
 
@@ -56,7 +56,7 @@ npm run test:e2e # 全テスト（第4章の通し・ロード復元を含む）
 
 物語の節目に、SVGで描いたストーリームービーが全画面で流れます：「はじめから」の後の火山島編の始まり、第5章の結末、鍛冶屋・僧侶の書の復活。クリック・Space・Enter で次の場面、Esc・「スキップ」で終わります。再生中はゲームの世界が止まります。
 
-ムービーの原本はStudioの [story-movies](../Storybook_Character_Studio/story-movies/) で、Studioの `npm.cmd run sync:movies` で `assets/movies/` へ写します（直接編集しない）。読み込めないときは今までの文字の演出に戻ります。始まりのムービーを最後まで見たときは、導入会話から字幕と同じ行（地の文と書の振り返り）を省きます（[不整合一覧のSTORY-008](../docs/story/inconsistencies.md#story-008)）。テストでは `tests/helpers.mjs` の `openGame` がムービーを止め、`tests/e2e/movies.test.mjs` だけがムービーを流します。
+ムービーの原本はStudioの [story-movies](../Storybook_Character_Studio/story-movies/) で、Studioの `npm.cmd run sync:movies` で `assets/movies/` へ写します（直接編集しない）。読み込めないときは流さずに進みます（書の復活だけは今までの小窓）。全画面で文字が流れる章末は2026-11-08に削除し、章末はムービーだけです（全文は[削除した文字の章末](../docs/story/reference/removed-text-endings.md)に記録）。始まりのムービーを最後まで見たときは、導入会話から字幕と同じ行（地の文と書の振り返り）を省きます（[不整合一覧のSTORY-008](../docs/story/inconsistencies.md#story-008)）。テストでは `tests/helpers.mjs` の `openGame` がムービーを止め、`tests/e2e/movies.test.mjs` だけがムービーを流します。
 
 ## 主要な技術メモ
 

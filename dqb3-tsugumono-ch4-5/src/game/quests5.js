@@ -387,8 +387,8 @@ export class Chapter5 {
     SFX.levelup();
     g.setBaseLevel(6);
     this.quests.busy = true;
-    // 火山島編の結びのムービー（M7）。流せないときは文字のエンディング。
-    g.movies.playOr("ch5-return", (done) => g.ui.playEnding(done, { lines: CH5.ending }), () => {
+    // 火山島編の結びのムービー（M7）。流せないときは、そのまま CH5_DONE へ（文字の結末は2026-11-08に削除）。
+    g.movies.play("ch5-return").then(() => {
       this.quests.busy = false;
       this.quests.setStage("CH5_DONE");
       g.autosave();

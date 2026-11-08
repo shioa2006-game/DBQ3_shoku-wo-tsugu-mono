@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { castParts, castPartsJson } from '../../story-movies/shared/cast.mjs';
 import { runPython } from '../../story-movies/shared/build-movie.mjs';
 import { CAST } from '../../story-movies/ch5-return/cast.mjs';
+import { removedEnding } from './removed-endings.mjs';
 
 const movies = fileURLToPath(new URL('../../story-movies/', import.meta.url));
 const dir = path.join(movies, 'ch5-return');
@@ -31,8 +32,8 @@ test('character parts are exported unchanged from the Studio authoring code', as
 });
 
 test('captions are the lines of the chapter 5 ending, in order, and the title is the saga end', async () => {
-  const chapter5 = await readFile(fileURLToPath(new URL('../../../dqb3-tsugumono-ch4-5/src/content/chapter5.js', import.meta.url)), 'utf8');
-  const ending = [...chapter5.match(/ending: \[([\s\S]*?)\]/)[1].matchAll(/"([^"]+)"/g)].map(m => m[1]).filter(l => l !== '&nbsp;');
+  // 文字の結末は2026-11-08にゲームから削除し、全文を docs/story/reference/removed-text-endings.md に残した
+  const ending = await removedEnding('第5章の結末');
   assert.deepEqual(captions, ending.filter(l => !l.includes('火山島編・完')));
   assert.ok(html.includes('<h1 class="title-main">火山島編・完</h1>'));
   assert.equal(scenes.length, 4);

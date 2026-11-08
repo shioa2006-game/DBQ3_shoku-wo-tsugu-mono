@@ -5,7 +5,7 @@
 人物の頭・胴は ../parts/cast.json（Studioの正式デザインから ../../shared/cast.mjs が書き出したもの）を読む。
 通常は Studio ルートの npm.cmd run build:movie -- ch3-departure から呼ばれる。
 
-字幕は、第3章の結末文（dqb3-tsugumono-ch1-3/src/content/chapter3.js の ending）の行をそのまま使う。
+字幕は、第3章の結末文（以前の chapter3.js の ending。2026-11-08にゲームから削除し、全文は docs/story/reference/removed-text-endings.md）の行をそのまま使う。
 
 使い方:
     python build.py                     # ../index.html（Studioの /story-movies/ch3-departure/）を出力

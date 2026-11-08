@@ -32,7 +32,7 @@
 |---|---|
 | ① | プロローグ（M0）の字幕（[`../prologue/src/build.py`](../prologue/src/build.py)） |
 | ② | 第4章の導入会話で職業の書が振り返る2行（[`chapter4.js`](../../../dqb3-tsugumono-ch4-5/src/content/chapter4.js) の `intro`）。呼びかけの「思い出すのう。」と、続く「……次は、この島の番じゃ」を除き、かぎかっこを外した |
-| ③ | 第3章の結末文の最後の行（[`chapter3.js`](../../../dqb3-tsugumono-ch1-3/src/content/chapter3.js) の `ending`）。M4の最後の字幕と同じ文で、二つのゲームをつなぐ |
+| ③ | 第3章の結末文の最後の行（以前の `chapter3.js` の `ending`。全文は[削除した文字の章末](../../../docs/story/reference/removed-text-endings.md)）。M4の最後の字幕と同じ文で、二つのゲームをつなぐ |
 | ④ | 第4章の導入会話の地の文（`intro` の1行目を2行に分けた） |
 | ⑤ | 火山島編のタイトル画面の一文（[`ui.js`](../../../dqb3-tsugumono-ch4-5/src/ui/ui.js) の `title-copy`）を2行に分けた。タイトルの「第4章　鬼火の山」は第4章の章名 |
 

@@ -97,9 +97,8 @@ export class UI {
     // Book revival cutscene --------------------------------------------------------
     this.bookOverlay = el("div", "overlay book hidden", root);
 
-    // Title / ending / fade / help ------------------------------------------------
+    // Title / fade / help ---------------------------------------------------------
     this.title = el("div", "overlay title hidden", root);
-    this.ending = el("div", "overlay ending hidden", root);
     this.help = el("div", "overlay help hidden", root);
     this.pause = el("div", "overlay pause hidden", root);
     this.fadeEl = el("div", "fade", root);
@@ -117,7 +116,6 @@ export class UI {
       this.storageOpen ||
       this.dialogue.open ||
       !this.title.classList.contains("hidden") ||
-      !this.ending.classList.contains("hidden") ||
       !this.help.classList.contains("hidden") ||
       !this.pause.classList.contains("hidden") ||
       !this.bookOverlay.classList.contains("hidden") ||
@@ -464,27 +462,6 @@ export class UI {
 
   hideJobBook() {
     this.bookOverlay.classList.add("hidden");
-  }
-
-  // エンディング演出。opts.lines で任意の文面を流せる（章末・編末で使用）。
-  playEnding(cb, opts = {}) {
-    this.ending.classList.remove("hidden");
-    const body = (opts.lines ?? [
-      "炉は冷え、鉄は眠っていた。",
-      "だが人々は、火を戻すことを選んだ。",
-      "&nbsp;",
-      "—— 火山島の復興は、まだ始まったばかり ——",
-    ]).map((l) => `<p${l.includes("完") ? ' class="ending-title"' : ""}>${l}</p>`).join("");
-    this.ending.innerHTML = `
-      <div class="ending-scroll">
-        ${body}
-        <p class="ending-hint">（クリックで つづける）</p>
-      </div>`;
-    const close = () => {
-      this.ending.classList.add("hidden");
-      cb();
-    };
-    setTimeout(() => this.ending.addEventListener("click", close, { once: true }), 4000);
   }
 
   fade(toBlack, duration = 600) {

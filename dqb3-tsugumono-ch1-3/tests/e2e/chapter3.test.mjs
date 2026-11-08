@@ -252,21 +252,11 @@ try {
   await page.evaluate(() => window.__game.quests.onTalk("watari"));
   await advanceToChoice(page); // 別れの会話 → 「錨を上げるか」の選択肢
   await page.click(".choice-panel button"); // 「旅立つ」
-  await page.waitForSelector(".ending:not(.hidden) .ending-title");
-  expect(await page.locator(".ending-title").textContent() === "―― ジパング復興編・完 ――",
-    "改称後も出航エンディングの編名に見出し装飾が付く");
-  // エンディングのクリックリスナは4秒後に付くので、CH3_DONE になるまで押し続ける。
-  await waitForCond(
-    page,
-    () => {
-      if (window.__game.quests.stage === "CH3_DONE") return true;
-      document.querySelector(".ending")?.click();
-      return false;
-    },
-    undefined,
-    { label: "出航エンディング→CH3_DONE", timeout: 20000, interval: 500 },
-  );
-  expect((await stage(page)) === "CH3_DONE", "出航エンディング後はCH3_DONE（ジパング復興編・完）");
+  // 結末は旅立ちのムービー（M4）だけ。このテストはムービーを止めているので、
+  // 文字の結末（2026-11-08に削除）を出さずに、そのまま CH3_DONE へ進む。
+  await waitForStage(page, "CH3_DONE", { timeout: 20000 });
+  expect(await page.evaluate(() => !document.querySelector(".ending") && !window.__game.ui.modalOpen),
+    "旅立ちを選ぶと、文字の結末を出さずにCH3_DONE（ジパング復興編・完）");
 
   // --- 後日談: 船のワタリに話すと出航を再演できる（やめれば自由行動のまま）------------
   await page.evaluate(() => window.__game.quests.onTalk("watari"));

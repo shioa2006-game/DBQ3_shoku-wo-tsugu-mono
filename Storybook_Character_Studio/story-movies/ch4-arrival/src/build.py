@@ -10,7 +10,7 @@
   場面1 プロローグの字幕（../../prologue/src/build.py）
   場面2 第4章の導入会話で職業の書が振り返る2行（dqb3-tsugumono-ch4-5/src/content/chapter4.js の intro。
         呼びかけの「思い出すのう。」と、つなぎの「……次は、この島の番じゃ」は除いた）
-  場面3 第3章の結末文の最後の行（dqb3-tsugumono-ch1-3/src/content/chapter3.js の ending）
+  場面3 第3章の結末文の最後の行（以前の chapter3.js の ending。全文は docs/story/reference/removed-text-endings.md）
   場面4 第4章の導入会話の地の文（chapter4.js の intro の1行目を2行に分けた）
   場面5 火山島編のタイトル画面の一文（dqb3-tsugumono-ch4-5/src/ui/ui.js の title-copy）
 

@@ -49,7 +49,7 @@ CH1～CH3の人型7人・基本モンスター5種は、Storybook Character Stud
 
 物語の節目に、SVGで描いたストーリームービーが全画面で流れます：「はじめから」の後のプロローグ、第1章の結び（社で祈った後）、第2章の結び（田んぼ防衛戦の勝利会話の後）、旅立ち（ワタリに旅立ちを告げた後。クリア後の再演でも）、農民・料理人・船乗りの書の復活。クリック・Space・Enter で次の場面、Esc・「スキップ」で終わります。再生中はゲームの世界が止まります。
 
-ムービーの原本はStudioの [story-movies](../Storybook_Character_Studio/story-movies/) で、Studioの `npm.cmd run sync:movies` で `assets/movies/` へ写します（直接編集しない）。読み込めないときは今までの文字の演出に戻ります。プロローグを最後まで見たときは、導入会話の冒頭の語り（ムービーと同じ内容）を省きます（[不整合一覧のSTORY-008](../docs/story/inconsistencies.md#story-008)）。テストでは `tests/helpers.mjs` の `openGame` がムービーを止め、`tests/e2e/movies.test.mjs` だけがムービーを流します。
+ムービーの原本はStudioの [story-movies](../Storybook_Character_Studio/story-movies/) で、Studioの `npm.cmd run sync:movies` で `assets/movies/` へ写します（直接編集しない）。読み込めないときは流さずに進みます（書の復活だけは今までの小窓）。全画面で文字が流れる章末は2026-11-08に削除し、章末はムービーだけです（全文は[削除した文字の章末](../docs/story/reference/removed-text-endings.md)に記録）。プロローグを最後まで見たときは、導入会話の冒頭の語り（ムービーと同じ内容）を省きます（[不整合一覧のSTORY-008](../docs/story/inconsistencies.md#story-008)）。テストでは `tests/helpers.mjs` の `openGame` がムービーを止め、`tests/e2e/movies.test.mjs` だけがムービーを流します。
 
 ## 操作方法
 
@@ -69,7 +69,7 @@ CH1～CH3の人型7人・基本モンスター5種は、Storybook Character Stud
 
 ## 第1～3章の流れ
 
-1. 第1章「漂着の浜」: 小屋と畑を作り、収穫で農民の書を復活させる。旗を守り、職業の社で祈ると章末演出が流れる。
+1. 第1章「漂着の浜」: 小屋と畑を作り、収穫で農民の書を復活させる。旗を守り、職業の社で祈ると章末のムービーが流れる。
 2. 第2章「荒れた田の村」: 第1章完了の翌日、南への橋と田・食堂を復旧する。料理人の書を復活させ、田を守る。
 3. 第3章「旅立ちの港」: 船乗りワタリと桟橋・灯台・船を再建する。授職の儀とクラーケン戦を経て出航し、「ジパング復興編・完」となる。
 
@@ -100,7 +100,7 @@ src/
 ├─ game/              items.js, quests.js, blueprints.js, defense.js,
 │                     daynight.js, save.js, sfx.js（WebAudio合成SFX）,
 │                     bgm.js（通常/ボスの2曲をクロスフェード）
-└─ ui/ui.js           HUD・会話・メニュー・設計図パネル・タイトル・エンディング
+└─ ui/ui.js           HUD・会話・メニュー・設計図パネル・タイトル
 ```
 
 ### キャラクター表現（2.5D）

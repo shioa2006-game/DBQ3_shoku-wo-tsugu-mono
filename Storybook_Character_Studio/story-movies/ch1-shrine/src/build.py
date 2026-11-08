@@ -5,7 +5,7 @@
 1つの自己完結HTMLにまとめて書き出す。人物の頭・胴は ../parts/cast.json を読む。
 通常は Studio ルートの npm.cmd run build:movie -- ch1-shrine から呼ばれる。
 
-字幕は、今の第1章の章末の文（dqb3-tsugumono-ch1-3/src/ui/ui.js の playEnding() の既定の文）のうち、
+字幕は、第1章の章末の文（以前の ui.js の playEnding() の既定の文。2026-11-08にゲームから削除し、全文は docs/story/reference/removed-text-endings.md）のうち、
 第1章の出来事の行だけを、順番どおりそのまま使う。勇者・魔物・神殿の崩壊を語る前半の行は、
 プロローグ（M0）と重なるので使わない。最後の「― 職をつぐ旅は、ここから続いていく ―」は前後の線を外して使う。
 タイトルの「漂着の浜」は第1章の章名（docs/story/implemented/chapter1.md）。

@@ -43,7 +43,7 @@ export const BASE_URL = process.env.BASE_URL ?? "http://localhost:4174/builder_s
 export const SAVE_KEY = "shoku_wo_tsugumono_save_v1"; // src/game/save.js と一致させる
 
 // Boots the game to the title screen with a clean localStorage.
-// SVGストーリームービーは既定で流さない（文字の演出・全文の会話に戻る）。movies: true で流す（movies.test.mjs）。
+// SVGストーリームービーは既定で流さない（導入は全文の会話、章末はそのまま次へ、書の復活は小窓）。movies: true で流す（movies.test.mjs）。
 export async function openGame(page, { collectErrors, movies = false } = {}) {
   if (!movies) await page.addInitScript(() => { window.__SHOKU_SKIP_MOVIES__ = true; });
   if (collectErrors) {

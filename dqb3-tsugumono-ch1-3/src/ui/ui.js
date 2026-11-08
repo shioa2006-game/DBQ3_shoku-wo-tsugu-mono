@@ -83,9 +83,8 @@ export class UI {
     // Book revival cutscene --------------------------------------------------------
     this.bookOverlay = el("div", "overlay book hidden", root);
 
-    // Title / ending / fade / help ------------------------------------------------
+    // Title / fade / help ---------------------------------------------------------
     this.title = el("div", "overlay title hidden", root);
-    this.ending = el("div", "overlay ending hidden", root);
     this.help = el("div", "overlay help hidden", root);
     this.pause = el("div", "overlay pause hidden", root);
     this.fadeEl = el("div", "fade", root);
@@ -103,7 +102,6 @@ export class UI {
       this.storageOpen ||
       this.dialogue.open ||
       !this.title.classList.contains("hidden") ||
-      !this.ending.classList.contains("hidden") ||
       !this.help.classList.contains("hidden") ||
       !this.pause.classList.contains("hidden") ||
       !this.bookOverlay.classList.contains("hidden") ||
@@ -441,43 +439,6 @@ export class UI {
 
   hideJobBook() {
     this.bookOverlay.classList.add("hidden");
-  }
-
-  // 第1章のエンディング（既定）。opts.lines を渡すと任意の文面を流せる
-  // （第3章の出航エンディングで使用）。
-  playEnding(cb, opts = {}) {
-    this.ending.classList.remove("hidden");
-    const body = opts.lines
-      ? opts.lines.map((l) => `<p${l.includes("ジパング復興編") ? ' class="ending-title"' : ""}>${l}</p>`).join("")
-      : `
-        <p>勇者がゾーマを倒し、世界には平和が訪れるはずだった。</p>
-        <p>だが、上の世界には再び魔物があふれ、混乱が広がった。</p>
-        <p>&nbsp;</p>
-        <p>ダーマ神殿は襲われ、多くの職業の書が焼かれ、散り散りになった。</p>
-        <p>職を受け継ぐ道は失われ、町は壊れたまま時を止めた。</p>
-        <p>&nbsp;</p>
-        <p>神官見習いの少年シオンは、一冊の「職業の書」を携えて神殿から脱出した。</p>
-        <p>その書に導かれ、流れ着いたジパングで槌を取った。</p>
-        <p>&nbsp;</p>
-        <p>家を建て、田を耕し、柵をめぐらせ、祈りの場を作った。</p>
-        <p>人々が働き始めた時、白紙の職業の書に文字が戻った。</p>
-        <p>&nbsp;</p>
-        <p>これは、勇者のいない上の世界で、</p>
-        <p>人々がもう一度、自分の職を取り戻す物語。</p>
-        <p>&nbsp;</p>
-        <p class="ending-title">職をつぐ者 〜ジパング復興編〜</p>
-        <p>&nbsp;</p>
-        <p>― 職をつぐ旅は、ここから続いていく ―</p>`;
-    this.ending.innerHTML = `
-      <div class="ending-scroll">
-        ${body}
-        <p class="ending-hint">（クリックで つづける）</p>
-      </div>`;
-    const close = () => {
-      this.ending.classList.add("hidden");
-      cb();
-    };
-    setTimeout(() => this.ending.addEventListener("click", close, { once: true }), 4000);
   }
 
   fade(toBlack, duration = 600) {

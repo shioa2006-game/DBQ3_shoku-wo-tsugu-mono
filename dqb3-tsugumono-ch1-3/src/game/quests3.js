@@ -182,8 +182,8 @@ export class Chapter3 {
             this.quests.busy = false;
             return; // 「まだ島でやることがある」→ 自由行動へ戻る
           }
-          SFX.gong(); // 出航の銅鑼 → 旅立ちのムービー（M4）。流せないときは文字の出航エンディング
-          g.movies.playOr("ch3-departure", (done) => g.ui.playEnding(done, { lines: CH3.ending }), () => {
+          SFX.gong(); // 出航の銅鑼 → 旅立ちのムービー（M4）。流せないときは、そのまま CH3_DONE へ
+          g.movies.play("ch3-departure").then(() => {
             this.quests.busy = false;
             this.quests.setStage("CH3_DONE");
             g.autosave();

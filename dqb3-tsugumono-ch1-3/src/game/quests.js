@@ -431,8 +431,8 @@ export class QuestManager {
         D(BOOK, "「この社を、島の暮らしを支える場所に育てるのじゃ。職をつぐ旅は、ここから続いていくぞ！」"),
       ],
       () => {
-        // 第1章の結びのムービー（M1）。流せないときは文字のエンディング。
-        this.game.movies.playOr("ch1-shrine", (done) => this.game.ui.playEnding(done), () => {
+        // 第1章の結びのムービー（M1）。流せないときは、そのまま自由行動へ（文字の章末は2026-11-08に削除）。
+        this.game.movies.play("ch1-shrine").then(() => {
           this.busy = false;
           this.setStage("POSTGAME");
         });

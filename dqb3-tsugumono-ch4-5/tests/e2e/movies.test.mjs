@@ -1,9 +1,9 @@
 // SVGストーリームービー（assets/movies/、再生は game-shared/story-movies.mjs）の組み込みテスト。
-// 他のテストは openGame の既定でムービーを止めて文字の演出を通すので、ここだけムービーを流す。
+// 他のテストは openGame の既定でムービーを止めて進めるので、ここだけムービーを流す。
 // - 「はじめから」で火山島編の始まり（M5）が全画面に重なり、世界が止まる
 // - 最後まで見ると、導入会話から字幕と同じ行（地の文・書の振り返り）を省く／スキップすると全文
 // - 書の復活（M2）はムービーに置き換わり、復活の窓は出ない
-// - すべてのムービーがビルド後のゲームから読み込める。読み込めないときは文字の演出へ戻る
+// - すべてのムービーがビルド後のゲームから読み込める。読み込めないときは流さずに進む（書の復活だけは復活の小窓）
 
 import { launchBrowser, openGame, dlg, expect, waitForCond, waitForStage } from "../helpers.mjs";
 
@@ -84,7 +84,7 @@ try {
     expect(result.shown && result.skipped, `${id}: スキップで閉じる`);
   }
 
-  // --- 読み込めないムービーは流さず、代わりの演出へ戻る ---------------------------------------
+  // --- 読み込めないムービーは流さず、playOr の代わりの演出（書の復活の小窓）へ戻る ----------------
   const fallback = await page.evaluate(async () => {
     const Movies = window.__game.movies.constructor;
     const broken = new Movies({ missing: "data:text/html,<title>no movie</title>" }, { loadTimeout: 4000 });
