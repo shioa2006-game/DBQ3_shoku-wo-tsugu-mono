@@ -80,13 +80,16 @@ npm.cmd run sync:games -- mina    # 指定したキャラクターだけ
 | `prototypes/dorotabo-8dir/` | どろたぼうの全身作画・泥が沈む2ポーズ・再生成 |
 | `prototypes/squid-8dir/` | イカの全身作画・触腕2ポーズ・再生成 |
 | `prototypes/shared/` | 目・鼻・SVG部品・方向順、各キャラクターの書き出し先のゲーム（`game-targets.mjs`） |
+| `story-movies/` | SVGストーリームービーの一覧ページ（`index.html`）と一覧データ（`catalog.mjs`） |
 | `story-movies/prologue/` | プロローグのSVGストーリームービー試作（正式デザインのシオンが登場。ゲーム未組み込み） |
 | `docs/` | 制作上の知見と整理記録 |
 | `index.html` | 人型7人とモンスター5体の制作入口 |
 | `tools/` | 起動とローカル静的配信 |
 | `tests/node/` | 起動、作画維持、リンク・参照の検査 |
 
-## プロローグの試作
+## SVGストーリームービー
+
+物語の節目に入れるムービー（採用した7本）の一覧が http://127.0.0.1:8081/story-movies/ にあります（トップページの「SVGストーリームービーの一覧」）。各ムービーの章・入る場所・長さ・優先度・作る順・場面を確認でき、「物語の順」と「作る順」で並べ替えられます。試作済みのムービーは静止画を表示し、クリックで再生します。一覧のデータは `story-movies/catalog.mjs` で、内容の正本は親リポジトリの `docs/story/planned/story-movies.md` です。計画を変えたら `catalog.mjs` も直します（`npm.cmd test` が計画資料の表・作る順番と照合します）。新しいムービーは `story-movies/<フォルダ>/` に作り、`catalog.mjs` の状態を試作済みにして静止画の場面を指定します。一覧ページのブラウザー確認は `npm.cmd run test:movie-list`。
 
 冒頭に挿入するSVGストーリームービー（約31秒・5場面）の試作が [`story-movies/prologue/`](story-movies/prologue/README.md) にあります。http://127.0.0.1:8081/story-movies/prologue/ で再生できます。主人公の頭・胴は `prototypes/hero2-8dir/character.mjs` から書き出して使い、手足と場面の絵はPythonで描きます（`npm.cmd run build:prologue`、Python 3.9以上が必要）。ブラウザーでの再生確認は `npm.cmd run test:prologue`。ゲームへの移植はユーザーが決めた段階で行います。
 

@@ -2,7 +2,7 @@
 
 『職をつぐ者』の冒頭に挿入する、約31秒・全5場面のストーリームービーの試作です。**Studio内の試作で、ゲーム本編には組み込んでいません。** 採用と移植はユーザーが確認してから決めます。
 
-- 確認URL: Studioを起動（`npm.cmd start`）して http://127.0.0.1:8081/story-movies/prologue/ 。Studioのトップページの「プロローグ・SVGストーリームービー（試作）」からも開けます。
+- 確認URL: Studioを起動（`npm.cmd start`）して http://127.0.0.1:8081/story-movies/prologue/ 。Studioのトップページの「SVGストーリームービーの一覧」（`/story-movies/`）からも開けます。
 - 物語の基準: [冒頭ショートムービーの計画](../../../docs/story/planned/opening-movie.md)、[世界観と物語の始まり](../../../docs/story/overview.md)、[人物と職業の書](../../../docs/story/characters-and-jobs.md)、[第1章](../../../docs/story/implemented/chapter1.md)
 - 主人公の正式デザイン: [hero2（試作03）](../../prototypes/hero2-8dir/README.md)、設定画 [`references/hero-redesign-8dir-v3.png`](../../references/hero-redesign-8dir-v3.png)
 - 場面ごとの時間・カメラ・字幕・絵の内容: [絵コンテ](reference/storyboard.md)

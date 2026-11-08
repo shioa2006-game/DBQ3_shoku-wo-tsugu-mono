@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SVGストーリームービー一覧 — Storybook Character Studio</title>
+<link rel="icon" href="data:,">
+<style>
+:root{font-family:"Yu Gothic UI",Meiryo,sans-serif;color:#263f4e;background:#efeee6}
+*{box-sizing:border-box}
+body{margin:0;background:#efeee6}
+main{max-width:1160px;margin:auto;padding:36px 24px 56px}
+h1{font-size:30px;margin:8px 0}
+p{line-height:1.8;color:#526b75}
+a{color:#245b72}
+small{color:#607b83}
+code{overflow-wrap:anywhere;font-size:.92em}
+.crumbs{margin:6px 0 18px}
+.overview{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin:0 0 8px}
+.counts{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
+.counts li{background:#fafbf6;border:1px solid #c1cdca;border-radius:999px;padding:4px 12px;font-size:14px}
+.counts b{font-size:16px;margin-left:4px}
+.toolbar{display:flex;align-items:center;gap:8px;margin-left:auto;font-size:14px;color:#526b75}
+.toolbar button{font:inherit;color:#245b72;background:#fafbf6;border:1px solid #c1cdca;border-radius:999px;padding:6px 14px;cursor:pointer;min-height:36px}
+.toolbar button[aria-pressed="true"]{background:#245b72;border-color:#245b72;color:#fff}
+.toolbar button:focus-visible{outline:3px solid #e9a54a;outline-offset:2px}
+.group{margin-top:30px}
+.group-title{font-size:22px;margin:0}
+.group-note{margin:2px 0 14px;font-size:14px}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+.movie{background:#fafbf6;border:1px solid #c1cdca;border-radius:18px;overflow:hidden;display:flex;flex-direction:column}
+.thumb{position:relative;display:block;aspect-ratio:16/9;overflow:hidden;background:#101626;color:#fff;text-decoration:none}
+.thumb iframe{position:absolute;left:0;top:0;width:1280px;height:720px;border:0;transform:scale(var(--k,.3));transform-origin:0 0;pointer-events:none;opacity:0;transition:opacity .4s}
+.thumb iframe.is-ready{opacity:1}
+.thumb .play{position:absolute;right:12px;bottom:12px;background:rgba(10,14,28,.72);border:1px solid rgba(242,207,124,.7);color:#f6e2ae;border-radius:999px;padding:6px 14px;font-size:14px;transition:background .2s}
+.thumb.is-live:hover .play,.thumb.is-live:focus-visible .play{background:#245b72;color:#fff}
+.thumb.is-live:focus-visible{outline:3px solid #e9a54a;outline-offset:-3px}
+.thumb.is-planned{background:radial-gradient(circle at 72% 78%,var(--b) 0,transparent 46%),linear-gradient(165deg,var(--a) 0%,#0c1120 100%)}
+.thumb-id{position:absolute;left:18px;top:12px;font-size:42px;font-weight:800;letter-spacing:.04em;opacity:.92;text-shadow:0 2px 10px rgba(0,0,0,.45)}
+.thumb-title{position:absolute;left:8%;right:8%;top:50%;transform:translateY(-50%);text-align:center;font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic","Yu Gothic UI","Meiryo",system-ui,sans-serif;font-weight:900;font-size:clamp(18px,2.6vw,27px);line-height:1.45;color:#fff4d2;text-shadow:0 2px 0 rgba(0,0,0,.35),0 0 18px rgba(0,0,0,.55)}
+.thumb-state{position:absolute;left:20px;bottom:14px;font-size:14px;background:rgba(10,14,28,.55);border-radius:999px;padding:4px 12px}
+.body{padding:18px 22px 20px;display:flex;flex-direction:column;gap:10px;flex:1}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:13px;border-radius:999px;padding:2px 10px;background:#e4e7e2;color:#4d5f66}
+.tag.id{background:#263f4e;color:#fff;font-weight:700}
+.tag.status-prototype{background:#d9eddf;color:#22603f}
+.tag.status-game{background:#d6e6f2;color:#1f4f73}
+.tag.prio-A{background:#f7e1cc;color:#8a4413}
+.tag.prio-B{background:#e7ecd2;color:#4f5c1f}
+.movie h3{font-size:20px;margin:0;line-height:1.4}
+.summary-text{margin:0}
+dl{display:grid;grid-template-columns:5.6em minmax(0,1fr);gap:4px 10px;margin:0;font-size:14px}
+dt{color:#607b83}
+dd{margin:0}
+details{font-size:14px;border-top:1px solid #dde3df;padding-top:8px}
+summary{cursor:pointer;color:#245b72}
+details ol{margin:8px 0 0;padding-left:1.6em;line-height:1.7}
+.links{display:flex;gap:8px 16px;flex-wrap:wrap;margin-top:auto;padding-top:4px;font-size:14px}
+.aside{margin-top:36px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+.note{padding:16px 20px;background:#e0e7dd;border-radius:10px}
+.note h2{font-size:17px;margin:0 0 6px}
+.note p,.note ul{margin:6px 0 0;font-size:14px;line-height:1.7;color:#4b6470}
+.note ul{padding-left:1.3em}
+.error{padding:16px 20px;background:#f6dcd6;border-radius:10px;color:#7a2a1d}
+@media(max-width:760px){
+  main{padding:24px 16px 40px}
+  h1{font-size:25px}
+  .cards,.aside{grid-template-columns:1fr}
+  .toolbar{margin-left:0}
+  .body{padding:16px 16px 18px}
+}
+</style>
+</head>
+<body><main>
+<small>STORYBOOK CHARACTER STUDIO / STORY MOVIES</small>
+<h1>SVGストーリームービー</h1>
+<p>物語の節目に入れるムービーの一覧です。Studioで1本ずつ試作し、ゲームへの組み込みはユーザーが決めた段階で行います。試作済みのムービーは、絵をクリックすると再生できます。</p>
+<nav class="crumbs" aria-label="戻る"><a href="../">← 制作室のトップ</a></nav>
+<div class="overview">
+  <ul class="counts" id="counts" aria-label="制作の状況"></ul>
+  <div class="toolbar" role="group" aria-label="並び順"><span>並び順</span><button type="button" data-order="story" aria-pressed="true">物語の順</button><button type="button" data-order="build" aria-pressed="false">作る順</button></div>
+</div>
+<div id="list" aria-live="polite"></div>
+<div class="aside" id="aside"></div>
+<noscript><p class="error">一覧はJavaScriptで表示します。<a href="prologue/">プロローグ（試作）</a>は直接開けます。</p></noscript>
+</main>
+<script type="module">
+import { MOVIES, SAGAS, STATUS, BUILD_STEPS, DECLINED, PLAN_DOC } from './catalog.mjs';
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const made = m => m.status !== 'planned';
+const list = document.getElementById('list');
+
+// ひな形の href・src は単引用符で書く（Studioのリンク検査は二重引用符の href・src を固定のリンクとして、実在するか確かめる）。
+function card(m) {
+  const status = STATUS[m.status];
+  const thumb = made(m) && m.thumb
+    ? `<a class="thumb is-live" href='${esc(m.slug)}/' aria-label="${esc(m.title)}を再生"><iframe src='${esc(m.slug)}/?still=${m.thumb.scene}&amp;t=${m.thumb.t}' loading="lazy" tabindex="-1" aria-hidden="true" title="${esc(m.title)}の静止画"></iframe><span class="play">▶ 再生</span></a>`
+    : `<div class="thumb is-planned" style="--a:${m.tone[0]};--b:${m.tone[1]}" aria-hidden="true"><span class="thumb-id">${m.id}</span><span class="thumb-title">${esc(m.title).replace('「', '<br>「')}</span><span class="thumb-state">${status.label}</span></div>`;
+  const step = BUILD_STEPS.find(s => s.step === m.buildStep);
+  const links = made(m) ? [{ label: '再生する', href: `${m.slug}/` }, { label: 'すぐ再生', href: `${m.slug}/?autoplay=1` }, ...(m.links || [])] : [];
+  return `<article class="movie" data-id="${m.id}" data-status="${m.status}">
+    ${thumb}
+    <div class="body">
+      <div class="tags"><span class="tag id">${m.id}</span><span class="tag status-${m.status}">${status.label}</span>${m.priority ? `<span class="tag prio-${m.priority}">優先度 ${m.priority}</span>` : ''}</div>
+      <h3>${esc(m.title)}</h3>
+      <p class="summary-text">${esc(m.summary)}</p>
+      <dl>
+        <dt>章</dt><dd>${esc(m.when)}</dd>
+        <dt>入る場所</dt><dd>${esc(m.place)}</dd>
+        <dt>長さ</dt><dd>${esc(m.length)}</dd>
+        <dt>作る順</dt><dd>${m.buildStep === 0 ? '試作済み' : `${m.buildStep}番目（${esc(step.label)}）`}</dd>
+        ${m.cast.length ? `<dt>登場</dt><dd>${m.cast.map(esc).join('・')}</dd>` : ''}
+        <dt>フォルダ</dt><dd><code>story-movies/${esc(m.slug)}/</code>${made(m) ? '' : '（作るときに作成）'}</dd>
+      </dl>
+      <details><summary>場面（${m.scenes.length}）</summary><ol>${m.scenes.map(s => `<li>${esc(s)}</li>`).join('')}</ol></details>
+      ${links.length ? `<div class="links">${links.map(l => `<a href='${esc(l.href)}'>${esc(l.label)}</a>`).join('')}</div>` : ''}
+    </div>
+  </article>`;
+}
+
+function groups(order) {
+  if (order === 'build') return BUILD_STEPS
+    .map(s => ({ id: `step-${s.step}`, title: s.step ? `${s.step}. ${s.label}` : s.label, note: s.note, items: MOVIES.filter(m => m.buildStep === s.step) }))
+    .filter(g => g.items.length);
+  return SAGAS.map(s => ({ id: s.id, title: s.title, note: s.note, items: MOVIES.filter(m => m.saga === s.id) }));
+}
+
+// 試作済みの静止画は1280×720で描いて、枠の幅に合わせて縮める（ムービーのPC表示と同じ見え方）。
+const fit = new ResizeObserver(entries => { for (const e of entries) e.target.style.setProperty('--k', e.contentRect.width / 1280); });
+
+function render(order) {
+  fit.disconnect();
+  list.innerHTML = groups(order).map(g => `<section class="group" data-group="${g.id}">
+    <h2 class="group-title">${esc(g.title)}</h2>${g.note ? `<p class="group-note">${esc(g.note)}</p>` : ''}
+    <div class="cards">${g.items.map(card).join('')}</div>
+  </section>`).join('');
+  list.querySelectorAll('.thumb.is-live').forEach(t => fit.observe(t));
+  // 読み込み直後に一瞬出る開始画面を見せず、静止画になってから表示する。
+  list.querySelectorAll('.thumb iframe').forEach(f => f.addEventListener('load', () => f.classList.add('is-ready'), { once: true }));
+  document.querySelectorAll('.toolbar button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.order === order)));
+  document.body.dataset.view = order;
+}
+
+const counts = ['game', 'prototype', 'planned'].map(k => [STATUS[k].label, MOVIES.filter(m => m.status === k).length]).filter(([, n]) => n);
+document.getElementById('counts').innerHTML = `<li>採用<b>${MOVIES.length}</b>本</li>` + counts.map(([label, n]) => `<li>${label}<b>${n}</b></li>`).join('');
+
+document.getElementById('aside').innerHTML = `
+  <section class="note"><h2>見送った案</h2><p>今の会話・演出のままとします。</p>
+    <ul>${DECLINED.map(d => `<li>${d.id} ${esc(d.title)}（${esc(d.note)}）</li>`).join('')}</ul></section>
+  <section class="note"><h2>計画とこの一覧の更新</h2>
+    <p>内容・入る場所・順番の正本は、親リポジトリの <code>${PLAN_DOC}</code> です。計画を変えたら <code>story-movies/catalog.mjs</code> も直します（Studioのテストが照合します）。</p>
+    <p>新しいムービーは <code>story-movies/&lt;フォルダ&gt;/index.html</code> に作り、<code>catalog.mjs</code> の状態を「試作済み」にして静止画の場面を指定すると、ここに絵が出ます。</p></section>`;
+
+const params = new URLSearchParams(location.search);
+render(params.get('order') === 'build' ? 'build' : 'story');
+document.querySelector('.toolbar').addEventListener('click', e => {
+  const order = e.target.closest('button')?.dataset.order;
+  if (!order || order === document.body.dataset.view) return;
+  render(order);
+  const url = new URL(location.href);
+  if (order === 'build') url.searchParams.set('order', 'build'); else url.searchParams.delete('order');
+  history.replaceState(null, '', url);
+});
+window.StoryMovieList = { render, MOVIES };
+</script>
+<script>
+// モジュールを読めなかったとき（file:// で開いた場合など）に知らせる。
+addEventListener('load', () => { if (!window.StoryMovieList) document.getElementById('list').innerHTML = '<p class="error">一覧を読み込めませんでした。Studioのサーバー（npm.cmd start）から http://127.0.0.1:8081/story-movies/ を開いてください。</p>'; });
+</script>
+</body>
+</html>
