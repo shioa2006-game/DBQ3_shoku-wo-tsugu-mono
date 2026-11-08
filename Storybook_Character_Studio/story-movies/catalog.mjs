@@ -59,12 +59,14 @@ export const MOVIES = [
     tone: ['#141d3a', '#e8823e'],
   },
   {
-    id: 'M4', slug: 'ch3-departure', title: '旅立ち「ジパング復興編・完」', saga: 'zipangu', status: 'planned', buildStep: 1,
+    id: 'M4', slug: 'ch3-departure', title: '旅立ち「ジパング復興編・完」', saga: 'zipangu', status: 'prototype', buildStep: 1,
     when: '第3章・結末', place: 'ワタリに旅立ちを告げた後（文字の結末を置き換え。クリア後の再演でも再生）', length: '大・30～35秒', priority: 'A',
     summary: '第1～3章の総まとめと、島からの船出。第2章の結びの荒れた夜の海と対になる、晴れた朝の海へ。火山島編（M5）へつなぐ。',
     scenes: ['復興した島（田・食堂・灯台・社）を朝の光で見渡す', '島に残るピノ・イナホ・ジンベエ', '船に乗る四人と、桟橋で見送る人々', '灯台の光の先、水平線へ進む帆', 'タイトル「ジパング復興編・完」'],
     cast: ['シオン', 'ミナ', 'ゴンタ', 'ワタリ', 'ピノ', 'イナホ', 'ジンベエ'],
     tone: ['#5b9cc8', '#f6dc8c'],
+    thumb: { scene: 3, t: 3600 },
+    links: [{ label: '制作メモ', href: 'ch3-departure/README.md' }, { label: '絵コンテ', href: 'ch3-departure/reference/storyboard.md' }],
   },
   {
     id: 'M5', slug: 'ch4-arrival', title: '火山島編の始まり「海を越えて」', saga: 'volcano', status: 'planned', buildStep: 1,

@@ -55,7 +55,7 @@ test('catalog entries are well formed', () => {
     assert.ok(Object.hasOwn(STATUS, m.status), `${m.id} status`);
     assert.ok(SAGAS.some(s => s.id === m.saga), `${m.id} saga`);
     assert.ok(BUILD_STEPS.some(s => s.step === m.buildStep), `${m.id} build step`);
-    assert.equal(m.buildStep === 0, m.status !== 'planned', `${m.id}: step 0 means already made`);
+    if (m.buildStep === 0) assert.notEqual(m.status, 'planned', `${m.id}: step 0 means made before the plan`);
     assert.ok(m.tone.length === 2 && m.tone.every(c => /^#[0-9a-f]{6}$/.test(c)), `${m.id} tone`);
     for (const key of ['title', 'when', 'place', 'length', 'summary']) assert.ok(m[key], `${m.id} ${key}`);
     assert.ok(m.scenes.length >= 3, `${m.id} scenes`);

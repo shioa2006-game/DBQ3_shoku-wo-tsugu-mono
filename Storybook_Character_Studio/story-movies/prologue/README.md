@@ -45,7 +45,7 @@ npm.cmd run build:prologue
 ```
 
 1. `src/shion_parts.mjs` が、正式デザインのシオンの作画コード（[`prototypes/hero2-8dir/character.mjs`](../../prototypes/hero2-8dir/character.mjs)）から、8方向の頭・胴のSVGを `parts/shion-parts.json` へ書き出します。
-2. `src/build.py` が、5場面のSVG・字幕・再生処理を組み立てて `index.html`（自己完結、外部ファイルなし）を書き出します。乱数は固定シードなので、何度実行しても同じ内容になります。
+2. `src/build.py` が、5場面のSVGとストーリーデータを、共通の再生エンジン（[`../shared/engine.py`](../shared/engine.py)）で `index.html`（自己完結、外部ファイルなし）にまとめて書き出します。乱数は固定シードなので、何度実行しても同じ内容になります。
 
 `index.html` と `parts/shion-parts.json` は生成物です。手で直さず、`src/` を直して生成し直します。主人公の作画（hero2）を変えたときも、生成し直すとムービーのシオンに反映されます（`npm.cmd test` は、ムービーの部品が作画コードと食い違うと失敗します）。
 
@@ -57,10 +57,11 @@ npm.cmd run build:prologue
 | `build.mjs` | 生成の入口（部品の書き出し → Pythonの組み立て） |
 | `src/shion_parts.mjs` | 正式デザインのシオンの頭・胴を書き出す（作画コードは読むだけで変えない） |
 | `src/shion.py` | ムービー用のシオン：手足・姿勢・表情・夜と夜明けの色調・縁の光 |
-| `src/helpers.py` | 作画用の汎用関数（山の稜線、すやり霞、雲、炎、渦巻き、煙の輪郭、草など） |
+| `../shared/helpers.py` | 作画用の汎用関数（山の稜線、すやり霞、雲、炎、渦巻き、煙の輪郭、草など）。2026-11-08に共通部品へ移動 |
 | `src/scenes_a.py` | 第1場面「平和の終わり」、第2場面「異変」 |
 | `src/scenes_b.py` | 第3場面「ダーマ神殿の崩壊」、第4場面「シオンの脱出」、第5場面「ジパングへの漂着」 |
-| `src/build.py` | CSS・HTML・JavaScript（ストーリーデータと再生エンジン `StoryPlayer`）を持ち、5場面と合わせて書き出す |
+| `src/build.py` | ストーリーデータ（`PROLOGUE_STORY`）とパネルの文言を持ち、5場面と合わせて書き出す |
+| `../shared/engine.py` | 画面の骨組み・CSS・再生エンジン `StoryPlayer`（ほかのムービーと共通。2026-11-08にこのファイルから移動し、出力が変わらないことを確かめた） |
 | `parts/shion-parts.json` | 書き出したシオンの部品（生成物） |
 | `reference/storyboard.md` | 絵コンテ（場面ごとの時間・カメラ・字幕・絵・動き） |
 | `screenshots/` | ブラウザーテストが保存する各場面の静止画（Git管理しない） |
@@ -70,7 +71,7 @@ npm.cmd run build:prologue
 | 各場面の絵 | `src/scenes_a.py` / `src/scenes_b.py` の `scene1()`～`scene5()` |
 | 絵の中の動き | 各場面の `S1_CSS`～`S5_CSS`（SVG内の `<style>`） |
 | 表示時間・字幕・カメラ・タイトルの時刻 | `src/build.py` の `PROLOGUE_STORY` |
-| 再生・送り・スキップの処理 | `src/build.py` の `StoryPlayer` |
+| 再生・送り・スキップの処理 | `../shared/engine.py` の `StoryPlayer`（全ムービー共通） |
 | シオンの姿勢・表情・光 | `src/shion.py` の `run_left()`・`run_away()`・`stand_dawn()`、場面の `shion.figure()` の呼び出し |
 | シオンの髪・顔・服・書の形 | 正式デザイン側の [`character.mjs`](../../prototypes/hero2-8dir/character.mjs)（ムービー側では描き直さない） |
 

@@ -39,7 +39,9 @@
     "sync:games": "node tools/sync-game-targets.mjs",
     "build:prologue": "node story-movies/prologue/build.mjs",
     "test:prologue": "node tests/movie/prologue.test.mjs",
-    "test:movie-list": "node tests/movie/list.test.mjs"
+    "test:movie-list": "node tests/movie/list.test.mjs",
+    "build:movie": "node story-movies/build.mjs",
+    "test:movie": "node tests/movie/story-movie.test.mjs"
   },
   "engines": {
     "node": ">=18"

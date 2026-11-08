@@ -57,7 +57,8 @@ try {
       const frame = page.locator(`.movie[data-id="${m.id}"] .thumb iframe`);
       await page.locator(`.movie[data-id="${m.id}"] .thumb iframe.is-ready`).waitFor({ timeout: 15000 });
       const inner = page.frameLocator(`.movie[data-id="${m.id}"] .thumb iframe`);
-      assert.equal(await inner.locator('#prologue').getAttribute('data-state'), 'still', `${m.id}: still picture`);
+      // プロローグのルートは #prologue、共通エンジンの2本目以降は #movie
+      assert.equal(await inner.locator(m.slug === 'prologue' ? '#prologue' : '#movie').getAttribute('data-state'), 'still', `${m.id}: still picture`);
       // 1280×720で描いた静止画が、枠の幅に縮んで収まる
       const [box, thumb] = await Promise.all([frame.boundingBox(), page.locator(`.movie[data-id="${m.id}"] .thumb`).boundingBox()]);
       assert.ok(Math.abs(box.width - thumb.width) < 2 && Math.abs(box.height - thumb.height) < 2, `${m.id}: still fits ${box.width}x${box.height} in ${thumb.width}x${thumb.height}`);
