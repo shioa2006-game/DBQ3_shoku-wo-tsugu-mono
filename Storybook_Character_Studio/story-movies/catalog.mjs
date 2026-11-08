@@ -91,12 +91,14 @@ export const MOVIES = [
     links: [{ label: '制作メモ', href: 'ch5-return/README.md' }, { label: '絵コンテ', href: 'ch5-return/reference/storyboard.md' }],
   },
   {
-    id: 'M2', slug: 'book-revival', title: '書の復活（共通の型）', saga: 'common', status: 'planned', buildStep: 3,
+    id: 'M2', slug: 'book-revival', title: '書の復活（共通の型）', saga: 'common', status: 'prototype', buildStep: 3,
     when: '第1～5章（5回）', place: '農民・料理人・船乗り・鍛冶屋・僧侶の書が復活するとき（復活の小窓を置き換え）', length: '小・6～8秒', priority: 'B',
-    summary: '職が戻る瞬間を、毎回同じ型で見せる。書の色・紋章・道具の絵だけを差し替える。先にStudioで5冊の書の意匠（表紙の色・紋章）を決める。',
-    scenes: ['白紙の書が開く', 'ページに光の文字が戻る', 'その職の道具が光の中に浮かぶ（鍬・鍋・舵・槌・薬草など）', '書の名前を表示する'],
+    summary: '職が戻る瞬間を、毎回同じ型で見せる。書の色・紋章・道具の絵だけを差し替える。5冊の書の意匠（表紙の色・紋章）はこの試作で案を作った（shared/books.py）。',
+    scenes: ['白紙の書が開く', 'ページに光の文字が戻る', 'その職の道具が光の中に浮かぶ（鍬・鍋・舵輪・槌・薬草）', '書の名前を表示する'],
     cast: [],
     tone: ['#20392d', '#e6c46a'],
+    thumb: { scene: 1, t: 6000 },
+    links: [{ label: '制作メモ', href: 'book-revival/README.md' }, { label: '絵コンテ', href: 'book-revival/reference/storyboard.md' }],
   },
 ];
 

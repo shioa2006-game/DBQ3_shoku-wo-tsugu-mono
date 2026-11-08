@@ -182,8 +182,11 @@ try {
     await page.waitForTimeout(500);
     const skip = await page.locator('[data-action="skip"]').boundingBox();
     assert.ok(skip.height >= 44 && skip.width >= 44, `${name}: skip button ${skip.width}x${skip.height}`);
-    await page.touchscreen.tap(viewport.width / 2, viewport.height / 2);
-    await page.waitForFunction(id => [...document.querySelectorAll('.scene')].at(-1)?.dataset.scene === id, ids[1]);
+    // タップで次の場面へ（1場面だけのムービー＝書の復活は、送る先がないので省く）
+    if (ids.length > 1) {
+      await page.touchscreen.tap(viewport.width / 2, viewport.height / 2);
+      await page.waitForFunction(id => [...document.querySelectorAll('.scene')].at(-1)?.dataset.scene === id, ids[1]);
+    }
     await page.locator('[data-action="skip"]').tap();
     await page.waitForFunction(() => document.getElementById('movie').dataset.state === 'ended', null, { timeout: 3000 });
     ok(`mobile ${name}: fits the screen with readable captions in every scene, tap to advance, skip button`);
