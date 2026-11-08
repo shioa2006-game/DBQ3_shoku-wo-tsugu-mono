@@ -69,12 +69,15 @@ export const MOVIES = [
     links: [{ label: '制作メモ', href: 'ch3-departure/README.md' }, { label: '絵コンテ', href: 'ch3-departure/reference/storyboard.md' }],
   },
   {
-    id: 'M5', slug: 'ch4-arrival', title: '火山島編の始まり「海を越えて」', saga: 'volcano', status: 'planned', buildStep: 1,
+    id: 'M5', slug: 'ch4-arrival', title: '火山島編の始まり「海を越えて」', saga: 'volcano', status: 'prototype', buildStep: 1,
     when: '第4～5章・開始', place: '「はじめから」の後、第4章の導入会話の前', length: '大・25～30秒', priority: 'A',
-    summary: '別のゲームとして始まる火山島編の入口。これまでの旅を短く振り返り、火山島への到着を見せる。',
-    scenes: ['これまでの旅を短く（神殿からの脱出、ジパングの復興）', '長い航海。物資が尽きていく船上の四人', '灰の匂いの風と、煙を上げる黒い島影', '焼けた船着き場'],
+    summary: '別のゲームとして始まる火山島編の入口。プロローグとM4の絵を思い出の額にしてこれまでの旅を短く振り返り、火山島への到着を見せる。',
+    scenes: ['これまでの旅①：神殿から逃れた見習い（プロローグの絵を額に）', 'これまでの旅②：ジパングの復興と、島に残る三人（M4の絵を額に）',
+      '長い航海。夕暮れから夜へ、空になった樽と船上の四人', '灰の匂いの風と、煙を上げる黒い島影', '焼けた船着き場。タイトル「火山島編」'],
     cast: ['シオン', 'ミナ', 'ゴンタ', 'ワタリ'],
     tone: ['#3b3a40', '#d8663a'],
+    thumb: { scene: 4, t: 4200 },
+    links: [{ label: '制作メモ', href: 'ch4-arrival/README.md' }, { label: '絵コンテ', href: 'ch4-arrival/reference/storyboard.md' }],
   },
   {
     id: 'M7', slug: 'ch5-return', title: '帰るべき場所へ「火山島編・完」', saga: 'volcano', status: 'planned', buildStep: 2,

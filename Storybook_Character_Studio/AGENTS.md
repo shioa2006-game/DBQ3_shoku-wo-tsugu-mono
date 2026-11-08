@@ -23,7 +23,7 @@
 - 2026-11-03に主人公・ミナ・ゴンタ・ワタリ・おおこうもり・どろたぼうを第4～5章へも移植。両編が書き出し先のキャラクターは、書き出し後に `npm.cmd run sync:games` で `game-targets.mjs` の全ゲームへ写す。
 
 - `story-movies/index.html` はSVGムービーの一覧で、データは `story-movies/catalog.mjs`（内容の正本は `docs/story/planned/story-movies.md`）。ムービーを作ったり計画を変えたりしたら `catalog.mjs` も直す。
-- 2本目以降のムービーは `story-movies/shared/`（再生エンジン `engine.py`、人物の部品 `cast.mjs`・手足 `figures.py`）を使い、`npm.cmd run build:movie -- <フォルダ名>` で生成、`npm.cmd run test:movie -- <フォルダ名>` で再生確認。各フォルダの `index.html`・`parts/` は生成物。人物の作画を変えたら、登場するムービーを生成し直す。
+- 2本目以降のムービーは `story-movies/shared/`（再生エンジン `engine.py`、人物の部品 `cast.mjs`・手足 `figures.py`）を使い、`npm.cmd run build:movie -- <フォルダ名>` で生成、`npm.cmd run test:movie -- <フォルダ名>` で再生確認。各フォルダの `index.html`・`parts/` は生成物。人物の作画を変えたら、登場するムービーを生成し直す。M5（`ch4-arrival/`）は思い出の額にプロローグとM4（`ch3-departure/`）の場面をそのまま使うので、それらを変えたらM5も生成し直す。
 - `story-movies/prologue/` はプロローグのSVGムービー試作（ゲーム未組み込み）。`index.html`・`parts/` は生成物なので `src/` を直して `npm.cmd run build:prologue`。主人公の作画（hero2）を変えたら生成し直す。移植はユーザーが決める。
 
 - Gitは[親リポジトリ](../AGENTS.md)で一括管理する。Studio単体のremoteや `.git` は作らない。旧履歴は統合時の外部bundleから参照する。
