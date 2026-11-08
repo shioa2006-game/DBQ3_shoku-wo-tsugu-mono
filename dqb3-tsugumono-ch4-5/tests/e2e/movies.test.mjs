@@ -23,6 +23,9 @@ async function waitForMovie(page, id) {
     if (!frame) await page.waitForTimeout(150);
   }
   expect(frame, `${id}: ムービーが再生中になる`);
+  // 自動再生では、ムービー単体で開いたときの開始パネル（「…を見る」）を出さない
+  const panel = await frame.evaluate(() => getComputedStyle(document.querySelector(".start-panel")).display);
+  expect(panel === "none", `${id}: 開始パネルは出ない (${panel})`);
   return frame;
 }
 

@@ -104,6 +104,9 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden}
   gap:22px;padding:24px;text-align:center;opacity:0;visibility:hidden;transition:opacity .6s ease,visibility 0s .6s;
   background:radial-gradient(ellipse 60% 55% at 50% 52%,rgba(52,38,112,.42),rgba(0,0,0,0) 70%),#000}
 .__ROOT__[data-state="idle"] .start-panel,.__ROOT__[data-state="ended"] .end-panel{opacity:1;visibility:visible;transition:opacity 1s ease}
+/* 自動再生（?autoplay=1・?from=N。ゲームへの組み込み）では開始パネルを出さない。
+   読み込み中（state=idle）に一瞬見えたり、再生が始まってからフェードで消えたりしないように、<head> で印を付ける */
+.is-autoplay .start-panel{display:none}
 .emblem{width:min(120px,26vw);height:auto;overflow:visible}
 .__ROOT__[data-state="idle"] .emblem .glow{animation:emb 3.2s ease-in-out infinite}
 @keyframes emb{0%,100%{opacity:.55}50%{opacity:1}}
@@ -590,6 +593,7 @@ def page(path, *, root, story_const, global_name, story_data, title, comment, bo
 {comment}
 -->
 <style>{css}</style>
+<script>(function () {{ var p = new URLSearchParams(location.search); if (p.get('autoplay') === '1' || p.has('from')) document.documentElement.classList.add('is-autoplay'); }})();</script>
 </head>
 <body>
 {body_html}
