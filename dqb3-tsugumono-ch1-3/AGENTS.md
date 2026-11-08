@@ -49,7 +49,7 @@ npm.cmd run test:e2e
 ### 回帰テストの役割
 
 - `tests/e2e/story.test.mjs`：第1章ストーリー全体の通し回帰。
-- `tests/e2e/blueprint.test.mjs`：設計図のオートスナップ、破壊優先、障害物。
+- `tests/e2e/blueprint.test.mjs`：設計図のオートスナップ、破壊優先、障害物、予定地に立つ住民のよけ（`game-shared/build-clearance.mjs`）。
 - `tests/e2e/saveload.test.mjs`：セーブ・ロード、設計図`baseY`、旧形式互換。
 - `tests/e2e/jobs.test.mjs`：職業の書の進捗、復活、セーブ保持、旧セーブ互換。
 - `tests/e2e/worldversion.test.mjs`：ワールド生成バージョンの記録と不一致時の警告。

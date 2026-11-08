@@ -1,9 +1,11 @@
 // Blueprint water-cell regression:
 // - a ghost over water can be aimed and filled through the real mouse path
 // - wrong solid blocks remain obstacles and are never auto-overwritten
+// - 住民が立つマスは住民がよけて置ける（通り抜けのブロックは住民ごと置ける。魔物がいれば置けない）
 
 import { launchBrowser, openGame, newGame, expect, waitForCond } from "../helpers.mjs";
 import { aimAtCell } from "../../../game-shared/tests/aim-at-cell.mjs";
+import { checkStepAside } from "../../../game-shared/tests/build-step-aside.mjs";
 
 const errors = [];
 const browser = await launchBrowser();
@@ -88,6 +90,27 @@ try {
   }), obstacleSetup);
   expect(obstacleAfter.block === 1, "クリックしても誤ブロックを自動上書きしない");
   expect(obstacleAfter.stones === obstacleSetup.stones, "障害物クリックでは資材を消費しない");
+
+  // 住民が立つマス: 海岸拠点の収納箱のマス（ミナの上陸地点）は、ミナがよけて置ける。
+  // 通り抜けられるベッドはミナごと置け、魔物が立つマスには今までどおり置けない。
+  const campY = await page.evaluate(() => {
+    const g = window.__game;
+    const bp = g.blueprints.activate("coast_camp", { x: 26, z: 6 }, g.world.pristineSurfaceY(28, 7));
+    return bp.baseY;
+  });
+  const aside = await checkStepAside(page, {
+    villagerId: "mina",
+    solid: { x: 31, y: campY, z: 8, item: "chest" },
+    passThrough: { x: 27, y: campY, z: 7, item: "bed" },
+    spawnAt: { x: 31, z: 8 },
+  });
+  expect(aside.monsterBlocked && aside.monsterKeptMats, `魔物が立つマスには置けず材料も減らない (${JSON.stringify(aside)})`);
+  expect(aside.blockedBefore, "ミナが収納箱のマスに立っている（判定に掛かる位置）");
+  expect(aside.solidPlaced && aside.usedOne, `ミナが立つ収納箱のマスにも置け、材料が1つ減る (${JSON.stringify(aside)})`);
+  expect(aside.movedOff && !aside.inSolid && aside.onGround && !aside.inWater, `ミナは床の上へよけ、ブロックに埋まらない (${JSON.stringify(aside)})`);
+  expect(aside.stepDistance < 4.6, `よけ先は近く (${aside.stepDistance.toFixed(2)})`);
+  expect(aside.onRemaining.length === 0, `よけたミナはまだ埋まっていないマスに掛からない (${aside.onRemaining.join(" ")})`);
+  expect(aside.passPlaced && aside.passStayed, `ベッドはミナが立っていても動かさずに置ける (${JSON.stringify(aside)})`);
 
   expect(errors.length === 0, `コンソールエラーゼロ (${JSON.stringify(errors.slice(0, 5))})`);
   console.log("blueprint.test: PASS");

@@ -109,26 +109,36 @@ try {
   expect(Object.values(combat).every(Boolean),"swings/armor/heads/real ally AI/incoming protection: "+JSON.stringify(combat));
 
   const placement=await page.evaluate(B=>{
-    const g=window.__game,w=g.world,c={x:22,y:10,z:22,block:B.WALL};
+    const g=window.__game,w=g.world,y=w.terrainSurfaceY(22.5,22.5),c={x:22,y,z:22,block:B.WALL};
     w.set(c.x,c.y,c.z,B.AIR);g.inventory.add("wall",10);
-    const p=g.player.pos.clone(),v=g.spawnVillager("belk",22,22,10),m=g.monsters.spawn("lava_lizard",22.5,10,22.5);
-    const entities=[g.player,v,m,...g.gromBattle.heads];
+    const p=g.player.pos.clone(),v=g.spawnVillager("belk",22,22,y),m=g.monsters.spawn("lava_lizard",22.5,y,22.5);
+    const blockers=[g.player,m,...g.gromBattle.heads];
+    const entities=[...blockers,v];
+    const away=()=>{for(const e of entities)e.pos.set(40,y,40);};
     const results=[];
-    for(const occupant of entities){
-      for(const e of entities)e.pos.set(40,10,40);
-      occupant.pos.set(22.5,10,22.5);
+    // Hero, enemy and dragon-head occupancy still blocks placement without cost.
+    for(const occupant of blockers){
+      away();
+      occupant.pos.set(22.5,y+0.001,22.5);
       const n=g.inventory.count("wall");
       g.fillGhostCell(c);
       results.push(w.get(c.x,c.y,c.z)===B.AIR && g.inventory.count("wall")===n);
     }
-    for(const e of entities)e.pos.set(40,10,40);
-    const n=g.inventory.count("wall");g.fillGhostCell(c);
+    // An NPC steps aside to nearby ground, then the cell builds once.
+    away();
+    v.pos.set(22.5,y+0.001,22.5);
+    let n=g.inventory.count("wall");g.fillGhostCell(c);
+    const off=Math.abs(v.pos.x-22.5)>=v.halfW+0.5||Math.abs(v.pos.z-22.5)>=v.halfW+0.5;
+    results.push(w.get(c.x,c.y,c.z)===B.WALL && g.inventory.count("wall")===n-1 && off && !v.collides(w,v.pos.x,v.pos.y,v.pos.z));
+    w.set(c.x,c.y,c.z,B.AIR);
+    away();
+    n=g.inventory.count("wall");g.fillGhostCell(c);
     results.push(w.get(c.x,c.y,c.z)===B.WALL && g.inventory.count("wall")===n-1);
     g.fillGhostCell(c);results.push(g.inventory.count("wall")===n-1);
     g.player.pos.copy(p);
     return results;
   },B);
-  expect(placement.every(Boolean),"hero/NPC/enemy/dragon-head occupancy blocks placement without cost; clear cell builds once");
+  expect(placement.every(Boolean),"hero/enemy/dragon-head occupancy blocks placement without cost; an NPC steps aside; clear cell builds once: "+JSON.stringify(placement));
   expect(errors.length===0,JSON.stringify(errors));
   console.log("quality-mechanics.test: PASS");
 }finally{await browser.close();}

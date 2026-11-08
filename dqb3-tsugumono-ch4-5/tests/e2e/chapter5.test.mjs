@@ -130,15 +130,17 @@ try {
     const g = window.__game;
     const cell = g.blueprints.active.cells.find((c) => c.x === 47 && c.z === 16 && c.y === g.blueprints.active.baseY);
     g.inventory.add("wall", 1);
-    // 付き添いのナギは歩き回るので、たまたま同じマスに来ないよう一時的に遠ざける。
+    // 付き添いのナギが歩き回って同じマスに来ていても、ナギがよけて置ける。
     const nagi = g.villager("nagi");
-    const nagiPos = nagi.pos.clone();
-    nagi.pos.set(0, -100, 0);
+    nagi.pos.set(cell.x + 0.5, cell.y + 0.001, cell.z + 0.5);
+    nagi.vel.set(0, 0, 0);
     g.fillGhostCell(cell);
-    nagi.pos.copy(nagiPos);
-    return g.world.get(cell.x, cell.y, cell.z) === cell.block;
+    return {
+      placed: g.world.get(cell.x, cell.y, cell.z) === cell.block,
+      nagiOff: Math.abs(nagi.pos.x - (cell.x + 0.5)) >= 0.8 || Math.abs(nagi.pos.z - (cell.z + 0.5)) >= 0.8,
+    };
   });
-  expect(wallFilled, "テルがいた宿坊の南壁のマスに壁を置ける");
+  expect(wallFilled.placed && wallFilled.nagiOff, `テルがいた宿坊の南壁のマスに、ナギが立っていても壁を置ける (${JSON.stringify(wallFilled)})`);
 
   // --- ③④ 宿坊 → 薬草園 → 煎じ湯 ---------------------------------------------------------
   await completeActiveBlueprint(page); // 宿坊
@@ -148,6 +150,20 @@ try {
     kamado: window.__game.kamados.size,
   }));
   expect(patients.sumi === true, "病人が宿坊の寝床で休む");
+
+  // ロード時の走査（z の小さい順）で宿坊のかまど(z15)が食堂の鉄鍋(z16)より先に並んでも、
+  // 食事の場所とカヤの持ち場は食堂の鉄鍋のまま（宿坊の南壁へずれない）。
+  const stove = await page.evaluate(() => {
+    const g = window.__game;
+    const pot = [...g.kamados].find((k) => k.startsWith("35,") && k.endsWith(",16"));
+    g.kamados.delete(pot);
+    g.kamados.add(pot); // 走査し直した後と同じ並び（宿坊のかまどが先）
+    return { first: [...g.kamados][0], stove: g.kitchenStove(), meal: g.kitchenPos(), cook: g.cookStandPos() };
+  });
+  expect(stove.first.startsWith("44,"), `宿坊のかまどが先に並ぶ (${stove.first})`);
+  expect(stove.stove.x === 35 && stove.stove.z === 16, `調理設備は食堂の鉄鍋 (${JSON.stringify(stove.stove)})`);
+  expect(stove.meal.x === 35.5 && stove.meal.z === 17.5, `食事は食堂のちゃぶ台を囲む (${JSON.stringify(stove.meal)})`);
+  expect(stove.cook.x === 36.5 && stove.cook.z === 16.5, `カヤの持ち場は鉄鍋の東隣 (${JSON.stringify(stove.cook)})`);
   await completeActiveBlueprint(page); // 薬草園
   await dlg(page);
   await page.evaluate(() => {

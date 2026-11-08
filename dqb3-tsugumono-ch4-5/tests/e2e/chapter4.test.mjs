@@ -7,6 +7,7 @@ import {
   launchBrowser, openGame, newGame, dlg, stage, expect,
   waitForCond, advanceToStage, advanceToChoice, completeActiveBlueprint, sleep,
 } from "../helpers.mjs";
+import { checkCookStand } from "../../../game-shared/tests/build-step-aside.mjs";
 
 const errors = [];
 const browser = await launchBrowser();
@@ -113,6 +114,18 @@ try {
   }
   const canteenBp = await page.evaluate(() => window.__game.blueprints.active?.id);
   expect(canteenBp === "canteen", `鉄鍋の完成で食堂の設計図が開く (${canteenBp})`);
+  // 鉄鍋→ちゃぶ台の順に置く。カヤの持ち場（鍋の東隣）は設計図のマスに掛からず、
+  // 以前の持ち場（鍋の前＝ちゃぶ台）に立っていても、カヤがよけてちゃぶ台を置ける。
+  const canteenY = await page.evaluate(() => window.__game.blueprints.active.baseY);
+  const cook = await checkCookStand(page, {
+    villagerId: "kaya",
+    stove: { x: 35, y: canteenY, z: 16, item: "iron_pot" },
+    table: { x: 35, y: canteenY, z: 17, item: "table" },
+    standPos: "cookStandPos",
+  });
+  expect(cook.id === "canteen" && cook.stovePlaced, `食堂の鉄鍋を置ける (${JSON.stringify(cook)})`);
+  expect(cook.standBlocks.length === 0 && !cook.standSolid, `カヤの持ち場は食堂の設計図のマスに掛からない (${JSON.stringify(cook)})`);
+  expect(cook.tablePlaced && cook.movedOff && !cook.inSolid, `ちゃぶ台のマスに立つカヤがよけ、ちゃぶ台を置ける (${JSON.stringify(cook)})`);
   await completeActiveBlueprint(page);
   await advanceToStage(page, "CH4_BOOK", { timeout: 90000 }); // 食事シーン＋回想＋復活演出を挟む
   const book = await page.evaluate(() => ({

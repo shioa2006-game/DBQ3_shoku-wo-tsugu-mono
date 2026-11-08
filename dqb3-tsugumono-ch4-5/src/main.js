@@ -1,9 +1,10 @@
 import * as THREE from "three";
 import { cellInReach, pickBlueprintCell } from "../../game-shared/blueprint-target.mjs";
+import { buildCellBlockers, clearVillagersFromCell } from "../../game-shared/build-clearance.mjs";
 import { StoryMovies } from "../../game-shared/story-movies.mjs";
 import { Input } from "./core/input.js";
 import { cellKey } from "./core/utils.js";
-import { B, BLOCK_DEFS } from "./world/blocks.js";
+import { B, BLOCK_DEFS, isSolidFor } from "./world/blocks.js";
 import { VoxelWorld, WORLD, PLACES, FISH_SPOTS } from "./world/world.js";
 import { ChunkRenderer } from "./world/mesher.js";
 import { PropRenderer } from "./world/props.js";
@@ -538,13 +539,31 @@ class Game {
     return this.quests.isCh5() ? WORLD.PASS_Z1 : WORLD.GATE_Z;
   }
 
-  // 最初の調理設備（かまど・鉄鍋）の位置。まだ無ければ null。
-  kitchenPos() {
+  // 町の調理設備のマス: 食堂の鉄鍋を優先し、無ければ最初のかまど。まだ無ければ null。
+  // kamados はロード時に z の小さい順で走査し直すため、並び順に頼ると宿坊のかまど(z15)が
+  // 食堂の鉄鍋(z16)より先になり、食事の場所とカヤの持ち場が宿坊へずれてしまう。
+  kitchenStove() {
+    let first = null;
     for (const key of this.kamados) {
-      const [x, , z] = key.split(",").map(Number);
-      return { x: x + 0.5, z: z + 1.5 };
+      const [x, y, z] = key.split(",").map(Number);
+      if (this.world.get(x, y, z) === B.IRON_POT) return { x, y, z };
+      first ??= { x, y, z };
     }
-    return null;
+    return first;
+  }
+
+  // 食事で囲む場所（鍋の前＝ちゃぶ台）。まだ無ければ null。
+  kitchenPos() {
+    const s = this.kitchenStove();
+    return s ? { x: s.x + 0.5, z: s.z + 1.5 } : null;
+  }
+
+  // カヤ（鉄鍋の火の番）の持ち場: 鍋の東隣の床。まだ無ければ null。
+  // 鍋の前（南）は食堂の設計図ではちゃぶ台のマスで、そこに立つと建築中に
+  // ちゃぶ台を置けず、完成後はちゃぶ台の上に乗ってしまう。
+  cookStandPos() {
+    const s = this.kitchenStove();
+    return s ? { x: s.x + 1.5, z: s.z + 0.5 } : null;
   }
 
   // 魚のかげは毎朝わき直す（獲った分だけ）。
@@ -625,11 +644,20 @@ class Game {
   }
 
   // Place the block a ghost cell requires, consumed from anywhere in the inventory.
+  // 主人公・魔物がいるマスには置けない。住民が立っているだけなら、材料があるときに
+  // 近くへよけてもらってから置く（住民は設計図を知らずに歩き回り、持ち場で立ち止まる）。
+  // 住民が通り抜けられるブロック（たいまつ・ベッド・坑道灯など）は、住民がいてもそのまま置く。
   fillGhostCell(cell) {
     if (!cell || !this.world.inBounds(cell.x, cell.y, cell.z)) return;
     const current = this.world.get(cell.x, cell.y, cell.z);
     if (current !== B.AIR && current !== B.WATER) return;
-    if (this.placeBlockedByEntity(cell)) {
+    const blockers = buildCellBlockers(cell, {
+      player: this.player,
+      villagers: this.villagers,
+      monsters: this.monsters.monsters,
+      villagersPassThrough: !isSolidFor(cell.block, "villager"),
+    });
+    if (blockers.hard.length) {
       this.throttledToast("bpoccupied", "人や魔物がいる場所には置けません");
       return;
     }
@@ -637,6 +665,10 @@ class Game {
     if (!itemId) return;
     if (!this.inventory.has(itemId)) {
       this.throttledToast("bpmat", `📦 ${ITEMS[itemId].name} が足りない`);
+      return;
+    }
+    if (blockers.villagers.length && !clearVillagersFromCell(blockers.villagers, cell, this.stepAsideOptions())) {
+      this.throttledToast("bpoccupied", "人や魔物がいる場所には置けません");
       return;
     }
     this.inventory.remove(itemId, 1);
@@ -778,6 +810,20 @@ class Game {
       }
     }
     return false;
+  }
+
+  // 設計図のマスからよける住民の行き先の条件: 水の中や溶岩の上には行かせず、
+  // まだ埋まっていない設計図のマスにはできるだけ掛からない場所を選ぶ。
+  stepAsideOptions() {
+    const remaining = new Set();
+    for (const c of this.blueprints.active?.cells ?? []) {
+      if (this.world.get(c.x, c.y, c.z) !== c.block) remaining.add(cellKey(c.x, c.y, c.z));
+    }
+    return {
+      world: this.world,
+      reserved: (x, y, z) => remaining.has(cellKey(x, y, z)),
+      unsafe: (x, y, z) => this.world.get(x, y, z) === B.WATER || this.world.get(x, y - 1, z) === B.LAVA,
+    };
   }
 
   breakBlock(x, y, z, bdef) {
@@ -1163,7 +1209,7 @@ class Game {
           : (this.defense.targetEntity ?? this.bannerEntity).pos,
         farmWork: this.blueprints.completed.has("ash_farm"),
         mealPos: this.cooking.mealPos(),
-        kitchenPos: this.kitchenPos(),
+        kitchenPos: this.cookStandPos(), // カヤの持ち場（鍋の東隣）
         forgePos: this.quests.flags.forgeLit
           ? { x: PLACES.forge.x + 2.5, z: PLACES.forge.z + 2.5 }
           : null,

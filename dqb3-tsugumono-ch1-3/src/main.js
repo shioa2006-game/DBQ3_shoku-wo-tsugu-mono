@@ -1,9 +1,10 @@
 import * as THREE from "three";
 import { cellInReach, pickBlueprintCell } from "../../game-shared/blueprint-target.mjs";
+import { buildCellBlockers, clearVillagersFromCell } from "../../game-shared/build-clearance.mjs";
 import { StoryMovies } from "../../game-shared/story-movies.mjs";
 import { Input } from "./core/input.js";
 import { cellKey } from "./core/utils.js";
-import { B, BLOCK_DEFS } from "./world/blocks.js";
+import { B, BLOCK_DEFS, isSolidFor } from "./world/blocks.js";
 import { VoxelWorld, WORLD, PLACES, FISH_SPOTS } from "./world/world.js";
 import { ChunkRenderer } from "./world/mesher.js";
 import { PropRenderer } from "./world/props.js";
@@ -552,11 +553,13 @@ class Game {
     return !!this.quests.flags.southOpen;
   }
 
-  // 最初のかまどの位置（イナホの持ち場）。まだ無ければ null。
+  // イナホの持ち場: 最初のかまどの東隣の床。まだ無ければ null。
+  // かまどの前（南）は食堂の設計図ではちゃぶ台のマスで、そこに立つと建築中に
+  // ちゃぶ台を置けず、完成後はちゃぶ台の上に乗ってしまう。
   kitchenPos() {
     for (const key of this.kamados) {
       const [x, , z] = key.split(",").map(Number);
-      return { x: x + 0.5, z: z + 1.5 };
+      return { x: x + 1.5, z: z + 0.5 };
     }
     return null;
   }
@@ -643,11 +646,20 @@ class Game {
   }
 
   // Place the block a ghost cell requires, consumed from anywhere in the inventory.
+  // 主人公・魔物がいるマスには置けない。住民が立っているだけなら、材料があるときに
+  // 近くへよけてもらってから置く（住民は設計図を知らずに歩き回り、持ち場で立ち止まる）。
+  // 住民が通り抜けられるブロック（たいまつ・ベッドなど）は、住民がいてもそのまま置く。
   fillGhostCell(cell) {
     if (!cell || !this.world.inBounds(cell.x, cell.y, cell.z)) return;
     const current = this.world.get(cell.x, cell.y, cell.z);
     if (current !== B.AIR && current !== B.WATER) return;
-    if (this.placeBlockedByEntity(cell)) {
+    const blockers = buildCellBlockers(cell, {
+      player: this.player,
+      villagers: this.villagers,
+      monsters: this.monsters.monsters,
+      villagersPassThrough: !isSolidFor(cell.block, "villager"),
+    });
+    if (blockers.hard.length) {
       this.throttledToast("bpoccupied", "人や魔物がいる場所には置けません");
       return;
     }
@@ -655,6 +667,10 @@ class Game {
     if (!itemId) return;
     if (!this.inventory.has(itemId)) {
       this.throttledToast("bpmat", `📦 ${ITEMS[itemId].name} が足りない`);
+      return;
+    }
+    if (blockers.villagers.length && !clearVillagersFromCell(blockers.villagers, cell, this.stepAsideOptions())) {
+      this.throttledToast("bpoccupied", "人や魔物がいる場所には置けません");
       return;
     }
     this.inventory.remove(itemId, 1);
@@ -794,6 +810,20 @@ class Game {
       }
     }
     return false;
+  }
+
+  // 設計図のマスからよける住民の行き先の条件: 水の中には入れず、
+  // まだ埋まっていない設計図のマスにはできるだけ掛からない場所を選ぶ。
+  stepAsideOptions() {
+    const remaining = new Set();
+    for (const c of this.blueprints.active?.cells ?? []) {
+      if (this.world.get(c.x, c.y, c.z) !== c.block) remaining.add(cellKey(c.x, c.y, c.z));
+    }
+    return {
+      world: this.world,
+      reserved: (x, y, z) => remaining.has(cellKey(x, y, z)),
+      unsafe: (x, y, z) => this.world.get(x, y, z) === B.WATER,
+    };
   }
 
   breakBlock(x, y, z, bdef) {

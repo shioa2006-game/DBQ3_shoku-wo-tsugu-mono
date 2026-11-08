@@ -3,6 +3,7 @@
 // 料理3回 → 料理人の書 → 田んぼ防衛戦（泥田の主）→ CH2_DONE → セーブ復元。
 
 import { launchBrowser, openGame, newGame, stage, expect, advanceToStage, advanceToChoice, waitForStage, waitForCond } from "../helpers.mjs";
+import { checkCookStand } from "../../../game-shared/tests/build-step-aside.mjs";
 
 const errors = [];
 const browser = await launchBrowser();
@@ -106,6 +107,18 @@ try {
   expect(kitchenSite.fishOnMovedPond === true, "village fish spots remain on the moved pond");
 
   // --- 食堂とかまど -------------------------------------------------------------------
+  // かまど→ちゃぶ台の順に置く。イナホの持ち場（かまどの東隣）は設計図のマスに掛からず、
+  // 以前の持ち場（かまどの前＝ちゃぶ台）に立っていても、イナホがよけてちゃぶ台を置ける。
+  const kitchenY = await page.evaluate(() => window.__game.blueprints.active.baseY);
+  const cook = await checkCookStand(page, {
+    villagerId: "inaho",
+    stove: { x: 40, y: kitchenY, z: 81, item: "kamado" },
+    table: { x: 40, y: kitchenY, z: 82, item: "table" },
+    standPos: "kitchenPos",
+  });
+  expect(cook.id === "kitchen" && cook.stovePlaced, `食堂のかまどを置ける (${JSON.stringify(cook)})`);
+  expect(cook.standBlocks.length === 0 && !cook.standSolid, `イナホの持ち場は食堂の設計図のマスに掛からない (${JSON.stringify(cook)})`);
+  expect(cook.tablePlaced && cook.movedOff && !cook.inSolid, `ちゃぶ台のマスに立つイナホがよけ、ちゃぶ台を置ける (${JSON.stringify(cook)})`);
   await page.evaluate(() => {
     const g = window.__game;
     for (const c of [...g.blueprints.active.cells]) g.world.set(c.x, c.y, c.z, c.block);

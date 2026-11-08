@@ -1,6 +1,7 @@
 // 設計図まわりの回帰テスト。
 // - ゴースト直接クリックのオートスナップ（実マウス経路）
 // - 材料不足時は設置されない
+// - 住民が立つマスは住民がよけて置ける（通り抜けのブロックは住民ごと置ける。魔物がいれば置けない）
 // - 障害物セルの赤フラグ
 // - ハンマー選択中は破壊優先（オートスナップ無効）
 // - 橋の水中橋脚をゴーストクリックで設置できる
@@ -8,6 +9,7 @@
 
 import { launchBrowser, openGame, newGame, expect, waitForCond } from "../helpers.mjs";
 import { aimAtCell } from "../../../game-shared/tests/aim-at-cell.mjs";
+import { checkStepAside } from "../../../game-shared/tests/build-step-aside.mjs";
 
 const errors = [];
 const browser = await launchBrowser();
@@ -87,6 +89,27 @@ try {
     return g.world.get(door.x, door.y, door.z);
   });
   expect(noMat === 0, "扉の材料が無いと設置されない");
+
+  // --- 住民が立つマス: 固いブロックは住民がよけて置ける／通り抜けは住民ごと置ける／魔物は不可 ---
+  const asideCells = await page.evaluate(() => {
+    const g = window.__game;
+    const bp = g.blueprints.active;
+    const y = bp.baseY;
+    // 北の壁（外側に住民がよけられる床がある）と、小屋の中のベッド。
+    const wall = bp.cells.find((c) => c.block === 10 && c.y === y && c.z === 20 && c.x > 20 && c.x < 23 && g.world.get(c.x, c.y, c.z) === 0)
+      ?? bp.cells.find((c) => c.block === 10 && c.y === y && g.world.get(c.x, c.y, c.z) === 0);
+    return { solid: { x: wall.x, y, z: wall.z, item: "wall" }, passThrough: { x: 21, y, z: 21, item: "bed" } };
+  });
+  const aside = await checkStepAside(page, {
+    villagerId: "pino", ...asideCells, spawnAt: { x: 26, z: 26 }, cleanup: true,
+  });
+  expect(aside.monsterBlocked && aside.monsterKeptMats, `魔物が立つマスには置けず材料も減らない (${JSON.stringify(aside)})`);
+  expect(aside.blockedBefore, "住民が壁のマスに立っている（判定に掛かる位置）");
+  expect(aside.solidPlaced && aside.usedOne, `住民が立つ壁のマスにも置け、材料が1つ減る (${JSON.stringify(aside)})`);
+  expect(aside.movedOff && !aside.inSolid && aside.onGround && !aside.inWater, `住民は床の上へよけ、ブロックに埋まらない (${JSON.stringify(aside)})`);
+  expect(aside.stepDistance < 4.6, `よけ先は近く (${aside.stepDistance.toFixed(2)})`);
+  expect(aside.onRemaining.length === 0, `よけた住民はまだ埋まっていないマスに掛からない (${aside.onRemaining.join(" ")})`);
+  expect(aside.passPlaced && aside.passStayed, `ベッドは住民が立っていても動かさずに置ける (${JSON.stringify(aside)})`);
 
   // --- 障害物: 赤フラグ -------------------------------------------------------------
   const obstacle = await page.evaluate(() => {
