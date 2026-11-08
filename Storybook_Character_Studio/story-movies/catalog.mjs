@@ -54,12 +54,16 @@ export const MOVIES = [
     links: [{ label: '制作メモ', href: 'ch1-shrine/README.md' }, { label: '絵コンテ', href: 'ch1-shrine/reference/storyboard.md' }],
   },
   {
-    id: 'M9', slug: 'ch2-harvest', title: '第2章の結び「収穫祭の夜」', saga: 'zipangu', status: 'planned', buildStep: 4,
+    id: 'M9', slug: 'ch2-harvest', title: '第2章の結び「収穫祭の夜」', saga: 'zipangu', status: 'prototype', buildStep: 4,
     when: '第2章・章末', place: '田んぼ防衛戦の勝利会話の後（章末の演出を新しく足す）', length: '中・約18秒', priority: 'B',
     summary: '「食卓が戻る」収穫祭で第2章を締めくくり、沖の嵐で第3章の海と船へつなぐ。ワタリの漂着とクラーケンの全身は見せない。',
-    scenes: ['守った田（月夜に実った稲が揺れる）', '収穫祭（かまどの火と、膳を囲む人々）', '二冊の書（農民と料理人の紋が浮かぶ）', '荒れる沖（稲光、波にもまれる小船の影、海中の巨大な影）', '「職をつぐ旅は、まだ続く。」'],
+    scenes: ['守った田：月夜、泥の跡の残る田で実った稲が揺れる', '収穫祭：食堂の前で膳を囲む五人と、料理を運ぶイナホ',
+      '二冊の書：シオンの背中の職業の書が光り、農民と料理人の書が浮かぶ', '荒れる沖：稲光と波にもまれる船の影。一瞬だけ海の中の巨大な影',
+      '結び：嵐が遠くで続く暗い海。タイトル「第2章・完」'],
     cast: ['シオン', 'ミナ', 'イナホ', 'ゴンタ', 'ジンベエ', 'ピノ'],
     tone: ['#141d3a', '#e8823e'],
+    thumb: { scene: 2, t: 3500 },
+    links: [{ label: '制作メモ', href: 'ch2-harvest/README.md' }, { label: '絵コンテ', href: 'ch2-harvest/reference/storyboard.md' }],
   },
   {
     id: 'M4', slug: 'ch3-departure', title: '旅立ち「ジパング復興編・完」', saga: 'zipangu', status: 'prototype', buildStep: 1,
