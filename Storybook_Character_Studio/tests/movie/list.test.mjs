@@ -55,6 +55,7 @@ try {
     assert.equal(await page.locator('[data-order="story"]').getAttribute('aria-pressed'), 'true');
     for (const m of made) {
       const frame = page.locator(`.movie[data-id="${m.id}"] .thumb iframe`);
+      await frame.scrollIntoViewIfNeeded();   // 静止画は loading="lazy"（見える所まで来てから読む）
       await page.locator(`.movie[data-id="${m.id}"] .thumb iframe.is-ready`).waitFor({ timeout: 15000 });
       const inner = page.frameLocator(`.movie[data-id="${m.id}"] .thumb iframe`);
       // プロローグのルートは #prologue、共通エンジンの2本目以降は #movie
@@ -91,7 +92,10 @@ try {
     await page.reload();
     await page.waitForFunction(() => window.StoryMovieList);
     assert.equal(await page.locator('[data-order="build"]').getAttribute('aria-pressed'), 'true');
-    for (const m of made) await page.locator(`.movie[data-id="${m.id}"] .thumb iframe.is-ready`).waitFor({ timeout: 15000 });
+    for (const m of made) {
+      await page.locator(`.movie[data-id="${m.id}"] .thumb iframe`).scrollIntoViewIfNeeded();
+      await page.locator(`.movie[data-id="${m.id}"] .thumb iframe.is-ready`).waitFor({ timeout: 15000 });
+    }
     await page.waitForTimeout(500);   // 静止画のフェードイン
     await page.screenshot({ path: `${shots}list-build.png`, fullPage: true });
     await page.locator('[data-order="story"]').click();
