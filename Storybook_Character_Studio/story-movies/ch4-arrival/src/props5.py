@@ -37,7 +37,7 @@ def volcano(p, R, x, base, w, h, ridge_color="#6a6266", lava=True):
             (x + w * .37, base - h * .2), (x + w / 2, base)]
     body, ridge = mountain(keys, base, R, depth=3, rough=.08)
     o = [f'<path d="{body}" fill="url(#{p}rock)"/>',
-         f'<path d="{ridge}" fill="none" stroke="{ridge_color}" stroke-width="3" stroke-linejoin="round" opacity=".7"/>']
+         f'<defs><clipPath id="{p}clip"><path d="{body}"/></clipPath></defs><g clip-path="url(#{p}clip)">']
     # 斜面の溝と、明るい岩肌（頂の近くだけ。短く、ばらばらに）
     for i in range(9):
         a = R.uniform(-1, 1)
@@ -57,6 +57,7 @@ def volcano(p, R, x, base, w, h, ridge_color="#6a6266", lava=True):
     if lava:
         o.append(f'<path d="M{n(x + rim * .4)},{n(top + 4)} Q{n(x + w * .05)},{n(top + h * .35)} {n(x + w * .02)},{n(top + h * .55)}" '
                  f'fill="none" stroke="#e2572a" stroke-width="3" stroke-linecap="round" opacity=".75"/>')
+    o.append('</g>' + f'<path d="{ridge}" fill="none" stroke="{ridge_color}" stroke-width="3" stroke-linejoin="round" opacity=".7"/>')
     return "".join(o)
 
 

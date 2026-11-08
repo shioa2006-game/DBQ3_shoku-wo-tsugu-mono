@@ -80,12 +80,15 @@ export const MOVIES = [
     links: [{ label: '制作メモ', href: 'ch4-arrival/README.md' }, { label: '絵コンテ', href: 'ch4-arrival/reference/storyboard.md' }],
   },
   {
-    id: 'M7', slug: 'ch5-return', title: '帰るべき場所へ「火山島編・完」', saga: 'volcano', status: 'planned', buildStep: 2,
+    id: 'M7', slug: 'ch5-return', title: '帰るべき場所へ「火山島編・完」', saga: 'volcano', status: 'prototype', buildStep: 2,
     when: '第5章・結末', place: '清めの泉の完成後（文字の結末を置き換え）', length: '大・30～35秒', priority: 'A',
     summary: '第4～5章を締めくくり、旧ダーマ神殿へ戻る決意を見せる。夜の海の向こうに、プロローグと同じ形の崩れた神殿の影。',
-    scenes: ['澄んだ水が戻る清めの泉', '町の人々', '船出する四人', '夜の海の向こうに、崩れた神殿の影', 'タイトル「火山島編・完」'],
+    scenes: ['澄んだ水が戻る清めの泉と、火の戻った鉱山町', '町の人々（ベルク・ナギ・ヨモギと、ロク・カヤ・スミ・テル）',
+      '夕日の海へ船出する四人と、桟橋で見送る人々', '夜の海の向こうに、崩れた神殿の影。タイトル「火山島編・完」'],
     cast: ['シオン', 'ミナ', 'ゴンタ', 'ワタリ', 'ベルク', 'ナギ', 'ヨモギ', 'ロク', 'カヤ', 'スミ', 'テル'],
     tone: ['#1c3346', '#8fd0c4'],
+    thumb: { scene: 2, t: 7000 },
+    links: [{ label: '制作メモ', href: 'ch5-return/README.md' }, { label: '絵コンテ', href: 'ch5-return/reference/storyboard.md' }],
   },
   {
     id: 'M2', slug: 'book-revival', title: '書の復活（共通の型）', saga: 'common', status: 'planned', buildStep: 3,

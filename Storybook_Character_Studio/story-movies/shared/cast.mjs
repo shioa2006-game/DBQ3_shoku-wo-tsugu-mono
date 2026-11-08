@@ -3,7 +3,8 @@
 // （色の CSS 変数 var(--hair) などを原本のパレットの値に置き換えるだけ）。
 //
 // あわせて、ムービー側（shared/figures.py）が手足を付けるための情報を添える。
-//   - limbs: 手足の色。ゲームの3Dリグの色（第1～3章の src/entities/player.js・villagers.js と同じ値）。
+//   - limbs: 手足の色。ゲームの3Dリグの色（第1～3章の src/entities/player.js・villagers.js、第4～5章の住民は
+//     第4～5章の src/entities/villagers.js と同じ値）。
 //   - anchors: 胴・頭の画像（output/*_torso_layer_8dir.png・*_head_layer_8dir.png）から測った位置
 //     （胴の上端・肩の高さと左右・裾の高さと左右、頭の上下左右）。作画を変えて画像を書き出し直すと、ここも変わる。
 // 全員が同じセル座標なので、ゲームと同じ背丈・頭の大きさの比で並べられる。
@@ -17,6 +18,13 @@ import * as inaho from '../../prototypes/inaho-8dir/character.mjs';
 import * as gonta from '../../prototypes/gonta-8dir/character.mjs';
 import * as jinbei from '../../prototypes/jinbei-8dir/character.mjs';
 import * as watari from '../../prototypes/watari-8dir/character.mjs';
+import * as belk from '../../prototypes/belk-8dir/character.mjs';
+import * as roku from '../../prototypes/roku-8dir/character.mjs';
+import * as kaya from '../../prototypes/kaya-8dir/character.mjs';
+import * as nagi from '../../prototypes/nagi-8dir/character.mjs';
+import * as yomogi from '../../prototypes/yomogi-8dir/character.mjs';
+import * as sumi from '../../prototypes/sumi-8dir/character.mjs';
+import * as teru from '../../prototypes/teru-8dir/character.mjs';
 import { DIRECTIONS } from '../../prototypes/shared/sheet-format.mjs';
 
 export const CELL = 128;
@@ -37,6 +45,21 @@ export const CAST = Object.freeze({
     limbs: { sleeve: '#4a6440', hand: '#cfa070', pants: '#57503f', boot: '#3a2f26' } },
   watari: { name: 'ワタリ', module: watari, markup: watari.watariMarkup, sheet: watari.buildWatariSheet,
     limbs: { sleeve: '#24506b', hand: '#caa079', pants: '#2f2a24', boot: '#38302a' } },
+  // 第4～5章の住民（手足の色は第4～5章の villagers.js）
+  belk: { name: 'ベルク', module: belk, markup: belk.belkMarkup, sheet: belk.buildBelkSheet,
+    limbs: { sleeve: '#6b3a26', hand: '#c98f66', pants: '#4a4440', boot: '#2e2a26' } },
+  roku: { name: 'ロク', module: roku, markup: roku.rokuMarkup, sheet: roku.buildRokuSheet,
+    limbs: { sleeve: '#5c5a52', hand: '#d0a074', pants: '#4f4436', boot: '#332b20' } },
+  kaya: { name: 'カヤ', module: kaya, markup: kaya.kayaMarkup, sheet: kaya.buildKayaSheet,
+    limbs: { sleeve: '#4d6d98', hand: '#eec39a', pants: '#6b5233', boot: '#4a3320' } },
+  nagi: { name: 'ナギ', module: nagi, markup: nagi.nagiMarkup, sheet: nagi.buildNagiSheet,
+    limbs: { sleeve: '#f2ecdc', hand: '#eec39a', pants: '#a03024', boot: '#3a2f26' } },
+  yomogi: { name: 'ヨモギ', module: yomogi, markup: yomogi.yomogiMarkup, sheet: yomogi.buildYomogiSheet,
+    limbs: { sleeve: '#6a7a4a', hand: '#d8b08a', pants: '#57503f', boot: '#3a2f26' } },
+  sumi: { name: 'スミ', module: sumi, markup: sumi.sumiMarkup, sheet: sumi.buildSumiSheet,
+    limbs: { sleeve: '#4b5c6e', hand: '#d8b08a', pants: '#57503f', boot: '#3a2f26' } },
+  teru: { name: 'テル', module: teru, markup: teru.teruMarkup, sheet: teru.buildTeruSheet,
+    limbs: { sleeve: '#6b6b3a', hand: '#eec39a', pants: '#4f4436', boot: '#332b20' } },
 });
 
 function resolveColors(svg, palette, id) {
