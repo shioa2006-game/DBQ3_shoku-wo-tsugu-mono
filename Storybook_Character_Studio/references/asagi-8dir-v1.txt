@@ -1,0 +1,60 @@
+アサギ：画像生成による8方向の元画像 v1
+作成日: 2026-11-10
+画像: asagi-8dir-v1.png
+生成方式: Codex内蔵 image_gen（初回生成後、肩の線と腰道具入れの左右を修正）
+用途: CH6〜7の大工見習いアサギをSVGで制作するためのデザイン参照。
+状態: 頭と胴をつないだ8方向の設定画像。SVG作画・頭胴レイヤー分離・ゲーム組み込みは未実施。
+参照: ユーザー提供の人物写真と prototypes/pino-8dir/output/comparison.png の既存キャラクター。
+人物写真そのものはこのリポジトリへ複製していない。
+特徴: 中央分けの波打つ黒褐色の髪、黒縁の丸い眼鏡、穏やかな表情。浅葱色の作業着、生成りの襟、茶色い革ベルト、左腰の道具入れ。
+構成: 4列×2行、透明背景。腕・脚なし、ベルト下の腰まで。
+方向: 上段は正面・左斜め前・左・左斜め後、下段は背面・右斜め後・右・右斜め前。左右は画面上の向き。
+SVG化時: 首・襟・衣装は胴、顔・耳・髪・眼鏡は頭に分ける。腰道具入れは本人の左腰で統一し、真横・斜め後ろでの見え方を確認する。
+
+初回生成プロンプト
+Use case: stylized-concept
+Asset type: an original 8-direction head-and-torso reference sprite sheet for Asagi, a young adult male apprentice carpenter in the Japanese fantasy village RPG "職をつぐ者", to be redrawn in SVG later.
+Input images:
+1. IMG_7277.jpg is the SOLE identity reference: preserve this man's recognizable face and hairstyle while transforming him into the established cute game style. Do not reproduce his modern outfit.
+2. comparison.png is the game's EXISTING STYLE AND BUST FORMAT reference, especially the characters in its upper left reference panel. It is not an identity reference. Do not reproduce the comparison page, its headings, panels, or other characters.
+
+Primary request:
+Create one cohesive transparent PNG sheet containing exactly EIGHT views of the SAME new character's joined head and torso, 4 equal columns by 2 equal rows. The head stays attached naturally to the short neck and the torso. These are ARMLESS and LEGLESS game bust sprites, from top of hair through the hip-length tunic hem below the waist belt, exactly like the reference bust format. No separate floating heads. No full bodies.
+
+Character likeness:
+Recognizably inspired by the real man: black/dark brown medium-length softly wavy hair, central/slightly off-center part revealing the forehead, loose outward-curled locks around ears and nape, rounded black eyeglass frames with a slightly squared upper edge, clear transparent lenses and visible dark brown eyes, gently elongated oval face, modest straight nose, small relaxed closed mouth and subtle friendly smile. No hat, no beard, no moustache. Translate these features faithfully into a young adult chibi fantasy NPC; do not turn him into a generic baby face. Hair falls around ears to nape, not below the shoulders. Eyeglass temples follow the skull and vanish naturally behind the ears/hair.
+The same face, hair volume, glasses, proportions and clothes must be consistent in all directions.
+
+Clothes:
+A modest medieval apprentice carpenter's outfit: muted asagi teal/blue-green sleeveless work tunic/waistcoat, simple cream/ivory small split collar, brown leather waist belt with a small dull brass square buckle, a small practical leather tool pouch at the CHARACTER'S LEFT hip. A short carpenter's pencil may be tucked into the pouch, but no large projecting tools. Small tan work-apron panel at the front extending a little below the belt; plain teal back with the same belt. Simple shapes readable at 128px per cell. No modern blazer, T-shirt, printed logos, hat, armour, weapon or backpack. No arms, no hands, no sleeve tubes, no legs, no feet; compact smooth armless shoulder-to-waist silhouette, sides described only by gentle shading.
+
+Style:
+Match the second input's top-left existing game character rendering: charming Japanese fantasy storybook RPG sprite, very large head and small compact torso, crisp dark brown ink outlines, smoothly rounded shapes, warm skin, controlled clean cel shading with gentle painted transitions, selective hair highlights, readable slightly enlarged anime eyes behind the glasses, polished 2D illustration, not photorealism, not pixel art, not a glossy 3D toy. Similar density of detail and head-to-torso ratio to the reference. Keep most detail in face, glasses and hair; clean simplified clothing.
+Head including hair about 58-62% of overall bust height; torso and short neck about 38-42%. Torso including hips is visibly narrower than the head. Belt is at waist level; show a short hem below it.
+
+Mandatory view arrangement, using SCREEN directions:
+Top row left to right:
+1 FRONT: facing viewer, both eyes visible symmetrically.
+2 FRONT-LEFT: exactly 45 degrees, nose points screen-left, both eyes visible with far eye narrower.
+3 LEFT PROFILE: exactly 90 degrees, nose points screen-left, only one eye and one eyeglass lens visible.
+4 BACK-LEFT: exactly 135 degrees, mostly back of hair and back/side of clothes, nose points away toward screen-left, NO visible eyes or mouth. This MUST NOT be another profile view.
+Bottom row left to right:
+5 BACK: 180 degrees, full back of head and tunic, no face or eyeglass lenses visible.
+6 BACK-RIGHT: 225 degrees, mostly back of hair and back/side of clothes, facing away toward screen-right, NO visible eyes or mouth.
+7 RIGHT PROFILE: 270 degrees, nose points screen-right, only one eye/lens visible.
+8 FRONT-RIGHT: 315 degrees, nose points screen-right, both eyes visible, far eye narrower.
+Head and torso rotate together. Correctly rotate the same outfit and the pouch, do not switch which hip holds the pouch.
+
+Composition:
+Wide landscape canvas, ideally 2048x1024 or equivalent 2:1. Eight equally spaced cells, centered sprites, consistent head size, crown baseline and hem baseline within each row, generous transparent padding so nothing touches or crosses cell boundaries. A small consistent top-down viewing angle as in the reference, without exaggerated perspective.
+Scene/backdrop: TRUE TRANSPARENT ALPHA background. No solid white or gray backdrop, no painted checkerboard. No cast shadow or floor. No text, labels, title, arrows, grid lines, panel borders, watermark, swatches, or extra views. Exactly eight busts, no additional detached parts.
+
+最終修正プロンプト
+Use case: precise-object-edit
+Edit the provided Asagi 8-direction transparent character sprite sheet. Keep exactly the same eight busts, the 4-column 2-row layout, the entire head/face/hair/glasses drawing in every cell, the existing style, proportions, colors, collar, belt, brass buckle, front tan apron, lighting, transparency and spacing. Do NOT redesign the character or change the faces.
+
+Make only these two production cleanups:
+1. Remove the curved dark internal shoulder/upper-arm boundaries and circular shoulder shading patches in the teal torso on all eight views. These are ARMLESS game bust sprites, arms will be separate 3D parts later. Teal fabric must form one smooth compact torso surface from shoulder to hip with subtle edge shading only. Do not draw arms, hands, sleeves, armhole circles or separate shoulder caps. Preserve outer torso shape and collar.
+2. The small brown carpenter pouch with pencil belongs to the character's LEFT hip only, and must not appear on both profiles. Maintain the pouch in the front (screen-right edge), front-left, left-profile, back-left, and back views (screen-left edge) exactly as appropriate for the same left-side hip. Correct the RIGHT PROFILE (bottom row third sprite): pouch and pencil are on the far side, so REMOVE them from the visible right flank. Correct BACK-RIGHT (bottom row second sprite): the pouch is on the far hip, so it should be fully hidden behind the torso, not attached to the near flank. In FRONT-RIGHT (bottom row fourth sprite), show at most the existing small far-edge sliver at screen right. Keep the belt continuous in places where the pouch is removed.
+
+Direction order remains top: front, front-left, left profile, back-left; bottom: back, back-right, right profile, front-right. Keep the rear three-quarter views showing NO eyes or mouth. True transparent alpha background, no background color, checkerboard, shadow, text, labels or extra images.
