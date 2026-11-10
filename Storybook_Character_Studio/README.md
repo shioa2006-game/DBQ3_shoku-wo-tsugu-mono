@@ -6,6 +6,8 @@
 - [制作ガイド：これまでの指摘と再発防止](docs/CHARACTER_AUTHORING.md)
 - [今回の整理内容](docs/CLEANUP.md)
 
+第6〜7章の大工見習い[アサギ](prototypes/asagi-8dir/README.md)は、承認済みの元画像v2から頭・胴を分けた8方向SVGを制作しました（2026-11-10、Studio内の試作）。トップのアサギから元画像との比較・SVG保存・手足つき表示へ進めます。再生成は `npm.cmd run export:asagi`、3D確認は `npm.cmd run test:compare -- asagi`。
+
 Git管理は[親リポジトリ](../README.md)に統合しました。Studio単体へのpushは行いません。
 
 ## 開く

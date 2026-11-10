@@ -12,6 +12,7 @@ import { TERU_RIG_PROFILE } from '../../../prototypes/teru-8dir/rig-profile.mjs'
 import { HERO2_RIG_PROFILE } from '../../../prototypes/hero2-8dir/rig-profile.mjs';
 import { ADVENTURER_RIG_PROFILE } from '../../../prototypes/adventurer-8dir/rig-profile.mjs';
 import { HERO2_V02_RIG_PROFILE } from '../../../prototypes/hero2-8dir/v02/rig-profile.mjs';
+import { ASAGI_RIG_PROFILE, ASAGI_RIG_COLORS } from '../../../prototypes/asagi-8dir/rig-profile.mjs';
 
 const asset = file => new URL(`../../../games/ch4-5/assets/humanoids/${file}`, import.meta.url).href;
 const reference = file => new URL(`../../../references/humanoids/${file}`, import.meta.url).href;
@@ -23,6 +24,14 @@ const studio = id => { const out = file => new URL(`../../../prototypes/${id}-8d
 const saved = (id, version) => { const out = file => new URL(`../../../prototypes/${id}-8dir/${version}/${file}`, import.meta.url).href;
   return { original: out(`${id}_code_body_8dir.png`), originalHead: out(`${id}_code_head_layer_8dir.png`), originalTorso: out(`${id}_code_torso_layer_8dir.png`) }; };
 const profiles = {
+  asagi: { name: 'アサギ', title: '第6〜7章・大工見習い', chapter: 'ダーマ再興編・制作中',
+    original: new URL('../../../prototypes/asagi-8dir/output/reference-normalized.png', import.meta.url).href,
+    ...studio('asagi'), tuning: ASAGI_RIG_PROFILE, originalTuning: ASAGI_RIG_PROFILE, colors: ASAGI_RIG_COLORS,
+    note: '承認済みの元画像v2から制作。細い目、面長の輪郭、鼻筋と鼻先、黒縁の眼鏡、中央で分けた波打つ髪。浅葱色の作業着と左腰の道具入れ。',
+    leftLabel: '元画像v2（合成シート）', rightLabel: 'アサギ・SVG作画（頭と胴を分離）',
+    gridLabels: { generated: 'アサギ（SVG）', original: '元画像v2' },
+    status: '第6〜7章向けにStudioで制作中です。頭と胴のSVG・PNGと配置設定を保存しています。元画像の合成シートは見た目の比較用です。',
+  },
   belk: { name: 'ベルク', title: '鍛冶職人', original: reference('blacksmith_body_8dir.png'), ...studio('belk'), tuning: BELK_RIG_PROFILE,
     note: 'くせのある茶髪、短いあごひげ、えんじの立ち襟、使い込んだ革の胴着と鉄の留め金。',
     colors: { sleeve: 0x6b3a26, hand: 0xc98f66, pants: 0x4a4440, boot: 0x2e2a26, headBack: 0x3a332e, bodyBack: 0x54301f } },
@@ -61,12 +70,14 @@ const profiles = {
     generatedColors: { sleeve: 0x293d75, bodyBack: 0x293d75 } },
 };
 const ids = Object.keys(profiles);
-const character = ids.includes(new URLSearchParams(location.search).get('c')) ? new URLSearchParams(location.search).get('c') : ids[0];
+const character = ids.includes(new URLSearchParams(location.search).get('c')) ? new URLSearchParams(location.search).get('c') : 'belk';
 const p = profiles[character];
 const directions = ['front', 'front_left', 'left', 'back_left', 'back', 'back_right', 'right', 'front_right'];
 const labels = ['正面', '左斜め前', '左', '左斜め後', '背面', '右斜め後', '右', '右斜め前'];
 const $ = id => document.getElementById(id);
-document.title = `${p.name}の8方向試作｜職をつぐ者 火山島編`;
+document.title = `${p.name}の8方向試作｜職をつぐ者 ${p.chapter ?? '火山島編'}`;
+if (p.chapter) document.querySelector('.eyebrow').textContent = `CHARACTER STUDY / ${p.chapter}`;
+if (p.status) $('production-note').textContent = p.status;
 $('title').textContent = `${p.name}（${p.title}）を、コードから。`;
 $('note').textContent = p.note;
 const stageLabels = document.querySelectorAll('.labels>span');
@@ -79,6 +90,10 @@ for (const id of ids) {
 }
 $('original-sheet').src = p.original; $('generated-sheet').src = p.generated;
 $('head-sheet').src = p.head; $('torso-sheet').src = p.torso;
+if (p.leftLabel) {
+  $('original-sheet').previousElementSibling.textContent = p.leftLabel;
+  $('original-sheet').alt = `${p.name}の元画像・8方向`;
+}
 
 // One stage = renderer + scene (same lights and floor) + camera at the gameplay camera's angle.
 function makeStage(canvas) {

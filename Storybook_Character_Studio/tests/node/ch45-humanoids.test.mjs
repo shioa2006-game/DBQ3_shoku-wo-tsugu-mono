@@ -13,22 +13,36 @@ import { buildSumiSheet } from '../../prototypes/sumi-8dir/character.mjs';
 import { buildTeruSheet } from '../../prototypes/teru-8dir/character.mjs';
 // 主人公の新デザイン案（Studioのみ）も同じ頭・胴分離方式なので、同じ条件で確かめる。
 import { buildHero2Sheet } from '../../prototypes/hero2-8dir/character.mjs';
+import { buildAsagiSheet, asagiMarkup } from '../../prototypes/asagi-8dir/character.mjs';
 
 const require = createRequire(new URL('../../../dqb3-tsugumono-ch4-5/package.json', import.meta.url));
 const { PNG } = require('pngjs');
 // Drawn with the tunic on the art centre (exported with keepDrawnX); see prototypes/hero2-8dir/README.md.
-const DRAWN_X = new Set(['hero2']);
-const BUILDERS = { belk: buildBelkSheet, roku: buildRokuSheet, kaya: buildKayaSheet, nagi: buildNagiSheet, yomogi: buildYomogiSheet, sumi: buildSumiSheet, teru: buildTeruSheet, hero2: buildHero2Sheet };
+const DRAWN_X = new Set(['hero2', 'asagi']);
+const BUILDERS = { belk: buildBelkSheet, roku: buildRokuSheet, kaya: buildKayaSheet, nagi: buildNagiSheet, yomogi: buildYomogiSheet, sumi: buildSumiSheet, teru: buildTeruSheet, hero2: buildHero2Sheet, asagi: buildAsagiSheet };
 const output = (id, file) => new URL(`../../prototypes/${id}-8dir/output/${file}`, import.meta.url);
 const png = async (id, file) => PNG.sync.read(await readFile(output(id, file)));
 const alpha = (image, cell, x, y) => image.data[((Math.floor(cell / 4) * 128 + y) * 512 + (cell % 4) * 128 + x) * 4 + 3];
 
-test('new CH4-5 humanoid SVGs reproduce exactly from their authoring code', async () => {
+test('humanoid SVGs reproduce exactly from their authoring code', async () => {
   for (const [id, build] of Object.entries(BUILDERS)) {
     assert.equal(build(), await readFile(output(id, `${id}-code.svg`), 'utf8'), `${id} combined`);
     for (const part of ['head', 'torso']) assert.equal(build({ part }), await readFile(output(id, `${id}_code_${part}_layer_8dir.svg`), 'utf8'), `${id} ${part}`);
     assert.throws(() => build({ part: 'unknown' }), /Unknown part/);
   }
+});
+
+test('Asagi is editable vector art, with unique clipping IDs and a left-hip pouch', () => {
+  const svg = buildAsagiSheet();
+  assert.doesNotMatch(svg, /<image\b|<foreignObject\b|data:image\//, '画像を埋め込んだSVGではない');
+  const ids = Array.from(svg.matchAll(/\bid="([^"]+)"/g), m => m[1]);
+  assert.equal(new Set(ids).size, ids.length, '向きごとのクリップIDが重複しない');
+  assert.doesNotMatch(buildAsagiSheet({ part: 'head' }), /data-part="(?:torso|buckle|left-hip-pouch)"/);
+  assert.doesNotMatch(buildAsagiSheet({ part: 'torso' }), /data-part="(?:face|eye|nose|glasses|hair-front|hair-back)"/);
+  for (const direction of ['right', 'back_right']) {
+    assert.doesNotMatch(asagiMarkup(direction), /data-part="left-hip-pouch"/, `${direction}: 奥の腰の道具入れは見えない`);
+  }
+  for (const direction of ['front', 'front_left', 'left', 'back_left', 'back', 'front_right']) assert.match(asagiMarkup(direction), /data-part="left-hip-pouch"/, `${direction}: 左腰の道具入れが見える`);
 });
 
 test('head layers own no clothing and torso layers own no face or hair', async () => {
