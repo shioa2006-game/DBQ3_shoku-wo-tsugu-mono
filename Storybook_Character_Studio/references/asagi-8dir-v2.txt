@@ -1,0 +1,39 @@
+アサギ：画像生成による8方向の元画像 v2
+作成日: 2026-11-10
+画像: asagi-8dir-v2.png
+生成方式: Codex内蔵 image_gen による v1 の編集。
+編集元: asagi-8dir-v1.png
+参照: ユーザー提供の人物写真。写真自体はリポジトリへ複製していない。
+修正依頼: 「もうちょっと、特徴を。目を細くして、より面長で、そして立派な鼻を。」
+修正内容: 目の縦幅を抑えた切れ長の目、縦長の輪郭と中顔面、鼻筋と鼻先の存在感を強めた顔立ち。
+用途: CH6〜7の大工見習いアサギをSVGで制作するための参照画像。
+構成: 4列×2行、透明背景、頭と胴をつないだ腰までの画像。腕・脚なし。
+方向: 上段は正面・左斜め前・左・左斜め後、下段は背面・右斜め後・右・右斜め前。
+状態: SVG作画・頭胴レイヤー分離・ゲーム組み込みは未実施。
+前の案は asagi-8dir-v1.png に保存されている。
+
+編集プロンプト
+Use case: identity-preserve
+Asset type: revised eight-direction head-and-torso game character reference sheet for Asagi.
+
+Input 1 is the EDIT TARGET: the current transparent 4x2 eight-direction Asagi sprite sheet.
+Input 2 is the IDENTITY REFERENCE: the user's provided photograph of a real man.
+The user asks for substantially more of the real man's distinctive facial features: narrower eyes, a longer face, and a prominent well-defined nose.
+
+Edit input 1. Preserve the charming Japanese storybook fantasy RPG 2D rendering, crisp dark outlines, soft cel shading, warm skin, medium-length center-parted dark wavy hair, black rounded eyeglasses, teal carpenter tunic, ivory collar, belt, apron, correct left-hip pouch placement, armless/legless bust format, eight views, layout, and transparent background.
+ONLY change the facial design and the necessary adjacent head contours to improve likeness to input 2:
+
+1) EYES: Visibly narrow, horizontally elongated almond eyes with relaxed, nearly straight upper eyelids; reduce the vertical eye opening to about 45–50% of the existing wide anime eyes. Dark brown irises are partly covered by the upper lids, with only a small highlight. They are still OPEN and attentive, not shut, not angry, not tired. Keep both eyes readable through the clear lenses. The glasses remain rounded, approximately their existing size and black frame thickness; narrow the eyes INSIDE them, do not just shrink the glasses.
+
+2) FACE: Make the face recognizably longer and more adult, matching the reference photograph's elongated oval face: moderately slimmer cheeks, less round baby cheeks, a longer middle face between eyes and mouth, and more distance from lower lip to chin. Aim for around 20% greater face length relative to face width than input 1. Keep a softly rounded but defined chin, not a sharp V. The whole character remains compact and stylized; this is a young adult NPC, not a toddler. Adjust the jawline and hair around the jaw only as needed to preserve natural head/neck connection. Do not fake a long face by lengthening the neck.
+
+3) NOSE: A noticeably larger, handsome, well-defined nose, with a clear straight bridge, a rounded substantial tip and subtly indicated nostril wings. Replace the tiny almost invisible dot nose. In front view, use a restrained nose-bridge shadow and rounded tip contour; in 3/4 views show its substantial volume; in both true profiles show a clearly projecting straight nose and rounded tip. Use input 2 for proportions. This is a respectful recognizable caricature, not a grotesque oversized bulb, hooked nose, Pinocchio nose, or photorealistic pasted face.
+
+Keep the mouth small, relaxed and almost neutral with a faint warm smile as in the photograph; keep the existing hair identity and no facial hair. Apply the same new proportions consistently to all face-visible directions. Rear views remain rear views with no facial features showing.
+
+Mandatory arrangement unchanged:
+Top row: FRONT, FRONT-LEFT (nose screen-left, both eyes), LEFT PROFILE (nose screen-left, one eye), BACK-LEFT (mostly back, no eyes or mouth).
+Bottom row: BACK, BACK-RIGHT (mostly back, no eyes or mouth), RIGHT PROFILE (nose screen-right, one eye), FRONT-RIGHT (nose screen-right, both eyes).
+Head and torso rotate together; all eight sprites have matching scale and aligned crowns/hip hems. Keep the same clothes and left-hip pouch visibility as input 1, with the right profile and back-right flank free of a pouch.
+No arms, hands, sleeve tubes, legs, feet, floor or cast shadows. Exactly eight connected head-and-torso busts, 4 equal columns by 2 equal rows. No text, labels, panel backgrounds, grid lines, watermark or extra drawings. TRUE TRANSPARENT ALPHA background; do not paint white or a checkerboard.
+The three requested facial changes must be immediately apparent at normal viewing size, while remaining compatible with the established game art.
