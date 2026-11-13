@@ -2,7 +2,7 @@
   "id": "asagi",
   "name": "アサギ",
   "role": "大工見習い",
-  "version": 3,
+  "version": 4,
   "status": "prototype",
   "source": "../character.mjs",
   "reference": "references/asagi-8dir-v2.png",

@@ -18,7 +18,7 @@ function comparison({ reference }) {
   const width = 32 + pair * 4, height = top + rowH * 2;
   const vector = `data:image/svg+xml;base64,${Buffer.from(buildAsagiSheet({ cellSize: 512 })).toString('base64')}`;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><rect width="100%" height="100%" fill="#eee9df"/>
-    <text x="24" y="34" font-family="sans-serif" font-size="24" font-weight="700" fill="#203344">アサギ / 8方向SVG・試作03（鼻をロクの表現へ調整）</text>
+    <text x="24" y="34" font-family="sans-serif" font-size="24" font-weight="700" fill="#203344">アサギ / 8方向SVG・試作04（左右の耳の後ろへ髪を追加）</text>
     <text x="24" y="60" font-family="sans-serif" font-size="16" fill="#60717b">左：承認済みの元画像v2　右：SVGから生成。同じ倍率で輪郭・目・鼻・眼鏡・腰を比較。</text>
     ${LABELS.map((label, i) => {
       const x = 16 + (i % 4) * pair, y = top + Math.floor(i / 4) * rowH;
@@ -33,6 +33,18 @@ function comparison({ reference }) {
 function referenceSheet(reference) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="256">${LABELS.map((_, i) =>
     referenceCell(reference, i, i % 4 * 128, Math.floor(i / 4) * 128)).join('')}</svg>`;
+}
+function profileComparison({ reference }) {
+  const vectorUri = svg => `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
+  const sheets = [vectorUri(referenceSheet(reference)), vectorUri(buildAsagiSheet({ cellSize: 512 }))];
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1104" height="294"><rect width="100%" height="100%" fill="#eee9df"/>
+    <text x="24" y="30" font-family="sans-serif" font-size="22" font-weight="700" fill="#203344">耳の後ろの髪 / 左右の同倍率比較</text>
+    ${[2, 6].flatMap((cell, direction) => sheets.map((sheet, side) => {
+      const x = 16 + (direction * 2 + side) * 272;
+      return `<text x="${x + 8}" y="56" font-family="sans-serif" font-size="16" fill="#203344">${LABELS[cell]}：${side ? '修正後SVG' : '元画像v2'}</text>
+        <rect x="${x}" y="64" width="256" height="224" rx="8" fill="#dce4df"/>
+        <svg x="${x}" y="64" width="256" height="224" viewBox="${cell % 4 * 128 + 16} ${Math.floor(cell / 4) * 128} 96 84"><image href="${sheet}" width="512" height="256"/></svg>`;
+    })).join('')}</svg>`;
 }
 function layersBoard({ normalized, layers }) {
   const rows = [['頭：髪・顔・耳・眼鏡', layers.head], ['胴：首・襟・服・ベルト・道具入れ', layers.torso], ['合成（比較用）', normalized]];
@@ -54,10 +66,10 @@ function noseStyleComparison() {
 }
 await exportHumanoid({
   id: 'asagi', name: 'アサギ', role: '大工見習い', build: buildAsagiSheet,
-  reference: 'asagi-8dir-v2.png', studioOnly: true, keepDrawnX: true, version: 3,
+  reference: 'asagi-8dir-v2.png', studioOnly: true, keepDrawnX: true, version: 4,
   summary: '細い目、面長の輪郭、鼻筋と鼻先、黒縁眼鏡と波打つ髪。浅葱色の作業着と左腰の道具入れ。',
   rigColors: ASAGI_RIG_COLORS, rigTuning: ASAGI_RIG_PROFILE,
-  boards: data => ({ 'comparison.png': comparison(data), 'nose-style-comparison.png': noseStyleComparison(), 'layers.png': layersBoard(data), 'preview.png': buildAsagiSheet({ cellSize: 384 }), 'reference-normalized.png': referenceSheet(data.reference) }),
+  boards: data => ({ 'comparison.png': comparison(data), 'profile-comparison.png': profileComparison(data), 'nose-style-comparison.png': noseStyleComparison(), 'layers.png': layersBoard(data), 'preview.png': buildAsagiSheet({ cellSize: 384 }), 'reference-normalized.png': referenceSheet(data.reference) }),
 });
 // 拡大して形を確認できる高解像度SVGも、同じ作画原本から書き出す。
 await writeFile(new URL('./output/asagi-detail.svg', import.meta.url), buildAsagiSheet({ cellSize: 512 }));
