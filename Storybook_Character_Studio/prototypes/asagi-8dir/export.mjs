@@ -1,6 +1,7 @@
 import { writeFile } from 'node:fs/promises';
 import { exportHumanoid } from '../shared/humanoid-export.mjs';
 import { buildAsagiSheet, ASAGI_LAYOUT, LABELS } from './character.mjs';
+import { buildRokuSheet } from '../roku-8dir/character.mjs';
 import { ASAGI_RIG_PROFILE, ASAGI_RIG_COLORS } from './rig-profile.mjs';
 
 const uri = bytes => `data:image/png;base64,${bytes.toString('base64')}`;
@@ -17,7 +18,7 @@ function comparison({ reference }) {
   const width = 32 + pair * 4, height = top + rowH * 2;
   const vector = `data:image/svg+xml;base64,${Buffer.from(buildAsagiSheet({ cellSize: 512 })).toString('base64')}`;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><rect width="100%" height="100%" fill="#eee9df"/>
-    <text x="24" y="34" font-family="sans-serif" font-size="24" font-weight="700" fill="#203344">アサギ / 8方向SVG・試作02（髪の輪郭・毛流れを修正）</text>
+    <text x="24" y="34" font-family="sans-serif" font-size="24" font-weight="700" fill="#203344">アサギ / 8方向SVG・試作03（鼻をロクの表現へ調整）</text>
     <text x="24" y="60" font-family="sans-serif" font-size="16" fill="#60717b">左：承認済みの元画像v2　右：SVGから生成。同じ倍率で輪郭・目・鼻・眼鏡・腰を比較。</text>
     ${LABELS.map((label, i) => {
       const x = 16 + (i % 4) * pair, y = top + Math.floor(i / 4) * rowH;
@@ -38,12 +39,25 @@ function layersBoard({ normalized, layers }) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1072" height="1740"><rect width="100%" height="100%" fill="#eee9df"/>${rows.map(([label, bytes], i) =>
     `<text x="24" y="${35 + i * 578}" font-family="sans-serif" font-size="21" fill="#203344">${label}</text><rect x="24" y="${48 + i * 578}" width="1024" height="512" fill="#dce4df"/><image href="${uri(bytes)}" x="24" y="${48 + i * 578}" width="1024" height="512"/>`).join('')}</svg>`;
 }
+function noseStyleComparison() {
+  const rows = [['参考：ロク', buildRokuSheet], ['調整後：アサギ', buildAsagiSheet]];
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="500"><rect width="100%" height="100%" fill="#eee9df"/>
+    <text x="24" y="32" font-family="sans-serif" font-size="23" font-weight="700" fill="#203344">鼻の描き方の比較（同倍率）</text>
+    ${LABELS.slice(0, 3).map((label, i) => `<text x="${170 + i * 296}" y="65" font-family="sans-serif" font-size="18" fill="#203344">${label}</text>`).join('')}
+    ${rows.map(([label, build], row) => {
+      const vector = `data:image/svg+xml;base64,${Buffer.from(build({ cellSize: 512 })).toString('base64')}`;
+      const y = 80 + row * 208;
+      return `<text x="24" y="${y + 95}" font-family="sans-serif" font-size="18" fill="#203344">${label}</text>`
+        + [0, 1, 2].map(i => `<rect x="${160 + i * 296}" y="${y}" width="280" height="180" rx="8" fill="#dce4df"/>
+          <svg x="${160 + i * 296}" y="${y}" width="280" height="180" viewBox="${i * 128 + 22} 30 84 54"><image href="${vector}" width="512" height="256"/></svg>`).join('');
+    }).join('')}</svg>`;
+}
 await exportHumanoid({
   id: 'asagi', name: 'アサギ', role: '大工見習い', build: buildAsagiSheet,
-  reference: 'asagi-8dir-v2.png', studioOnly: true, keepDrawnX: true, version: 2,
+  reference: 'asagi-8dir-v2.png', studioOnly: true, keepDrawnX: true, version: 3,
   summary: '細い目、面長の輪郭、鼻筋と鼻先、黒縁眼鏡と波打つ髪。浅葱色の作業着と左腰の道具入れ。',
   rigColors: ASAGI_RIG_COLORS, rigTuning: ASAGI_RIG_PROFILE,
-  boards: data => ({ 'comparison.png': comparison(data), 'layers.png': layersBoard(data), 'preview.png': buildAsagiSheet({ cellSize: 384 }), 'reference-normalized.png': referenceSheet(data.reference) }),
+  boards: data => ({ 'comparison.png': comparison(data), 'nose-style-comparison.png': noseStyleComparison(), 'layers.png': layersBoard(data), 'preview.png': buildAsagiSheet({ cellSize: 384 }), 'reference-normalized.png': referenceSheet(data.reference) }),
 });
 // 拡大して形を確認できる高解像度SVGも、同じ作画原本から書き出す。
 await writeFile(new URL('./output/asagi-detail.svg', import.meta.url), buildAsagiSheet({ cellSize: 512 }));
