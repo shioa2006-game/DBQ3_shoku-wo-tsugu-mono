@@ -5,8 +5,11 @@
 - [共通ストーリー資料・実装と計画の境界](../docs/story/README.md)
 - [第6～7章シナリオと共通設計・未決事項](../docs/story/planned/chapter6-7-scenario.md)
 - 第6章制作計画: [よみがえるダーマ神殿](../docs/story/planned/chapter6.md)
-- 第7章制作計画: [神殿防衛と三頭竜の最終決戦](../docs/story/planned/chapter7.md)（章名は未決定。従来の「大穴の影」は仮題）
+- 第7章制作計画: [三つ首の空](../docs/story/planned/chapter7.md)（神殿防衛と三頭魔竜ヴァルガの最終決戦）
+- ストーリームービー: [第6～7章のムービー計画](../docs/story/planned/chapter6-7-movies.md)（5本。Studioで作り、このゲームへ組み込む）
 - 着手前の確認: [未解決の不整合](../docs/story/inconsistencies.md)。過去章の説明は第1～5章の実装を基準にします。
+
+制作は、キャラクター（Studio）→ ストーリー資料 → ショートムービー（Studio）→ このゲーム、の順に進めます（[制作の順序](../docs/story/planned/chapter6-7-scenario.md)）。ゲームの地形と神殿の設計図は、ムービーで描いた島と神殿の形に合わせます。
 
 着手時は第4～5章の必要なコードを基礎にします。Gitは親リポジトリを使用し、ここで個別に初期化しません。実行環境とセーブ領域は他の編から独立させます。
 
