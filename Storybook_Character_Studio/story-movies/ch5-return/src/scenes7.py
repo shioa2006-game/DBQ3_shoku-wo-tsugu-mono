@@ -273,7 +273,7 @@ S4_CSS = """
 @keyframes s4-mist{from{transform:translateX(50px)}to{transform:translateX(-50px)}}
 """
 RUIN_SCALE = .22
-RUIN_AT = (1176, 456)      # 神殿の基壇の中央（プロローグの座標の (800, 592)）を置く位置。手前の山の肩
+RUIN_AT = (1292, 457)      # 神殿の基壇の中央（プロローグの座標の (800, 592)）を置く位置。手前の山の肩の平らなところ（1150～1424）の中ほど
 
 
 def scene4():
@@ -295,13 +295,11 @@ def scene4():
     o.append('<circle cx="330" cy="170" r="150" fill="url(#s4-mglow)"/><circle cx="330" cy="170" r="40" fill="#f4f6ff"/>'
              '<circle cx="344" cy="162" r="36" fill="#1b2748" opacity=".25"/>')
     # 水平線の島（M10と同じ並び：左で海に接し、右の奥へ山が続く）と、山の肩の神殿跡の影
-    o.append('<path d="M1060,562 C1160,520 1250,470 1330,440 C1390,418 1440,404 1500,398 C1550,394 1580,398 1640,404 L1640,562Z" fill="#202a48"/>'
-             '<path d="M1060,562 C1160,520 1250,470 1330,440 C1390,418 1440,404 1500,398 C1550,394 1580,398 1640,404" fill="none" '
-             'stroke="#6f82b0" stroke-width="2" opacity=".35"/>')
-    o.append('<path d="M840,562 C920,548 990,526 1040,500 C1070,484 1090,466 1106,458 L1250,454 C1280,452 1310,440 1350,426 '
-             'C1400,410 1450,418 1500,432 C1550,446 1590,452 1640,456 L1640,562Z" fill="#151b31"/>'
-             '<path d="M840,562 C920,548 990,526 1040,500 C1070,484 1090,466 1106,458 L1250,454 C1280,452 1310,440 1350,426 '
-             'C1400,410 1450,418 1500,432" fill="none" stroke="#7d8fbc" stroke-width="2" opacity=".45"/>')
+    back = "M1180,562 C1280,520 1380,470 1460,432 C1510,410 1560,394 1610,388 C1625,386 1635,386 1640,387"
+    o.append(f'<path d="{back} L1640,562Z" fill="#202a48"/><path d="{back}" fill="none" stroke="#6f82b0" stroke-width="2" opacity=".35"/>')
+    # 手前の山：左の浜から上り、神殿跡の基壇（幅約234）より広い平らな肩（1150～1424）を経て、右の奥へまた上る
+    front = "M840,562 C930,550 1010,528 1070,500 C1110,480 1130,464 1150,458 L1424,456 C1456,454 1490,440 1530,426 C1570,414 1610,414 1640,418"
+    o.append(f'<path d="{front} L1640,562Z" fill="#151b31"/><path d="{front}" fill="none" stroke="#7d8fbc" stroke-width="2" opacity=".45"/>')
     tx, ty = RUIN_AT[0] - 800 * RUIN_SCALE, RUIN_AT[1] - 592 * RUIN_SCALE
     o.append(f'<g class="s4-ruin"><g transform="translate({n(tx)} {n(ty)}) scale({RUIN_SCALE})">'
              f'{T.remains_silhouette(random.Random(1010), color="#151b31", rim="#9fb2d8", rim_op=.55, bedrock=False)}</g></g>')
