@@ -66,7 +66,7 @@ function noseStyleComparison() {
 }
 await exportHumanoid({
   id: 'asagi', name: 'アサギ', role: '大工見習い', build: buildAsagiSheet,
-  reference: 'asagi-8dir-v2.png', studioOnly: true, keepDrawnX: true, version: 4,
+  reference: 'asagi-8dir-v2.png', keepDrawnX: true, version: 4,
   summary: '細い目、面長の輪郭、鼻筋と鼻先、黒縁眼鏡と波打つ髪。浅葱色の作業着と左腰の道具入れ。',
   rigColors: ASAGI_RIG_COLORS, rigTuning: ASAGI_RIG_PROFILE,
   boards: data => ({ 'comparison.png': comparison(data), 'profile-comparison.png': profileComparison(data), 'nose-style-comparison.png': noseStyleComparison(), 'layers.png': layersBoard(data), 'preview.png': buildAsagiSheet({ cellSize: 384 }), 'reference-normalized.png': referenceSheet(data.reference) }),

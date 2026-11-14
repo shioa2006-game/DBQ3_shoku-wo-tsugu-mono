@@ -1,8 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
 import { VARUGA_PROFILE } from '../../prototypes/varuga-8dir/rig-profile.mjs';
 import { MOTIONS, sampleMotion } from '../../prototypes/varuga-8dir/motion.mjs';
 import { buildVarugaOpenHeadSheet } from '../../prototypes/varuga-8dir/character.mjs';
@@ -10,16 +8,27 @@ import { createRequire } from 'node:module';
 const require = createRequire(new URL('../../../dqb3-tsugumono-ch4-5/package.json', import.meta.url));
 const { PNG } = require('pngjs');
 
-test('ヴァルガの生成設定は三頭の原本と一致し、ゲームへの未登録の書き出しを拒否する', async () => {
+test('ヴァルガの生成設定は三頭の原本と一致し、第6～7章へ書き出す', async () => {
   const manifest = JSON.parse(await readFile(new URL('../../prototypes/varuga-8dir/output/manifest.json', import.meta.url), 'utf8'));
   for (const [key, value] of Object.entries(VARUGA_PROFILE)) assert.deepEqual(manifest.runtime[key], value, key);
   assert.equal(manifest.runtime.heads.length, 3);
   assert.ok(VARUGA_PROFILE.heads[1].forward > 0, '中央の頭は胴より前へ出す');
-  assert.deepEqual(manifest.targets, []);
+  assert.deepEqual(manifest.targets, ['ch6-7']);
   assert.deepEqual(manifest.runtime.motions, MOTIONS);
-  const result = spawnSync(process.execPath, [fileURLToPath(new URL('../../prototypes/varuga-8dir/export.mjs', import.meta.url)), '--preview-game'], { encoding: 'utf8' });
-  assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /ゲームへの移植先は未登録/);
+});
+
+// ゲームは motion.mjs の写しと、rig-profile.mjs の造形の値（頭の配置・倍率・色）をそのまま使う。
+// リグ（rig.js）の写しは、読み込み先（three・dragon.js・設定）だけが違う。
+test('第6～7章のゲームは、Studioと同じ動作・造形・リグでヴァルガを動かす', async () => {
+  const game = file => new URL(`../../../dqb3-tsugumono-ch6-7/src/${file}`, import.meta.url);
+  const lf = text => text.replace(/\r\n/g, '\n');
+  const studioMotion = lf(await readFile(new URL('../../prototypes/varuga-8dir/motion.mjs', import.meta.url), 'utf8'));
+  assert.equal(lf(await readFile(game('entities/varuga-motion.mjs'), 'utf8')), `// Runtime copy of Storybook Character Studio: prototypes/varuga-8dir/motion.mjs.\n${studioMotion}`);
+  const { VARUGA_CONFIG } = await import(game('entities/dragon-configs.js').href);
+  for (const [key, value] of Object.entries(VARUGA_PROFILE)) assert.deepEqual(VARUGA_CONFIG[key], value, `dragon-configs.js: ${key}`);
+  const body = text => lf(text).slice(lf(text).indexOf('// グロムの動きを継承し'));
+  const studioRig = await readFile(new URL('../../prototypes/varuga-8dir/rig.js', import.meta.url), 'utf8');
+  assert.equal(body(await readFile(game('entities/varuga-rig.js'), 'utf8')), body(studioRig).replace('config = VARUGA_CONFIG', 'config'), 'varuga-rig.js: クラスの中身はStudioの rig.js と同じ');
 });
 
 test('着地から地上待機へつながり、三頭の攻撃は予兆・攻撃・復帰を経る', () => {

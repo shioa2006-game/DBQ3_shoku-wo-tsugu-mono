@@ -1,0 +1,21 @@
+{
+  "name": "dqb3-tsugumono-ch6-7",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test:e2e": "npm run build && node tests/run.mjs",
+    "test:ci": "npm run build && node tests/run.mjs --fast"
+  },
+  "dependencies": {
+    "three": "^0.184.0",
+    "vite": "^8.0.16"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.61.1",
+    "pngjs": "^7.0.0"
+  }
+}

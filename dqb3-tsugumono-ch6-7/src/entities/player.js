@@ -1,0 +1,146 @@
+import * as THREE from "three";
+import { Entity, GRAVITY } from "./entity.js";
+import { HumanoidRig, submersionAt } from "./rig.js";
+import { ITEMS, bestArmor } from "../game/items.js";
+import { HERO2_RIG_PROFILE } from "../content/rig-profiles/hero2.mjs";
+
+// シオン。Storybook Character Studio の主人公（prototypes/hero2-8dir）。頭・胴の分離画像と
+// リグ設定・手足の色を使う（docs/CHARACTER_ART.md）。表示・操作・画像・リグ設定は前の2編と同じ。
+const HUMANOIDS = (file) => new URL(`../../assets/humanoids/${file}`, import.meta.url).href;
+const SHEET_URL = HUMANOIDS("hero2_code_body_8dir.png");
+const HEAD_SHEET_URL = HUMANOIDS("hero2_code_head_layer_8dir.png");
+const TORSO_SHEET_URL = HUMANOIDS("hero2_code_torso_layer_8dir.png");
+
+// 紺の袖、素手、焦げ茶のズボン、茶色のブーツ。頭・胴の裏は金髪と紺のベスト。
+const PLAYER_COLORS = {
+  sleeve: 0x293d75,
+  hand: 0xf3c9a4,
+  pants: 0x3b2a22,
+  boot: 0x8a5428,
+  headBack: 0xe1a432,
+  bodyBack: 0x293d75,
+};
+
+const WALK_SPEED = 4.4;
+const WATER_SPEED = 2.1;
+const JUMP_VELOCITY = 8.2;
+
+export class Player extends Entity {
+  constructor(scene) {
+    super("player", 0.3, 1.15);
+    this.baseMaxHp = 20;
+    this.maxHp = 20;
+    this.hp = 20;
+    this.rig = new HumanoidRig({
+      sheetUrl: SHEET_URL, headSheetUrl: HEAD_SHEET_URL, bodySheetUrl: TORSO_SHEET_URL,
+      colors: PLAYER_COLORS, tuning: HERO2_RIG_PROFILE,
+    });
+    this.root = new THREE.Group();
+    this.root.add(this.rig.group);
+    scene.add(this.root);
+
+    this.shadow = new THREE.Mesh(
+      new THREE.CircleGeometry(0.32, 24),
+      new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.22, depthWrite: false }),
+    );
+    this.shadow.rotation.x = -Math.PI / 2;
+    this.shadow.scale.set(1.25, 0.82, 1);
+    scene.add(this.shadow);
+
+    this.facing = new THREE.Vector2(0, 1); // world-space facing (x, z)
+    this.walking = false;
+    this.attackCooldown = 0;
+    this.armor = null; // いちばん強い所持中の防具（items.js の bestArmor）
+  }
+
+  // moveInput: screen-space {x, z} from WASD, already camera-independent.
+  update(dt, world, moveInput, cameraYaw, wantJump) {
+    this.invuln = Math.max(0, this.invuln - dt);
+    this.attackCooldown = Math.max(0, this.attackCooldown - dt);
+
+    const speed = this.inWater ? WATER_SPEED : WALK_SPEED;
+    let mx = 0;
+    let mz = 0;
+    if (moveInput) {
+      const c = Math.cos(cameraYaw);
+      const s = Math.sin(cameraYaw);
+      const len = Math.hypot(moveInput.x, moveInput.z) || 1;
+      const sx = moveInput.x / len;
+      const sz = moveInput.z / len;
+      mx = c * sx + s * sz;
+      mz = -s * sx + c * sz;
+      this.facing.set(mx, mz);
+    }
+    this.walking = !!moveInput;
+
+    // Horizontal velocity: direct control + knockback decay.
+    const control = this.walking ? 1 : 0;
+    this.vel.x = this.vel.x * Math.max(0, 1 - dt * 14) + mx * speed * control * Math.min(1, dt * 60) * 14 * dt;
+    this.vel.z = this.vel.z * Math.max(0, 1 - dt * 14) + mz * speed * control * Math.min(1, dt * 60) * 14 * dt;
+    if (this.walking) {
+      // Snap to target speed for tight control, keeping knockback impulses.
+      const kx = this.vel.x - mx * speed;
+      const kz = this.vel.z - mz * speed;
+      const kd = Math.hypot(kx, kz);
+      const keep = Math.max(0, kd - dt * 30) / (kd || 1);
+      this.vel.x = mx * speed + kx * keep;
+      this.vel.z = mz * speed + kz * keep;
+    }
+
+    if (this.inWater) {
+      if (wantJump) {
+        // Hold jump to swim up: sustained (re-applied every frame) so the player
+        // can rise from any depth and, with the in-water auto-step, climb out onto
+        // a 1-block shore bank.
+        this.vel.y = 5.0;
+      } else {
+        // Otherwise sink slowly (no buoyancy), so diving and standing on the
+        // bottom work like before. Space is the only thing that lifts you.
+        this.vel.y += GRAVITY * 0.4 * dt;
+        this.vel.y = Math.max(this.vel.y, -3.0);
+      }
+    } else {
+      this.vel.y += GRAVITY * dt;
+      if (wantJump && this.onGround) this.vel.y = JUMP_VELOCITY;
+    }
+    this.hitWall = false;
+    // In water, auto-climb 1-block shore banks (see moveWithCollision).
+    this.moveWithCollision(world, dt, this.inWater ? 1.05 : 0);
+
+    // Visuals.
+    this.root.position.copy(this.pos);
+    this.rig.group.rotation.y = cameraYaw;
+    this.rig.faceWorld(this.facing.x, this.facing.y, cameraYaw);
+    this.rig.update(dt, this.walking);
+    // Image faces, 3D limbs and tools share the same depth-based water color.
+    this.rig.setSubmersion(submersionAt(world, this.pos, this.inWater));
+    const gy = world.groundYBelow(this.pos.x, this.pos.z, this.pos.y + 0.1);
+    this.shadow.position.set(this.pos.x, gy + 0.02, this.pos.z);
+    // Damage blink.
+    this.rig.group.visible = this.invuln <= 0 || Math.floor(this.invuln * 14) % 2 === 0;
+  }
+
+  faceToward(x, z) {
+    const dx = x - this.pos.x;
+    const dz = z - this.pos.z;
+    if (Math.abs(dx) + Math.abs(dz) > 0.01) this.facing.set(dx, dz);
+  }
+
+  heldItem(inventory) {
+    const slot = inventory.held();
+    return slot ? { id: slot.id, def: ITEMS[slot.id] } : null;
+  }
+
+  updateEquipmentBonuses(inventory) {
+    this.armor = bestArmor(inventory);
+    const newMax = this.baseMaxHp + (this.armor?.hp ?? 0);
+    if (newMax !== this.maxHp) {
+      this.hp = Math.min(newMax, this.hp + Math.max(0, newMax - this.maxHp));
+      this.maxHp = newMax;
+    }
+  }
+
+  defense() {
+    return this.armor?.def ?? 0;
+  }
+}

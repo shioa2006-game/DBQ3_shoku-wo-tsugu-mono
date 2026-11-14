@@ -1,0 +1,298 @@
+{
+  "source": "Storybook_Character_Studio/prototypes/item-icons/icons.mjs",
+  "version": 2,
+  "image": "item_icons_16.png",
+  "cellSize": 16,
+  "columns": 8,
+  "rows": 14,
+  "cells": {
+    "dirt": [
+      0,
+      0
+    ],
+    "stone": [
+      1,
+      0
+    ],
+    "sand": [
+      2,
+      0
+    ],
+    "log": [
+      3,
+      0
+    ],
+    "plank": [
+      4,
+      0
+    ],
+    "wall": [
+      5,
+      0
+    ],
+    "thatch": [
+      6,
+      0
+    ],
+    "farmland": [
+      7,
+      0
+    ],
+    "fence": [
+      0,
+      1
+    ],
+    "spikes": [
+      1,
+      1
+    ],
+    "torch": [
+      2,
+      1
+    ],
+    "door": [
+      3,
+      1
+    ],
+    "workbench": [
+      4,
+      1
+    ],
+    "chest": [
+      5,
+      1
+    ],
+    "bed": [
+      6,
+      1
+    ],
+    "kamado": [
+      3,
+      2
+    ],
+    "table": [
+      4,
+      2
+    ],
+    "sail": [
+      5,
+      2
+    ],
+    "shipwall": [
+      6,
+      2
+    ],
+    "helm": [
+      7,
+      2
+    ],
+    "straw": [
+      0,
+      3
+    ],
+    "wing": [
+      3,
+      3
+    ],
+    "clay": [
+      6,
+      3
+    ],
+    "hide": [
+      7,
+      3
+    ],
+    "fish": [
+      0,
+      4
+    ],
+    "mushroom": [
+      1,
+      4
+    ],
+    "hammer_stone": [
+      7,
+      4
+    ],
+    "sword_stone": [
+      1,
+      5
+    ],
+    "herb": [
+      4,
+      5
+    ],
+    "onigiri": [
+      5,
+      5
+    ],
+    "grilled_fish": [
+      6,
+      5
+    ],
+    "mushroom_soup": [
+      7,
+      5
+    ],
+    "kiln": [
+      6,
+      6
+    ],
+    "forge": [
+      7,
+      6
+    ],
+    "anvil": [
+      0,
+      7
+    ],
+    "trough": [
+      1,
+      7
+    ],
+    "iron_ore": [
+      3,
+      7
+    ],
+    "charcoal": [
+      4,
+      7
+    ],
+    "iron": [
+      5,
+      7
+    ],
+    "iron_fitting": [
+      6,
+      7
+    ],
+    "hammer_iron": [
+      4,
+      8
+    ],
+    "sword_iron": [
+      6,
+      8
+    ],
+    "iron_armor": [
+      7,
+      8
+    ],
+    "dharma_stone": [
+      4,
+      9
+    ],
+    "dharma_pillar": [
+      5,
+      9
+    ],
+    "roof": [
+      6,
+      9
+    ],
+    "emblem": [
+      7,
+      9
+    ],
+    "lantern": [
+      0,
+      10
+    ],
+    "bookshelf": [
+      1,
+      10
+    ],
+    "keystone": [
+      2,
+      10
+    ],
+    "flame_bowl": [
+      3,
+      10
+    ],
+    "select_pillar": [
+      4,
+      10
+    ],
+    "palisade": [
+      5,
+      10
+    ],
+    "gate": [
+      6,
+      10
+    ],
+    "crossbow": [
+      7,
+      10
+    ],
+    "great_ballista": [
+      0,
+      11
+    ],
+    "steel": [
+      1,
+      11
+    ],
+    "meat": [
+      2,
+      11
+    ],
+    "crab_meat": [
+      3,
+      11
+    ],
+    "barley": [
+      4,
+      11
+    ],
+    "barley_seed": [
+      5,
+      11
+    ],
+    "wedge": [
+      6,
+      11
+    ],
+    "bolt": [
+      7,
+      11
+    ],
+    "great_bolt": [
+      0,
+      12
+    ],
+    "book_copy": [
+      1,
+      12
+    ],
+    "sword_steel": [
+      2,
+      12
+    ],
+    "steel_armor": [
+      3,
+      12
+    ],
+    "nuts": [
+      4,
+      12
+    ],
+    "grilled_meat": [
+      5,
+      12
+    ],
+    "crab_soup": [
+      6,
+      12
+    ],
+    "barley_porridge": [
+      7,
+      12
+    ],
+    "builder_feast": [
+      0,
+      13
+    ]
+  }
+}

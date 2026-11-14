@@ -208,5 +208,7 @@
     "references/small-rock-crab-4dir-v2.png",
     "references/small-rock-crab-4dir-v2.png"
   ],
-  "targets": []
+  "targets": [
+    "ch6-7"
+  ]
 }

@@ -1,7 +1,8 @@
-// 設置物の3Dモデルの原本（models.mjs）を、--preview-game で本編の両ゲームへ写す。
+// 設置物の3Dモデルの原本（models.mjs）を、--preview-game で本編の各ゲームへ写す。
 // 比較ページ（Studioの compare/ch1-3/props-3d/・compare/ch4-5/props-3d/）は原本を直接読むので、写しは要らない。
 //   dqb3-tsugumono-ch1-3/src/world/prop-models.js
 //   dqb3-tsugumono-ch4-5/src/world/prop-models.js
+//   dqb3-tsugumono-ch6-7/src/world/prop-models.js
 // 写しは原本の先頭に生成ファイルの注記を付けるだけで、コードは変えない。
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
@@ -12,6 +13,7 @@ const gameFile = (folder, p) => new URL(`../../../${folder}/${p}`, import.meta.u
 export const GAME_COPIES = Object.freeze([
   { folder: 'dqb3-tsugumono-ch1-3', path: 'src/world/prop-models.js' },
   { folder: 'dqb3-tsugumono-ch4-5', path: 'src/world/prop-models.js' },
+  { folder: 'dqb3-tsugumono-ch6-7', path: 'src/world/prop-models.js' },
 ]);
 
 export const GENERATED_HEADER = [

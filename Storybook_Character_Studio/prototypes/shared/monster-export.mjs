@@ -47,7 +47,7 @@ export function normalizeCells(src) {
 }
 
 export async function exportMonster({ id, name, role, build, references, summary, runtime, studioFolder, reportPrefix = '' }) {
-  const character = studioFolder ? { folder: studioFolder, targets: [] } : CHARACTERS.find(c => c.id === id);
+  const character = CHARACTERS.find(c => c.id === id) ?? (studioFolder ? { folder: studioFolder, targets: [] } : null);
   if (!character) throw Error(`${id} is not listed in game-targets.mjs`);
   const previewGame = process.argv.includes('--preview-game');
   if (previewGame && !character.targets.length) throw Error(`${name}の本編への移植先は未設定です。`);

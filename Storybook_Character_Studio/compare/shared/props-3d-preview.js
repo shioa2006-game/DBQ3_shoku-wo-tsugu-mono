@@ -14,6 +14,9 @@ const LABELS = {
   CROP1: '稲のなえ', CROP2: '育つ稲', CROP3: '実った稲', BUSH: 'わら草', MUSHROOM: 'きのこ',
   FISH_SPOT: '魚のかげ', MINE_LAMP: '坑道灯', KILN: '炭焼き窯', FORGE: '炉', ANVIL: '金床', TROUGH: '水桶', IRON_POT: '鉄鍋',
   TAINT_STONE: '穢れ石', INCENSE_PLANT: '清めの香草', PRAYER_PILLAR: '祈り柱',
+  LANTERN: '提灯', FLAME_BOWL: '授職の灯', SELECT_PILLAR0: '選択の柱（印なし）', SELECT_PILLAR1: '選択の柱（印1）', SELECT_PILLAR2: '選択の柱（印2）',
+  SELECT_PILLAR3: '選択の柱（印3）', SELECT_PILLAR4: '選択の柱（印4）', GATE: '門', CROSSBOW_N: 'ボウガン（北）', CROSSBOW_E: 'ボウガン（東）',
+  CROSSBOW_S: 'ボウガン（南）', CROSSBOW_W: 'ボウガン（西）', GREAT_BALLISTA: '大型対空ボウガン', WEDGE_MARK: 'くさびの印', WEDGE_SET: '打ったくさび',
 };
 const GAME = { spikes: document.body.dataset.spikes ?? 'stone', grain: document.body.dataset.grain ?? 'rice' };
 const NAMES = PROP_MODEL_NAMES.filter((name) => B[name] !== undefined);

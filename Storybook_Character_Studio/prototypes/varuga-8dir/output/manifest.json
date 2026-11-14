@@ -356,5 +356,7 @@
     "references/dragons/grom_body_8dir.png",
     "references/dragons/grom_head_8dir.png"
   ],
-  "targets": []
+  "targets": [
+    "ch6-7"
+  ]
 }

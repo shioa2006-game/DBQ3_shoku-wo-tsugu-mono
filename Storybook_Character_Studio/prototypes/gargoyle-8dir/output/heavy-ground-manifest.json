@@ -208,5 +208,7 @@
     "references/gargoyle-landed-v2.png",
     "references/gargoyle-landed-v2.png"
   ],
-  "targets": []
+  "targets": [
+    "ch6-7"
+  ]
 }

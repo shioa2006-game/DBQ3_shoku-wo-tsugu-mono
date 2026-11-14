@@ -66,13 +66,20 @@ test('placing many props reuses geometry and materials', () => {
 });
 
 test('prop model names match the block ids of each game', async () => {
-  const ch13 = await blockNames('dqb3-tsugumono-ch1-3'), ch45 = await blockNames('dqb3-tsugumono-ch4-5');
-  // 共通の設置物は両方に、かかしは第1～3章だけ、試作03の設備は第4～5章だけにある。
+  const ch13 = await blockNames('dqb3-tsugumono-ch1-3'), ch45 = await blockNames('dqb3-tsugumono-ch4-5'), ch67 = await blockNames('dqb3-tsugumono-ch6-7');
+  // 共通の設置物は第1～5章の両方に、かかしは第1～3章だけ、試作03の設備は第4～5章（一部は第6～7章も）、
+  // 試作05の設置物は第6～7章だけにある。
   const only13 = new Set(['SCARECROW']);
   const only45 = new Set(['MINE_LAMP', 'KILN', 'FORGE', 'ANVIL', 'TROUGH', 'IRON_POT', 'TAINT_STONE', 'INCENSE_PLANT', 'PRAYER_PILLAR']);
+  const only67 = new Set(['LANTERN', 'FLAME_BOWL', 'SELECT_PILLAR0', 'SELECT_PILLAR1', 'SELECT_PILLAR2', 'SELECT_PILLAR3', 'SELECT_PILLAR4',
+    'GATE', 'CROSSBOW_N', 'CROSSBOW_E', 'CROSSBOW_S', 'CROSSBOW_W', 'GREAT_BALLISTA', 'WEDGE_MARK', 'WEDGE_SET']);
+  // 第6～7章が使わない、前の編の設置物。
+  const not67 = new Set(['SCARECROW', 'ALTAR', 'TORII', 'MINE_LAMP', 'IRON_POT', 'TAINT_STONE', 'INCENSE_PLANT', 'PRAYER_PILLAR']);
   for (const name of PROP_MODEL_NAMES) {
-    if (!only45.has(name)) assert.ok(ch13.has(name), `CH1-3 has B.${name}`);
-    if (!only13.has(name)) assert.ok(ch45.has(name), `CH4-5 has B.${name}`);
+    if (!only45.has(name) && !only67.has(name)) assert.ok(ch13.has(name), `CH1-3 has B.${name}`);
+    if (!only13.has(name) && !only67.has(name)) assert.ok(ch45.has(name), `CH4-5 has B.${name}`);
+    if (!not67.has(name)) assert.ok(ch67.has(name), `CH6-7 has B.${name}`);
+    else assert.ok(!ch67.has(name), `CH6-7 does not use B.${name}`);
   }
 });
 

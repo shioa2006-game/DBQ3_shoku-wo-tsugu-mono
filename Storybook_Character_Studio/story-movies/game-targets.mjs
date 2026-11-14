@@ -1,7 +1,7 @@
 // SVGストーリームービーの書き出し先。Studioの生成物（story-movies/<slug>/index.html）を、
 // 各ゲームの assets/movies/<name>.html へ写す（npm.cmd run sync:movies）。
 // ゲーム側は src/content/movies.js がこの名前で読み込み、game-shared/story-movies.mjs が再生する。
-// ムービーを作り直したら、build:movie（プロローグは build:prologue）の後にこれで両編へ配る。
+// ムービーを作り直したら、build:movie（プロローグは build:prologue）の後にこれで各編へ配る。
 import { GAMES } from '../prototypes/shared/game-targets.mjs';
 
 export { GAMES };
@@ -19,6 +19,12 @@ export const MOVIE_FILES = Object.freeze([
   { name: 'ch5-return', from: 'ch5-return/index.html', game: 'ch4-5' },
   { name: 'book-blacksmith', from: 'book-revival/blacksmith/index.html', game: 'ch4-5' },
   { name: 'book-priest', from: 'book-revival/priest/index.html', game: 'ch4-5' },
+  // 第6～7章（ダーマ再興編）: 編の始まり・第6章の結び・ヴァルガの初襲来・最終決戦の決着・エンディング
+  { name: 'ch6-arrival', from: 'ch6-arrival/index.html', game: 'ch6-7' },
+  { name: 'ch6-roof-light', from: 'ch6-roof-light/index.html', game: 'ch6-7' },
+  { name: 'ch7-three-heads', from: 'ch7-three-heads/index.html', game: 'ch6-7' },
+  { name: 'ch7-flame-holds', from: 'ch7-flame-holds/index.html', game: 'ch6-7' },
+  { name: 'ch7-unseen-books', from: 'ch7-unseen-books/index.html', game: 'ch6-7' },
 ]);
 
 export const studioMovieUrl = (file) => new URL(`./${file.from}`, import.meta.url);

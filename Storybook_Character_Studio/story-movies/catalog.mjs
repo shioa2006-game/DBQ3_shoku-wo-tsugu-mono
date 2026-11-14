@@ -16,7 +16,7 @@ export const STATUS = {
 export const SAGAS = [
   { id: 'zipangu', title: 'ジパング復興編', note: '第1～3章（dqb3-tsugumono-ch1-3）' },
   { id: 'volcano', title: '火山島編', note: '第4～5章（dqb3-tsugumono-ch4-5）' },
-  { id: 'dharma', title: 'ダーマ再興編', note: '第6～7章（dqb3-tsugumono-ch6-7。ゲームは未実装で、ムービーを先に作る）' },
+  { id: 'dharma', title: 'ダーマ再興編', note: '第6～7章（dqb3-tsugumono-ch6-7）' },
   { id: 'common', title: '両編で繰り返し使うもの', note: '型を1つ作り、差し替えて使う' },
 ];
 
@@ -113,7 +113,7 @@ export const MOVIES = [
     links: [{ label: '制作メモ', href: 'ch5-return/README.md' }, { label: '絵コンテ', href: 'ch5-return/reference/storyboard.md' }],
   },
   {
-    id: 'M10', slug: 'ch6-arrival', title: 'ダーマ再興編の始まり「始まりの場所」', saga: 'dharma', status: 'prototype', buildStep: 5,
+    id: 'M10', slug: 'ch6-arrival', title: 'ダーマ再興編の始まり「始まりの場所」', saga: 'dharma', status: 'game', buildStep: 5,
     when: '第6章・開始', place: '「はじめから」の後、第6章の導入会話（着岸・スズハとの出会い）の前', length: '大・25～30秒', priority: 'A',
     summary: '別のゲームとして始まるダーマ再興編の入口。三枚の思い出の額でこれまでの旅を振り返り、M7の夜の海の続きの夜明けから、旧ダーマ神殿の島への着岸までを見せる。',
     scenes: ['これまでの旅：神殿からの脱出・ジパングの復興・清めの泉（三枚の思い出の額）', '夜明けの海。日が昇り、船の上の四人',
@@ -124,7 +124,7 @@ export const MOVIES = [
     links: [{ label: '制作メモ', href: 'ch6-arrival/README.md' }, { label: '絵コンテ', href: 'ch6-arrival/reference/storyboard.md' }],
   },
   {
-    id: 'M11', slug: 'ch6-roof-light', title: '第6章の結び「大屋根の灯」', saga: 'dharma', status: 'prototype', buildStep: 6,
+    id: 'M11', slug: 'ch6-roof-light', title: '第6章の結び「大屋根の灯」', saga: 'dharma', status: 'game', buildStep: 6,
     when: '第6章・章末', place: '神殿の完成と最初の授職を祝った後、第7章へ移る前', length: '中・15～20秒', priority: 'B',
     summary: '神殿の完成と最初の授職の喜びで第6章を締めくくり、最後に海の向こうから来る三つ首の影とガーゴイルの群れを、輪郭だけで短く見せる。',
     scenes: ['授職の灯がともる祭壇と、アサギの大工の印を刻んだ選択の柱', '共同台所の前の祝いの夜', '海岸から望む、灯のともった大屋根',
@@ -135,7 +135,7 @@ export const MOVIES = [
     links: [{ label: '制作メモ', href: 'ch6-roof-light/README.md' }, { label: '絵コンテ', href: 'ch6-roof-light/reference/storyboard.md' }],
   },
   {
-    id: 'M12', slug: 'ch7-three-heads', title: '三頭魔竜の襲来「三つ首の影」', saga: 'dharma', status: 'prototype', buildStep: 7,
+    id: 'M12', slug: 'ch7-three-heads', title: '三頭魔竜の襲来「三つ首の影」', saga: 'dharma', status: 'game', buildStep: 7,
     when: '第7章・中盤', place: 'ガーゴイル軍の3波を退けた後、初襲来の戦闘の直前', length: '小・6～8秒', priority: 'B',
     summary: '軍勢を率いる竜が自ら海を越えて現れ、ダーマを焼いたのは自分だと名乗る。戦いの結果は見せない。',
     scenes: ['海の向こうの空が暗くなり、水平線から三つ首の竜が飛んでくる', '三つの頭が大屋根を見下ろし、火を噴く構えをとる', '竜が自ら名を告げる'],
@@ -145,7 +145,7 @@ export const MOVIES = [
     links: [{ label: '制作メモ', href: 'ch7-three-heads/README.md' }, { label: '絵コンテ', href: 'ch7-three-heads/reference/storyboard.md' }],
   },
   {
-    id: 'M13', slug: 'ch7-flame-holds', title: '最終決戦の決着「灯は消えず」', saga: 'dharma', status: 'prototype', buildStep: 7,
+    id: 'M13', slug: 'ch7-flame-holds', title: '最終決戦の決着「灯は消えず」', saga: 'dharma', status: 'game', buildStep: 7,
     when: '第7章・終盤', place: '三つ目の頭を倒した直後、戦後の修復の前', length: '中・10～20秒', priority: 'B',
     summary: '三つの頭を倒した決着と、傷ついた神殿の奥で祭壇の灯がともり続けていることを見せる。',
     scenes: ['三つ目の頭が倒れ、竜の巨体が黒い霧へ崩れる', '煙が晴れ、傷ついた屋根と壁の奥で祭壇の灯がともり続ける。朝の光が選択の柱の印を照らす',
@@ -156,7 +156,7 @@ export const MOVIES = [
     links: [{ label: '制作メモ', href: 'ch7-flame-holds/README.md' }, { label: '絵コンテ', href: 'ch7-flame-holds/reference/storyboard.md' }],
   },
   {
-    id: 'M14', slug: 'ch7-unseen-books', title: 'ダーマ再興編・完「まだ見ぬ書へ」', saga: 'dharma', status: 'prototype', buildStep: 5,
+    id: 'M14', slug: 'ch7-unseen-books', title: 'ダーマ再興編・完「まだ見ぬ書へ」', saga: 'dharma', status: 'game', buildStep: 5,
     when: '第7章・結末', place: 'スズハへの継承の後、ピノとベルクも乗せた最後の出航', length: '大・30～35秒', priority: 'A',
     summary: 'ダーマ再興編とこれまでの旅を締めくくる。ピノをジパング、ベルクを火山島へ送り届け、世界中の職業の書を探す旅へ。',
     scenes: ['再開した神殿', '桟橋から出る船', 'ジパングでピノが降りる', '火山島でベルクが降りる', '四人と職業の書だけを乗せて、その先の海へ',

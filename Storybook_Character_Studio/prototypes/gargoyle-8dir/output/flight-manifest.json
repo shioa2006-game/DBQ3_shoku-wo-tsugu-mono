@@ -208,5 +208,7 @@
     "references/gargoyle-flight-4dir-v1.png",
     "references/gargoyle-flight-4dir-v1.png"
   ],
-  "targets": []
+  "targets": [
+    "ch6-7"
+  ]
 }

@@ -1,0 +1,14 @@
+// Runtime copy of Storybook Character Studio: prototypes/ganzou-8dir/rig-profile.mjs.
+export const GANZOU_RIG_PROFILE = Object.freeze({
+  bodyTopV: .54, armSep: .14, armRestTilt: .28, shoulderLift: .008,
+  sleeveY: -.105, headForward: .012, headDepth: .025, headOffsetY: -.005,
+  headLiftByDirection: Object.freeze({
+    front: .012, front_left: .018, left: .016, back_left: .016,
+    back: .012, back_right: .016, right: .016, front_right: .018,
+  }),
+  bodyDepth: -.008, toolOverHead: Object.freeze(['front_right']),
+});
+export const GANZOU_RIG_COLORS = Object.freeze({
+  sleeve: 0x50504f, hand: 0xefb16c, pants: 0x514b42, boot: 0x624633,
+  headBack: 0xb4afa7, bodyBack: 0x97603c,
+});

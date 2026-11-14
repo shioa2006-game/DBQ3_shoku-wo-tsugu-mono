@@ -7,6 +7,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 export const GAMES = Object.freeze({
   'ch1-3': 'dqb3-tsugumono-ch1-3',
   'ch4-5': 'dqb3-tsugumono-ch4-5',
+  'ch6-7': 'dqb3-tsugumono-ch6-7',
 });
 
 // kind: 'humanoid'（合成シート1枚）| 'humanoid-layers'（頭・胴の分離＋比較用合成）| 'monster'（A・Bの2枚）| 'dragon'（頭・胴の2枚）
@@ -24,33 +25,38 @@ const monster = (folder, art, targets) => ({
 });
 
 // Dragons: head and body billboards, one pose each (the game's DragonRig adds the 3D neck, wings and tail).
-const dragon = (folder, id, targets) => ({
+// extra: more sheets of the same dragon (Varuga's open-mouth head).
+const dragon = (folder, id, targets, extra = []) => ({
   id, folder: `${folder}-8dir`, kind: 'dragon', targets, dir: 'dragons', rigProfile: false,
-  files: [`${id}_code_head_8dir`, `${id}_code_body_8dir`],
+  files: [`${id}_code_head_8dir`, `${id}_code_body_8dir`, ...extra.map((part) => `${id}_code_${part}_8dir`)],
 });
 
 export const CHARACTERS = Object.freeze([
   // 以前の主人公（合成シート1枚）。2026-11-07に hero2 へ切り替えたが、比較用に両編へ残す。
   humanoid('adventurer', 'humanoid', ['ch1-3', 'ch4-5']),
   // 主人公シオン（2026-11-07から本編の主人公。頭・胴の分離、胴の中心を描いた位置のまま書き出す）。
-  humanoid('hero2', 'humanoid-layers', ['ch1-3', 'ch4-5']),
-  humanoid('mina', 'humanoid-layers', ['ch1-3', 'ch4-5']),
-  humanoid('pino', 'humanoid-layers', ['ch1-3']),
+  humanoid('hero2', 'humanoid-layers', ['ch1-3', 'ch4-5', 'ch6-7']),
+  humanoid('mina', 'humanoid-layers', ['ch1-3', 'ch4-5', 'ch6-7']),
+  humanoid('pino', 'humanoid-layers', ['ch1-3', 'ch6-7']), // 第6章で大屋根の棟梁として招聘
   humanoid('inaho', 'humanoid-layers', ['ch1-3']),
-  humanoid('gonta', 'humanoid-layers', ['ch1-3', 'ch4-5']),
+  humanoid('gonta', 'humanoid-layers', ['ch1-3', 'ch4-5', 'ch6-7']),
   humanoid('jinbei', 'humanoid-layers', ['ch1-3']),
-  humanoid('watari', 'humanoid-layers', ['ch1-3', 'ch4-5']),
+  humanoid('watari', 'humanoid-layers', ['ch1-3', 'ch4-5', 'ch6-7']),
   // 第4～5章の新しい人型（段階2）。
-  humanoid('belk', 'humanoid-layers', ['ch4-5']),
+  humanoid('belk', 'humanoid-layers', ['ch4-5', 'ch6-7']), // 第7章で大型対空ボウガンの機構を作る
   humanoid('roku', 'humanoid-layers', ['ch4-5']),
   humanoid('kaya', 'humanoid-layers', ['ch4-5']),
   humanoid('nagi', 'humanoid-layers', ['ch4-5']),
   humanoid('yomogi', 'humanoid-layers', ['ch4-5']),
   humanoid('sumi', 'humanoid-layers', ['ch4-5']),
   humanoid('teru', 'humanoid-layers', ['ch4-5']),
+  // 第6～7章の新しい人型（ダーマの住民）。
+  humanoid('suzuha', 'humanoid-layers', ['ch6-7']),
+  humanoid('asagi', 'humanoid-layers', ['ch6-7']),
+  humanoid('ganzou', 'humanoid-layers', ['ch6-7']),
   monster('slime', 'slime', ['ch1-3']),
-  monster('night-bat', 'night_bat', ['ch1-3', 'ch4-5']), // 第4～5章は火喰いこうもり・瘴気こうもり（色替え）
-  monster('field-rat', 'field_rat', ['ch1-3']),
+  monster('night-bat', 'night_bat', ['ch1-3', 'ch4-5', 'ch6-7']), // 第4～5章は火喰いこうもり・瘴気こうもり、第6章は洞窟こうもり（色替え）
+  monster('field-rat', 'field_rat', ['ch1-3', 'ch6-7']), // 第6章は山ねずみ（色替え）
   monster('dorotabo', 'dorotabo', ['ch1-3', 'ch4-5']), // 第4～5章は灰どろたぼう・瘴気どろたぼう（色替え）
   monster('squid', 'squid', ['ch1-3']),
   // 第4～5章の新しいモンスター（段階3）。鬼火は瘴気の鬼火・炉喰らいの大鬼火にも色替え・拡大で使う。
@@ -59,6 +65,17 @@ export const CHARACTERS = Object.freeze([
   monster('volcano-lizard', 'volcano_lizard', ['ch4-5']),
   // 第5章の章ボス（段階4）。
   dragon('grom', 'grom', ['ch4-5']),
+  // 第6～7章のモンスター。小岩ガニは大岩ガニ（第6章ボス）にも拡大して使う。
+  // ガーゴイルは飛行・地上の2組、岩砕きのガーゴイルは静止・飛行・攻撃の3組（同じ gargoyle-8dir から書き出す）。
+  monster('rockhorn-goat', 'rockhorn_goat', ['ch6-7']),
+  monster('small-rock-crab', 'small_rock_crab', ['ch6-7']),
+  monster('gargoyle', 'gargoyle_flight', ['ch6-7']),
+  monster('gargoyle', 'gargoyle_ground', ['ch6-7']),
+  monster('gargoyle', 'gargoyle_heavy_ground', ['ch6-7']),
+  monster('gargoyle', 'gargoyle_heavy_flight', ['ch6-7']),
+  monster('gargoyle', 'gargoyle_heavy_attack', ['ch6-7']),
+  // 第7章のボス（通常頭・胴・開口頭）。リグと動作は rig.js・motion.mjs をゲームへ移植する。
+  dragon('varuga', 'varuga', ['ch6-7'], ['head_open']),
 ]);
 
 export const gameUrl = (game, path) => new URL(`../../../${GAMES[game]}/${path}`, import.meta.url);

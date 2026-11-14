@@ -14,7 +14,7 @@ const rootId = createHash('sha256').update(process.platform === 'win32' ? realRo
 // このサーバーのコードの版。起動ツールは、同じフォルダでも古いコードのまま動くサーバーは再利用しない。
 const serverId = createHash('sha256').update((await readFile(fileURLToPath(import.meta.url), 'utf8')).replace(/\r\n/g, '\n')).digest('hex');
 // prototypes/shared/game-targets.mjs の GAMES と同じ。サーバーは単独でコピーされても動くよう、ここに直接書く。
-const GAMES = { 'ch1-3': 'dqb3-tsugumono-ch1-3', 'ch4-5': 'dqb3-tsugumono-ch4-5' };
+const GAMES = { 'ch1-3': 'dqb3-tsugumono-ch1-3', 'ch4-5': 'dqb3-tsugumono-ch4-5', 'ch6-7': 'dqb3-tsugumono-ch6-7' };
 const PORT = Number(process.argv[2] || process.env.PORT || 8080);
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.json': 'application/json; charset=utf-8', '.md': 'text/markdown; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml', '.txt': 'text/plain; charset=utf-8' };

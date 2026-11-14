@@ -35,10 +35,10 @@ test('each target game uses the same images and rig profile as the Studio output
   }
 });
 
-// キャラクターはどちらの編でも同じリグで動かす（第4～5章の道具も含めて1つの rig.js）。
-test('both games run characters on the same rig.js', async () => {
-  const [a, b] = await Promise.all(Object.keys(GAMES).map((game) => readFile(gameUrl(game, 'src/entities/rig.js'), 'utf8')));
-  assert.equal(lf(b), lf(a), 'src/entities/rig.js must stay identical in both games');
+// キャラクターはどの編でも同じリグで動かす（第4～5章の道具も含めて1つの rig.js）。
+test('every game runs characters on the same rig.js', async () => {
+  const [first, ...rest] = await Promise.all(Object.keys(GAMES).map((game) => readFile(gameUrl(game, 'src/entities/rig.js'), 'utf8')));
+  for (const other of rest) assert.equal(lf(other), lf(first), 'src/entities/rig.js must stay identical in every game');
 });
 
 // Studioのサーバー（tools/serve.mjs）は /games/<key>/ でゲームのフォルダを配る。単独でも動くよう同じ表を持つ。

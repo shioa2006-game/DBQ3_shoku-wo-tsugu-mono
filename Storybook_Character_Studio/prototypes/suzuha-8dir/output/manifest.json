@@ -148,5 +148,7 @@
     ]
   },
   "rigProfile": "../rig-profile.mjs",
-  "targets": []
+  "targets": [
+    "ch6-7"
+  ]
 }

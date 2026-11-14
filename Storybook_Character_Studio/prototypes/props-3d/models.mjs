@@ -3,7 +3,7 @@
 // 木・石・わらの面にはブロックの16px模様を、1マス=1枚の密度で貼る。
 //
 // このファイルは依存なし。THREE はゲームから渡す（Studioのテストでも同じ）。
-// 書き出し: Studio で `npm.cmd run export:props -- --preview-game`（両ゲームの src/world/prop-models.js）。比較ページはこの原本を直接読む。
+// 書き出し: Studio で `npm.cmd run export:props -- --preview-game`（各ゲームの src/world/prop-models.js）。比較ページはこの原本を直接読む。
 //
 // 約束（ゲームの PropRenderer が使うので守る）:
 // - 原点はマスの底面の中央。大きさは基本1マス（PROP_LIMITS の例外を除く）。
@@ -13,7 +13,7 @@
 // - 作る関数は ctx を受け取る。ctx.connects(dx, dz) は、隣のマスが柵か扉なら true
 //   （柵の横木をつなぐのに使う）。ゲームの PropRenderer は隣が変わると作り直す。
 
-export const PROP_MODEL_VERSION = 4;
+export const PROP_MODEL_VERSION = 5;
 
 // 作り直した設置物。ブロック名（ゲームの B のキー）で引く。
 export const PROP_MODEL_NAMES = Object.freeze([
@@ -21,6 +21,8 @@ export const PROP_MODEL_NAMES = Object.freeze([
   'FENCE', 'CHEST', 'KAMADO', 'TABLE', 'HELM', 'BANNER', 'CROP1', 'CROP2', 'CROP3', 'BUSH', 'MUSHROOM', // 試作02
   'MINE_LAMP', 'KILN', 'FORGE', 'ANVIL', 'TROUGH', 'IRON_POT', 'TAINT_STONE', 'INCENSE_PLANT', 'PRAYER_PILLAR', // 試作03（第4～5章だけ）
   'FISH_SPOT', // 試作04
+  'LANTERN', 'FLAME_BOWL', 'SELECT_PILLAR0', 'SELECT_PILLAR1', 'SELECT_PILLAR2', 'SELECT_PILLAR3', 'SELECT_PILLAR4', // 試作05（第6～7章だけ）
+  'GATE', 'CROSSBOW_N', 'CROSSBOW_E', 'CROSSBOW_S', 'CROSSBOW_W', 'GREAT_BALLISTA', 'WEDGE_MARK', 'WEDGE_SET',
 ]);
 
 // ゲームの PropRenderer.update が使う部品と目印。
@@ -41,6 +43,11 @@ export const PROP_REQUIREMENTS = Object.freeze({
   INCENSE_PLANT: { names: [], userData: ['sway'] },
   PRAYER_PILLAR: { names: ['orb'], userData: [] },
   FISH_SPOT: { names: [], userData: ['sway'] },
+  LANTERN: { names: ['flame'], userData: ['torch'] },
+  FLAME_BOWL: { names: ['flame'], userData: ['torch'] },
+  GATE: { names: ['hinge'], userData: ['door'] },
+  GREAT_BALLISTA: { names: ['turret'], userData: ['ballista'] },
+  WEDGE_MARK: { names: ['orb'], userData: [] },
 });
 
 // 大きさの上限（輪郭線を含む）。xz は中心からの半幅、y は高さ。既定は1マス。
@@ -55,6 +62,12 @@ export const PROP_LIMITS = Object.freeze({
   TAINT_STONE: { xz: 0.5, y: 1.2 }, // 結晶（本編の今の形は約1.1）
   PRAYER_PILLAR: { xz: 0.5, y: 2.0 }, // 石柱と光る玉（本編の今の形は約1.88）
   FISH_SPOT: { xz: 0.5, y: 0.2, minY: -0.3 }, // 魚の影は水面の下（下の水のマスの中）に置く
+  FLAME_BOWL: { xz: 0.5, y: 1.4 }, // 授職の灯の炎
+  SELECT_PILLAR0: { xz: 0.5, y: 2.1 }, SELECT_PILLAR1: { xz: 0.5, y: 2.1 }, SELECT_PILLAR2: { xz: 0.5, y: 2.1 },
+  SELECT_PILLAR3: { xz: 0.5, y: 2.1 }, SELECT_PILLAR4: { xz: 0.5, y: 2.1 }, // 仕事の印を刻む柱
+  GATE: { xz: 0.55, y: 2.0 }, // 門柱は扉より太い
+  CROSSBOW_N: { xz: 0.5, y: 1.0 }, CROSSBOW_E: { xz: 0.5, y: 1.0 }, CROSSBOW_S: { xz: 0.5, y: 1.0 }, CROSSBOW_W: { xz: 0.5, y: 1.0 },
+  GREAT_BALLISTA: { xz: 1.0, y: 1.6 }, // 弓の腕が左右へ張り出す
 });
 
 // 水面の高さ（設置物の原点からの差）。ゲームの mesher.js は水の一番上のマスの上面を
@@ -88,6 +101,8 @@ export function createPropModels(THREE, { tile = () => null, spikes = 'stone', g
     fin: toon(0x4f7393), splash: glow(0xf4fbff),
     flame: new THREE.MeshBasicMaterial({ color: 0xff8a3d, transparent: true, opacity: 0.82, depthWrite: false }),
     flameCore: glow(0xffe27a), orb: glow(0x9fd8ff), orbCore: glow(0xe8f7ff),
+    // 第6～7章: 神殿の石（明るい切り石）と、提灯の紙。
+    dharma: toon(0xd9d0be), dharmaDark: toon(0xa69b8a), paper: glow(0xf6dfae), paperRib: toon(0xc9a86a),
   };
   const outlineMaterial = new THREE.MeshBasicMaterial({ color: OUTLINE_COLOR, side: THREE.BackSide });
 
@@ -106,6 +121,7 @@ export function createPropModels(THREE, { tile = () => null, spikes = 'stone', g
     stone: () => tex('stone', C.stone),
     thatch: () => tex('thatch', C.straw),
     basalt: () => tex('basalt', C.basalt),
+    dharma: () => tex('dharma_stone', C.dharma),
   };
 
   // --- 形状（同じ寸法は使い回す） -------------------------------------------------
@@ -720,7 +736,168 @@ export function createPropModels(THREE, { tile = () => null, spikes = 'stone', g
         [[-0.06, 0.1, 0.03], [0.1, 0.07, -0.04], [0.06, 0.12, 0.07]].map(([x, dy, z]) => sphere(0.018, C.splash, { x, y: S + dy, z, outline: false })),
       ), { userData: { sway: true } });
     },
+
+    // --- 試作05（第6～7章だけ） ----------------------------------------------------------
+    // 提灯: 軒から下がる紙の提灯。上下の黒い枠と金の房、中の灯り。マスの上から吊る。
+    LANTERN() {
+      const light = flame(0.5, 0.75);
+      const g = group(
+        box(0.016, 0.2, 0.016, C.black, { y: 0.9, outline: false }),
+        cyl(0.09, 0.09, 0.05, C.black, { y: 0.79 }),
+        cyl(0.15, 0.15, 0.34, C.paper, { y: 0.6 }),
+        [0.69, 0.6, 0.51].map((y) => cyl(0.153, 0.153, 0.012, C.paperRib, { y, outline: false })),
+        cyl(0.09, 0.09, 0.05, C.black, { y: 0.41 }),
+        box(0.03, 0.12, 0.03, C.gold, { y: 0.33, outline: false }),
+        light,
+      );
+      g.userData.torch = true;
+      return g;
+    },
+
+    // 授職の灯: 要石の上に据える石の皿と、大きな炎。二段の脚、縁の金の輪。
+    FLAME_BOWL() {
+      const g = group(
+        box(0.56, 0.12, 0.56, T.dharma(), { y: 0.06 }),
+        cyl(0.14, 0.2, 0.22, C.dharmaDark, { y: 0.23 }),
+        cyl(0.36, 0.2, 0.16, T.dharma(), { y: 0.42 }),
+        part(torusGeo(0.34, 0.025), C.gold, { y: 0.5, rx: Math.PI / 2 }),
+        cyl(0.3, 0.3, 0.02, C.charcoal, { y: 0.5, outline: false }),
+        flame(0.62, 2.1),
+      );
+      g.userData.torch = true;
+      return g;
+    },
+
+    // 選択の柱: 祭壇とは別の、四角い石の記念柱。仕事の印を刻む枠が縦に四つ（南と東の面）。
+    // 印の数（0〜4）ごとに別のブロックにする。下から大工・石・食・守り。
+    SELECT_PILLAR0() { return selectPillar(0); },
+    SELECT_PILLAR1() { return selectPillar(1); },
+    SELECT_PILLAR2() { return selectPillar(2); },
+    SELECT_PILLAR3() { return selectPillar(3); },
+    SELECT_PILLAR4() { return selectPillar(4); },
+
+    // 門: 丸太の門柱と、鉄の帯と鋲を打った厚い板の扉。人が近づくと開く（扉と同じ仕組み）。
+    GATE() {
+      const frame = group(
+        box(0.14, 1.95, 0.16, T.log(), { x: -0.43, y: 0.975 }),
+        box(0.14, 1.95, 0.16, T.log(), { x: 0.43, y: 0.975 }),
+        box(0.98, 0.14, 0.18, T.log(), { y: 1.9 }),
+      );
+      const panel = group(
+        [0, 1, 2].map((i) => box(0.245, 1.74, 0.1, i % 2 ? C.woodDark : T.plank(), { x: 0.13 + i * 0.25, y: 0.89 })),
+        [0.3, 0.9, 1.5].flatMap((y) => [-1, 1].map((s) => box(0.76, 0.09, 0.03, C.iron, { x: 0.38, y, z: s * 0.06 }))),
+        [0.3, 0.9, 1.5].flatMap((y) => [0.1, 0.38, 0.66].map((x) => sphere(0.028, C.steel, { x, y, z: 0.08, outline: false }))),
+        part(torusGeo(0.06, 0.016), C.iron, { x: 0.62, y: 1.05, z: 0.09, outline: false }),
+      );
+      const hinge = group(panel);
+      hinge.position.set(-0.38, 0, 0);
+      hinge.name = 'hinge';
+      const g = group(frame, hinge);
+      g.userData.door = true;
+      return g;
+    },
+
+    // ボウガン: 三脚の木の台に据えた、鉄の弓の据え付け式。向き（北・東・南・西）ごとに別のブロック。
+    CROSSBOW_N() { return crossbow(Math.PI); },
+    CROSSBOW_E() { return crossbow(Math.PI / 2); },
+    CROSSBOW_S() { return crossbow(0); },
+    CROSSBOW_W() { return crossbow(-Math.PI / 2); },
+
+    // 大型対空ボウガン: ピノの木組みの台座に、ベルクの鉄の弓と巻き上げ車を据えたもの。
+    // 名前 "turret" の部分を、ゲームが狙いの向きへ回す。
+    GREAT_BALLISTA() {
+      const turret = group(
+        box(0.2, 0.16, 1.5, T.log(), { y: 0.86, rx: -0.32 }),
+        box(0.1, 0.05, 1.3, C.iron, { y: 0.96, z: 0.02, rx: -0.32, outline: false }),
+        [-1, 1].map((s) => box(0.8, 0.07, 0.09, C.iron, { x: s * 0.42, y: 1.03, z: 0.42, ry: s * -0.5 })),
+        [-1, 1].map((s) => sphere(0.05, C.steel, { x: s * 0.78, y: 1.03, z: 0.22, outline: false })),
+        box(1.5, 0.014, 0.014, C.cloth, { y: 1.03, z: 0.16, outline: false }),
+        cyl(0.025, 0.025, 1.2, C.wood, { y: 1.02, z: 0.2, rx: Math.PI / 2 - 0.32, outline: false }, 6),
+        cone(0.06, 0.18, C.steel, { y: 1.22, z: 0.84, rx: Math.PI / 2 - 0.32, outline: false }, 6),
+        [-1, 1].map((s) => cyl(0.16, 0.16, 0.05, C.iron, { x: s * 0.2, y: 0.74, z: -0.5, rz: Math.PI / 2 }, 12)),
+        cyl(0.03, 0.03, 0.56, C.steel, { y: 0.74, z: -0.5, rz: Math.PI / 2, outline: false }, 6),
+      );
+      turret.name = 'turret';
+      const g = group(
+        box(0.9, 0.14, 0.9, T.plank(), { y: 0.07 }),
+        [[-0.32, -0.32], [0.32, -0.32], [-0.32, 0.32], [0.32, 0.32]].map(([x, z]) => box(0.12, 0.5, 0.12, T.log(), { x, y: 0.39 })),
+        box(0.82, 0.1, 0.82, T.plank(), { y: 0.66 }),
+        cyl(0.16, 0.2, 0.14, C.iron, { y: 0.75 }),
+        turret,
+      );
+      g.userData.ballista = true;
+      return g;
+    },
+
+    // くさびの印: 要石の岩盤（マスの北の面）に付けた、打つ場所の印。青く光る輪と十字。
+    WEDGE_MARK() {
+      const mark = group(
+        part(torusGeo(0.16, 0.022), C.orb, { outline: false }),
+        box(0.22, 0.03, 0.02, C.orbCore, { outline: false }),
+        box(0.03, 0.22, 0.02, C.orbCore, { outline: false }),
+      );
+      mark.position.set(0, 0.5, -0.47);
+      mark.name = 'orb';
+      return group(mark);
+    },
+
+    // 打ったくさび: 岩盤（マスの北の面）へ打ち込んだ鉄のくさびと、走ったひび。
+    WEDGE_SET() {
+      return group(
+        box(0.1, 0.16, 0.2, C.iron, { y: 0.5, z: -0.37 }),
+        box(0.14, 0.2, 0.05, C.steel, { y: 0.5, z: -0.26 }),
+        box(0.02, 0.3, 0.012, C.ink, { x: 0.03, y: 0.72, z: -0.49, rz: 0.25, outline: false }),
+        box(0.02, 0.26, 0.012, C.ink, { x: -0.04, y: 0.27, z: -0.49, rz: -0.3, outline: false }),
+      );
+    },
   };
+
+  // 選択の柱（marks = 刻んだ印の数）。印は金。枠は南（+z）と東（+x）の面に同じものを刻む。
+  function selectPillar(marks) {
+    const glyphs = [
+      // 大工: 曲尺（L字）と木槌
+      [[-0.07, 0, 0.03, 0.17], [-0.01, -0.07, 0.15, 0.03], [0.05, 0.04, 0.1, 0.06], [0.05, -0.01, 0.025, 0.08]],
+      // 石: 積んだ石
+      [[-0.045, -0.045, 0.08, 0.07], [0.045, -0.045, 0.08, 0.07], [0, 0.04, 0.08, 0.07]],
+      // 食: 湯気の立つ椀
+      [[0, -0.03, 0.17, 0.06], [0, -0.075, 0.1, 0.03], [-0.04, 0.055, 0.02, 0.07], [0.04, 0.055, 0.02, 0.07]],
+      // 守り: 盾
+      [[0, 0.035, 0.15, 0.09], [0, -0.035, 0.11, 0.05], [0, -0.075, 0.05, 0.03]],
+    ];
+    const face = (i) => {
+      const y = 0.46 + i * 0.37;
+      const parts = [box(0.27, 0.27, 0.02, C.dharmaDark, { y, z: 0.205, outline: false })];
+      if (i < marks) {
+        for (const [gx, gy, w, h] of glyphs[i]) parts.push(box(w, h, 0.02, C.gold, { x: gx, y: y + gy, z: 0.214, outline: false }));
+      }
+      return parts;
+    };
+    const south = group([0, 1, 2, 3].map(face));
+    const east = group([0, 1, 2, 3].map(face));
+    east.rotation.y = Math.PI / 2;
+    return group(
+      box(0.62, 0.16, 0.62, C.dharmaDark, { y: 0.08 }),
+      box(0.4, 1.74, 0.4, T.dharma(), { y: 1.03 }),
+      box(0.5, 0.12, 0.5, C.dharmaDark, { y: 1.96 }),
+      south,
+      east,
+    );
+  }
+
+  // 据え付け式のボウガン。作るときは南（+z）向きで、yaw で向きを変える。
+  function crossbow(yaw) {
+    const body = group(
+      box(0.12, 0.1, 0.8, T.log(), { y: 0.62, z: 0.02 }),
+      [-1, 1].map((s) => box(0.46, 0.05, 0.06, C.iron, { x: s * 0.23, y: 0.66, z: 0.3, ry: s * -0.42 })),
+      box(0.84, 0.012, 0.012, C.cloth, { y: 0.66, z: 0.17, outline: false }),
+      cyl(0.016, 0.016, 0.6, C.wood, { y: 0.69, z: 0.06, rx: Math.PI / 2, outline: false }, 6),
+      cone(0.035, 0.1, C.steel, { y: 0.69, z: 0.4, rx: Math.PI / 2, outline: false }, 6),
+      [[-0.24, -0.24], [0.24, -0.24], [0, 0.26]].map(([x, z]) => box(0.07, 0.58, 0.07, C.woodDark, { x: x * 0.8, y: 0.34, z: z * 0.8, rz: -x * 0.5, rx: z * 0.5 })),
+      box(0.3, 0.06, 0.3, T.plank(), { y: 0.56 }),
+    );
+    body.rotation.y = yaw;
+    return group(body);
+  }
 
   // 稲の株。spots: 株の位置、blades: 1株の葉の数、h: 高さ、tip: 葉先の色、head: 穂の色、w: 葉の幅。
   // 遠くのカメラからも見えるよう、葉は太めにして外へ反らせる。穂は1株に2本、反対向きに垂らす。

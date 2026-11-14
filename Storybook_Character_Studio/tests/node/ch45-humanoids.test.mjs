@@ -38,7 +38,7 @@ test('Ganzou and Suzuha retain editable layers and anatomical left-hip accessori
     for (const direction of ['front', 'front_left', 'left', 'front_right']) assert.match(markup(direction), /data-accessory="left-hip-/, `${id} ${direction}: 左腰の小物が見える`);
     assert.throws(() => markup('unknown'), /Unknown direction/);
     const manifest = JSON.parse(await readFile(output(id, 'manifest.json'), 'utf8'));
-    assert.deepEqual(manifest.targets, [], `${id}: 未実装の章向けにStudio内へ保存`);
+    assert.deepEqual(manifest.targets, ['ch6-7'], `${id}: 第6～7章へ書き出す`);
   }
 });
 

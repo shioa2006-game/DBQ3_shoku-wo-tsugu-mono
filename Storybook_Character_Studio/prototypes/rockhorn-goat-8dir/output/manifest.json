@@ -208,5 +208,7 @@
     "references/rockhorn-goat-4dir-v1.png",
     "references/rockhorn-goat-4dir-v1.png"
   ],
-  "targets": []
+  "targets": [
+    "ch6-7"
+  ]
 }
