@@ -6,7 +6,7 @@
   "image": "item_icons_16.png",
   "cellSize": 16,
   "columns": 8,
-  "rows": 10,
+  "rows": 14,
   "outline": true,
   "display": {
     "scale": 2,
@@ -317,6 +317,122 @@
     "porridge": [
       3,
       9
+    ],
+    "dharma_stone": [
+      4,
+      9
+    ],
+    "dharma_pillar": [
+      5,
+      9
+    ],
+    "roof": [
+      6,
+      9
+    ],
+    "emblem": [
+      7,
+      9
+    ],
+    "lantern": [
+      0,
+      10
+    ],
+    "bookshelf": [
+      1,
+      10
+    ],
+    "keystone": [
+      2,
+      10
+    ],
+    "flame_bowl": [
+      3,
+      10
+    ],
+    "select_pillar": [
+      4,
+      10
+    ],
+    "palisade": [
+      5,
+      10
+    ],
+    "gate": [
+      6,
+      10
+    ],
+    "crossbow": [
+      7,
+      10
+    ],
+    "great_ballista": [
+      0,
+      11
+    ],
+    "steel": [
+      1,
+      11
+    ],
+    "meat": [
+      2,
+      11
+    ],
+    "crab_meat": [
+      3,
+      11
+    ],
+    "barley": [
+      4,
+      11
+    ],
+    "barley_seed": [
+      5,
+      11
+    ],
+    "wedge": [
+      6,
+      11
+    ],
+    "bolt": [
+      7,
+      11
+    ],
+    "great_bolt": [
+      0,
+      12
+    ],
+    "book_copy": [
+      1,
+      12
+    ],
+    "sword_steel": [
+      2,
+      12
+    ],
+    "steel_armor": [
+      3,
+      12
+    ],
+    "nuts": [
+      4,
+      12
+    ],
+    "grilled_meat": [
+      5,
+      12
+    ],
+    "crab_soup": [
+      6,
+      12
+    ],
+    "barley_porridge": [
+      7,
+      12
+    ],
+    "builder_feast": [
+      0,
+      13
     ]
   },
   "games": {
@@ -328,6 +444,11 @@
     "ch4-5": {
       "folder": "dqb3-tsugumono-ch4-5",
       "items": 63,
+      "pending": []
+    },
+    "ch6-7": {
+      "folder": "dqb3-tsugumono-ch6-7",
+      "items": 72,
       "pending": []
     }
   },

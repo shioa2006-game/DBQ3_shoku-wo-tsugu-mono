@@ -88,7 +88,54 @@ export const CUBES = {
   bamboo_channel: cube((f, x, y, a, b, seed) => f === 'top' && b > 0.24 && b < 0.76
     ? (hash(x, y, seed) < 0.3 ? '#5b9be6' : '#3f7fd0')
     : bambooFace(f, x, y, a, b, seed), 15),
+  // --- 第6～7章（ゲーム ch6-7 の blocks.js のタイルに合わせる） ---
+  // 神殿の石: 明るい切り石を段に積む。横の面に目地。
+  dharma_stone: cube((f, x, y, a, b, seed) => {
+    const joint = f !== 'top' && (near(b, 0.48, 0.06) || (b < 0.48 ? near(a, 0.5) : near(a, 0.24) || near(a, 0.78)));
+    return joint ? '#a69b8a' : speckle('#d9d0be', ['#cfc6b3', '#e4dccb', '#c6bca8'], 0.3)(f, x, y, seed);
+  }, 16),
+  // 神殿の柱: 縦の溝。上面は四角い縁。
+  dharma_pillar: cube((f, x, y, a, b, seed) => {
+    if (f === 'top') return Math.abs(Math.max(Math.abs(a - 0.5), Math.abs(b - 0.5)) - 0.33) < 0.07 ? '#a69b8a' : '#e4dccb';
+    return near(a, 0.2) || near(a, 0.5) || near(a, 0.8) ? '#b8ad9b' : speckle('#e4dccb', ['#d9d0be', '#f2ead9'], 0.25)(f, x, y, seed);
+  }, 17),
+  // 屋根板: 上面は葺き板の段、横の面は垂木の木口。
+  roof: cube((f, x, y, a, b, seed) => roofFace(f, x, y, a, b, seed), 18),
+  // 書の紋章: 破風の木の面に、金の職業の書。
+  emblem: cube((f, x, y, a, b, seed) => {
+    if (f === 'top') return roofFace(f, x, y, a, b, seed);
+    return bookMark(a, b) ? '#d9b545' : speckle('#8a5a36', ['#7c4f2e', '#96663f'], 0.25)(f, x, y, seed);
+  }, 19),
+  // 本棚: 木の枠に、色とりどりの背表紙が二段。
+  bookshelf: cube((f, x, y, a, b, seed) => {
+    if (f === 'top') return speckle('#c99c5f', ['#d3a869', '#bf9256'], 0.25)(f, x, y, seed);
+    if (a < 0.14 || a > 0.86 || b < 0.1 || b > 0.9 || near(b, 0.5, 0.06)) return '#7c5730';
+    const spines = ['#a03024', '#2f5db0', '#3e7d33', '#d9b545', '#6a4a8a', '#c97b3f', '#e6ddc8'];
+    return spines[Math.floor(hash(x, b < 0.5 ? 1 : 2, seed) * spines.length)];
+  }, 20),
+  // 要石: 青みのある石に、光る職業の書の紋章。
+  keystone: cube((f, x, y, a, b, seed) => {
+    if (f !== 'top' && bookMark(a, b)) return '#f0c860';
+    return speckle('#9fb0bf', ['#8fa0b0', '#afc0cd', '#7f90a2'], 0.35)(f, x, y, seed);
+  }, 21),
+  // 丸太の防壁: 縦に並べた丸太を縄で締める。上面は丸太の木口。
+  palisade: cube((f, x, y, a, b, seed) => {
+    if (f === 'top') return (a * 3) % 1 < 0.22 || (b * 3) % 1 < 0.22 ? '#4e3518' : '#b98a51';
+    if (near(b, 0.28) || near(b, 0.74)) return '#c2a557';
+    return near(a, 0.33, 0.06) || near(a, 0.67, 0.06) ? '#4e3518' : speckle('#7c5730', ['#8a6238', '#6d4c29', '#966c3e'], 0.3)(f, x, y, seed);
+  }, 22),
 };
+
+// 屋根板の面（屋根板・書の紋章の上面で共用）。
+function roofFace(f, x, y, a, b, seed) {
+  if (f === 'top') return near(a, 0.3, 0.06) || near(a, 0.68, 0.06) ? '#4e301a' : speckle('#8a5a36', ['#7c4f2e', '#96663f', '#a8774a'], 0.3)(f, x, y, seed);
+  if (near(b, 0.36, 0.06)) return '#4e301a';
+  if (b > 0.62 && b < 0.92 && (near(a, 0.2, 0.1) || near(a, 0.55, 0.1) || near(a, 0.88, 0.1))) return '#c99c5f';
+  return speckle('#7c4f2e', ['#6f4628', '#8a5a36'], 0.3)(f, x, y, seed);
+}
+
+// 横の面の中央に描く、開いた書の紋章（左右のページ。中央の綴じ目は地の色）。
+const bookMark = (a, b) => Math.abs(a - 0.5) < 0.32 && Math.abs(b - 0.5) < 0.24 && !near(a, 0.5, 0.06);
 
 // 竹: 横の面は節の線と縦の筋、上面は切り口の輪。
 function bambooFace(f, x, y, a, b, seed) {

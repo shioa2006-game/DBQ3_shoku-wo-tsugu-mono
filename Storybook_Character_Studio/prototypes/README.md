@@ -87,9 +87,9 @@ Studioの `compare/ch1-3/` の各ページは実際のリグとの比較用で�
 
 | 対象 | 原本・手順 | 出力 | 今の表示 |
 |---|---|---|---|
-| 第1～5章のアイテム76件（第1～3章50件・第4～5章63件、共通37件） | [item-icons](item-icons/README.md) | [アトラス](item-icons/output/item_icons_16.png)・[確認画像](item-icons/output/preview.png)・[マニフェスト](item-icons/output/manifest.json) | ゲームの `itemIcon()` がブロックの模様かemojiを描画 |
+| 第1～7章のアイテム105件（第1～3章50件・第4～5章63件・第6～7章72件。後の編だけのものは26件・29件） | [item-icons](item-icons/README.md) | [アトラス](item-icons/output/item_icons_16.png)・[確認画像](item-icons/output/preview.png)・[マニフェスト](item-icons/output/manifest.json) | ゲームの `itemIcon()` がブロックの模様かemojiを描画 |
 
-試作03で第1～5章の全76件を作画しました。[比較ページ](item-icons/index.html)で今のemojiと並べて確認できます。2026-11-03に第1～3章と第4～5章へ移植しました（`--preview-game` の出力を両方の本編が読み込みます）。
+試作03で第1～5章の全76件、試作04（2026-11-14）で第6～7章だけの29件を作画しました。[比較ページ](item-icons/index.html)で今のemojiと並べて確認できます。2026-11-03に第1～3章と第4～5章へ移植しました（`--preview-game` の出力を両方の本編が読み込みます）。
 
 ## 設置物の3D
 

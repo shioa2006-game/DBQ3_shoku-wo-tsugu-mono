@@ -4,7 +4,7 @@
   "image": "item_icons_16.png",
   "cellSize": 16,
   "columns": 8,
-  "rows": 10,
+  "rows": 14,
   "cells": {
     "dirt": [
       0,
