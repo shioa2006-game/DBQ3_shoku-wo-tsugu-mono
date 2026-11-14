@@ -27,4 +27,4 @@ npm.cmd start
 
 起動後、表示されたURLの `compare/ch4-5/characters/?c=suzuha` を開きます。PNGとSVGは単体でも確認できます。比較ページはHTTPサーバー経由で開いてください。
 
-第6〜7章は未実装のため、現時点の出力先はStudio内だけです。`game-targets.mjs` への追加や既存ゲームへの配布はしていません。
+2026-11-14に第6～7章（`dqb3-tsugumono-ch6-7`）へ移植しました。書き出し先は `shared/game-targets.mjs`、書き出し後に `npm.cmd run sync:games` でゲームへ写します。

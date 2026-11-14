@@ -16,6 +16,6 @@ npm.cmd test
 npm.cmd run test:compare -- varuga varuga-motions
 ```
 
-通常の生成先はStudio内だけです。`--preview-game` は移植先未登録として拒否します。移植時は頭・胴のPNGとリグ設定・首の曲線・材質処理を一緒に扱い、`motion.mjs`・開口頭PNGも含めて移植し、戦闘数値・AI・命中判定と動作を第6～7章で接続します。`output/comparison.png` のREFERENCEは流用元グロムの画像で、承認済みのヴァルガ原画ではありません。
+2026-11-14に第6～7章（`dqb3-tsugumono-ch6-7`）へ移植しました。頭・開口頭・胴のPNGは `shared/game-targets.mjs` の書き出し先へ `npm.cmd run sync:games` で写します。リグ（`rig.js`）・動作（`motion.mjs`）・造形の設定（`rig-profile.mjs`）は、ゲームの `src/entities/varuga-rig.js`・`varuga-motion.mjs`・`dragon-configs.js` に同じ内容の写しがあり、`tests/node/varuga.test.mjs` が一致を確かめます。ここを直したら、ゲーム側の写しも同じ内容に直してください。戦いの数値・AI・命中判定・頭別の耐久はゲーム側（`src/game/varuga-battle.js`、`dragon-configs.js` の `battle`）のものです。`output/comparison.png` のREFERENCEは流用元グロムの画像で、承認済みのヴァルガ原画ではありません。
 
 リグの `update()` に渡す `origin` は従来と同じ浮遊時の胴の基準位置です。地上の床は `origin.y - config.hover` として計算します。`setMotion()` で演出を開始し、`poseState.done` で終わりを確認できます。Studioの攻撃は描画確認用です。
