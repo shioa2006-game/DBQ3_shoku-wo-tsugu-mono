@@ -156,13 +156,15 @@ export const MOVIES = [
     links: [{ label: '制作メモ', href: 'ch7-flame-holds/README.md' }, { label: '絵コンテ', href: 'ch7-flame-holds/reference/storyboard.md' }],
   },
   {
-    id: 'M14', slug: 'ch7-unseen-books', title: 'ダーマ再興編・完「まだ見ぬ書へ」', saga: 'dharma', status: 'planned', buildStep: 5,
+    id: 'M14', slug: 'ch7-unseen-books', title: 'ダーマ再興編・完「まだ見ぬ書へ」', saga: 'dharma', status: 'prototype', buildStep: 5,
     when: '第7章・結末', place: 'スズハへの継承の後、ピノとベルクも乗せた最後の出航', length: '大・30～35秒', priority: 'A',
     summary: 'ダーマ再興編とこれまでの旅を締めくくる。ピノをジパング、ベルクを火山島へ送り届け、世界中の職業の書を探す旅へ。',
-    scenes: ['再開した神殿と、桟橋から出る船', 'ジパングでピノが降りる', '火山島でベルクが降りる', '四人と職業の書だけを乗せて、その先の海へ',
+    scenes: ['再開した神殿', '桟橋から出る船', 'ジパングでピノが降りる', '火山島でベルクが降りる', '四人と職業の書だけを乗せて、その先の海へ',
       '水平線。タイトル「ダーマ再興編・完」と「職をつぐ者」「完」'],
     cast: ['シオン', 'ミナ', 'ゴンタ', 'ワタリ', 'ピノ', 'ベルク', 'スズハ', 'アサギ', 'ガンゾウ', 'イナホ', 'ジンベエ', 'ナギ', 'ロク', 'カヤ', 'ヨモギ'],
     tone: ['#5b9cc8', '#ffe7a8'],
+    thumb: { scene: 2, t: 2600 },
+    links: [{ label: '制作メモ', href: 'ch7-unseen-books/README.md' }, { label: '絵コンテ', href: 'ch7-unseen-books/reference/storyboard.md' }],
   },
   {
     id: 'M2', slug: 'book-revival', title: '書の復活（共通の型）', saga: 'common', status: 'game', buildStep: 3,
