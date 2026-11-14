@@ -1,3 +1,5 @@
+import { buildSuzuhaSheet, suzuhaMarkup } from '../../prototypes/suzuha-8dir/character.mjs';
+import { buildGanzouSheet, ganzouMarkup } from '../../prototypes/ganzou-8dir/character.mjs';
 // 第4～5章の新しい人型（段階2）: 原本コードから出力が再現できること、頭と胴の担当が分かれていること、
 // ゲームのリグが切り出す範囲（頭・胴のUV窓、下端121px）に収まっていることを確かめる。
 import test from 'node:test';
@@ -18,11 +20,27 @@ import { buildAsagiSheet, asagiMarkup } from '../../prototypes/asagi-8dir/charac
 const require = createRequire(new URL('../../../dqb3-tsugumono-ch4-5/package.json', import.meta.url));
 const { PNG } = require('pngjs');
 // Drawn with the tunic on the art centre (exported with keepDrawnX); see prototypes/hero2-8dir/README.md.
-const DRAWN_X = new Set(['hero2', 'asagi']);
-const BUILDERS = { belk: buildBelkSheet, roku: buildRokuSheet, kaya: buildKayaSheet, nagi: buildNagiSheet, yomogi: buildYomogiSheet, sumi: buildSumiSheet, teru: buildTeruSheet, hero2: buildHero2Sheet, asagi: buildAsagiSheet };
+const DRAWN_X = new Set(['ganzou', 'hero2', 'asagi']);
+const BUILDERS = { suzuha: buildSuzuhaSheet, ganzou: buildGanzouSheet, belk: buildBelkSheet, roku: buildRokuSheet, kaya: buildKayaSheet, nagi: buildNagiSheet, yomogi: buildYomogiSheet, sumi: buildSumiSheet, teru: buildTeruSheet, hero2: buildHero2Sheet, asagi: buildAsagiSheet };
 const output = (id, file) => new URL(`../../prototypes/${id}-8dir/output/${file}`, import.meta.url);
 const png = async (id, file) => PNG.sync.read(await readFile(output(id, file)));
 const alpha = (image, cell, x, y) => image.data[((Math.floor(cell / 4) * 128 + y) * 512 + (cell % 4) * 128 + x) * 4 + 3];
+
+test('Ganzou and Suzuha retain editable layers and anatomical left-hip accessories', async () => {
+  for (const [id, build, markup] of [['ganzou', buildGanzouSheet, ganzouMarkup], ['suzuha', buildSuzuhaSheet, suzuhaMarkup]]) {
+    const svg = build();
+    assert.doesNotMatch(svg, /<image\b|<foreignObject\b|data:image\//, `${id}: ラスターを埋め込まず作画`);
+    const ids = Array.from(svg.matchAll(/\bid="([^"]+)"/g), m => m[1]);
+    assert.equal(new Set(ids).size, ids.length, `${id}: 方向間でクリップIDが重複しない`);
+    assert.doesNotMatch(build({ part: 'head' }), /data-part="torso"|data-accessory=/);
+    assert.doesNotMatch(build({ part: 'torso' }), /data-part="head"|clip-path="url\(#(?:ganzou|suzuha)-locks/);
+    for (const direction of ['right', 'back_right', 'back']) assert.doesNotMatch(markup(direction), /data-accessory="left-hip-/, `${id} ${direction}: 奥に隠れる小物を反対側へ反転しない`);
+    for (const direction of ['front', 'front_left', 'left', 'front_right']) assert.match(markup(direction), /data-accessory="left-hip-/, `${id} ${direction}: 左腰の小物が見える`);
+    assert.throws(() => markup('unknown'), /Unknown direction/);
+    const manifest = JSON.parse(await readFile(output(id, 'manifest.json'), 'utf8'));
+    assert.deepEqual(manifest.targets, [], `${id}: 未実装の章向けにStudio内へ保存`);
+  }
+});
 
 test('humanoid SVGs reproduce exactly from their authoring code', async () => {
   for (const [id, build] of Object.entries(BUILDERS)) {

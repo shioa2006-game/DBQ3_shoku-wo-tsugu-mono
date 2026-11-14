@@ -1,3 +1,5 @@
+import { SUZUHA_RIG_PROFILE, SUZUHA_RIG_COLORS } from '../../../prototypes/suzuha-8dir/rig-profile.mjs';
+import { GANZOU_RIG_PROFILE, GANZOU_RIG_COLORS } from '../../../prototypes/ganzou-8dir/rig-profile.mjs';
 // 第4～5章の新しい人型（段階2）の比較ページ。左は以前の画像と以前の手足の色、右はStudioでコードから
 // 描いた頭・胴の分離画像とリグ設定・手足の色。同じ3Dリグ・照明・道具で並べる。
 import * as THREE from 'three';
@@ -24,6 +26,22 @@ const studio = id => { const out = file => new URL(`../../../prototypes/${id}-8d
 const saved = (id, version) => { const out = file => new URL(`../../../prototypes/${id}-8dir/${version}/${file}`, import.meta.url).href;
   return { original: out(`${id}_code_body_8dir.png`), originalHead: out(`${id}_code_head_layer_8dir.png`), originalTorso: out(`${id}_code_torso_layer_8dir.png`) }; };
 const profiles = {
+  suzuha: { name: 'スズハ', title: '第6〜7章・元水汲み役・神殿の世話役候補', chapter: 'ダーマ再興編・制作中',
+    original: new URL('../../../prototypes/suzuha-8dir/output/reference-normalized.png', import.meta.url).href,
+    ...studio('suzuha'), tuning: SUZUHA_RIG_PROFILE, originalTuning: SUZUHA_RIG_PROFILE, colors: SUZUHA_RIG_COLORS,
+    note: '栗色の髪とこめかみの白髪、低いお団子と黄土色のリボン。くすんだ紫の作業着、生成りの前掛け、青灰色の腰布と左腰の手ぬぐい。',
+    leftLabel: '元画像v2（合成シート）', rightLabel: 'スズハ・SVG作画（頭と胴を分離）',
+    gridLabels: { generated: 'スズハ（SVG）', original: '元画像v2' },
+    status: '第6〜7章向けにStudioで制作中です。承認済み元画像v2から頭・胴のSVGと配置設定を制作しています。',
+  },
+  ganzou: { name: 'ガンゾウ', title: '第6〜7章・石切り職人', chapter: 'ダーマ再興編・制作中',
+    original: new URL('../../../prototypes/ganzou-8dir/output/reference-normalized.png', import.meta.url).href,
+    ...studio('ganzou'), tuning: GANZOU_RIG_PROFILE, originalTuning: GANZOU_RIG_PROFILE, colors: GANZOU_RIG_COLORS,
+    note: '短い銀髪、茶色の鉢巻き、太い灰色の眉と口ひげ。灰色の作業着と革の前掛け、左腰の石工用工具。',
+    leftLabel: '元画像v2（合成シート）', rightLabel: 'ガンゾウ・SVG作画（頭と胴を分離）',
+    gridLabels: { generated: 'ガンゾウ（SVG）', original: '元画像v2' },
+    status: '第6〜7章向けにStudioで制作中です。承認済み元画像v2から頭・胴のSVGと配置設定を制作しています。',
+  },
   asagi: { name: 'アサギ', title: '第6〜7章・大工見習い', chapter: 'ダーマ再興編・制作中',
     original: new URL('../../../prototypes/asagi-8dir/output/reference-normalized.png', import.meta.url).href,
     ...studio('asagi'), tuning: ASAGI_RIG_PROFILE, originalTuning: ASAGI_RIG_PROFILE, colors: ASAGI_RIG_COLORS,

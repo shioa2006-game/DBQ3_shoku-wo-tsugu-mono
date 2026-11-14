@@ -1,0 +1,152 @@
+{
+  "id": "ganzou",
+  "name": "ガンゾウ",
+  "role": "石切り職人",
+  "version": 1,
+  "status": "prototype",
+  "source": "../character.mjs",
+  "reference": "references/ganzou-8dir-v2.png",
+  "format": "game-humanoid-bust",
+  "cellSize": 128,
+  "columns": 4,
+  "rows": 2,
+  "directions": [
+    "front",
+    "front_left",
+    "left",
+    "back_left",
+    "back",
+    "back_right",
+    "right",
+    "front_right"
+  ],
+  "labels": [
+    "正面",
+    "左斜め前",
+    "左",
+    "左斜め後",
+    "背面",
+    "右斜め後",
+    "右",
+    "右斜め前"
+  ],
+  "anchor": {
+    "centerU": 0.494,
+    "bottomFromTop": 0.945,
+    "horizontal": "drawn tunic centre"
+  },
+  "normalization": [
+    {
+      "row": 0,
+      "col": 0,
+      "dx": 0,
+      "dy": 0,
+      "before": "0.488",
+      "after": "0.488",
+      "horizontal": "drawn"
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "dx": 0,
+      "dy": 0,
+      "before": "0.480",
+      "after": "0.480",
+      "horizontal": "drawn"
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "dx": 0,
+      "dy": 0,
+      "before": "0.484",
+      "after": "0.484",
+      "horizontal": "drawn"
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "dx": 0,
+      "dy": 0,
+      "before": "0.512",
+      "after": "0.512",
+      "horizontal": "drawn"
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "dx": 0,
+      "dy": 0,
+      "before": "0.488",
+      "after": "0.488",
+      "horizontal": "drawn"
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "dx": 0,
+      "dy": 0,
+      "before": "0.469",
+      "after": "0.469",
+      "horizontal": "drawn"
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "dx": 0,
+      "dy": 0,
+      "before": "0.496",
+      "after": "0.496",
+      "horizontal": "drawn"
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "dx": 0,
+      "dy": 0,
+      "before": "0.500",
+      "after": "0.500",
+      "horizontal": "drawn"
+    }
+  ],
+  "output": "ganzou_code_body_8dir.png",
+  "runtime": "HumanoidRig with separate headSheetUrl/bodySheetUrl; limbs and equipment supplied by the game",
+  "runtimeSheets": {
+    "headSheetUrl": "ganzou_code_head_layer_8dir.png",
+    "bodySheetUrl": "ganzou_code_torso_layer_8dir.png"
+  },
+  "rigColors": {
+    "sleeve": 5263439,
+    "hand": 15708524,
+    "pants": 5327682,
+    "boot": 6440499,
+    "headBack": 11841447,
+    "bodyBack": 9920572
+  },
+  "rigTuning": {
+    "bodyTopV": 0.54,
+    "armSep": 0.14,
+    "armRestTilt": 0.28,
+    "shoulderLift": 0.008,
+    "sleeveY": -0.105,
+    "headForward": 0.012,
+    "headDepth": 0.025,
+    "headOffsetY": -0.005,
+    "headLiftByDirection": {
+      "front": 0.012,
+      "front_left": 0.018,
+      "left": 0.016,
+      "back_left": 0.016,
+      "back": 0.012,
+      "back_right": 0.016,
+      "right": 0.016,
+      "front_right": 0.018
+    },
+    "bodyDepth": -0.008,
+    "toolOverHead": [
+      "front_right"
+    ]
+  },
+  "rigProfile": "../rig-profile.mjs",
+  "targets": []
+}

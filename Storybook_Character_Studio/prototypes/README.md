@@ -4,6 +4,8 @@
 
 | キャラクター | 制作原本・手順 | 出力 | 旧画像との対応（旧画像は比較用に保持） |
 |---|---|---|---|
+| ガンゾウ／石切り職人（第6〜7章、Studio内の試作） | [ganzou-8dir](ganzou-8dir/README.md) | [SVG](ganzou-8dir/output/ganzou-code.svg)・[頭](ganzou-8dir/output/ganzou_code_head_layer_8dir.png)・[胴](ganzou-8dir/output/ganzou_code_torso_layer_8dir.png)・[比較](ganzou-8dir/output/comparison.png) | 承認済み元画像 `references/ganzou-8dir-v2.png` |
+| スズハ／元水汲み役・神殿の世話役候補（第6〜7章、Studio内の試作） | [suzuha-8dir](suzuha-8dir/README.md) | [SVG](suzuha-8dir/output/suzuha-code.svg)・[頭](suzuha-8dir/output/suzuha_code_head_layer_8dir.png)・[胴](suzuha-8dir/output/suzuha_code_torso_layer_8dir.png)・[比較](suzuha-8dir/output/comparison.png) | 承認済み元画像 `references/suzuha-8dir-v2.png` |
 | アサギ／大工見習い（第6〜7章、Studio内の試作） | [asagi-8dir](asagi-8dir/README.md) | [SVG](asagi-8dir/output/asagi-code.svg)・[頭](asagi-8dir/output/asagi_code_head_layer_8dir.png)・[胴](asagi-8dir/output/asagi_code_torso_layer_8dir.png)・[比較](asagi-8dir/output/comparison.png) | 承認済みの8方向元画像 `references/asagi-8dir-v2.png` |
 | 以前の主人公（2026-11-07まで本編、比較用に両編へ残す） | [adventurer-8dir](adventurer-8dir/README.md) | [PNG](adventurer-8dir/output/adventurer_code_body_8dir.png) | `assets/adventurer_boy_body_8dir.png` |
 | 主人公シオン（試作03。2026-11-07から両編の主人公。試作02は `hero2-8dir/v02/`） | [hero2-8dir](hero2-8dir/README.md) | [頭](hero2-8dir/output/hero2_code_head_layer_8dir.png)・[胴体](hero2-8dir/output/hero2_code_torso_layer_8dir.png)・[比較用合成](hero2-8dir/output/hero2_code_body_8dir.png) | 8方向の設定画 `references/hero-redesign-8dir-v2.png`（頭）・`hero-redesign-8dir-v3.png`（胴） |

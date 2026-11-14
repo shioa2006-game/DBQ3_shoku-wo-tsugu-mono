@@ -1,5 +1,7 @@
 # Storybook Character Studio
 
+ガンゾウ・スズハの8方向SVG試作を追加しました。[ガンゾウの比較](compare/ch4-5/characters/?c=ganzou)・[スズハの比較](compare/ch4-5/characters/?c=suzuha)から元画像との比較、頭・胴の分離表示、手足つきの動作を確認できます。制作原本と成果物は `prototypes/ganzou-8dir/`・`prototypes/suzuha-8dir/` にあります。
+
 「職をつぐ者」の8方向キャラクターをコードで制作するフォルダです。現在は人型7人（主人公・ミナ・ピノ・イナホ・ゴンタ・ジンベエ・ワタリ）とスライム・おおこうもり・おおねずみ・どろたぼう・イカを管理しています。人型は頭・胴の画像と3D手足、モンスターは全身画像2枚の切り替えで確認します。
 
 - [制作一覧と移植対象](prototypes/README.md)
