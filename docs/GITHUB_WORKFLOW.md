@@ -20,7 +20,7 @@ git commit -m "変更内容"
 git push origin main
 ```
 
-新しい開発環境では親リポジトリをcloneし、ルートREADMEに従い2ゲームの依存関係をインストールします。子フォルダごとのcloneやremote設定は不要です。GitHubの認証は端末の既存の認証機構を利用し、トークンをURLや設定ファイルへ埋め込まないでください。
+新しい開発環境では親リポジトリをcloneし、ルートREADMEに従い3つのゲームの依存関係をインストールします。子フォルダごとのcloneやremote設定は不要です。GitHubの認証は端末の既存の認証機構を利用し、トークンをURLや設定ファイルへ埋め込まないでください。
 
 ## 管理するもの
 
@@ -40,7 +40,7 @@ npm.cmd run build
 Remove-Item Env:RELATIVE_ASSET_PATHS
 ```
 
-GitLab CI設定は廃止しました。現在は [GitHub Actions](../.github/workflows/pages.yml) が、`main` の共通トップ・両ゲーム・公開処理に関するpushを受けてGitHub Pagesへ自動公開します。`tools/build-portal.mjs` が相対URLで両ゲームを専用フォルダへビルドし、共通トップとまとめて配信します。Studioは公開対象外です。PagesのSourceは「GitHub Actions」に設定します。手動実行や確認方法は [共通トップのREADME](../portal/README.md) を参照してください。
+GitLab CI設定は廃止しました。現在は [GitHub Actions](../.github/workflows/pages.yml) が、`main` の共通トップ・3つのゲーム・公開処理に関するpushを受けてGitHub Pagesへ自動公開します。`tools/build-portal.mjs` が相対URLで3つのゲーム（第1～3章・第4～5章・第6～7章）を専用フォルダへビルドし、共通トップとまとめて配信します。Studioは公開対象外です。PagesのSourceは「GitHub Actions」に設定します。手動実行や確認方法は [共通トップのREADME](../portal/README.md) を参照してください。
 
 ## 履歴
 

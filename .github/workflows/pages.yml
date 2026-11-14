@@ -1,4 +1,4 @@
-name: 共通トップと両ゲームを公開
+name: 共通トップと3つのゲームを公開
 
 on:
   push:
@@ -11,6 +11,7 @@ on:
       - game-shared/**
       - dqb3-tsugumono-ch1-3/**
       - dqb3-tsugumono-ch4-5/**
+      - dqb3-tsugumono-ch6-7/**
       - .github/workflows/pages.yml
   workflow_dispatch:
 
@@ -33,17 +34,19 @@ jobs:
           cache-dependency-path: |
             dqb3-tsugumono-ch1-3/package-lock.json
             dqb3-tsugumono-ch4-5/package-lock.json
-      - name: 両ゲームの依存関係を準備
+            dqb3-tsugumono-ch6-7/package-lock.json
+      - name: 各ゲームの依存関係を準備
         run: |
           npm --prefix dqb3-tsugumono-ch1-3 ci
           npm --prefix dqb3-tsugumono-ch4-5 ci
+          npm --prefix dqb3-tsugumono-ch6-7 ci
       - name: 共通ゲーム部品の回帰テスト
         run: node --test game-shared/tests/*.test.mjs
-      - name: 共通トップと両ゲームをビルド
+      - name: 共通トップと3つのゲームをビルド
         id: build
         run: node tools/build-portal.mjs
-      - name: 公開用ビルドで両編の設計図を確認
-        timeout-minutes: 8
+      - name: 公開用ビルドで各編の設計図を確認
+        timeout-minutes: 12
         env:
           PORTAL_BUILD: ${{ steps.build.outputs.path }}
         run: |
@@ -52,7 +55,7 @@ jobs:
           trap 'kill "$server_pid"' EXIT
           base=http://127.0.0.1:5188/DBQ3_shoku-wo-tsugu-mono
           curl --fail --silent --show-error --retry 10 --retry-connrefused --retry-delay 1 "$base/" --output /dev/null
-          for game in dqb3-tsugumono-ch1-3 dqb3-tsugumono-ch4-5; do
+          for game in dqb3-tsugumono-ch1-3 dqb3-tsugumono-ch4-5 dqb3-tsugumono-ch6-7; do
             BASE_URL="$base/$game/" node "$game/tests/e2e/blueprint.test.mjs"
           done
       - uses: actions/upload-pages-artifact@v4

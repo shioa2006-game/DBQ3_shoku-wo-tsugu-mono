@@ -82,7 +82,7 @@ npm.cmd run test:e2e
 
 - Git管理は親 `DBQ3_shoku-wo-tsugu-mono` の1つだけ。[親のAGENTS.md](../AGENTS.md)と[運用手順](../docs/GITHUB_WORKFLOW.md)に従う。
 - このフォルダに `.git` を作らない。変更対象を指定して親でコミットする。既存の未コミット変更は無断で破棄しない。
-- 公開（共通トップの準備中ボタン、ポータルのビルド対象、`.github/workflows/pages.yml`）は、ユーザーの確認を得てから行う。
+- この編は公開の対象（共通トップのカード、`tools/build-portal.mjs`、`.github/workflows/pages.yml`。2026-11-14にユーザーの確認を得て追加）。`main` へpushすると、このフォルダの変更もGitHub Pagesへ公開されるので、pushはユーザーが頼んだときだけ行う。公開前に、公開処理がこの編の `tests/e2e/blueprint.test.mjs` を相対URLで実行する。
 - `vite.config.js` の既定baseは `/dqb3-tsugumono-ch6-7/`。相対URLでの出力は `RELATIVE_ASSET_PATHS=1` を指定する。
 
 ## 作業完了時

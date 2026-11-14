@@ -1,11 +1,11 @@
-// 共通トップと2ゲームを、既存distとは別の新規ディレクトリへまとめる。
+// 共通トップと3つのゲームを、既存distとは別の新規ディレクトリへまとめる。
 import { cp, mkdir, mkdtemp, access, writeFile, appendFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
-const games = ["dqb3-tsugumono-ch1-3", "dqb3-tsugumono-ch4-5"];
+const games = ["dqb3-tsugumono-ch1-3", "dqb3-tsugumono-ch4-5", "dqb3-tsugumono-ch6-7"];
 
 function run(args, cwd) {
   return new Promise((resolve, reject) => {
@@ -21,7 +21,7 @@ function run(args, cwd) {
 }
 
 try {
-  // 先に2ゲームの依存関係を確認。自動インストールや既存成果物の削除は行わない。
+  // 先に各ゲームの依存関係を確認。自動インストールや既存成果物の削除は行わない。
   for (const game of games) {
     await access(path.join(root, game, "node_modules/vite/bin/vite.js"));
   }
@@ -34,7 +34,7 @@ try {
   await cp(path.join(root, "portal/images"), path.join(output, "portal/images"), { recursive: true });
   await writeFile(path.join(output, ".nojekyll"), "");
 
-  // 同じテストポートを使わず、2ゲームを順番にビルドする。
+  // 同じテストポートを使わず、ゲームを順番にビルドする。
   for (const game of games) {
     console.log(`\n${game} を共通ページ用にビルドします。`);
     await run([
