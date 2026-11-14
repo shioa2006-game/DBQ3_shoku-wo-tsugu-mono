@@ -52,6 +52,55 @@ try {
     await page.locator('.stage').screenshot({ path: fileURLToPath(new URL(`${direction}.png`, output)) });
   }
   assert.equal(images.size, 8);
+  // 頭だけの描画と、接続する首を足した描画を比較する。
+  // 頭の不透明な内部が変われば、首が頭の手前へ突き抜けている。
+  for (const direction of DIRECTIONS) {
+    const overwritten = await page.evaluate(async direction => {
+      const p = window.__dragonPreview;
+      p.setState({ direction, paused: true }); p.pose();
+      const rig = p.rigs[1];
+      const THREE = await import('/games/ch4-5/node_modules/three/build/three.module.js');
+      // MSAAの境界サンプル混合を避け、頭の不透明画素の深度だけを検査する。
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
+      renderer.outputColorSpace = p.renderer.outputColorSpace;
+      renderer.setSize(1072, 480, false);
+      const visibility = [];
+      p.scene.traverse(o => visibility.push([o, o.visible]));
+      const width = renderer.domElement.width, height = renderer.domElement.height;
+      const gl = renderer.getContext();
+      const capture = () => {
+        renderer.render(p.scene, p.camera);
+        const pixels = new Uint8Array(width * height * 4);
+        gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+        return pixels;
+      };
+      let changed = 0, covered = 0, maxDelta = 0;
+      try {
+        renderer.setScissorTest(false); renderer.setViewport(0, 0, width, height);
+        p.scene.children.forEach(o => { o.visible = o.isLight || o === rig.group; });
+        for (const head of rig.heads) {
+          rig.group.children.forEach(o => { o.visible = o === head.sprite.group; });
+          const alone = capture();
+          head.neck.forEach(s => { s.visible = true; });
+          const joined = capture();
+          for (let y = 1; y < height - 1; y++) for (let x = 1; x < width - 1; x++) {
+            const i = (y * width + x) * 4;
+            if ([-width - 1, -width, -width + 1, -1, 0, 1, width - 1, width, width + 1]
+              .some(offset => alone[i + offset * 4 + 3] !== 255)) continue;
+            covered++;
+            const delta = Math.max(...[0, 1, 2].map(channel => Math.abs(alone[i + channel] - joined[i + channel])));
+            maxDelta = Math.max(maxDelta, delta);
+            if (delta > 2) changed++;
+          }
+        }
+        return { changed, covered, maxDelta };
+      } finally {
+        visibility.forEach(([o, visible]) => { o.visible = visible; }); renderer.dispose(); p.draw();
+      }
+    }, direction);
+    assert.ok(overwritten.covered > 300, `${direction}: 三頭の内部を検査できる`);
+    assert.equal(overwritten.changed, 0, `${direction}: 首が頭の表面を覆わない ${JSON.stringify(overwritten)}`);
+  }
   // 長い中央の首を含め、浮遊中も隣接する球が連続してつながる。
   for (const time of [0, .8, 1.6, 3.2, 5.4]) {
     const connected = await page.evaluate(time => {

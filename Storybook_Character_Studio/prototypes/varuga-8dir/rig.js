@@ -41,13 +41,26 @@ export class VarugaRig extends DragonRig {
       const head = this.heads[i], mount = c.heads[i];
       const base = new THREE.Vector3(origin.x + rx * mount.side * .15,
         this.body.group.position.y + .92 * c.bodyScale, origin.z + rz * mount.side * .15);
-      // 後頭部の下へ入り、最後は上向きにつなぐ。横顔の顎へ首が突き刺さらないようにする。
-      const end = head.sprite.group.position.clone().add(new THREE.Vector3(
-        -fx * .22 * c.headScale, .28 * c.headScale, -fz * .22 * c.headScale)).addScaledVector(away, .1);
+      // 頭はカメラへ向いた平面。後頭部への横ずれだけを画像面に投影し、
+      // 奥行きは首先の半径ぶん確保する（固定の .1 では球面が頭を突き抜ける）。
+      const back = new THREE.Vector3(-fx, 0, -fz);
+      back.addScaledVector(away, -back.dot(away));
+      const tipRadius = head.neck.at(-1).geometry.parameters.radius;
+      const end = head.sprite.group.position.clone().addScaledVector(back, .22 * c.headScale);
+      end.y += .20 * c.headScale;
+      end.addScaledVector(away, tipRadius + .06);
       const lower = base.clone().add(new THREE.Vector3(rx * mount.side * .12, .85, rz * mount.side * .12));
       const upper = end.clone().add(new THREE.Vector3(0, -.75, 0));
       const curve = new THREE.CubicBezierCurve3(base, lower, upper, end);
-      head.neck.forEach((segment, j) => segment.position.copy(curve.getPoint(j / (head.neck.length - 1))));
+      head.neck.forEach((segment, j) => {
+        const t = j / (head.neck.length - 1);
+        segment.position.copy(curve.getPoint(t));
+        // 接続付近の太い節も画像の裏へ収める。下側から滑らかに補正する。
+        const blend = THREE.MathUtils.smoothstep(t, .45, .65);
+        const depth = segment.position.clone().sub(head.sprite.group.position).dot(away);
+        const clearance = segment.geometry.parameters.radius + .06;
+        segment.position.addScaledVector(away, Math.max(0, clearance - depth) * blend);
+      });
     }
   }
 }
