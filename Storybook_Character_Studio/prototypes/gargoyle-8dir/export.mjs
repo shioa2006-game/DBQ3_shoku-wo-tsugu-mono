@@ -17,5 +17,5 @@ await exportMonster({
   build:buildHeavyGroundSheet,
   references:{a:'gargoyle-landed-v2.png',b:'gargoyle-landed-v2.png'},
   summary:'肩・胸・前腕を厚くした地上静止姿勢。A/Bは同一。飛行・攻撃は未制作。', reportPrefix:'heavy-ground-',
-  runtime:{scale:1,tint:0xffffff,yOffset:0},
+  runtime:{scale:1.3,tint:0xffffff,yOffset:0},
 });

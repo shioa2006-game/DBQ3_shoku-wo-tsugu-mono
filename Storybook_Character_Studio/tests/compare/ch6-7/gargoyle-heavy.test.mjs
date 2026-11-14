@@ -32,7 +32,7 @@ try {
     assert.deepEqual(result.directions,[direction,direction]);
     assert.ok(result.urls[0].endsWith('gargoyle_ground_code_idle_a_8dir.png'));
     assert.ok(result.urls[1].endsWith('gargoyle_heavy_ground_code_idle_a_8dir.png'));
-    assert.deepEqual(result.scales[0],result.scales[1],'通常型と重装型を同倍率で比較');
+    for(const axis of [0,1]) assert.ok(Math.abs(result.scales[1][axis]/result.scales[0][axis]-1.3)<1e-9,'重装型は通常型の1.3倍');
     renders.add(result.after);
     if(['front','front_left','left','back_left','back','back_right'].includes(direction)) {
       await page.locator('.stage').screenshot({path:new URL(`../../../work/gargoyle-heavy/${direction}.png`,import.meta.url).pathname.replace(/^\/([A-Z]:)/,'$1')});

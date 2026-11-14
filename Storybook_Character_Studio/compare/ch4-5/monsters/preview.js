@@ -35,9 +35,9 @@ const MONSTERS = {
     variants: [['飛行',1,0xffffff,true], ['地上',1,0xffffff,false]] },
   gargoyle_heavy: { name:'岩砕きのガーゴイル', chapter:'ダーマ再興編', art:'gargoyle_heavy_ground',
     output:new URL('../../../prototypes/gargoyle-8dir/output/',import.meta.url),
-    referenceArt:'gargoyle_ground', staticPose:true,
-    note:'壁を壊す大型ガーゴイルの静止造形。幅広い胸、厚い肩と前腕、低く構えた岩の拳。左の通常型と同じ倍率で比較できます。',
-    variants:[['静止造形（同倍率で比較）',1,0xffffff,false]] },
+    referenceArt:'gargoyle_ground', referenceScale:1, staticPose:true,
+    note:'壁を壊す大型ガーゴイルの静止造形。幅広い胸、厚い肩と前腕、低く構えた岩の拳。左の通常型は1倍、右の岩砕きは1.3倍で比較できます。',
+    variants:[['静止造形（1.3倍）',1.3,0xffffff,false]] },
 };
 const ids = Object.keys(MONSTERS);
 const params = new URLSearchParams(location.search);
@@ -73,10 +73,10 @@ if (m.design) {
 }
 if(m.staticPose) {
   document.querySelector('.eyebrow').textContent = `MONSTER STUDY / ${m.chapter}`;
-  $('reference-label').textContent = '通常ガーゴイル（同倍率）';
+  $('reference-label').textContent = '通常ガーゴイル（1倍）';
   $('pose').replaceChildren(new Option('静止姿勢','a'));
   $('pose').disabled = true;
-  $('scene').setAttribute('aria-label','通常ガーゴイルと岩砕きのガーゴイルの静止造形を同倍率で比較');
+  $('scene').setAttribute('aria-label','通常型1倍と岩砕き1.3倍の静止造形を比較');
   $('ref-a').previousElementSibling.textContent = '通常ガーゴイル・地上A';
   $('code-a').previousElementSibling.textContent = '岩砕きのガーゴイル・静止姿勢';
   $('ref-a').alt = '通常ガーゴイルの8方向';
@@ -108,9 +108,10 @@ function build() {
     for (const f of ['a','b']) $('ref-'+f).previousElementSibling.textContent = caption;
     $('production-note').textContent = flying ? '第7章の制作素材。斜め後ろの参照には背面を表示します。' : '第7章の制作素材。左は着地修正版の1方向、右はコードで描いた8方向です。';
   }
-  rigs = [original, drawn].map(s => { const r = new MonsterSprite({ sheetAUrl: s[0], sheetBUrl: s[1], scale, tint, yOffset: flying ? .4 : 0 }); scene.add(r.group); return r; });
-  shadows = rigs.map(() => {
-    const s = new THREE.Mesh(new THREE.CircleGeometry(.3 * scale, 48), new THREE.MeshBasicMaterial({ color: 0x657966, transparent: true, opacity: .2, depthWrite: false }));
+  const scales = [m.referenceScale ?? scale, scale];
+  rigs = [original, drawn].map((s,i) => { const r = new MonsterSprite({ sheetAUrl: s[0], sheetBUrl: s[1], scale:scales[i], tint, yOffset: flying ? .4 : 0 }); scene.add(r.group); return r; });
+  shadows = rigs.map((_,i) => {
+    const s = new THREE.Mesh(new THREE.CircleGeometry(.3 * scales[i], 48), new THREE.MeshBasicMaterial({ color: 0x657966, transparent: true, opacity: .2, depthWrite: false }));
     s.rotation.x = -Math.PI / 2; s.position.y = .002; s.scale.y = .8; scene.add(s); return s;
   });
   // Frame the camera on the sprite's size, at the gameplay camera's angle (8.2 / 11.5).
@@ -157,7 +158,7 @@ function frame(now) {
   const dt = state.paused ? 0 : Math.min(.05, last ? (now - last) / 1000 : 0); last = now; elapsed += dt;
   if (state.auto && (turn += dt) > 1.1) { turn = 0; setState({ direction: directions[(directions.indexOf(state.direction) + 1) % 8] }); }
   pose(elapsed);
-  $('status').textContent = ready() ? (m.staticPose ? `${labels[directions.indexOf(state.direction)]} / 静止姿勢 · 通常型と同倍率 · Studio試作` : `${labels[directions.indexOf(state.direction)]} / ポーズ${rigs[0].usingA ? 'A' : 'B'} · ${m.variants[state.variant][0]} · 本編と同じ倍率・色・表示方式`) : '読み込み中…';
+  $('status').textContent = ready() ? (m.staticPose ? `${labels[directions.indexOf(state.direction)]} / 静止姿勢 · 通常型1倍 / 岩砕き1.3倍 · Studio試作` : `${labels[directions.indexOf(state.direction)]} / ポーズ${rigs[0].usingA ? 'A' : 'B'} · ${m.variants[state.variant][0]} · 本編と同じ倍率・色・表示方式`) : '読み込み中…';
   requestAnimationFrame(frame);
 }
 // Only exposed by this dedicated prototype page for visual checks.
