@@ -31,12 +31,23 @@ try {
           const v = h.sprite.group.position.clone(); v.y += p.rigs[1].config.headScale;
           return v.project(p.camera).toArray();
         }),
+        neckAngles: p.rigs[1].heads.map(h => {
+          const start = h.neck[0].position.clone().project(p.camera);
+          const end = h.neck.at(-1).position.clone().project(p.camera);
+          const canvas = document.querySelector('canvas');
+          return Math.atan2(Math.abs(end.y - start.y) * canvas.clientHeight,
+            Math.abs(end.x - start.x) * canvas.clientWidth / 2) * 180 / Math.PI;
+        }),
       };
     });
     assert.deepEqual(result.counts, [2, 3]);
     assert.ok(result.frozen);
     assert.ok(result.directions.every(d => d === direction));
     assert.ok(result.bounds.every(v => Math.abs(v[0]) < 1 && Math.abs(v[1]) < 1), '頭が画面内に収まる');
+    if (direction === 'front') for (const i of [0, 2]) {
+      assert.ok(result.neckAngles[i] >= 35 && result.neckAngles[i] <= 60,
+        `左右の首は正面で約45度に立ち上がる: ${result.neckAngles[i]}`);
+    }
     images.add(result.data);
     await page.locator('.stage').screenshot({ path: fileURLToPath(new URL(`${direction}.png`, output)) });
   }

@@ -4,10 +4,13 @@ export { DIRECTIONS, LABELS } from '../shared/sheet-format.mjs';
 
 // 外見確認用の試作色。ストーリー上の確定色ではない。
 export const VARUGA_PALETTE = Object.freeze({
-  ink: '#211a2b', scale: '#4d3b60', scaleLight: '#806b91', scaleDark: '#2b2339',
-  belly: '#b3955c', bellyLight: '#dbc28a', bellyDark: '#76603d',
-  horn: '#b4a794', hornLight: '#eee0bf', hornDark: '#75695e',
-  eye: '#ec9d31', eyeLight: '#ffe5a3', pupil: '#210e0d', claw: '#d6c7a6',
+  ink: '#291516', scale: '#a2392b', scaleLight: '#f0aa7d', scaleDark: '#461c21',
+  belly: '#b88744', bellyLight: '#f4d394', bellyDark: '#68462d',
+  horn: '#a4a3ad', hornLight: '#faf1de', hornDark: '#494650',
+  eye: '#ffc13c', eyeLight: '#fff6b7', pupil: '#210e0d', claw: '#d1c9c5',
 });
-export const buildVarugaHeadSheet = (options = {}) => buildGromHeadSheet({ ...options, palette: { ...VARUGA_PALETTE, ...options.palette } });
-export const buildVarugaBodySheet = (options = {}) => buildGromBodySheet({ ...options, palette: { ...VARUGA_PALETTE, ...options.palette } });
+// 鱗の面に細い明部を置き、赤銅の反射を表現する。流用元グロムの原本は変更しない。
+const copperFinish = svg => svg.replace(/(<linearGradient id="scale"[^>]*>).*?(<\/linearGradient>)/,
+  '$1<stop stop-color="var(--scaleLight)"/><stop offset=".28" stop-color="var(--scale)"/><stop offset=".43" stop-color="var(--scaleDark)"/><stop offset=".51" stop-color="var(--scaleLight)"/><stop offset=".64" stop-color="var(--scale)"/><stop offset="1" stop-color="var(--scaleDark)"/>$2');
+export const buildVarugaHeadSheet = (options = {}) => copperFinish(buildGromHeadSheet({ ...options, palette: { ...VARUGA_PALETTE, ...options.palette } }));
+export const buildVarugaBodySheet = (options = {}) => copperFinish(buildGromBodySheet({ ...options, palette: { ...VARUGA_PALETTE, ...options.palette } }));

@@ -196,50 +196,54 @@
     "name": "三頭魔竜ヴァルガ",
     "bodyScale": 2.1,
     "headScale": 1.65,
-    "neckColor": 5061472,
+    "neckColor": 9846316,
     "tint": 16777215,
     "hover": 1.5,
+    "metal": {
+      "specular": 7950404,
+      "shininess": 32
+    },
+    "neckSegments": 32,
     "wings": {
       "span": 4.6,
       "height": 3.1,
       "flapSpeed": 2.3,
-      "membraneColor": 6901871,
-      "boneColor": 3155516
+      "membraneColor": 7941424,
+      "boneColor": 7420714
     },
     "heads": [
       {
-        "side": -2.6,
-        "forward": 2.2,
-        "up": 2.7,
+        "side": -2,
+        "forward": 2,
+        "up": 5.3,
         "swoop": {
           "period": 4.2,
-          "down": 0.28,
-          "forward": 0.18
+          "down": 0.2,
+          "forward": 0.12
         }
       },
       {
         "side": 0,
-        "forward": -1,
-        "up": 4.3,
+        "forward": 0.8,
+        "up": 5.6,
         "swoop": {
           "period": 5.4,
-          "down": 0.24,
-          "forward": 0.15
+          "down": 0.18,
+          "forward": 0.1
         }
       },
       {
-        "side": 2.6,
-        "forward": 2.2,
-        "up": 2.7,
+        "side": 2,
+        "forward": 2,
+        "up": 5.3,
         "swoop": {
           "period": 4.8,
-          "down": 0.28,
-          "forward": 0.18
+          "down": 0.2,
+          "forward": 0.12
         }
       }
     ],
     "rig": "../rig.js",
-    "neckSegments": 18,
     "config": "../rig-profile.mjs",
     "paletteStatus": "provisional"
   },

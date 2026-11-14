@@ -28,7 +28,7 @@ const grid = new THREE.GridHelper(24, 48, 0xc1cfc4, 0xcbd6cc); grid.position.y =
 const rigs = configs.map((c, i) => { const r = i === 0 ? new DragonRig(c) : new VarugaRig(c); scene.add(r.group); return r; });
 const origin = new THREE.Vector3(0, GROM_CONFIG.hover, 0);
 // The gameplay camera's angle (8.2 / 11.5), pulled back to fit the wings.
-const d = 17.5; camera.position.set(0, 3.3 + d * 8.2 / 11.5, d); camera.lookAt(0, 3.3, 0);
+const d = 18.5; camera.position.set(0, 4 + d * 8.2 / 11.5, d); camera.lookAt(0, 4, 0);
 const state = { direction: 'front', auto: false, paused: true };
 let turn = 0, last = 0;
 function setState(next) {

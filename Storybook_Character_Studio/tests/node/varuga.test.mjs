@@ -9,6 +9,7 @@ test('ヴァルガの生成設定は三頭の原本と一致し、ゲームへ�
   const manifest = JSON.parse(await readFile(new URL('../../prototypes/varuga-8dir/output/manifest.json', import.meta.url), 'utf8'));
   for (const [key, value] of Object.entries(VARUGA_PROFILE)) assert.deepEqual(manifest.runtime[key], value, key);
   assert.equal(manifest.runtime.heads.length, 3);
+  assert.ok(VARUGA_PROFILE.heads[1].forward > 0, '中央の頭は胴より前へ出す');
   assert.deepEqual(manifest.targets, []);
   const result = spawnSync(process.execPath, [fileURLToPath(new URL('../../prototypes/varuga-8dir/export.mjs', import.meta.url)), '--preview-game'], { encoding: 'utf8' });
   assert.notEqual(result.status, 0);

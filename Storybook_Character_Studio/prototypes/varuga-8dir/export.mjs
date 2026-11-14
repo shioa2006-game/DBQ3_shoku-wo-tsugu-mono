@@ -8,6 +8,6 @@ await exportDragon({
     head: { build: buildVarugaHeadSheet, reference: 'dragons/grom_head_8dir.png' },
     body: { build: buildVarugaBodySheet, reference: 'dragons/grom_body_8dir.png' },
   },
-  summary: 'Grom-derived study / violet scales, antique gold plates, ivory horns / provisional palette',
-  runtime: { ...VARUGA_PROFILE, class: 'VarugaRig extends DragonRig', rig: '../rig.js', neckSegments: 18, config: '../rig-profile.mjs', paletteStatus: 'provisional' },
+  summary: 'Grom-derived study / red copper scales, gold plates, silver horns / provisional palette',
+  runtime: { ...VARUGA_PROFILE, class: 'VarugaRig extends DragonRig', rig: '../rig.js', config: '../rig-profile.mjs', paletteStatus: 'provisional' },
 });
