@@ -5,7 +5,8 @@
 // 3. 失敗が1つでもあれば非0で終了
 //
 // 使い方:  npm run test:e2e            全テスト（重い通し含む）
-//          npm run test:ci             高速サブセットのみ（--fast: sheets + smoke + visuals）
+//          npm run test:ci             高速サブセットのみ（--fast: sheets + smoke + visuals + アイコン・設置物・ムービー）
+//   TEST_ONLY=chapter7,smoke で名前の一部から絞れる。TEST_PORT=4178 でプレビューのポートを変えられる。
 //   TEST_CONCURRENCY=N で同時実行数を指定。
 // ブラウザ解決は tests/helpers.mjs 参照（PW_CHROMIUM_PATH で明示指定可能）。
 
@@ -18,7 +19,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PORT = Number(process.env.TEST_PORT ?? 4176); // 既存2編（4174）と重ならない
 const BASE_URL = `http://localhost:${PORT}/dqb3-tsugumono-ch6-7/`;
-const TEST_TIMEOUT_MS = 240_000;
+const TEST_TIMEOUT_MS = 540_000; // 全編の通し（full-run）が、同時実行で4分を超えることがある
 const CONCURRENCY = Math.max(
   1,
   Number(process.env.TEST_CONCURRENCY) || Math.min(2, (os.cpus()?.length ?? 2) - 1),
@@ -26,11 +27,19 @@ const CONCURRENCY = Math.max(
 
 // 実行時間の目安（長いものから投入して待ち時間を最小化）。未知は中間値。
 const WEIGHT = {
-  "chapter5.test.mjs": 110,
-  "chapter4.test.mjs": 70,
+  "full-run.test.mjs": 260,
+  "chapter7.test.mjs": 170,
+  "varuga-retry.test.mjs": 115,
+  "defeat-retry.test.mjs": 70,
+  "chapter6.test.mjs": 65,
+  "shortage.test.mjs": 50,
+  "save-coexist.test.mjs": 46,
+  "texture-retry.test.mjs": 44,
+  "raid-save.test.mjs": 37,
+  "quality-input.test.mjs": 32,
+  "movies.test.mjs": 27,
   "jobs.test.mjs": 25,
   "worldversion.test.mjs": 23,
-  "region-gate.test.mjs": 15,
   "newgame-state.test.mjs": 12,
   "inventory.test.mjs": 10,
 };

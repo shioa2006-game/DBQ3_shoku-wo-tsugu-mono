@@ -128,7 +128,8 @@ export const RECIPES = [
   { out: "dharma_pillar", n: 1, cost: { dharma_stone: 2 }, station: "bench", unlock: "CH6_ROOF" },
   { out: "roof", n: 2, cost: { plank: 2 }, station: "bench", unlock: "CH6_ROOF" },
   { out: "lantern", n: 2, cost: { plank: 1, torch: 1 }, station: "bench", unlock: "CH6_ROOF" },
-  { out: "emblem", n: 1, cost: { plank: 2, iron_fitting: 1 }, station: "bench", unlock: "CH6_ROOF" },
+  // 書の紋章は、戦後の「神殿の再開」に必ず要る。鉄が尽きても作り直せるよう、木と石だけで作る。
+  { out: "emblem", n: 1, cost: { plank: 2, dharma_stone: 1 }, station: "bench", unlock: "CH6_ROOF" },
   { out: "builder_feast", n: 1, cost: { meat: 1, fish: 1, mushroom: 1 }, station: "kamado", unlock: "CH6_ROOF" },
   // --- 祭壇と暮らしの設備 ---------------------------------------------------------------
   { out: "flame_bowl", n: 1, cost: { dharma_stone: 3, torch: 1 }, station: "bench", unlock: "CH6_ALTAR" },

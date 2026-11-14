@@ -8,7 +8,7 @@ import { B, BLOCK_DEFS, isSolidFor } from "./world/blocks.js";
 import { VoxelWorld, WORLD, PLACES, FISH_SPOTS, RAID_ROUTE, FLOOR_Y, TERRACE_Y, inCave, shipCells } from "./world/world.js";
 import { ChunkRenderer } from "./world/mesher.js";
 import { PropRenderer } from "./world/props.js";
-import { ITEMS, Inventory, itemForBlock, onItemIconsReady, itemIconReport, itemIcon } from "./game/items.js";
+import { ITEMS, RECIPES, Inventory, itemForBlock, onItemIconsReady, itemIconReport, itemIcon } from "./game/items.js";
 import { QuestManager, stageIndex } from "./game/quests.js";
 import { WAVES } from "./game/quests7.js";
 import { JobManager } from "./game/jobs.js";
@@ -222,6 +222,8 @@ class Game {
 
     // Debug / automation hook.
     this.itemIcons = { report: itemIconReport, icon: itemIcon };
+    // 自動テスト用: アイテム・レシピ・設計図の定義（資材が足りない状態からの復帰の確認に使う）。
+    this.defs = { ITEMS, RECIPES, BLUEPRINTS, BLOCK_DEFS, itemForBlock };
     window.__game = this;
     console.info(`職をつぐ者 ダーマ再興編 build ${BUILD_ID}`);
   }
@@ -441,6 +443,14 @@ class Game {
   autosave() {
     if (!this.started || this.quests.busy || this.battleActive) return;
     writeSave(this);
+  }
+
+  // 持ちもの・預かり・すべての収納箱を合わせた数（物語の品を渡し直すかどうかの判断に使う）。
+  ownedCount(id) {
+    let n = this.inventory.count(id);
+    for (const [rid, rn] of this.pendingRewards) if (rid === id) n += rn;
+    for (const chest of this.storage.storages.values()) n += chest.count(id);
+    return n;
   }
 
   // --- quest facade ------------------------------------------------------------------
@@ -877,7 +887,7 @@ class Game {
     const blockers = buildCellBlockers(cell, {
       player: this.player,
       villagers: this.villagers,
-      monsters: this.monsters.monsters.filter((m) => m.root),
+      monsters: this.monsters.monsters,
       villagersPassThrough: !isSolidFor(cell.block, "villager"),
     });
     if (blockers.hard.length) {
@@ -1357,7 +1367,8 @@ class Game {
     this.updateCamera(dt);
     this.input.endFrame();
     // ムービーは不透明な全画面の iframe で覆うので、その間は3Dを描かない。
-    if (!this.movies.open) this.renderer.render(this.scene, this.camera);
+    // skipRender は自動テストの早送り用（時間だけ進める。大量の描画がたまると、実時間のループが滞る）。
+    if (!this.movies.open && !this.skipRender) this.renderer.render(this.scene, this.camera);
   }
 
   // 世界停止中（会話・メニュー）の見た目だけの同期。

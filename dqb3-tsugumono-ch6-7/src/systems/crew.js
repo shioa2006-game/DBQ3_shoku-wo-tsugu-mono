@@ -84,7 +84,7 @@ export class BuildCrew {
       const blockers = buildCellBlockers(cell, {
         player: g.player,
         villagers: g.villagers,
-        monsters: g.monsters.monsters.filter((m) => m.root),
+        monsters: g.monsters.monsters,
         villagersPassThrough: !isSolidFor(cell.block, "villager"),
       });
       if (blockers.hard.length) continue;

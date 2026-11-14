@@ -105,6 +105,7 @@ export class Chapter7 {
       SFX.book();
       this.play([...CH7.dialogues.ballistaDone, ...CH7.dialogues.pillarDone], () => {
         this.quests.setStage("CH7_FINAL_PREP");
+        this.showRepair(); // 防衛線などに壊れた場所が残っていれば、任意の修理の枠を出す
         g.autosave();
       });
     }
@@ -120,6 +121,9 @@ export class Chapter7 {
   repairParts() {
     const done = this.game.blueprints.completed;
     const parts = ["frame", "roof", "altar"];
+    // 初襲来の後の修理（物語で必ず要る）は、神殿の本体だけ。門・ボウガン・とげ罠は鉄を使うので
+    // 必須にしない（鉄が尽きても先へ進める）。防衛線の枠は、後の準備の段階でまた出す。
+    if (this.stage === "CH7_REPAIR" && !this.flags.repairDone) return parts;
     if (done.has("defense_line")) parts.push("defense");
     if (done.has("ballista_tower")) parts.push("tower");
     if (done.has("great_ballista")) parts.push("ballista");
@@ -245,6 +249,13 @@ export class Chapter7 {
         SFX.book();
         g.onStageChanged();
       });
+      return true;
+    }
+    // ベルク: 大矢が足りなければ、打っておいた分を渡す（鉄が尽きても最終決戦に挑めるように）。
+    if (villagerId === "belk" && (this.stage === "CH7_BALLISTA" || this.stage === "CH7_FINAL_PREP")) {
+      const have = g.inventory.count("great_bolt");
+      if (have >= 5) return false;
+      this.play(d.belkBolts, () => g.giveItems([["great_bolt", 6 - have]]));
       return true;
     }
     // ピノがアサギの屋根を確かめ、仕事を託す。
@@ -483,7 +494,7 @@ export class Chapter7 {
     const i = stageIndex(this.stage);
     setRepairParts(this.repairParts());
     // 準備の段階では、壊れた場所の修復ガイドを出し直す（別の設計図が出ていれば、そちらを優先）。
-    const prep = ["CH7_PREP2", "CH7_PREP3", "CH7_OMEN"].includes(this.stage) ||
+    const prep = ["CH7_PREP2", "CH7_PREP3", "CH7_OMEN", "CH7_FINAL_PREP"].includes(this.stage) ||
       (this.stage === "CH7_REPAIR" && !this.flags.repairDone);
     if (prep && !this.game.blueprints.active) this.showRepair();
     void i;

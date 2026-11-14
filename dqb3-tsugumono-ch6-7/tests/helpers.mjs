@@ -238,10 +238,17 @@ export async function reloadAndContinue(page) {
 
 // ゲーム内の時間を seconds 秒ぶん進める（ヘッドレスの描画は遅いので、フレームを直接回す）。
 // 会話などで世界が止まっている間は進まない。
+// 早送りの間は描画を省く（g.skipRender）。ソフトウェア描画へ何百フレームも一度に積むと、その後しばらく
+// ブラウザの描画ループ（requestAnimationFrame）が回らず、実時間で待つ処理がタイムアウトする。
 export async function fastForward(page, seconds) {
   await page.evaluate((n) => {
     const g = window.__game;
-    for (let i = 0; i < n; i += 1) g.frame(0.05);
+    g.skipRender = true;
+    try {
+      for (let i = 0; i < n; i += 1) g.frame(0.05);
+    } finally {
+      g.skipRender = false;
+    }
   }, Math.ceil(seconds / 0.05));
 }
 

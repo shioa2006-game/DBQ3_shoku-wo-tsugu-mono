@@ -118,6 +118,8 @@ export class Chapter6 {
       const p = g.player.pos;
       if (p.z < 11.5 && inCave(p.x, p.y, p.z) && p.distanceTo(this.crab.pos) < 7) {
         this.play(CH6.dialogues.crabWakes, () => {
+          // 戦いの最中のポーズのセーブが書く「開始直前の状態」（大岩ガニは積み石のまま）。
+          g.saveCheckpoint();
           this.crab.awaken();
           BGM.play("boss");
           this.quests.setStage("CH6_CRAB", true);
@@ -351,7 +353,13 @@ export class Chapter6 {
     if (kind === "wedge") {
       if (this.stage !== "CH6_KEYSTONE") return true;
       if (!g.inventory.has("wedge", 1)) {
-        this.play(d.wedgeNeed, () => g.giveItems([["wedge", 3 - (this.quests.counters.wedges ?? 0)]]));
+        // なくしたときだけ渡し直す。預かり分や収納箱にあるなら渡さない（調べるたびに増えてしまう）。
+        const lacking = 3 - (this.quests.counters.wedges ?? 0) - g.ownedCount("wedge");
+        if (lacking <= 0) {
+          g.throttledToast("wedgekept", "🔺 くさびは 収納箱か預かりにある。持ちものへ入れてから 打とう");
+          return true;
+        }
+        this.play(d.wedgeNeed, () => g.giveItems([["wedge", lacking]]));
         return true;
       }
       g.inventory.remove("wedge", 1);

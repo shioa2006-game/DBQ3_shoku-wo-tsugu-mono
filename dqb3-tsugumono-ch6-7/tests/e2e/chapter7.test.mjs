@@ -126,11 +126,13 @@ try {
     m.pos.set(24.5, 12.1, 53.5);
     m.vel.set(0, 0, 0);
     let flew = false;
+    g.skipRender = true; // 時間だけ進める（helpers の fastForward と同じ）
     for (let i = 0; i < 260 && !flew; i += 1) {
       g.frame(0.05);
       flew = m.state === "flyin";
     }
     for (let i = 0; i < 120 && m.state === "flyin"; i += 1) g.frame(0.05);
+    g.skipRender = false;
     return { flew, state: m.state, dead: m.dead, y: m.pos.y, z: m.pos.z };
   });
   expect(lost.flew && (lost.dead || (lost.state === "march" && lost.y > 13.5 && lost.z > 54)),
