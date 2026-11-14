@@ -8,6 +8,7 @@
 - 第7章制作計画: [三つ首の空](../docs/story/planned/chapter7.md)（神殿防衛と三頭魔竜ヴァルガの最終決戦）
 - ストーリームービー: [第6～7章のムービー計画](../docs/story/planned/chapter6-7-movies.md)（5本。Studioで作り、このゲームへ組み込む）
 - 着手前の確認: [未解決の不整合](../docs/story/inconsistencies.md)。過去章の説明は第1～5章の実装を基準にします。
+- 実装の依頼文: [IMPLEMENTATION_BRIEF.md](docs/IMPLEMENTATION_BRIEF.md)（2026-11-14。ストーリー・キャラクター・ムービーの準備が終わり、Fable 5.2 に実装を任せるときの指示。守るストーリーの決定と、任せる設計の範囲）
 
 制作は、キャラクター（Studio）→ ストーリー資料 → ショートムービー（Studio）→ このゲーム、の順に進めます（[制作の順序](../docs/story/planned/chapter6-7-scenario.md)）。神殿の形（崩れた神殿跡と再建後の外観）はムービーに合わせて設計図を作ります。島の向き・寸法・坂道・桟橋・麓の集落などの地形と配置はゲームで決めてよく、決まった後にムービーの島を合わせ直します（[分担表](../docs/story/planned/chapter6-7-scenario.md#movie-game-alignment)）。
 
