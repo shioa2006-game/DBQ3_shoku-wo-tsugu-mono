@@ -407,7 +407,7 @@ export class UI {
         <div class="panel-title">そうさ方法 <span class="hint">クリックで閉じる</span></div>
         <div class="help-grid">
           <div><b>WASD / 矢印</b> 移動</div><div><b>Space</b> ジャンプ</div>
-          <div><b>左クリック</b> 置く・攻撃／<b>左ボタン長押し</b> ハンマーで採掘</div><div><b>右クリック / F</b> 調べる・話す</div>
+          <div><b>左クリック</b> 置く・攻撃／<b>左ボタン長押し</b> ハンマーで採掘</div><div><b>右クリック</b> 指した人・設備を操作<br><b>F</b> 正面の近い人・設備を操作</div>
           <div><b>1〜8 / ホイール</b> 持ち物選択</div><div><b>E</b> もちもの・クラフト</div>
           <div><b>Q / [ / ]</b> カメラ回転（8方向）</div><div><b>B</b> 職業の書</div>
           <div><b>M</b> サウンドON/OFF</div><div><b>Esc</b> ポーズ（セーブ）</div>

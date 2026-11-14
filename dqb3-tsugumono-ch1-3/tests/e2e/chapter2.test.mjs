@@ -229,6 +229,7 @@ try {
     const gonta = g.villager("gonta");
     // 食事の席は隣り合うマスなので、1マス離れると隣の席の住民の方が近いことがある。ゴンタのすぐそばで話す。
     g.player.pos.set(gonta.pos.x + 0.05, gonta.pos.y, gonta.pos.z);
+    g.player.faceToward(gonta.pos.x, gonta.pos.z);
   });
   await page.keyboard.press("f");
   await advanceToChoice(page); // 会話を進めて選択肢が出るまで待つ

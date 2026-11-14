@@ -1,0 +1,25 @@
+.interaction-hints {
+  position: absolute;
+  left: 50%;
+  bottom: 100px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+  max-width: 90vw;
+}
+.interaction-hints[hidden], .interaction-hint[hidden] { display: none; }
+.interaction-hint {
+  padding: 5px 12px;
+  border: 2px solid #ffdf72;
+  border-radius: 8px;
+  background: rgba(10, 16, 38, 0.94);
+  color: #ffdf72;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  text-shadow: 1px 1px 2px #000;
+}
+.interaction-hint.facing { color: #83dfff; border-color: #83dfff; }

@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import { InteractionTargets } from "../../game-shared/interactions.mjs";
+import "../../game-shared/interactions.css";
 import { cellInReach, pickBlueprintCell } from "../../game-shared/blueprint-target.mjs";
 import { buildCellBlockers, clearVillagersFromCell } from "../../game-shared/build-clearance.mjs";
 import { StoryMovies } from "../../game-shared/story-movies.mjs";
@@ -192,6 +194,7 @@ class Game {
     this.started = false;
     this.wasPaused = false; // 前フレームにモーダルUIが開いていたか
     this.graceT = 0; // 会話・メニューを閉じた直後の被弾猶予（秒）
+    this.interactions = new InteractionTargets({ THREE, game: this, blockDefs: BLOCK_DEFS, reach: REACH });
     this.clock = new THREE.Clock();
 
     // Title screen over the live scene.
@@ -903,27 +906,19 @@ class Game {
 
   // --- interact ---------------------------------------------------------------------
 
-  interact() {
-    // Villagers first.
-    let nearest = null;
-    let nearestD = 2.6;
-    for (const v of this.villagers) {
-      const d = v.pos.distanceTo(this.player.pos);
-      if (d < nearestD) {
-        nearestD = d;
-        nearest = v;
-      }
-    }
-    if (nearest) {
-      nearest.facePlayer(this.player.pos);
-      this.player.faceToward(nearest.pos.x, nearest.pos.z);
-      if (!this.quests.onTalk(nearest.id)) this.smallTalk(nearest);
+  interact(source = "pointer") {
+    this.interactions.update();
+    const target = source === "facing" ? this.interactions.facingTarget : this.interactions.pointerTarget;
+    if (!target) return;
+    if (target.kind === "villager") {
+      const v = target.villager;
+      v.facePlayer(this.player.pos);
+      this.player.faceToward(v.pos.x, v.pos.z);
+      if (!this.quests.onTalk(v.id)) this.smallTalk(v);
       return;
     }
-    // Props under the cursor.
-    if (!this.aim) return;
-    const { x, y, z } = this.aim.cell;
-    const def = BLOCK_DEFS[this.aim.id];
+    const { x, y, z } = target.cell;
+    const def = BLOCK_DEFS[target.id];
     switch (def?.interact) {
       case "craft":
         this.ui.openMenu(this.menuCtx({ bench: true }));
@@ -1071,7 +1066,8 @@ class Game {
       this.ui.setHotbar(this.inventory);
     }
 
-    if (input.pressed("f") || input.rawButtonPressed(2)) this.interact();
+    if (input.rawButtonPressed(2)) this.interact("pointer");
+    else if (input.pressed("f")) this.interact("facing");
 
     this.primaryAction(dt);
   }
@@ -1149,6 +1145,7 @@ class Game {
     this.blueprints.update(time);
     this.chunks.flushDirty();
     this.updateCamera(dt);
+    this.interactions.update();
     this.input.endFrame();
     // ムービーは不透明な全画面の iframe で覆うので、その間は3Dを描かない。
     if (!this.movies.open) this.renderer.render(this.scene, this.camera);

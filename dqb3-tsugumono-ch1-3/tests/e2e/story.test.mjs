@@ -81,7 +81,9 @@ try {
   await page.evaluate(() => {
     const g = window.__game;
     const mina = g.villager("mina");
-    g.player.pos.set(mina.pos.x + 1, mina.pos.y, mina.pos.z);
+    // 東側には木があるので、空いた西側から話しかける。
+    g.player.pos.set(mina.pos.x - 1, mina.pos.y, mina.pos.z);
+    g.player.faceToward(mina.pos.x, mina.pos.z);
   });
   await page.waitForTimeout(200);
   await page.keyboard.press("f");
@@ -151,6 +153,7 @@ try {
     const g = window.__game;
     const gonta = g.villager("gonta");
     g.player.pos.set(gonta.pos.x + 1, gonta.pos.y, gonta.pos.z);
+    g.player.faceToward(gonta.pos.x, gonta.pos.z);
   });
   await page.keyboard.press("f");
   await advanceToChoice(page); // 会話を進めて選択肢が出るまで待つ

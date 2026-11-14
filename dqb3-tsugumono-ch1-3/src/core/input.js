@@ -5,7 +5,7 @@ export class Input {
     this.dom = domElement;
     this.keys = new Set();
     this.pressedKeys = new Set(); // cleared each frame
-    this.mouse = { x: 0, y: 0, ndcX: 0, ndcY: 0 };
+    this.mouse = { x: 0, y: 0, ndcX: 0, ndcY: 0, inside: false };
     this.buttons = new Set();
     this.pressedButtons = new Set();
     this.wheelDelta = 0;
@@ -24,15 +24,20 @@ export class Input {
     window.addEventListener("blur", () => {
       this.keys.clear();
       this.buttons.clear();
+      this.mouse.inside = false;
     });
 
-    window.addEventListener("mousemove", (e) => {
+    const updateMouse = (e) => {
+      this.mouse.inside = e.target === domElement;
       this.mouse.x = e.clientX;
       this.mouse.y = e.clientY;
       this.mouse.ndcX = (e.clientX / window.innerWidth) * 2 - 1;
       this.mouse.ndcY = -(e.clientY / window.innerHeight) * 2 + 1;
-    });
+    };
+    window.addEventListener("mousemove", updateMouse);
+    domElement.addEventListener("mouseleave", () => { this.mouse.inside = false; });
     domElement.addEventListener("mousedown", (e) => {
+      updateMouse(e);
       this.buttons.add(e.button);
       this.pressedButtons.add(e.button);
     });

@@ -159,7 +159,7 @@ export class VoxelWorld {
   }
 
   // Amanatides & Woo voxel traversal. Returns {x,y,z,id,nx,ny,nz,dist} or null.
-  raycast(origin, dir, maxDist) {
+  raycast(origin, dir, maxDist, acceptsBlock = () => true) {
     let x = Math.floor(origin.x);
     let y = Math.floor(origin.y);
     let z = Math.floor(origin.z);
@@ -181,7 +181,7 @@ export class VoxelWorld {
       // 「掘っても消えず、ドロップだけ湧き続ける無限の石」になってしまう。
       if (this.inBounds(x, y, z)) {
         const id = this.get(x, y, z);
-        if (id !== B.AIR && id !== B.WATER) {
+        if (id !== B.AIR && id !== B.WATER && acceptsBlock(id)) {
           return { x, y, z, id, nx, ny, nz, dist };
         }
       }

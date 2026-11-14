@@ -38,6 +38,7 @@ const WEIGHT = {
 // --fast: PR 必須ゲート用の高速・決定論サブセットだけを回す。
 const FAST_ONLY = process.argv.includes("--fast");
 const FAST = new Set([
+  "interaction.test.mjs",
   "sheets.test.mjs",
   "smoke.test.mjs",
   "hud-hearts.test.mjs",
