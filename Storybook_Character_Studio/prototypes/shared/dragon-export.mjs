@@ -10,10 +10,11 @@ import { launchBrowser } from '../../../dqb3-tsugumono-ch4-5/tests/helpers.mjs';
 const require = createRequire(new URL('../../../dqb3-tsugumono-ch4-5/package.json', import.meta.url));
 const { PNG } = require('pngjs');
 
-export async function exportDragon({ id, name, role, sheets, summary, runtime }) {
-  const character = CHARACTERS.find(c => c.id === id);
+export async function exportDragon({ id, name, role, sheets, summary, runtime, studioFolder }) {
+  const character = CHARACTERS.find(c => c.id === id) ?? (studioFolder ? { folder: studioFolder, targets: [] } : null);
   if (!character) throw Error(`${id} is not listed in game-targets.mjs`);
   const previewGame = process.argv.includes('--preview-game');
+  if (previewGame && !character.targets.length) throw Error(`${id}: ゲームへの移植先は未登録です。Studio内で確認してください。`);
   const unknown = process.argv.slice(2).filter(arg => arg !== '--preview-game');
   if (unknown.length) throw Error(`Unknown arguments: ${unknown.join(', ')}`);
   const here = file => new URL(`../${character.folder}/${file}`, import.meta.url);

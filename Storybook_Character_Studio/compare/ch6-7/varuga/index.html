@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- Studioのサーバー（start-studio.bat）で開く。three と本編のコードは、サーバーが配る games/ch4-5/ から読む。 -->
+<script type="importmap">{"imports":{"three":"../../../games/ch4-5/node_modules/three/build/three.module.js"}}</script>
+<title>三頭魔竜ヴァルガの造形試作</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%232f3d68'/%3E%3C/svg%3E">
+<style>
+:root{font-family:"Yu Gothic UI",Meiryo,sans-serif;color:#263f4e;background:#efeee6;font-synthesis:none}*{box-sizing:border-box}body{margin:0}main{max-width:1120px;margin:auto;padding:32px 24px 48px}.eyebrow{font-size:12px;letter-spacing:.16em;color:#6a7e84;font-weight:700}h1{font-size:30px;letter-spacing:.03em;margin:8px 0}p{font-size:14px;line-height:1.8;margin:10px 0;color:#5e727c}.bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:20px 0}button{font:inherit;font-size:13px;border:1px solid #b8c6c6;border-radius:8px;background:#fafbf6;color:#2b4856;padding:9px 14px;cursor:pointer}button:hover{border-color:#3a798d}button[aria-pressed=true]{color:#fff;background:#28576c;border-color:#28576c}.directions{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}.stage{position:relative;margin-top:14px;border:1px solid #c1cdca;border-radius:18px;background:#dce4de;overflow:hidden}.stage canvas{display:block;width:100%;height:480px}.labels{position:absolute;top:20px;left:0;width:100%;display:flex;text-align:center;pointer-events:none}.labels>span{width:50%;font-size:13px;letter-spacing:.08em;font-weight:700}.tag{font-size:11px;color:#607b83;font-weight:400;display:block;letter-spacing:0;margin-top:5px}#status{min-height:24px;font-size:12px}section{margin-top:28px}h2{font-size:17px;margin-bottom:6px}.sheets{display:grid;grid-template-columns:1fr 1fr;gap:16px}.sheet{padding:18px;border-radius:14px;background:#dce4de;min-width:0}.sheet img{width:100%;height:auto;image-rendering:pixelated}.sheet strong{font-size:12px}.links{display:flex;gap:10px;flex-wrap:wrap}.links a{color:#245b72;font-size:13px;padding:6px 12px;border:1px solid #b8c6c6;border-radius:8px;background:#fafbf6;text-decoration:none}.note{padding:15px 18px;background:#e4e8de;border-radius:10px;font-size:13px}#error{color:#a63232}@media(max-width:650px){main{padding:22px 14px}h1{font-size:23px}.directions{grid-template-columns:repeat(4,1fr)}.stage canvas{height:340px}.sheets{grid-template-columns:1fr}.labels{top:14px}}
+</style></head><body><main>
+<div class="eyebrow">DRAGON STUDY / 第6〜7章</div>
+<h1>三頭魔竜ヴァルガ</h1>
+<p class="note">グロムを基にした三つの頭と大きな翼。中央の頭を高く、左右の首を広げています。濃い紫の鱗・古金色の腹・象牙色の角は試作色です。まず静止した造形を8方向で確認できます。</p>
+<div class="bar"><button id="motion" aria-pressed="false">浮遊を再生</button><button id="rotate" aria-pressed="false">8方向を順に見る</button></div>
+<div class="directions" id="directions"></div>
+<div class="stage"><div class="labels"><span>グロム<span class="tag">BASE</span></span><span>ヴァルガ<span class="tag">PROTOTYPE</span></span></div><canvas id="scene" aria-label="グロムと三頭魔竜ヴァルガを同じ倍率で並べた比較"></canvas></div>
+<p id="status" role="status">読み込み中…</p><p id="error" role="alert"></p>
+<section><h2>8方向シート（頭・胴）</h2><p>4列 × 2行、1セル128px、透明背景。首・翼・尾は画像に含めず、本編の3Dで表示します。</p>
+<div class="sheets"><div class="sheet"><strong>グロム・頭</strong><img id="ref-head" alt="グロムの頭の8方向シート"></div><div class="sheet"><strong>ヴァルガ・頭</strong><img id="code-head" alt="コードで描いた頭の8方向シート"></div>
+<div class="sheet"><strong>グロム・胴</strong><img id="ref-body" alt="グロムの胴の8方向シート"></div><div class="sheet"><strong>ヴァルガ・胴</strong><img id="code-body" alt="コードで描いた胴の8方向シート"></div></div></section>
+<p class="note">左右は同じカメラ・倍率です。グロムの頭・胴の造形を受け継ぎ、首・翼・尾をつないだ試作です。浮遊はグロムの動きを基にした確認用で、着地・攻撃・頭別耐久は今後制作します。</p>
+<div class="bar links"><a href="../../../">Studioへ戻る</a><a href="../../ch4-5/monsters/">モンスターの比較</a><a href="../../ch4-5/characters/">人型の比較</a></div>
+</main><script type="module" src="./preview.js"></script></body></html>
