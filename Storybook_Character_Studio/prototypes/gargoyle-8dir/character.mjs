@@ -131,7 +131,8 @@ function draw(view,frame,flying,heavy=false) {
   const tailPts=[[0,40,-5],[1,29,-16],[3,25,-27],[5,28,-33],[5,32,-32]].map(project);
   const tail=slab(tube(tailPts,[4,3.5,2.8,1.8,.5]),'#777580');
   const [hx,hy]=P(0,heavy?74:71,heavy?10:7);
-  const head=group(hx,hy,`<g transform="scale(.84)">${face(view)}</g>`);
+  // 重装型は全身を1.3倍表示するため、頭部だけ逆倍率にして通常型と同じ大きさに保つ。
+  const head=group(hx,hy,`<g transform="scale(${heavy?.84/1.3:'.84'})">${face(view)}</g>`);
   const rear=view>=3;
   const trunk=foot(-1)+arm(-1)+foot(1)+body;
   if(view===3) return trunk+arm(1)+wing(-1)+wing(1)+head+tail;

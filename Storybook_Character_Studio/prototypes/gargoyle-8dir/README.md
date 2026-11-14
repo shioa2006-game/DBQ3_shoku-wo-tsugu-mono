@@ -15,3 +15,5 @@ Studioで `npm.cmd run export:gargoyle` を実行すると、`output/` に飛行
 `npm.cmd run export:gargoyle` で通常型と一緒に再生成する。出力は `output/gargoyle_heavy_ground_code_idle_{a,b}_8dir.{svg,src.png,png}` と `heavy-ground-manifest.json`・`heavy-ground-comparison.png`。既存の `MonsterSprite` 用にA/Bを出力するが、静止試作のため両方は同じ画像。比較ボードの参照は通常型の着地設定画であり、重装型の専用設定画ではない。ゲームへは移植しない。
 
 確認: `npm.cmd test` と `npm.cmd run test:compare -- gargoyle gargoyle-heavy`。
+
+頭部は通常型と同じ見かけの大きさになるよう、作画時に1/1.3へ縮小した。全身の表示倍率1.3と組み合わせ、胸・肩・前腕の量感を強める。顔・耳・角を一緒に縮小し、頭の取付位置と体の造形は維持する。
