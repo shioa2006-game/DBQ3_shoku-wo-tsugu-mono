@@ -49,9 +49,13 @@ function face(view) {
 }
 
 // 肩から腰までの石の面と腕脚の節は共通。x は左右、h は高さ、z は前方。
-function draw(view,frame,flying,heavy=false) {
+function draw(view,frame,flying,heavy=false,attack=false) {
   const angle=view*Math.PI/4, c=Math.cos(angle), s=Math.sin(angle);
-  const project=([x,h,z])=>[63+c*x-s*z,115-h+.23*(s*x+c*z)];
+  const project=([x,h,z])=>{
+    // 振り下ろしでは腰から上を前へ倒す。接地している足は動かさない。
+    if(attack && frame==='b') { const lean=Math.max(0,h-38); h-=lean*.16; z+=lean*.18; }
+    return [63+c*x-s*z,115-h+.23*(s*x+c*z)];
+  };
   const P=(x,h,z)=>project([x,h,z]);
   const poly=(vertices,color)=>slab(points(vertices.map(project)),color);
   function block(start,end,r1,r2) {
@@ -65,7 +69,7 @@ function draw(view,frame,flying,heavy=false) {
   const b=frame==='b';
   function wing(side) {
     const root=[side*(heavy?11:8),62,-7];
-    const w=(x,h,z)=>P(side*x*(heavy?1.22:1),h,z).join(' ');
+    const w=(x,h,z)=>P(side*x*(heavy&&!flying?1.22:1),h,z).join(' ');
     const base=project(root).join(' ');
     if(!flying) {
       // 各肩に独立した一枚。先端も背骨を越えず同じ側の腰へ下がる。
@@ -86,7 +90,7 @@ function draw(view,frame,flying,heavy=false) {
       +line(`M${base} Q${w(17,72,-8)} ${wrist} Q${w(47,b?68:89,-17)} ${tip}`,'#96939c',2);
   }
   function foot(side) {
-    // 重装型の試作は両足を接地した静止姿勢。歩行・攻撃は後で制作する。
+    // 重装型は地上で踏ん張り、飛行中は足を後ろへ引く。
     const step=flying||heavy?0:side*(b?1:-1);
     const hip=[side*(heavy?11:8),39,0], knee=[side*(heavy?17:13),25,8+step*3];
     const ankle=[side*(heavy?15:10),flying?16:8+(step>0?8:0),flying?-7:step*6];
@@ -99,8 +103,13 @@ function draw(view,frame,flying,heavy=false) {
   }
   function arm(side) {
     if(heavy) {
-      const shoulder=[side*20,64,1], elbow=[side*29,47,7], hand=[side*28,33,17];
-      const v=(x,h,z)=>[side*x,h,z];
+      const tilt=attack?(b?-25:-100)*Math.PI/180:0;
+      const v=(x,h,z)=>{
+        if(!attack) return [side*x,h,z];
+        const dh=h-64,dz=z-1;
+        return [side*x,64+Math.cos(tilt)*dh-Math.sin(tilt)*dz,1+Math.sin(tilt)*dh+Math.cos(tilt)*dz];
+      };
+      const shoulder=v(20,64,1), elbow=v(29,47,7), hand=v(28,33,17);
       // 肩と前腕の張り出しで壁破壊役の輪郭を作る。手は低く構えた岩の拳。
       return block(shoulder,elbow,11,8)+block(elbow,hand,12,10)
         +poly([v(12,65,3),v(18,72,1),v(27,69,0),v(30,61,3),v(23,57,8),v(15,59,7)],'var(--stone)')
@@ -145,3 +154,5 @@ export const buildFlightSheet = options => monsterSheet(options,palette,'',(view
 export const buildGroundSheet = options => monsterSheet(options,palette,'',(view,frame)=>draw(view,frame,false));
 // 静止試作。表示リグ用のA/Bは同じ造形で、角・耳・顔は通常型を共有する。
 export const buildHeavyGroundSheet = options => monsterSheet(options,palette,'',view=>draw(view,'a',false,true));
+export const buildHeavyFlightSheet = options => monsterSheet(options,palette,'',(view,frame)=>draw(view,frame,true,true));
+export const buildHeavyAttackSheet = options => monsterSheet(options,palette,'',(view,frame)=>draw(view,frame,false,true,true));

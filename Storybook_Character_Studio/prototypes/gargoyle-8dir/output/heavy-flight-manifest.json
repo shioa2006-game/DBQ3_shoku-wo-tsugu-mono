@@ -1,0 +1,212 @@
+{
+  "id": "gargoyle_heavy_flight",
+  "name": "岩砕きのガーゴイル",
+  "role": "飛行",
+  "version": 1,
+  "status": "prototype",
+  "source": "../character.mjs",
+  "format": "game-monster-billboard",
+  "cellSize": 128,
+  "columns": 4,
+  "rows": 2,
+  "directions": [
+    "front",
+    "front_left",
+    "left",
+    "back_left",
+    "back",
+    "back_right",
+    "right",
+    "front_right"
+  ],
+  "labels": [
+    "正面",
+    "左斜め前",
+    "左",
+    "左斜め後",
+    "背面",
+    "右斜め後",
+    "右",
+    "右斜め前"
+  ],
+  "anchor": {
+    "centerU": 0.494,
+    "bottomFromTop": 0.945
+  },
+  "frames": [
+    {
+      "frame": "a",
+      "output": "gargoyle_heavy_flight_code_idle_a_8dir.png",
+      "normalization": [
+        {
+          "row": 0,
+          "col": 0,
+          "dx": 0,
+          "dy": 15,
+          "bbox": "6-119/14-106",
+          "before": "0.488",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "dx": -9,
+          "dy": 12,
+          "bbox": "21-123/11-109",
+          "before": "0.563",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "dx": -4,
+          "dy": 11,
+          "bbox": "36-98/12-110",
+          "before": "0.523",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 3,
+          "dx": -9,
+          "dy": 12,
+          "bbox": "21-123/15-109",
+          "before": "0.563",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 0,
+          "dx": 0,
+          "dy": 15,
+          "bbox": "6-119/18-106",
+          "before": "0.488",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 1,
+          "dx": 10,
+          "dy": 12,
+          "bbox": "2-104/15-109",
+          "before": "0.414",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "dx": 5,
+          "dy": 11,
+          "bbox": "27-89/12-110",
+          "before": "0.453",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 3,
+          "dx": 10,
+          "dy": 12,
+          "bbox": "2-104/11-109",
+          "before": "0.414",
+          "after": "0.492"
+        }
+      ]
+    },
+    {
+      "frame": "b",
+      "output": "gargoyle_heavy_flight_code_idle_b_8dir.png",
+      "normalization": [
+        {
+          "row": 0,
+          "col": 0,
+          "dx": 0,
+          "dy": 15,
+          "bbox": "6-119/23-106",
+          "before": "0.488",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "dx": -9,
+          "dy": 12,
+          "bbox": "21-123/22-109",
+          "before": "0.563",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "dx": -4,
+          "dy": 11,
+          "bbox": "36-98/20-110",
+          "before": "0.523",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 3,
+          "dx": -9,
+          "dy": 12,
+          "bbox": "21-123/19-109",
+          "before": "0.563",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 0,
+          "dx": 0,
+          "dy": 15,
+          "bbox": "6-119/18-106",
+          "before": "0.488",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 1,
+          "dx": 10,
+          "dy": 12,
+          "bbox": "2-104/19-109",
+          "before": "0.414",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "dx": 5,
+          "dy": 11,
+          "bbox": "27-89/20-110",
+          "before": "0.453",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 3,
+          "dx": 10,
+          "dy": 12,
+          "bbox": "2-104/22-109",
+          "before": "0.414",
+          "after": "0.492"
+        }
+      ]
+    }
+  ],
+  "runtime": {
+    "class": "MonsterSprite",
+    "interval": 0.38,
+    "uv": {
+      "uMin": 0.02,
+      "uMax": 0.98,
+      "vMin": 0.02,
+      "vMax": 0.98
+    },
+    "scale": 1.3,
+    "tint": 16777215,
+    "yOffset": 0.4
+  },
+  "references": [
+    "references/gargoyle-flight-4dir-v1.png",
+    "references/gargoyle-flight-4dir-v1.png"
+  ],
+  "targets": []
+}

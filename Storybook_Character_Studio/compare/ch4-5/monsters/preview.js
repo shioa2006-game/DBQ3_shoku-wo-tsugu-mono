@@ -35,9 +35,9 @@ const MONSTERS = {
     variants: [['飛行',1,0xffffff,true], ['地上',1,0xffffff,false]] },
   gargoyle_heavy: { name:'岩砕きのガーゴイル', chapter:'ダーマ再興編', art:'gargoyle_heavy_ground',
     output:new URL('../../../prototypes/gargoyle-8dir/output/',import.meta.url),
-    referenceArt:'gargoyle_ground', referenceScale:1, staticPose:true,
-    note:'壁を壊す大型ガーゴイルの静止造形。幅広い胸、厚い肩と前腕、低く構えた岩の拳。左の通常型は1倍、右の岩砕きは1.3倍で比較できます。',
-    variants:[['静止造形（1.3倍）',1.3,0xffffff,false]] },
+    referenceArt:'gargoyle_ground', referenceScale:1, modes:['ground','flight','attack'],
+    note:'体は1.3倍、頭は通常型と同じ大きさ。飛行は翼の上げ下げ、攻撃は両腕の振りかぶりと振り下ろしです。左の通常型と比較できます。',
+    variants:[['静止',1.3,0xffffff,false],['飛行',1.3,0xffffff,true],['攻撃',1.3,0xffffff,false]] },
 };
 const ids = Object.keys(MONSTERS);
 const params = new URLSearchParams(location.search);
@@ -71,34 +71,44 @@ if (m.design) {
   }
   $('production-note').textContent = '第6章に向けてStudioで制作中。左は通常姿勢の参照画、右はコードで描いた8方向・2姿勢です。';
 }
-if(m.staticPose) {
+if(m.modes) {
   document.querySelector('.eyebrow').textContent = `MONSTER STUDY / ${m.chapter}`;
   $('reference-label').textContent = '通常ガーゴイル（1倍）';
-  $('pose').replaceChildren(new Option('静止姿勢','a'));
-  $('pose').disabled = true;
-  $('scene').setAttribute('aria-label','通常型1倍と岩砕き1.3倍の静止造形を比較');
-  $('ref-a').previousElementSibling.textContent = '通常ガーゴイル・地上A';
-  $('code-a').previousElementSibling.textContent = '岩砕きのガーゴイル・静止姿勢';
-  $('ref-a').alt = '通常ガーゴイルの8方向';
-  $('code-a').alt = '岩砕きのガーゴイルの静止8方向';
-  for(const el of ['ref-b','code-b']) $(el).parentElement.hidden = true;
-  document.querySelector('section h2').textContent = '静止造形の8方向シート';
-  document.querySelector('section > p').textContent = '4列 × 2行、1セル128px、透明背景。今回は静止姿勢のみです。';
-  $('production-note').textContent = '第7章向けの静止試作です。飛行・歩行・振りかぶり・振り下ろしは今後制作します。';
+  $('scene').setAttribute('aria-label','通常型1倍と岩砕き1.3倍の姿勢と動作を比較');
 }
+
 
 const renderer = new THREE.WebGLRenderer({ canvas: $('scene'), antialias: true, alpha: true, preserveDrawingBuffer: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.outputColorSpace = THREE.SRGBColorSpace;
 const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(32, 1, .1, 60);
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.MeshBasicMaterial({ color: 0xdce4de })); floor.rotation.x = -Math.PI / 2; scene.add(floor);
 const grid = new THREE.GridHelper(16, 64, 0xc1cfc4, 0xcbd6cc); grid.position.y = .001; scene.add(grid);
-const state = { direction: 'front', pose: m.staticPose?'a':'auto', variant: 0, auto: false, water: false, paused: false };
+const state = { direction: 'front', pose: m.modes?'a':'auto', variant: 0, auto: false, water: false, paused: false };
+const heavyMode = () => m.modes?.[state.variant];
 let rigs = [], shadows = [], elapsed = 0, turn = 0, last = 0;
 function build() {
   for (const r of rigs) scene.remove(r.group);
   for (const s of shadows) scene.remove(s);
   const [, scale, tint, flying] = m.variants[state.variant];
-  const [original, drawn] = ground && !flying ? ground : [ref, code];
+  const mode=heavyMode();
+  const normal = mode==='flight' ? studioSheets('gargoyle_flight') : ref;
+  const [original, drawn] = mode ? [normal,studioSheets('gargoyle_heavy_'+mode)] : ground && !flying ? ground : [ref, code];
+  if(mode) {
+    const names=mode==='attack'?['振りかぶり','振り下ろし']:mode==='flight'?['翼を上げる','翼を下げる']:['静止姿勢','静止姿勢'];
+    $('pose').replaceChildren(...(mode==='ground' ? [new Option('静止姿勢','a')] : [new Option('A/Bを交互に','auto'),new Option('A：'+names[0],'a'),new Option('B：'+names[1],'b')]));
+    $('pose').disabled=mode==='ground';
+    for(const [i,f] of ['a','b'].entries()) {
+      $('ref-'+f).previousElementSibling.textContent='通常型・'+(mode==='flight'?'飛行'+f.toUpperCase():'地上A');
+      $('code-'+f).previousElementSibling.textContent='岩砕き・'+names[i];
+      $('code-'+f).alt='岩砕きのガーゴイル・'+names[i]+'の8方向';
+      $('ref-'+f).alt='通常ガーゴイルの8方向';
+      $('ref-'+f).parentElement.hidden=f==='b'&&mode==='ground';
+      $('code-'+f).parentElement.hidden=f==='b'&&mode==='ground';
+    }
+    document.querySelector('section h2').textContent=mode==='ground'?'静止造形の8方向シート':'8方向シート（A・B）';
+    document.querySelector('section > p').textContent='4列 × 2行、1セル128px、透明背景。体1.3倍、頭部は通常型と同じ表示サイズ。';
+    $('production-note').textContent=mode==='attack'?'両腕を上げて力をため、体を前へ倒して振り下ろします。左は通常型の静止姿勢。壁への命中判定はゲーム制作時に接続します。':mode==='flight'?'翼を上げ下げし、足を後ろへ引いた飛行姿勢です。':'地上の静止姿勢です。「種類」で飛行・攻撃へ切り替えられます。';
+  }
   for (const [i, frame] of ['a','b'].entries()) {
     $(`ref-${frame}`).src = original[i]; $(`code-${frame}`).src = drawn[i];
   }
@@ -120,7 +130,7 @@ function build() {
 }
 const ready = () => rigs.every(r => r.texA.image?.width && r.texB.image?.width);
 function pose(time = 0) {
-  const b = state.pose === 'b' || (state.pose === 'auto' && Math.floor((time + 1e-9) / .38) % 2 === 1);
+  const b = state.pose === 'b' || (state.pose === 'auto' && (heavyMode()==='attack' ? (time+1e-9)%1.1>=.75 : Math.floor((time + 1e-9) / .38) % 2 === 1));
   for (const r of rigs) { r.usingA = true; r.material.map = r.texA; r.flipTimer = 0; r.update(b ? .38 : 0); r.flipTimer = time % .38; }
   draw();
 }
@@ -137,7 +147,9 @@ function draw() {
 function setState(next) {
   const rebuild = next.variant !== undefined && +next.variant !== state.variant;
   Object.assign(state, next, next.variant !== undefined ? { variant: +next.variant } : {});
-  if(m.staticPose) state.pose='a';
+  if(heavyMode()==='ground') state.pose='a';
+  else if(m.modes && rebuild) state.pose='auto';
+  if(rebuild) elapsed=0;
   if (rebuild || !rigs.length) build();
   const i = directions.indexOf(state.direction);
   const [, , tint] = m.variants[state.variant];
@@ -158,7 +170,7 @@ function frame(now) {
   const dt = state.paused ? 0 : Math.min(.05, last ? (now - last) / 1000 : 0); last = now; elapsed += dt;
   if (state.auto && (turn += dt) > 1.1) { turn = 0; setState({ direction: directions[(directions.indexOf(state.direction) + 1) % 8] }); }
   pose(elapsed);
-  $('status').textContent = ready() ? (m.staticPose ? `${labels[directions.indexOf(state.direction)]} / 静止姿勢 · 通常型1倍 / 岩砕き1.3倍 · Studio試作` : `${labels[directions.indexOf(state.direction)]} / ポーズ${rigs[0].usingA ? 'A' : 'B'} · ${m.variants[state.variant][0]} · 本編と同じ倍率・色・表示方式`) : '読み込み中…';
+  $('status').textContent = ready() ? (m.modes ? `${labels[directions.indexOf(state.direction)]} / ${m.variants[state.variant][0]} · ${rigs[1].usingA?'A':'B'} · 通常型1倍 / 岩砕き1.3倍 · Studio試作` : `${labels[directions.indexOf(state.direction)]} / ポーズ${rigs[0].usingA ? 'A' : 'B'} · ${m.variants[state.variant][0]} · 本編と同じ倍率・色・表示方式`) : '読み込み中…';
   requestAnimationFrame(frame);
 }
 // Only exposed by this dedicated prototype page for visual checks.

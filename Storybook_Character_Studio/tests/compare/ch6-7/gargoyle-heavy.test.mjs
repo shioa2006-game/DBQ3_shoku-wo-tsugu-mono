@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { mkdir } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
 import { launchBrowser } from '../../../../dqb3-tsugumono-ch4-5/tests/helpers.mjs';
 import { DIRECTIONS } from '../../../prototypes/shared/sheet-format.mjs';
 
@@ -10,7 +11,7 @@ try {
   page.on('pageerror',e=>errors.push(e.message));
   page.on('response',r=>{if(r.status()>=400) errors.push(`${r.status()} ${r.url()}`);});
   await page.goto(new URL('/',process.env.STUDIO_URL).href);
-  await page.getByRole('link',{name:'通常型と静止造形を比較'}).click();
+  await page.getByRole('link',{name:'通常型と姿勢・動作を比較'}).click();
   await page.waitForFunction(()=>window.__monsterPreview?.ready());
   assert.equal(await page.locator('#pose').isDisabled(),true);
   assert.equal(await page.locator('#code-b').isVisible(),false);
@@ -39,6 +40,40 @@ try {
     }
   }
   assert.equal(renders.size,8,'8方向すべてで表示が変わる');
+  for(const [label,mode] of [['飛行','flight'],['攻撃','attack']]) {
+    await page.selectOption('#variant',{label});
+    await page.waitForFunction(()=>window.__monsterPreview.ready());
+    assert.equal(await page.locator('#pose').isDisabled(),false);
+    const frames=new Set();
+    for(const direction of DIRECTIONS) {
+      await page.click(`[data-direction="${direction}"]`);
+      for(const pose of ['a','b']) {
+        await page.selectOption('#pose',pose);
+        const result=await page.evaluate(()=>{
+          const p=window.__monsterPreview;
+          p.draw();
+          return {url:p.rigs[1].material.map.image.src,direction:p.rigs[1].direction,
+            y:p.rigs[1].mesh.position.y,image:document.querySelector('#scene').toDataURL()};
+        });
+        assert.ok(result.url.endsWith(`gargoyle_heavy_${mode}_code_idle_${pose}_8dir.png`));
+        assert.equal(result.direction,direction);
+        assert.ok(Math.abs(result.y-(mode==='flight'?1.05:.65))<1e-9);
+        frames.add(result.image);
+        if(['front','front_left','left','back_left','back','back_right'].includes(direction)) {
+          await page.locator('.stage').screenshot({path:fileURLToPath(new URL(`../../../work/gargoyle-heavy/${mode}-${direction}-${pose}.png`,import.meta.url))});
+        }
+      }
+    }
+    assert.equal(frames.size,16,'全8方向で2姿勢を描画');
+    await page.selectOption('#pose','auto');
+    await page.evaluate(()=>window.__monsterPreview.setState({paused:false}));
+    const initial=await page.evaluate(()=>window.__monsterPreview.rigs[1].usingA);
+    await page.waitForFunction(a=>window.__monsterPreview.rigs[1].usingA!==a,initial);
+    await page.evaluate(()=>window.__monsterPreview.setState({paused:true}));
+  }
+  await page.selectOption('#variant',{label:'静止'});
+  await page.waitForFunction(()=>window.__monsterPreview.ready());
+  assert.equal(await page.locator('#pose').isDisabled(),true);
   await page.setViewportSize({width:390,height:844});
   await page.click('[data-direction="front_left"]');
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);

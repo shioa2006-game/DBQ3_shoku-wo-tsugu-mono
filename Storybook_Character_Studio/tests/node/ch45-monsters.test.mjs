@@ -7,7 +7,7 @@ import { createRequire } from 'node:module';
 import { buildWillOWispSheet } from '../../prototypes/will-o-wisp-8dir/character.mjs';
 import { buildArmoredScorpionSheet } from '../../prototypes/armored-scorpion-8dir/character.mjs';
 import { buildVolcanoLizardSheet } from '../../prototypes/volcano-lizard-8dir/character.mjs';
-import { buildFlightSheet, buildGroundSheet, buildHeavyGroundSheet } from '../../prototypes/gargoyle-8dir/character.mjs';
+import { buildFlightSheet, buildGroundSheet, buildHeavyGroundSheet, buildHeavyFlightSheet, buildHeavyAttackSheet } from '../../prototypes/gargoyle-8dir/character.mjs';
 import { buildCrabSheet } from '../../prototypes/small-rock-crab-8dir/character.mjs';
 import { buildGromHeadSheet, buildGromBodySheet } from '../../prototypes/grom-8dir/character.mjs';
 
@@ -19,6 +19,8 @@ const MONSTERS = {
   gargoyle_flight: ['gargoyle-8dir', buildFlightSheet],
   gargoyle_ground: ['gargoyle-8dir', buildGroundSheet],
   gargoyle_heavy_ground: ['gargoyle-8dir', buildHeavyGroundSheet, {staticPose:true}],
+  gargoyle_heavy_flight: ['gargoyle-8dir', buildHeavyFlightSheet],
+  gargoyle_heavy_attack: ['gargoyle-8dir', buildHeavyAttackSheet],
   small_rock_crab: ['small-rock-crab-8dir', buildCrabSheet],
   volcano_lizard: ['volcano-lizard-8dir', buildVolcanoLizardSheet],
 };
