@@ -205,13 +205,16 @@ S3_CSS = """
 """
 S3_SEA = 652
 S3_TEMPLE_AT, S3_TEMPLE_SCALE = (860, 448), .34      # 山の肩の平らなところ（620～1110）に、基壇の下端を置く
+# 島の並びは第6～7章のゲームの地形に合わせる（海から見て、神殿の真下に浜と桟橋、浜の奥に集落、その奥に島を横切る谷と橋）
+S3_VALLEY = "M300,592 C480,566 680,572 860,560 C1040,550 1260,548 1640,512"
 S3_FRONT = ("M60,652 C160,640 260,612 360,566 C430,534 520,482 600,452 C612,449 616,448 620,448 L1110,446 "
             "C1170,430 1250,390 1330,352 C1410,320 1500,300 1640,292")
 
 
 def scene3():
     R = random.Random(1103)
-    o = [HEAD.format(label="夜の海岸から、山の肩に立つ再建した神殿を見上げる。木組みの大屋根の窓と提灯の灯が、海に映る。浜から神殿へ上る坂道にも灯")]
+    o = [HEAD.format(label="夜の海から、山の肩に立つ再建した神殿を見上げる。木組みの大屋根の窓と提灯の灯が、海に映る。神殿の真下の浜に桟橋の灯と"
+                           "麓の集落の灯、島を横切る谷の橋を渡って神殿の正面へ上る坂道にも灯")]
     o.append(f"<style>{S3_CSS}</style>")
     o.append('<defs><linearGradient id="s3-sky" x1="0" y1="0" x2="0" y2="660" gradientUnits="userSpaceOnUse">'
              '<stop offset="0" stop-color="#070b1c"/><stop offset=".7" stop-color="#1a2648"/><stop offset="1" stop-color="#34446c"/></linearGradient>'
@@ -220,7 +223,8 @@ def scene3():
              '<radialGradient id="s3-warm" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffc06a" stop-opacity=".55"/>'
              '<stop offset="1" stop-color="#ffc06a" stop-opacity="0"/></radialGradient>'
              '<radialGradient id="s3-mglow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#e8f0ff" stop-opacity=".55"/>'
-             '<stop offset="1" stop-color="#e8f0ff" stop-opacity="0"/></radialGradient></defs>')
+             '<stop offset="1" stop-color="#e8f0ff" stop-opacity="0"/></radialGradient>'
+             f'<clipPath id="s3-hill"><path d="{S3_FRONT} L1640,652Z"/></clipPath></defs>')
     o.append('<rect width="1600" height="900" fill="url(#s3-sky)"/>')
     o.append(stars(R, "s3-tw", 90, 420))
     o.append('<circle cx="1360" cy="150" r="130" fill="url(#s3-mglow)"/><circle cx="1360" cy="150" r="34" fill="#f4f6ff"/>'
@@ -233,13 +237,29 @@ def scene3():
     tx, ty = S3_TEMPLE_AT
     o.append(f'<ellipse class="s3-glow" cx="{tx}" cy="{ty - 90}" rx="380" ry="200" fill="url(#s3-warm)"/>')
     o.append(place_temple(T.temple_rebuilt("s3-t-", R, T.REBUILT_NIGHT, lamp_cls="s3-lamp", window_cls="s3-win"), S3_TEMPLE_AT, S3_TEMPLE_SCALE))
-    # 浜から神殿へ上る坂道と、道の灯（山の斜面の内側だけ）
-    road = "M210,650 C320,640 420,626 470,606 C430,592 400,580 420,566 C500,548 560,532 600,516 C560,502 540,490 560,478 C600,466 640,458 680,452"
-    o.append(f'<path d="{road}" fill="none" stroke="#3a4466" stroke-width="5" stroke-linecap="round"/>')
+    # 島を左右に横切る谷（山の斜面の内側だけ）
+    o.append(f'<g clip-path="url(#s3-hill)"><path d="{S3_VALLEY}" fill="none" stroke="#0b0f20" stroke-width="10" stroke-linecap="round"/>'
+             f'<path d="{S3_VALLEY}" transform="translate(0 -6)" fill="none" stroke="#7d8fbc" stroke-width="1.6" opacity=".3"/></g>')
+    # 神殿の真下の浜から、集落・谷の橋を経て神殿の正面へまっすぐ上る坂道と、道の灯
+    road = (f"M{tx},648 C{tx + 8},632 {tx - 8},618 {tx - 2},602 C{tx + 3},588 {tx - 3},578 {tx},566 L{tx},554 "
+            f"C{tx + 12},534 {tx - 14},512 {tx - 2},490 C{tx + 5},474 {tx - 2},462 {tx},{ty + 2}")
+    o.append(f'<path d="{road}" fill="none" stroke="#3a4466" stroke-width="5" stroke-linecap="round"/>'
+             f'<path d="M{tx},567 L{tx},553" stroke="#5e5142" stroke-width="7"/>')          # 架け直した水運びの橋
     o.append("".join(f'<circle class="s3-path" cx="{x}" cy="{y}" r="4" fill="#ffd98a" style="animation-delay:-{n(i * .3)}s"/>'
-                     for i, (x, y) in enumerate(((300, 645), (450, 612), (420, 566), (560, 528), (560, 478), (650, 456)))))
+                     for i, (x, y) in enumerate(((tx + 3, 604), (tx - 7, 569), (tx + 7, 551), (tx + 4, 524), (tx - 7, 496), (tx + 1, 466)))))
+    # 麓の集落（坂道の左に二軒、右に一軒）の影と、窓の灯
+    for i, (x, y) in enumerate(((tx - 84, 626), (tx + 76, 628), (tx - 56, 644))):
+        o.append(f'<path d="M{x - 20},{y} L{x + 20},{y} L{x + 20},{y - 16} L{x + 26},{y - 16} L{x + 13},{y - 36} L{x - 13},{y - 36} L{x - 26},{y - 16} '
+                 f'L{x - 20},{y - 16}Z" fill="#232c4a" stroke="#7d8fbc" stroke-width="1.4" stroke-opacity=".35" stroke-linejoin="round"/>'
+                 f'<rect class="s3-win" x="{x - 5}" y="{y - 12}" width="10" height="8" fill="#ffd98a" style="animation-delay:-{n(i * .7)}s"/>')
     # 海と、灯の映り込み
     o.append(f'<rect x="0" y="{S3_SEA - 2}" width="1600" height="{900 - S3_SEA + 2}" fill="url(#s3-sea)"/>')
+    # 浜の中央から手前の沖へ伸びる桟橋と、その先の二つの灯
+    o.append(f'<path d="M{tx - 9},{S3_SEA - 3} L{tx + 9},{S3_SEA - 3} L{tx + 12},{S3_SEA + 52} L{tx - 24},{S3_SEA + 52}Z" fill="#161c34" '
+             f'stroke="#7d8fbc" stroke-width="1.4" stroke-opacity=".35" stroke-linejoin="round"/>'
+             + "".join(f'<path d="M{x},{S3_SEA + 30} L{x},{S3_SEA + 52}" stroke="#161c34" stroke-width="5"/>'
+                       f'<circle class="s3-path" cx="{x}" cy="{S3_SEA + 26}" r="4.5" fill="#ffd98a" style="animation-delay:-{d}s"/>'
+                       for x, d in ((tx - 22, .2), (tx + 11, .7))))
     refl = "".join(f'<path class="s3-ref" d="M{n(x - w / 2)},{n(y)} L{n(x + w / 2)},{n(y)}" stroke="#ffcf7a" stroke-width="{n(2 + (y - S3_SEA) / 60)}" '
                    f'stroke-linecap="round" style="animation-delay:-{n(R.uniform(0, 1.8))}s"/>'
                    for x, y, w in ((tx + R.uniform(-120, 120), S3_SEA + 8 + i * 13, R.uniform(30, 90)) for i in range(16)))

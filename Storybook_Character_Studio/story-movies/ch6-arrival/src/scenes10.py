@@ -4,10 +4,15 @@
                        清めの泉（M7第1場面）。順に現れ、前の額は少し暗くなる。
   2. 夜明けの海        M7の夜の海の続き。星が消えて空が白み、右の水平線から日が昇る。船の上の四人。
   3. 海から山へ続く島  船首に立つ四人の後ろ姿（シオンの背中に職業の書）。ワタリが指す先に、左で海に接し、
-                       右の奥へ山が重なって続く島。山腹に小さく、神殿跡の二本の柱。
+                       右の奥へ山が重なって続く島。山腹に小さく、神殿跡の二本の柱。その真下に浜と桟橋、麓の集落、
+                       島を横切る谷、神殿跡の正面へまっすぐ上る坂道。
   4. 神殿跡            山腹の崩れた神殿跡を見上げる。プロローグ・M7と同じ基壇と柱の並びで、屋根はなく、
-                       二本の柱だけが立つ。麓から古い水運びの坂道（石段）が上り、谷の橋は落ちている。
-  5. 着岸              朝の浜の古い桟橋に船が着く。奥の山腹に神殿跡。タイトル「ダーマ再興編」。
+                       二本の柱だけが立つ。古い水運びの坂道（石段）が正面へ上り、手前で島を横切る谷の橋は落ちている。
+  5. 着岸              神殿跡の山の麓の浜。手前へ伸びる古い桟橋の左に船が着く。浜の奥に集落、その上に谷と坂道、
+                       神殿跡。タイトル「ダーマ再興編」。
+
+島の並び（浜・桟橋・集落・谷と橋・坂道・神殿跡の位置関係）は、第6～7章のゲームの地形に合わせている
+（2026-11-14に合わせ直した。props10.py の冒頭）。
 
 思い出の額（場面1）は、ほかのムービーの場面をそのまま縮めて入れる（火山島編の始まりの props5.recall）。元の接頭辞
 （s4- / s1-）はこの場面の接頭辞の下（s1-pa- / s1-mb- / s1-mc-）に置き換え、元の動きはこの場面の再生中に動く。
@@ -75,11 +80,10 @@ def far_ranges(dx=0.0, dy=0.0, k=1.0):
     ]
 
 
-# 神殿跡と坂道を島の山腹に置く位置（場面3の座標。場面5は同じ並びを大きく置く）。
-# 坂道は (x, 稜線からの深さ)。高さは手前の山の稜線から下へ測り、山の斜面の内側に収める（空に道が出ないように）。
+# 神殿跡を島の山腹に置く位置（場面3の座標。場面5は同じ並びを大きく置く）。
 # 神殿跡は x と、基壇の幅全体で稜線より下に置くときの余白（基壇が斜面から浮かないように）。
+# 浜・集落・谷・坂道は、神殿跡の真下に props10.isle_foot() で置く（ゲームの地形と同じ並び）。
 ISLE_RUIN = (952, 12)
-ISLE_PATH = ((612, 40), (760, 60), (700, 26), (842, 46), (792, 26))   # 最後は神殿跡の基壇の左下の角へつなぐ
 ISLE_RUIN_SCALE = .085
 
 
@@ -254,7 +258,8 @@ def morning(c):
 def scene3():
     R = random.Random(1003)
     o = [HEAD.format(label="晴れた朝の海。船首に立つシオン・ミナ・ゴンタ・ワタリの後ろ姿。シオンの背中に職業の書。ワタリが指す先に、"
-                           "左で海に接し、右の奥へ山が重なって続く島。山腹に小さく、神殿跡の二本の柱")]
+                           "左で海に接し、右の奥へ山が重なって続く島。山腹に小さく、神殿跡の二本の柱。その真下に浜と桟橋、麓の集落、"
+                           "島を横切る谷、神殿跡の正面へ上る坂道")]
     o.append(f"<style>{S3_CSS}</style>")
     bdefs, backs = figure_set([(cid, "back", arms, (x, S3_FEET), s, False) for cid, arms, x, s in S3_BACKS], "s3-b-",
                               tone=morning, rims=(("#fff3cf", 1.1, -.7, .8),))
@@ -265,21 +270,20 @@ def scene3():
     o.append('<rect width="1600" height="900" fill="url(#s3-sky)"/>')
     o.append('<circle cx="1480" cy="90" r="260" fill="url(#s3-sunglow)"/>')
     o.append(M4.clouds(R, [(-40, 150, 520, 18), (560, 110, 420, 14)], cls="s3-cl"))
-    # 島：左で海に接し、右の奥へ山が続く。山腹に神殿跡（遠景の色）と、そこへ上る坂道
+    # 島：左で海に接し、右の奥へ山が続く。山腹に神殿跡（遠景の色）。その真下に浜・集落・谷、正面へ上る坂道
     isle, ridge = Q.isle("s3-", R, 500, 520, far_ranges(), shore_cls="s3-shore", clip_id="s3-isleclip")
-    on = lambda x, d: (x, min(516, Q.ridge_y(ridge, x) + d))     # 稜線から d だけ下（浜より下には出さない）
     half = 530 * ISLE_RUIN_SCALE                                 # 基壇の幅の半分（プロローグの座標の 1060 の半分）
     rx = ISLE_RUIN[0]
     ry = Q.base_below_ridge(ridge, rx, half, ISLE_RUIN[1])
-    foot = (rx - half + 3, ry - 1)                               # 基壇の左下の角（プロローグの座標の (270, 592)）
-    path = (f'<g clip-path="url(#s3-isleclip)">'
-            + Q.stair_path(R, [on(x, d) for x, d in ISLE_PATH] + [foot], w=2.6, pal=Q.FAR, steps=False, edge="#5f7f70") + "</g>")
+    path = Q.isle_foot(rx, ry, 512, 1, "s3-isleclip")            # 波打ち際は海の上端（512）
     ruin = Q.place_remains(Q.temple_remains(random.Random(1010), Q.FAR, grass=False), (rx, ry), ISLE_RUIN_SCALE)
     light = f'<ellipse class="s3-ruinlight" cx="{n(rx)}" cy="{n(ry - 9)}" rx="34" ry="13" fill="#fff6d8"/>'
     o.append(f'<g class="s3-isle mv">{isle}{path}{light}{ruin}</g>')
     o.append('<g class="s3-haze mv" opacity=".35"><path d="' + " ".join(kasumi(x, y, w, h) for x, y, w, h in
              ((300, 500, 420, 10), (1180, 506, 400, 8))) + '" fill="#f4f7f8"/></g>')
     o.append('<rect x="0" y="512" width="1600" height="388" fill="url(#s3-sea)"/>')
+    # 浜の中央から手前の沖へ伸びる古い桟橋（島と一緒に近づく）
+    o.append(f'<g class="s3-isle mv">{Q.old_pier((rx, 511), (rx - 5, 529), 5, 9, posts=2, planks=5, missing=(2,))}</g>')
     o.append(M4.glints(R, "s3-gl", 900, 1500, 530, 700, 30, "#ffffff"))
     o.append(f'<g class="s3-wv mv">{M4.waves(R, 0, 1600, 530, 720, 26, color="#eef6fb", opacity=.45)}</g>')
     # 船首：舷側の上の手すり（右へ上がる）と、甲板（火山島編の始まりの第4場面と同じ形）
@@ -315,12 +319,16 @@ S4_CSS = """
 """
 S4_RUIN_AT, S4_RUIN_SCALE = (836, 443.8), .8     # 基壇の中央の下端と倍率
 S4_TERRACE_TOP = 430                               # 石積みの台の上端（基壇の下端より少し上から描き、基壇で隠す）
+# 谷の奥の岸（左から右）と、手前の岸（右から左）。坂道の通る中央（x=836）で奥が 610、手前が 692
+S4_VALLEY = ("-40,640 C300,610 600,604 836,610 C1100,616 1400,600 1640,580",
+             "C1400,676 1100,696 836,692 C600,688 300,700 -40,730")
+S4_VALLEY_ENDS = (580, 650)                        # 右端での奥の岸・手前の岸の高さ
 
 
 def scene4():
     R = random.Random(1004)
     o = [HEAD.format(label="朝の山腹の崩れた神殿跡を見上げる。三段の基壇の上に、屋根を失った二本の柱だけが立ち、ほかの柱は折れて倒れている。"
-                           "麓から古い石段の坂道が上り、谷に架かっていた橋は落ちている")]
+                           "古い石段の坂道が神殿跡の正面へ上り、手前で島を横切る谷に架かっていた橋は落ちている")]
     o.append(f"<style>{S4_CSS}</style>")
     o.append("<defs>" + M4.sky_defs("s4-", "#86bde4", "#cfe5f0", "#f8ecd2", 520)
              + '<linearGradient id="s4-slope" x1="0" y1="420" x2="0" y2="900" gradientUnits="userSpaceOnUse">'
@@ -338,33 +346,39 @@ def scene4():
     # 山腹（神殿の立つ斜面）。手前へ下る斜面の明暗の帯と、両側の木
     o.append('<path d="M-40,540 C160,490 320,440 420,420 L1220,420 C1320,404 1440,370 1640,350 L1640,900 L-40,900Z" fill="url(#s4-slope)"/>'
              '<path d="M-40,540 C160,490 320,440 420,420 M1220,420 C1320,404 1440,370 1640,350" fill="none" stroke="#c9dca8" stroke-width="3" opacity=".7"/>')
-    o.append('<path d="M-40,690 C300,640 620,610 900,622 C1180,634 1420,600 1640,560 L1640,620 C1420,660 1180,690 900,680 C620,670 300,700 -40,760Z" '
-             'fill="#a9c47e" opacity=".35"/>'
-             '<path d="M-40,820 C360,770 760,760 1100,780 C1320,792 1500,770 1640,740 L1640,900 L-40,900Z" fill="#3f6a40" opacity=".35"/>')
+    o.append('<path d="M-40,820 C360,770 760,760 1100,780 C1320,792 1500,770 1640,740 L1640,900 L-40,900Z" fill="#3f6a40" opacity=".35"/>')
     for x, y, w, h in ((120, 470, 70, 30), (60, 520, 84, 34), (1330, 400, 76, 32), (1420, 430, 90, 36), (1540, 380, 70, 30),
-                       (1480, 540, 100, 40), (1300, 600, 84, 34)):
+                       (1480, 500, 100, 40), (1290, 540, 84, 34)):
         o.append(P.pine(R, x, y, w, h, color="#4f7f57"))
-    # 神殿跡：山腹から張り出す古い石積みの台の上に、三段の基壇
+    # 神殿跡：山腹から張り出す古い石積みの台の上に、三段の基壇。台の正面の中央に、坂道の着く石段
     o.append(Q.terrace(random.Random(1011), 400, 1240, S4_TERRACE_TOP, 536))
+    o.append(Q.terrace_steps(S4_RUIN_AT[0], S4_RUIN_AT[1], 538, 120, 150))
     o.append(f'<g id="s4-ruin">{Q.place_remains(Q.temple_remains(random.Random(1010), Q.DAY), S4_RUIN_AT, S4_RUIN_SCALE)}</g>')
     # 朝日の筋（右上から）
     rays = "".join(f'<path d="M1640,-40 L{n(x)},900 L{n(x + w)},900Z" fill="url(#s4-rayg)"/>' for x, w in ((520, 90), (760, 130), (1040, 80)))
     o.append(f'<g class="s4-ray" style="mix-blend-mode:screen">{rays}</g>')
-    # 古い水運びの坂道（石段）。麓から石積みの台の左へ上る。途中の谷に架かっていた橋は落ちている
-    o.append('<path d="M226,900 C230,800 240,720 256,656 L334,646 C326,720 340,810 368,900Z" fill="#3c5a3a"/>'
-             '<path d="M256,656 C240,720 230,800 226,900 M334,646 C326,720 340,810 368,900" fill="none" stroke="#2c442b" stroke-width="3"/>')
-    o.append(Q.stair_path(R, [(40, 900), (200, 800), (140, 726), (250, 656)], w=22))
-    o.append(Q.stair_path(R, [(338, 644), (300, 590), (370, 540), (402, 468)], w=20))
-    o.append(Q.broken_bridge(246, 342, 648))
+    # 島を左右に横切る谷（神殿跡の手前）。奥の岸の崖が見え、手前の岸は縁だけ
+    north, south = S4_VALLEY
+    o.append(f'<path d="M{north} L1640,{S4_VALLEY_ENDS[1]} {south} Z" fill="#2b4233"/>'
+             f'<path d="M{north} L1640,{S4_VALLEY_ENDS[0] + 34} C1400,652 1100,668 836,648 C600,644 300,650 -40,680Z" fill="#8b8375"/>'
+             f'<path d="M-40,662 C300,634 600,628 836,632 C1100,640 1400,626 1640,604" fill="none" stroke="#5f584d" stroke-width="2.4" opacity=".7"/>'
+             f'<path d="M-40,680 C300,650 600,644 836,648 C1100,668 1400,652 1640,614" fill="none" stroke="#1f3226" stroke-width="5" opacity=".55"/>'
+             f'<path d="M{north}" fill="none" stroke="#c9dca8" stroke-width="3" opacity=".8"/>'
+             f'<path d="M1640,{S4_VALLEY_ENDS[1]} {south}" fill="none" stroke="#2c442b" stroke-width="4"/>')
+    # 古い水運びの坂道（石段）。手前の麓から谷の橋（落ちている）を経て、石積みの台の正面の石段へまっすぐ上る
+    cx = S4_RUIN_AT[0]
+    o.append(Q.stair_path(R, [(cx + 70, 900), (cx - 40, 824), (cx + 26, 756), (cx, 700)], w=30))
+    o.append(Q.stair_path(R, [(cx, 606), (cx + 9, 584), (cx - 7, 560), (cx, 540)], w=22))
+    o.append(Q.broken_bridge(cx, 610, 696, 62, 104))
     # 手前の草と岩
-    for x, y, s in ((90, 880, 1.4), (700, 860, 1.1), (1080, 830, 1.3), (1400, 870, 1.5), (1530, 760, 1.0)):
+    for x, y, s in ((90, 880, 1.4), (560, 860, 1.1), (1120, 830, 1.3), (1400, 870, 1.5), (1530, 780, 1.0)):
         o.append(f'<path d="M{n(x - 40 * s)},{n(y)} L{n(x - 26 * s)},{n(y - 30 * s)} L{n(x + 8 * s)},{n(y - 38 * s)} L{n(x + 40 * s)},{n(y - 14 * s)} '
                  f'L{n(x + 46 * s)},{n(y)}Z" fill="#8b8375" stroke="#4a4236" stroke-width="3"/>'
                  f'<path d="M{n(x - 26 * s)},{n(y - 30 * s)} L{n(x + 8 * s)},{n(y - 38 * s)} L{n(x + 4 * s)},{n(y - 22 * s)}Z" fill="#a69e8e"/>')
     tufts = []
     for _ in range(26):
         x, y = R.uniform(0, 1600), R.uniform(640, 900)
-        if 400 < x < 1240 and y < 720:
+        if y < 740 or abs(x - 836) < 110:            # 谷の中と坂道の上には生やさない
             continue
         h = R.uniform(18, 34)
         tufts.append(f'<path class="s4-grass mv" d="M{n(x - 8)},{n(y)} Q{n(x - 6)},{n(y - h)} {n(x - 2)},{n(y - h * 1.1)} M{n(x)},{n(y)} '
@@ -405,56 +419,49 @@ S5_CSS = """
 @keyframes s5-flap{from{transform:scaleY(1)}to{transform:scaleY(.45)}}
 @keyframes s5-ruinlight{from{opacity:.3}to{opacity:.75}}
 """
-S5_K, S5_DX, S5_DY = 1.5, -250, -150     # 場面3の島を大きく置く（神殿跡がタイトルの右下に来る）
-S5_SEA = 610
+S5_K, S5_DX, S5_DY = 2.0, -664, -400     # 場面3の島を大きく置く（神殿跡がタイトルの右下に来る）
+S5_SEA = 640
+S5_PIER = ((0, 4), (-46, 166), 30, 92)   # 桟橋：浜の中央（神殿跡の真下）からの位置で、浜の端・手前の端・幅
+S5_SHIP = (930, 776)                     # 着いた船（桟橋の左）
 
 
 def scene5():
     R = random.Random(1005)
-    o = [HEAD.format(label="朝の浜。古い木の桟橋に、わらの帆の船が着く。奥の山腹に神殿跡の二本の柱と、そこへ上る坂道。"
+    o = [HEAD.format(label="朝の浜。浜から手前へ伸びる古い木の桟橋の左に、わらの帆の船が着く。浜の奥に麓の集落、その上に島を横切る谷と、"
+                           "神殿跡の二本の柱の正面へ上る坂道。"
                            "タイトル「職をつぐ者／ダーマ再興編／第6章　よみがえるダーマ神殿」")]
     o.append(f"<style>{S5_CSS}</style>")
     o.append("<defs>" + M4.sky_defs("s5-", "#7ab4e0", "#c4e0ef", "#f6e8cc", S5_SEA) + M4.sea_defs("s5-", S5_SEA, 900, "#9fcbe2", "#2f78ad")
-             + '<linearGradient id="s5-sand" x1="0" y1="600" x2="0" y2="900" gradientUnits="userSpaceOnUse">'
-             '<stop offset="0" stop-color="#eadbb8"/><stop offset="1" stop-color="#d2bd90"/></linearGradient>'
              + P.ship_defs("s5-sh-") + "</defs>")
     o.append('<rect width="1600" height="900" fill="url(#s5-sky)"/>')
     o.append('<circle cx="1500" cy="80" r="260" fill="url(#s5-sunglow)"/>')
     o.append(M4.clouds(R, [(60, 120, 420, 16), (700, 70, 360, 12)], cls="s5-cl"))
-    # 島（場面3の並びを大きく）：坂道と神殿跡
+    # 島（場面3の並びを大きく）：神殿跡と、その真下の浜・集落・谷・坂道
     k = S5_K
     isle, ridge = Q.isle("s5-", R, 500 * k + S5_DX, S5_SEA, far_ranges(S5_DX, S5_DY, k), shore_cls="s5-shore", clip_id="s5-isleclip")
-    on = lambda x, d: (x * k + S5_DX, min(S5_SEA - 4, Q.ridge_y(ridge, x * k + S5_DX) + d * k))
     half = 530 * ISLE_RUIN_SCALE * k
     rx = ISLE_RUIN[0] * k + S5_DX
     ry = Q.base_below_ridge(ridge, rx, half, ISLE_RUIN[1] * k)
-    foot = (rx - half + 4, ry - 1)
-    path = (f'<g clip-path="url(#s5-isleclip)">'
-            + Q.stair_path(R, [on(x, d) for x, d in ISLE_PATH] + [foot], w=4, pal=Q.FAR, steps=False, edge="#5f7f70") + "</g>")
+    shore = S5_SEA - 2                                           # 波打ち際は海の上端
+    path = Q.isle_foot(rx, ry, shore, k, "s5-isleclip")
     ruin = Q.place_remains(Q.temple_remains(random.Random(1010), Q.FAR, grass=False), (rx, ry), ISLE_RUIN_SCALE * k)
     light = f'<ellipse class="s5-ruinlight" cx="{n(rx)}" cy="{n(ry - 22)}" rx="50" ry="16" fill="#fff6d8"/>'
     o.append(isle + path + light + ruin)
-    # 海と、右の浜
-    o.append(f'<rect x="0" y="{S5_SEA - 2}" width="1600" height="{900 - S5_SEA + 2}" fill="url(#s5-sea)"/>')
-    o.append(M4.glints(R, "s5-gl", 100, 700, S5_SEA + 10, 800, 30, "#ffffff"))
-    o.append(f'<g class="s5-wv mv">{M4.waves(R, 0, 900, S5_SEA + 20, 880, 26, color="#eef6fb", opacity=.45)}</g>')
-    o.append('<path d="M1000,900 C1060,790 1160,700 1300,650 C1400,616 1500,606 1620,604 L1620,900Z" fill="url(#s5-sand)"/>'
-             '<path class="s5-shore" d="M1000,900 C1060,790 1160,700 1300,650 C1400,616 1500,606 1620,604" fill="none" stroke="#ffffff" '
-             'stroke-width="6" opacity=".6"/>')
-    # 浜の草と石
-    for _ in range(14):
-        x = R.uniform(1240, 1600)
-        y = R.uniform(680, 880)
-        h = R.uniform(14, 26)
-        o.append(f'<path d="M{n(x - 7)},{n(y)} Q{n(x - 5)},{n(y - h)} {n(x - 1)},{n(y - h * 1.1)} M{n(x)},{n(y)} Q{n(x + 3)},{n(y - h * .9)} '
-                 f'{n(x + 8)},{n(y - h)}" fill="none" stroke="#7d9a55" stroke-width="3" stroke-linecap="round"/>')
-    # 古い桟橋（浜から沖へ）と、着く船
-    o.append(Q.old_pier(R, 1240, 560, 700, depth=30, posts=6, missing=(2, 4)))
+    # 海と、浜の波打ち際
+    o.append(f'<rect x="0" y="{shore}" width="1600" height="{900 - shore}" fill="url(#s5-sea)"/>')
+    o.append(f'<path class="s5-shore" d="M{n(rx - 180)},{shore + 2} Q{n(rx)},{shore - 3} {n(rx + 200)},{shore + 2}" fill="none" stroke="#ffffff" '
+             'stroke-width="4" opacity=".6"/>')
+    o.append(M4.glints(R, "s5-gl", 100, 760, S5_SEA + 10, 800, 30, "#ffffff"))
+    o.append(f'<g class="s5-wv mv">{M4.waves(R, 0, 1600, S5_SEA + 20, 880, 30, color="#eef6fb", opacity=.45)}</g>')
+    # 古い桟橋（浜の中央から手前の沖へ）と、その左に着く船
+    (ax, ay), (bx, by), w0, w1 = S5_PIER
+    o.append(Q.old_pier((rx + ax, shore + ay), (rx + bx, shore + by), w0, w1))
     ship = P.ship_full("s5-sh-", crew=P.tiny_crew())
-    o.append(f'<g class="s5-ship mv"><g class="s5-bob mv" style="transform-origin:380px 720px">'
-             f'<g transform="translate(380 724) scale(.6)">{ship}</g></g>'
-             '<path d="M240,736 Q380,748 530,734" fill="none" stroke="#1d4a6e" stroke-width="10" opacity=".35"/></g>')
-    o.append(M4.waves(R, 0, 1000, 760, 890, 16, color="#eef6fb", opacity=.5))
+    sx, sy = S5_SHIP
+    o.append(f'<g class="s5-ship mv"><g class="s5-bob mv" style="transform-origin:{sx}px {sy - 4}px">'
+             f'<g transform="translate({sx} {sy}) scale(.6)">{ship}</g></g>'
+             f'<path d="M{sx - 140},{sy + 12} Q{sx},{sy + 24} {sx + 150},{sy + 10}" fill="none" stroke="#1d4a6e" stroke-width="10" opacity=".35"/></g>')
+    o.append(M4.waves(R, 0, 1600, 800, 890, 20, color="#eef6fb", opacity=.5))
     birds = ((1120, 240, 1.0, 0), (1180, 214, .8, .2), (1250, 256, .9, .35), (960, 300, .7, .1))
     o.append('<g class="s5-flock mv">' + "".join(
         f'<g transform="translate({x} {y}) scale({s})"><path class="s5-gull mv" d="M-14,0 Q-7,-8 0,0 Q7,-8 14,0" fill="none" '

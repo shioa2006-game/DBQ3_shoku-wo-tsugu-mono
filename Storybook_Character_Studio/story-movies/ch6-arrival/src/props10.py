@@ -2,8 +2,15 @@
 
   temple_remains   崩れた神殿跡（共通部品 ../../shared/temple.py。M7の最後の場面の影と同じ形）。ここから使えるように取り込む。
   isle             ダーマの島：左で海に接し、右の奥へ山が重なって続く島影。山腹に神殿跡を小さく置く。
-  old_pier         古い桟橋（板の欠けた、潮で白っぽくなった木の桟橋。焼けてはいない）。
-  stair_path       神殿跡へ上る古い水運びの坂道（石段）と、谷に架かっていた橋の残り。
+  isle_foot        神殿跡の真下の麓：浜、麓の集落、島を左右に横切る谷、神殿跡の正面へまっすぐ上る坂道。
+  old_pier         古い桟橋（板の欠けた、潮で白っぽくなった木の桟橋。焼けてはいない）。浜から手前の沖へ伸びる。
+  stair_path       神殿跡へ上る古い水運びの坂道（石段）。
+  terrace          基壇を載せた古い石積みの台。terrace_steps はその正面の中央の石段。
+  broken_bridge    谷に架かっていた橋の残り（渡る向きに見る）。
+
+島の並びは、第6～7章のゲームの地形（dqb3-tsugumono-ch6-7/docs/DESIGN.md の「2. マップ」）に合わせる：
+海の側（南）から見て、浜の中央から手前へ桟橋、船は桟橋の左、浜のすぐ奥に集落、その奥に島を横切る谷と橋、
+坂道は神殿跡の正面へまっすぐ上る。
 
 座標は viewBox="0 0 1600 900"。乱数は呼び出し側の固定シード。
 """
@@ -49,31 +56,77 @@ def base_below_ridge(ridge, x, half, margin):
     return max(ridge_y(ridge, x + half * (i / 4 - 1)) for i in range(9)) + margin
 
 
-def old_pier(R, x_shore, x_end, y, depth=28, posts=6, missing=(2, 5)):
-    """古い桟橋：右の浜（x_shore）から左の沖（x_end）へ伸びる板の道。板が所々欠け、杭に潮の跡。"""
+def isle_foot(cx, base_y, shore_y, u, clip_id):
+    """神殿跡の真下の麓（海から見た並び。ゲームの地形に合わせる）：浜、麓の集落（かやぶきの小さな家が三軒と畑）、
+    島を左右に横切る谷、浜から集落と谷の落ちた橋を経て、神殿跡の正面へまっすぐ上る水運びの坂道。
+    cx は神殿跡の中央、base_y は基壇の下端、shore_y は波打ち際。u は場面3の 1px にあたる長さ（場面5は大きく置く）。
+    山の斜面の内側だけに描く（clip_id は isle() の切り抜き）。"""
+    X = lambda dx: n(cx + dx * u)
+    Y = lambda y0, dy=0.0: n(y0 + dy * u)
+    vy = base_y + (shore_y - base_y) * .5                      # 谷の高さ（集落と神殿跡の間）
+    o = [f'<g clip-path="url(#{clip_id})">']
+    # 浜（神殿跡の真下）
+    o.append(f'<path d="M{X(-96)},{Y(shore_y, 2)} C{X(-60)},{Y(shore_y, -8)} {X(64)},{Y(shore_y, -9)} {X(108)},{Y(shore_y, 2)}Z" '
+             f'fill="#e6d8b4" opacity=".92"/>')
+    # 谷（島を左右に横切る。奥の岸に明るい縁）
+    valley = (f'M{X(-340)},{Y(vy, 10)} C{X(-200)},{Y(vy, -3)} {X(-90)},{Y(vy, 3)} {X(0)},{Y(vy)} '
+              f'C{X(90)},{Y(vy, -3)} {X(200)},{Y(vy, 2)} {X(430)},{Y(vy, -10)}')
+    o.append(f'<path d="{valley}" fill="none" stroke="#486459" stroke-width="{n(5 * u)}" stroke-linecap="round"/>'
+             f'<path d="{valley}" transform="translate(0 {n(-2.8 * u)})" fill="none" stroke="#cfe0c8" stroke-width="{n(.8 * u)}" opacity=".5"/>')
+    # 坂道：浜 → 集落 → 谷の橋（落ちている）→ 神殿跡の正面
+    lower = [(cx, shore_y - 4 * u), (cx + 3 * u, shore_y - 16 * u), (cx - 2 * u, vy + 12 * u), (cx, vy + 3.4 * u)]
+    upper = [(cx, vy - 3.4 * u), (cx + 5 * u, vy - 14 * u), (cx - 4 * u, base_y + 13 * u), (cx, base_y + 1)]
+    for pts in (lower, upper):
+        o.append(stair_path(None, pts, w=2.6 * u, pal=FAR, steps=False, edge="#5f7f70"))
+    for d0, d1 in ((3.6, 1.7), (-3.6, -1.9)):                  # 両岸に残った橋板の端
+        o.append(f'<path d="M{X(0)},{Y(vy, d0)} L{X(0)},{Y(vy, d1)}" stroke="{WOOD_DARK}" stroke-width="{n(3.2 * u)}"/>')
+    # 麓の集落：坂道の左に二軒、右に一軒と畑
+    sw = n(max(.8, .5 * u))
+    o.append(f'<path d="M{X(30)},{Y(shore_y, -9)} L{X(48)},{Y(shore_y, -9)} L{X(46)},{Y(shore_y, -14)} L{X(28)},{Y(shore_y, -14)}Z" fill="#b9b56a"/>'
+             f'<path d="M{X(29)},{Y(shore_y, -11.5)} L{X(47)},{Y(shore_y, -11.5)}" stroke="#8f9a52" stroke-width="{sw}"/>')
+    for dx, dy in ((-42, -21), (40, -20), (-29, -10)):
+        x, y, w = cx + dx * u, shore_y + dy * u, 12 * u
+        o.append(f'<path d="M{n(x - w * .5)},{n(y)} L{n(x + w * .5)},{n(y)} L{n(x + w * .5)},{n(y - w * .45)} L{n(x - w * .5)},{n(y - w * .45)}Z" '
+                 f'fill="#cfc4a6" stroke="#5d6b62" stroke-width="{sw}"/>'
+                 f'<path d="M{n(x - w * .1)},{n(y)} L{n(x - w * .1)},{n(y - w * .28)} L{n(x + w * .1)},{n(y - w * .28)} L{n(x + w * .1)},{n(y)}Z" fill="#5d5444"/>'
+                 f'<path d="M{n(x - w * .64)},{n(y - w * .4)} L{n(x - w * .3)},{n(y - w * .98)} L{n(x + w * .3)},{n(y - w * .98)} L{n(x + w * .64)},{n(y - w * .4)}Z" '
+                 f'fill="#a99766" stroke="#5d6b62" stroke-width="{sw}" stroke-linejoin="round"/>')
+    o.append("</g>")
+    return "".join(o)
+
+
+def old_pier(top, end, w0, w1, posts=4, planks=12, missing=(4, 8)):
+    """古い桟橋：浜（top）から手前の沖（end）へ伸びる板の道を、海の側から見る。幅は w0 から w1 へ広がる。
+    板が所々欠け、杭に潮の跡。遠景（場面3）では小さく置く。"""
+    (x0, y0), (x1, y1) = top, end
+    at = lambda t: (x0 + (x1 - x0) * t, y0 + (y1 - y0) * t, w0 + (w1 - w0) * t)
+    sw = n(max(.8, w1 * .035))
     o = []
-    span = (x_shore - x_end) / posts
-    # 杭（手前と奥の2列）
-    for j in range(posts + 1):
-        x = x_end + span * j
-        for dy, op in ((-6, .7), (depth, 1)):
-            o.append(f'<path d="M{n(x - 6)},{n(y + dy - 4)} L{n(x + 6)},{n(y + dy - 4)} L{n(x + 5)},{n(y + dy + 58)} L{n(x - 5)},{n(y + dy + 58)}Z" '
-                     f'fill="{WOOD_DARK}" stroke="{WOOD_INK}" stroke-width="2.4" opacity="{op}"/>'
-                     f'<path d="M{n(x - 5)},{n(y + dy + 40)} L{n(x + 5)},{n(y + dy + 40)}" stroke="#e8e2d0" stroke-width="5" opacity="{op * .6}"/>')
-    # 板（欠けたところは隙間）
-    o.append(f'<path d="M{n(x_end)},{n(y)} L{n(x_shore)},{n(y)} L{n(x_shore + 10)},{n(y + depth)} L{n(x_end - 6)},{n(y + depth)}Z" '
-             f'fill="{WOOD}" stroke="{WOOD_INK}" stroke-width="3" stroke-linejoin="round"/>')
-    for j in range(posts * 3):
-        x = x_end + span / 3 * j
-        if j // 3 in missing and j % 3 == 1:
-            o.append(f'<path d="M{n(x)},{n(y + 1)} L{n(x + span / 3)},{n(y + 1)} L{n(x + span / 3 + 3)},{n(y + depth - 1)} L{n(x + 2)},{n(y + depth - 1)}Z" '
-                     f'fill="#3d5f78" opacity=".85"/>')
-        o.append(f'<path d="M{n(x)},{n(y + 1)} L{n(x + 2)},{n(y + depth - 1)}" stroke="#8a7656" stroke-width="2" opacity=".8"/>')
-    o.append(f'<path d="M{n(x_end)},{n(y)} L{n(x_shore)},{n(y)}" stroke="#ece2c8" stroke-width="3" opacity=".7"/>')
-    # 係船柱と、ほどけた綱
-    o.append(f'<path d="M{n(x_end + 18)},{n(y - 22)} L{n(x_end + 30)},{n(y - 22)} L{n(x_end + 30)},{n(y + 4)} L{n(x_end + 18)},{n(y + 4)}Z" '
-             f'fill="{WOOD_DARK}" stroke="{WOOD_INK}" stroke-width="2.4"/>'
-             f'<path d="M{n(x_end + 24)},{n(y - 14)} q-18,10 -6,22 q10,8 -4,18" fill="none" stroke="#c8b48a" stroke-width="3"/>')
+    for j in range(posts + 1):                                 # 杭（両側）
+        x, y, w = at(j / posts)
+        pw, h = max(1.2, w * .1), w * .5
+        for side in (-1, 1):
+            px = x + side * w * .5
+            o.append(f'<path d="M{n(px - pw / 2)},{n(y - h * .3)} L{n(px + pw / 2)},{n(y - h * .3)} L{n(px + pw * .4)},{n(y + h * .7)} '
+                     f'L{n(px - pw * .4)},{n(y + h * .7)}Z" fill="{WOOD_DARK}" stroke="{WOOD_INK}" stroke-width="{sw}"/>'
+                     f'<path d="M{n(px - pw * .4)},{n(y + h * .45)} L{n(px + pw * .4)},{n(y + h * .45)}" stroke="#e8e2d0" stroke-width="{n(pw * .5)}" opacity=".6"/>')
+    edge = lambda t, side: (at(t)[0] + side * at(t)[2] * .5, at(t)[1])
+    quad = lambda t0, t1: poly_d([edge(t0, -1), edge(t0, 1), edge(t1, 1), edge(t1, -1)])
+    o.append(f'<path d="{quad(0, 1)}" fill="{WOOD}" stroke="{WOOD_INK}" stroke-width="{sw}" stroke-linejoin="round"/>')
+    for i in range(planks):
+        t0, t1 = i / planks, (i + 1) / planks
+        if i in missing:
+            o.append(f'<path d="{quad(t0 + .012, t1 - .012)}" fill="#3d5f78" opacity=".85"/>')
+        (ax, ay), (bx, by) = edge(t0, -1), edge(t0, 1)
+        o.append(f'<path d="M{n(ax)},{n(ay)} L{n(bx)},{n(by)}" stroke="#8a7656" stroke-width="{n(max(.6, w1 * .022))}" opacity=".8"/>')
+    (ax, ay), (bx, by) = edge(1, -1), edge(1, 1)                # 手前の端の厚み
+    o.append(f'<path d="M{n(ax)},{n(ay)} L{n(bx)},{n(by)} L{n(bx)},{n(by + w1 * .1)} L{n(ax)},{n(ay + w1 * .1)}Z" fill="{WOOD_DARK}" '
+             f'stroke="{WOOD_INK}" stroke-width="{sw}"/>')
+    if w1 > 40:                                                # 係船柱と、ほどけた綱（近くで見るときだけ）
+        mx, my = ax + w1 * .16, ay - w1 * .06
+        o.append(f'<path d="M{n(mx - 6)},{n(my - 24)} L{n(mx + 6)},{n(my - 24)} L{n(mx + 6)},{n(my + 2)} L{n(mx - 6)},{n(my + 2)}Z" '
+                 f'fill="{WOOD_DARK}" stroke="{WOOD_INK}" stroke-width="2.4"/>'
+                 f'<path d="M{n(mx)},{n(my - 14)} q-18,8 -8,20 q8,8 -6,16" fill="none" stroke="#c8b48a" stroke-width="3"/>')
     return "".join(o)
 
 
@@ -120,13 +173,41 @@ def terrace(R, x0, x1, top, bottom, pal=DAY):
     return "".join(o)
 
 
-def broken_bridge(x0, x1, y, pal=DAY):
-    """谷に架かっていた木の橋の残り（両岸に板の端が残り、中ほどは落ちている）。"""
-    mid0, mid1 = x0 + (x1 - x0) * .32, x0 + (x1 - x0) * .7
-    return (f'<path d="M{n(x0)},{n(y)} L{n(mid0)},{n(y + 4)} L{n(mid0 - 6)},{n(y + 18)} L{n(x0)},{n(y + 14)}Z" fill="{WOOD}" stroke="{WOOD_INK}" stroke-width="2.4"/>'
-            f'<path d="M{n(mid1)},{n(y + 6)} L{n(x1)},{n(y)} L{n(x1)},{n(y + 14)} L{n(mid1 + 8)},{n(y + 20)}Z" fill="{WOOD}" stroke="{WOOD_INK}" stroke-width="2.4"/>'
-            f'<path d="M{n(mid0 - 2)},{n(y + 8)} L{n(mid0 + 18)},{n(y + 70)}" stroke="{WOOD_DARK}" stroke-width="7" stroke-linecap="round"/>'
-            f'<path d="M{n(x0 + 6)},{n(y - 30)} L{n(x0 + 6)},{n(y + 12)} M{n(x1 - 6)},{n(y - 30)} L{n(x1 - 6)},{n(y + 12)}" '
-            f'stroke="{WOOD_DARK}" stroke-width="6" stroke-linecap="round"/>'
-            f'<path d="M{n(x0 + 6)},{n(y - 28)} Q{n(mid0)},{n(y - 8)} {n(mid0 + 10)},{n(y + 30)} M{n(x1 - 6)},{n(y - 28)} Q{n(mid1)},{n(y - 6)} '
-            f'{n(mid1 - 6)},{n(y + 26)}" fill="none" stroke="#c8b48a" stroke-width="2.6"/>')
+def terrace_steps(cx, top, bottom, w0, w1, pal=DAY, steps=7):
+    """石積みの台の正面の中央を上る石段（坂道が神殿跡の正面へ着くところ）。"""
+    p = pal
+    o = [f'<path d="M{n(cx - w0 / 2)},{n(top)} L{n(cx + w0 / 2)},{n(top)} L{n(cx + w1 / 2)},{n(bottom)} L{n(cx - w1 / 2)},{n(bottom)}Z" '
+         f'fill="{p["stone"]}" stroke="{p["ink"]}" stroke-width="3" stroke-linejoin="round"/>']
+    for i in range(1, steps):
+        y, w = top + (bottom - top) * i / steps, w0 + (w1 - w0) * i / steps
+        o.append(f'<path d="M{n(cx - w / 2 + 2)},{n(y)} L{n(cx + w / 2 - 2)},{n(y)}" stroke="{p["shade"]}" stroke-width="2.6"/>'
+                 f'<path d="M{n(cx - w / 2 + 3)},{n(y + 2.4)} L{n(cx + w / 2 - 3)},{n(y + 2.4)}" stroke="{p["light"]}" stroke-width="1.6" opacity=".8"/>')
+    return "".join(o)
+
+
+def broken_bridge(cx, y_far, y_near, w_far, w_near):
+    """谷に架かっていた木の橋の残りを、渡る向き（手前から奥）に見る。両岸に板の端と親柱が残り、中ほどは落ちている。"""
+    gap = y_near - y_far
+    f2, n2 = y_far + gap * .2, y_near - gap * .3
+    hf, hn = w_far / 2, w_near / 2
+    o = [
+        # 奥の岸に残った板
+        f'<path d="M{n(cx - hf)},{n(y_far - 3)} L{n(cx + hf)},{n(y_far - 3)} L{n(cx + hf * 1.06)},{n(f2 - 4)} L{n(cx + hf * .3)},{n(f2 + 3)} '
+        f'L{n(cx - hf * .2)},{n(f2 - 2)} L{n(cx - hf * 1.06)},{n(f2 + 2)}Z" fill="{WOOD}" stroke="{WOOD_INK}" stroke-width="2.4" stroke-linejoin="round"/>',
+        f'<path d="M{n(cx - hf)},{n(y_far + 4)} L{n(cx + hf)},{n(y_far + 4)}" stroke="#8a7656" stroke-width="2"/>',
+        # 垂れ下がった板と綱
+        f'<path d="M{n(cx + hf * .5)},{n(f2)} L{n(cx + hf * .8)},{n(f2 + gap * .34)}" stroke="{WOOD_DARK}" stroke-width="7" stroke-linecap="round"/>',
+        f'<path d="M{n(cx - hf)},{n(y_far - 26)} Q{n(cx - hf * 1.3)},{n(f2)} {n(cx - hf * .9)},{n(f2 + gap * .3)} '
+        f'M{n(cx + hf)},{n(y_far - 26)} Q{n(cx + hf * 1.4)},{n(f2 - 4)} {n(cx + hf * 1.2)},{n(f2 + gap * .22)}" fill="none" stroke="#c8b48a" stroke-width="2.4"/>',
+        # 手前の岸に残った板
+        f'<path d="M{n(cx - hn)},{n(y_near + 4)} L{n(cx + hn)},{n(y_near + 4)} L{n(cx + hn * .94)},{n(n2 + 5)} L{n(cx + hn * .35)},{n(n2 - 4)} '
+        f'L{n(cx - hn * .3)},{n(n2 + 6)} L{n(cx - hn * .94)},{n(n2)}Z" fill="{WOOD}" stroke="{WOOD_INK}" stroke-width="2.8" stroke-linejoin="round"/>',
+        f'<path d="M{n(cx - hn * .97)},{n(y_near - gap * .14)} L{n(cx + hn * .97)},{n(y_near - gap * .14)}" stroke="#8a7656" stroke-width="2.4"/>',
+        f'<path d="M{n(cx - hn)},{n(y_near - 44)} Q{n(cx - hn * 1.25)},{n(n2 - 6)} {n(cx - hn * .8)},{n(n2 - gap * .18)} '
+        f'M{n(cx + hn)},{n(y_near - 44)} Q{n(cx + hn * 1.3)},{n(n2 - 10)} {n(cx + hn * 1.1)},{n(n2 - gap * .1)}" fill="none" stroke="#c8b48a" stroke-width="2.8"/>',
+    ]
+    # 親柱（奥は細く、手前は太く）
+    for x, y, h, w in ((cx - hf, y_far, 30, 5), (cx + hf, y_far, 30, 5), (cx - hn, y_near, 50, 8), (cx + hn, y_near, 50, 8)):
+        o.append(f'<path d="M{n(x)},{n(y - h)} L{n(x)},{n(y + h * .25)}" stroke="{WOOD_INK}" stroke-width="{w + 3}" stroke-linecap="round"/>'
+                 f'<path d="M{n(x)},{n(y - h)} L{n(x)},{n(y + h * .25)}" stroke="{WOOD_DARK}" stroke-width="{w}" stroke-linecap="round"/>')
+    return "".join(o)
