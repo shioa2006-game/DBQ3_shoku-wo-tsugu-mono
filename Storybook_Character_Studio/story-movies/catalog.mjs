@@ -135,12 +135,14 @@ export const MOVIES = [
     links: [{ label: '制作メモ', href: 'ch6-roof-light/README.md' }, { label: '絵コンテ', href: 'ch6-roof-light/reference/storyboard.md' }],
   },
   {
-    id: 'M12', slug: 'ch7-three-heads', title: '三頭魔竜の襲来「三つ首の影」', saga: 'dharma', status: 'planned', buildStep: 7,
+    id: 'M12', slug: 'ch7-three-heads', title: '三頭魔竜の襲来「三つ首の影」', saga: 'dharma', status: 'prototype', buildStep: 7,
     when: '第7章・中盤', place: 'ガーゴイル軍の3波を退けた後、初襲来の戦闘の直前', length: '小・6～8秒', priority: 'B',
     summary: '軍勢を率いる竜が自ら海を越えて現れ、ダーマを焼いたのは自分だと名乗る。戦いの結果は見せない。',
     scenes: ['海の向こうの空が暗くなり、水平線から三つ首の竜が飛んでくる', '三つの頭が大屋根を見下ろし、火を噴く構えをとる', '竜が自ら名を告げる'],
     cast: ['ヴァルガ'],
     tone: ['#2a1d2e', '#c8462e'],
+    thumb: { scene: 2, t: 2200 },
+    links: [{ label: '制作メモ', href: 'ch7-three-heads/README.md' }, { label: '絵コンテ', href: 'ch7-three-heads/reference/storyboard.md' }],
   },
   {
     id: 'M13', slug: 'ch7-flame-holds', title: '最終決戦の決着「灯は消えず」', saga: 'dharma', status: 'planned', buildStep: 7,
