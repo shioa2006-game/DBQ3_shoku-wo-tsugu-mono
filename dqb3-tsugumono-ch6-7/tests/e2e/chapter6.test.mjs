@@ -3,6 +3,7 @@
 // 素材集め・移動はスクリプトで代行し、ステージ遷移と状態の整合を確認する
 // （実際の採掘・設置の操作は quality-input.test.mjs、資材不足からの復帰は shortage.test.mjs）。
 
+import { PNG } from "pngjs";
 import {
   launchBrowser, openGame, newGame, stage, expect, SAVE_KEY,
   waitForCond, go, settle, completeActiveBlueprint, reloadAndContinue, talk, activeBlueprint,
@@ -178,6 +179,17 @@ try {
 
   // ⑪ 搬出路 → 住民と運び出す。その間にワタリとピノが帰港する → CH6_ROOF。
   await completeActiveBlueprint(page);
+  // go/settle は見えない会話も Enter で送るため、入力する前に実際の表示を確かめる。
+  await waitForCond(page, () => {
+    const g = window.__game;
+    return g.quests.stage === "CH6_ROOF" && g.ui.dialogue.open && !g.ui.dialogue.typing;
+  }, undefined, { label: "搬出後の最初の会話（入力せずに待つ）" });
+  const haulText = PNG.sync.read(await page.locator(".dlg-text").screenshot());
+  let brightPixels = 0;
+  for (let i = 0; i < haulText.data.length; i += 4) {
+    if (haulText.data[i] > 180 && haulText.data[i + 1] > 180 && haulText.data[i + 2] > 180) brightPixels += 1;
+  }
+  expect(brightPixels > 100, `搬出後の会話の文字が暗転に覆われず見える（明るい画素 ${brightPixels}）`);
   await go(page, "CH6_ROOF", { timeout: 40000 });
   const back = await page.evaluate(() => {
     const g = window.__game;

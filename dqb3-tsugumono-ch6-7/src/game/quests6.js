@@ -279,10 +279,11 @@ export class Chapter6 {
     g.player.pos.set(PLACES.caveMouth.x + 1.5, g.world.terrainSurfaceY(PLACES.caveMouth.x + 1, PLACES.caveMouth.z) + 0.1, PLACES.caveMouth.z + 0.5);
     g.player.vel.set(0, 0, 0);
     if (g.daynight.hour < 16 || g.daynight.hour > 19) g.daynight.hour = 16.2;
+    // 暗転は会話欄も覆うため、画面を戻してから会話の入力待ちに入る。
+    await g.ui.fade(false, 700);
     this.quests.busy = false;
-    this.play(CH6.dialogues.haulDone, async () => {
+    this.play(CH6.dialogues.haulDone, () => {
       this.quests.setStage("CH6_ROOF");
-      await g.ui.fade(false, 700);
       g.autosave();
     });
   }
