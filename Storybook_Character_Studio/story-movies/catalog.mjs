@@ -145,12 +145,15 @@ export const MOVIES = [
     links: [{ label: '制作メモ', href: 'ch7-three-heads/README.md' }, { label: '絵コンテ', href: 'ch7-three-heads/reference/storyboard.md' }],
   },
   {
-    id: 'M13', slug: 'ch7-flame-holds', title: '最終決戦の決着「灯は消えず」', saga: 'dharma', status: 'planned', buildStep: 7,
+    id: 'M13', slug: 'ch7-flame-holds', title: '最終決戦の決着「灯は消えず」', saga: 'dharma', status: 'prototype', buildStep: 7,
     when: '第7章・終盤', place: '三つ目の頭を倒した直後、戦後の修復の前', length: '中・10～20秒', priority: 'B',
     summary: '三つの頭を倒した決着と、傷ついた神殿の奥で祭壇の灯がともり続けていることを見せる。',
-    scenes: ['三つ目の頭が倒れ、竜の巨体が崩れ落ちる', '煙が晴れ、傷ついた屋根と壁の奥で祭壇の灯がともり続ける', '朝の光の中の対空ボウガンの射台と選択の柱、集まる仲間と住民'],
+    scenes: ['三つ目の頭が倒れ、竜の巨体が黒い霧へ崩れる', '煙が晴れ、傷ついた屋根と壁の奥で祭壇の灯がともり続ける。朝の光が選択の柱の印を照らす',
+      '朝の光の中の対空ボウガンの射台と傷の残る神殿、集まる仲間と住民。タイトル「灯は消えず」'],
     cast: ['シオン', 'ミナ', 'ゴンタ', 'ワタリ', 'ピノ', 'ベルク', 'スズハ', 'アサギ', 'ガンゾウ', 'ヴァルガ'],
     tone: ['#3a3440', '#f6d38a'],
+    thumb: { scene: 2, t: 4200 },
+    links: [{ label: '制作メモ', href: 'ch7-flame-holds/README.md' }, { label: '絵コンテ', href: 'ch7-flame-holds/reference/storyboard.md' }],
   },
   {
     id: 'M14', slug: 'ch7-unseen-books', title: 'ダーマ再興編・完「まだ見ぬ書へ」', saga: 'dharma', status: 'planned', buildStep: 5,
