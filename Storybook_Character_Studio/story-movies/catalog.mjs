@@ -124,13 +124,15 @@ export const MOVIES = [
     links: [{ label: '制作メモ', href: 'ch6-arrival/README.md' }, { label: '絵コンテ', href: 'ch6-arrival/reference/storyboard.md' }],
   },
   {
-    id: 'M11', slug: 'ch6-roof-light', title: '第6章の結び「大屋根の灯」', saga: 'dharma', status: 'planned', buildStep: 6,
+    id: 'M11', slug: 'ch6-roof-light', title: '第6章の結び「大屋根の灯」', saga: 'dharma', status: 'prototype', buildStep: 6,
     when: '第6章・章末', place: '神殿の完成と最初の授職を祝った後、第7章へ移る前', length: '中・15～20秒', priority: 'B',
     summary: '神殿の完成と最初の授職の喜びで第6章を締めくくり、最後に海の向こうから来る三つ首の影とガーゴイルの群れを、輪郭だけで短く見せる。',
     scenes: ['授職の灯がともる祭壇と、アサギの大工の印を刻んだ選択の柱', '共同台所の前の祝いの夜', '海岸から望む、灯のともった大屋根',
       '遠い咆哮。月の沖を横切る三つ首の影とガーゴイルの群れ（輪郭だけ）', 'タイトル「第6章・完」'],
     cast: ['シオン', 'ミナ', 'ゴンタ', 'ワタリ', 'ピノ', 'スズハ', 'アサギ', 'ガンゾウ'],
     tone: ['#1e2a4a', '#f0b862'],
+    thumb: { scene: 2, t: 3600 },
+    links: [{ label: '制作メモ', href: 'ch6-roof-light/README.md' }, { label: '絵コンテ', href: 'ch6-roof-light/reference/storyboard.md' }],
   },
   {
     id: 'M12', slug: 'ch7-three-heads', title: '三頭魔竜の襲来「三つ首の影」', saga: 'dharma', status: 'planned', buildStep: 7,

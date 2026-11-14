@@ -153,3 +153,112 @@ def remains_silhouette(R, color="#1a2138", rim="#8fa3cf", rim_op=.45, bedrock=Tr
         o.append(f'<path d="M{x},{y - 21} L{x + w},{y - 21} A9,21 0 0 1 {x + w},{y + 21} L{x},{y + 21} A9,21 0 0 1 {x},{y - 21}Z" fill="{color}"/>')
     o.append(f'<path d="M488,388 L500,382 L560,512 L546,516Z M1286,520 L1300,512 L1372,600 L1356,608Z" fill="{color}"/>')
     return "".join(o)
+
+
+# ---------------------------------------------------------------------------
+# 再建した神殿（第6章の完成後）。同じ三段の基壇と柱の並びの上に、石造りの本堂と木組みの大屋根。
+# 残った二本の柱（3本目と5本目）は正面の入口の両脇に生かし、中央（4本目の位置）を入口にする。
+# 座標はプロローグのまま（崩れた神殿跡と重ねると、基壇と柱の位置がそろう）。M11・M14 などで使い、ゲームの設計図の手本になる。
+# ---------------------------------------------------------------------------
+REBUILT_DAY = dict(stone="#d8cfbd", stone_light="#efe6d4", stone_shade="#a99e8c", old="#c4b89f", old_shade="#938670",
+                   wood="#9a6a3c", wood_dark="#5e3e22", wood_light="#c4945c", roof="#7a4e2c", roof_light="#a8744a",
+                   roof_dark="#4e301a", ink="#3e3226", window="#4a3a2e", door="#f6dfae", gold="#d9b545", lamp="#f3d9a0", glow=None)
+REBUILT_NIGHT = dict(stone="#5d6378", stone_light="#7a8098", stone_shade="#43485c", old="#565a6c", old_shade="#3d4152",
+                     wood="#4b3a33", wood_dark="#2a201c", wood_light="#6c5446", roof="#3a2c2a", roof_light="#5a4540",
+                     roof_dark="#211816", ink="#121320", window="#ffcf7a", door="#ffd890", gold="#f0c860", lamp="#ffd98a",
+                     glow="#ffb24a")
+WALL_TOP, WALL_LEFT, WALL_RIGHT = 336, 340, 1260
+EAVE_Y, RIDGE_Y = 278, 112
+EAVE_D = "M190,262 Q222,276 300,278 L1300,278 Q1378,276 1410,262"
+ROOF_D = "M190,262 Q222,276 300,278 L1300,278 Q1378,276 1410,262 Q1290,172 1140,122 L460,122 Q310,172 190,262Z"
+
+
+def book_emblem(cx, cy, r, gold, ink):
+    """職業の書の紋章（金の円に開いた本）。破風の飾りと祭壇の要石に使う。"""
+    return (f'<circle cx="{n(cx)}" cy="{n(cy)}" r="{n(r)}" fill="{gold}" stroke="{ink}" stroke-width="{n(max(1.2, r * .12))}"/>'
+            f'<path d="M{n(cx)},{n(cy + r * .42)} Q{n(cx - r * .35)},{n(cy + r * .2)} {n(cx - r * .62)},{n(cy + r * .36)} L{n(cx - r * .62)},{n(cy - r * .32)} '
+            f'Q{n(cx - r * .35)},{n(cy - r * .48)} {n(cx)},{n(cy - r * .26)} Q{n(cx + r * .35)},{n(cy - r * .48)} {n(cx + r * .62)},{n(cy - r * .32)} '
+            f'L{n(cx + r * .62)},{n(cy + r * .36)} Q{n(cx + r * .35)},{n(cy + r * .2)} {n(cx)},{n(cy + r * .42)}Z M{n(cx)},{n(cy - r * .26)} L{n(cx)},{n(cy + r * .42)}" '
+            f'fill="none" stroke="{ink}" stroke-width="{n(max(1, r * .1))}" stroke-linejoin="round"/>')
+
+
+def temple_rebuilt(p, R, pal=REBUILT_DAY, lamp_cls="", window_cls=""):
+    """再建した神殿（プロローグの座標）。p は id の接頭辞（屋根の切り抜きに使う）。夜は REBUILT_NIGHT（窓と灯りが光る）。"""
+    c = pal
+    o = []
+    # 基壇（崩れた神殿跡と同じ三段。石を継ぎ直してきれいにした）
+    o.append(f'<path d="{PLATFORM}" fill="{c["stone"]}" stroke="{c["ink"]}" stroke-width="3" stroke-linejoin="round"/>')
+    for y0, y1, x0, x1 in ((566, 592, 270, 1330), (542, 566, 300, 1300), (516, 542, 330, 1270)):
+        o.append(f'<path d="M{x0},{y0 + 2} L{x1},{y0 + 2}" stroke="{c["stone_light"]}" stroke-width="4"/>'
+                 f'<path d="M{x0},{y1 - 3} L{x1},{y1 - 3}" stroke="{c["stone_shade"]}" stroke-width="4"/>')
+    # 本堂の石の壁（段積み）
+    o.append(f'<rect x="{WALL_LEFT}" y="{WALL_TOP}" width="{WALL_RIGHT - WALL_LEFT}" height="{516 - WALL_TOP}" fill="{c["stone"]}" '
+             f'stroke="{c["ink"]}" stroke-width="3"/>')
+    for k, y in enumerate(range(WALL_TOP + 22, 516, 22)):
+        o.append(f'<path d="M{WALL_LEFT},{y} L{WALL_RIGHT},{y}" stroke="{c["stone_shade"]}" stroke-width="1.8"/>')
+        x = WALL_LEFT + (24 if k % 2 else 48)
+        while x < WALL_RIGHT - 10:
+            o.append(f'<path d="M{x},{y - 22} L{x},{y}" stroke="{c["stone_shade"]}" stroke-width="1.6"/>')
+            x += 50
+    # 窓（入口の左右三つずつの柱の間）。夜は灯りがもれる
+    for b in (0, 1, 2, 5, 6, 7):
+        cx = (COLS[b] + COLS[b + 1]) / 2
+        o.append(f'<path class="{window_cls}" d="M{n(cx - 17)},452 L{n(cx - 17)},398 A17,17 0 0 1 {n(cx + 17)},398 L{n(cx + 17)},452Z" '
+                 f'fill="{c["window"]}" stroke="{c["wood_dark"]}" stroke-width="4"/>'
+                 f'<path d="M{n(cx)},382 L{n(cx)},452 M{n(cx - 17)},420 L{n(cx + 17)},420" stroke="{c["wood_dark"]}" stroke-width="3"/>')
+    # 正面の入口（4本目の位置）と、開いた木の扉。奥に祭壇の灯
+    o.append(f'<path d="M736,516 L736,410 A64,64 0 0 1 864,410 L864,516Z" fill="{c["door"]}" stroke="{c["ink"]}" stroke-width="3"/>'
+             f'<path d="M736,516 L736,412 L700,404 L700,520Z M864,516 L864,412 L900,404 L900,520Z" fill="{c["wood"]}" stroke="{c["ink"]}" stroke-width="2.6"/>'
+             f'<path d="M786,516 L786,488 L814,488 L814,516Z" fill="{c["stone_shade"]}" opacity=".7"/>'
+             f'<path d="M800,486 Q792,474 800,462 Q808,474 800,486Z" fill="{c["gold"]}"/>')
+    # 柱（壁から少し張り出す）。入口の両脇の2本は、崩れずに残った古い柱（色が少し違い、すすの跡が残る）
+    for i, cx in enumerate(COLS):
+        if i == 4:
+            continue
+        old = i in STANDING
+        body, shade = (c["old"], c["old_shade"]) if old else (c["stone_light"], c["stone_shade"])
+        o.append(f'<path d="M{cx - 22},516 L{cx - 20},{WALL_TOP} L{cx + 20},{WALL_TOP} L{cx + 22},516Z" fill="{body}" stroke="{c["ink"]}" stroke-width="3"/>'
+                 f'<path d="M{cx + 6},516 L{cx + 5},{WALL_TOP} L{cx + 20},{WALL_TOP} L{cx + 22},516Z" fill="{shade}" opacity=".7"/>'
+                 f'<path d="M{cx - 30},{WALL_TOP - 16} L{cx + 30},{WALL_TOP - 16} L{cx + 30},{WALL_TOP - 8} L{cx + 26},{WALL_TOP} L{cx - 26},{WALL_TOP} '
+                 f'L{cx - 30},{WALL_TOP - 8}Z" fill="{body}" stroke="{c["ink"]}" stroke-width="3" stroke-linejoin="round"/>')
+        if old:
+            o.append(f'<path d="M{cx - 4},{516 - 130} Q{cx + 10},{516 - 80} {cx + 2},{516 - 12} L{cx + 16},{516 - 12} Q{cx + 18},{516 - 90} {cx + 8},{516 - 136}Z" '
+                     f'fill="{c["ink"]}" opacity=".18"/>')
+    # 頭貫（壁の上の木の梁）と、柱の上の組物
+    o.append(f'<rect x="{WALL_LEFT - 10}" y="{WALL_TOP - 34}" width="{WALL_RIGHT - WALL_LEFT + 20}" height="18" fill="{c["wood"]}" stroke="{c["ink"]}" stroke-width="3"/>'
+             f'<path d="M{WALL_LEFT - 10},{WALL_TOP - 32} L{WALL_RIGHT + 10},{WALL_TOP - 32}" stroke="{c["wood_light"]}" stroke-width="2.4"/>')
+    for cx in COLS:
+        o.append(f'<path d="M{cx - 18},{WALL_TOP - 34} L{cx - 18},{EAVE_Y + 6} L{cx + 18},{EAVE_Y + 6} L{cx + 18},{WALL_TOP - 34}Z" '
+                 f'fill="{c["wood"]}" stroke="{c["ink"]}" stroke-width="2.4"/>'
+                 f'<path d="M{cx - 26},{EAVE_Y + 6} L{cx + 26},{EAVE_Y + 6}" stroke="{c["wood_dark"]}" stroke-width="5"/>')
+    # 軒下の垂木（木口の並び）
+    o.append(f'<path d="M230,{EAVE_Y - 2} L1370,{EAVE_Y - 2} L1370,{EAVE_Y + 8} L230,{EAVE_Y + 8}Z" fill="{c["wood_dark"]}"/>'
+             + "".join(f'<rect x="{x}" y="{EAVE_Y}" width="7" height="7" fill="{c["wood_light"]}"/>' for x in range(240, 1364, 18)))
+    # 大屋根（木の板葺き）：四隅の反り、葺き板の段、棟と両端の飾り
+    clip = f"{p}roofclip"
+    o.append(f'<defs><clipPath id="{clip}"><path d="{ROOF_D}"/></clipPath></defs>')
+    o.append(f'<path d="{ROOF_D}" fill="{c["roof"]}" stroke="{c["ink"]}" stroke-width="3.4" stroke-linejoin="round"/>')
+    courses = "".join(f'<path d="M150,{y} L1450,{y}" stroke="{c["roof_dark"]}" stroke-width="2" opacity=".6"/>' for y in range(138, 276, 14))
+    seams = "".join(f'<path d="M{x},122 L{n(x + (x - 800) * .62)},280" stroke="{c["roof_light"]}" stroke-width="1.4" opacity=".35"/>'
+                    for x in range(480, 1130, 40))
+    o.append(f'<g clip-path="url(#{clip})">{courses}{seams}'
+             f'<path d="M460,122 Q310,172 190,262 L232,262 Q336,180 480,130Z M1140,122 Q1290,172 1410,262 L1368,262 Q1264,180 1120,130Z" '
+             f'fill="{c["roof_light"]}" opacity=".45"/></g>')
+    o.append(f'<path d="{EAVE_D}" fill="none" stroke="{c["roof_dark"]}" stroke-width="10" stroke-linecap="round"/>'
+             f'<path d="{EAVE_D}" fill="none" stroke="{c["roof_light"]}" stroke-width="3" transform="translate(0 -4)"/>')
+    o.append(f'<path d="M450,{RIDGE_Y + 12} L1150,{RIDGE_Y + 12} L1150,{RIDGE_Y - 8} L450,{RIDGE_Y - 8}Z" fill="{c["roof_dark"]}" stroke="{c["ink"]}" stroke-width="3"/>'
+             f'<path d="M440,{RIDGE_Y + 14} L422,{RIDGE_Y - 30} L456,{RIDGE_Y - 10}Z M1160,{RIDGE_Y + 14} L1178,{RIDGE_Y - 30} L1144,{RIDGE_Y - 10}Z" '
+             f'fill="{c["roof_dark"]}" stroke="{c["ink"]}" stroke-width="2.6" stroke-linejoin="round"/>')
+    # 正面の破風（入口の上）と、職業の書の紋章
+    o.append(f'<path d="M666,266 L800,150 L934,266Z" fill="{c["roof_light"]}" stroke="{c["ink"]}" stroke-width="3" stroke-linejoin="round"/>'
+             f'<path d="M692,258 L800,166 L908,258Z" fill="{c["wood"]}" stroke="{c["wood_dark"]}" stroke-width="2"/>'
+             + "".join(f'<path d="M{x},258 L{x},{n(258 - (108 - abs(x - 800)) * .85)}" stroke="{c["wood_dark"]}" stroke-width="1.6"/>'
+                       for x in range(716, 888, 16))
+             + book_emblem(800, 220, 20, c["gold"], c["ink"]))
+    # 軒の提灯（夜は灯る）
+    for x in [COLS[0] - 60] + [(COLS[b] + COLS[b + 1]) / 2 for b in (0, 1, 2, 5, 6, 7)] + [COLS[-1] + 60]:
+        if c["glow"]:
+            o.append(f'<circle class="{lamp_cls}" cx="{n(x)}" cy="{EAVE_Y + 30}" r="26" fill="{c["glow"]}" opacity=".35"/>')
+        o.append(f'<path d="M{n(x)},{EAVE_Y + 8} L{n(x)},{EAVE_Y + 16}" stroke="{c["ink"]}" stroke-width="2"/>'
+                 f'<ellipse cx="{n(x)}" cy="{EAVE_Y + 30}" rx="10" ry="14" fill="{c["lamp"]}" stroke="{c["ink"]}" stroke-width="2"/>')
+    return "".join(o)

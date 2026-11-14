@@ -4,7 +4,7 @@
 //
 // あわせて、ムービー側（shared/figures.py）が手足を付けるための情報を添える。
 //   - limbs: 手足の色。ゲームの3Dリグの色（第1～3章の src/entities/player.js・villagers.js、第4～5章の住民は
-//     第4～5章の src/entities/villagers.js と同じ値）。
+//     第4～5章の src/entities/villagers.js と同じ値。第6～7章の住民はゲームがまだないので、Studioの rig-profile.mjs の値）。
 //   - anchors: 胴・頭の画像（output/*_torso_layer_8dir.png・*_head_layer_8dir.png）から測った位置
 //     （胴の上端・肩の高さと左右・裾の高さと左右、頭の上下左右）。作画を変えて画像を書き出し直すと、ここも変わる。
 // 全員が同じセル座標なので、ゲームと同じ背丈・頭の大きさの比で並べられる。
@@ -25,6 +25,9 @@ import * as nagi from '../../prototypes/nagi-8dir/character.mjs';
 import * as yomogi from '../../prototypes/yomogi-8dir/character.mjs';
 import * as sumi from '../../prototypes/sumi-8dir/character.mjs';
 import * as teru from '../../prototypes/teru-8dir/character.mjs';
+import * as suzuha from '../../prototypes/suzuha-8dir/character.mjs';
+import * as asagi from '../../prototypes/asagi-8dir/character.mjs';
+import * as ganzou from '../../prototypes/ganzou-8dir/character.mjs';
 import { DIRECTIONS } from '../../prototypes/shared/sheet-format.mjs';
 
 export const CELL = 128;
@@ -60,7 +63,24 @@ export const CAST = Object.freeze({
     limbs: { sleeve: '#4b5c6e', hand: '#d8b08a', pants: '#57503f', boot: '#3a2f26' } },
   teru: { name: 'テル', module: teru, markup: teru.teruMarkup, sheet: teru.buildTeruSheet,
     limbs: { sleeve: '#6b6b3a', hand: '#eec39a', pants: '#4f4436', boot: '#332b20' } },
+  // 第6～7章の住民（手足の色は各人の rig-profile.mjs）
+  suzuha: { name: 'スズハ', module: suzuha, markup: suzuha.suzuhaMarkup, sheet: suzuha.buildSuzuhaSheet,
+    limbs: { sleeve: '#8e656c', hand: '#f5c796', pants: '#514b42', boot: '#624633' } },
+  asagi: { name: 'アサギ', module: asagi, markup: asagi.asagiMarkup, sheet: asagi.buildAsagiSheet,
+    limbs: { sleeve: '#536d70', hand: '#f4c99d', pants: '#4c4337', boot: '#614733' } },
+  ganzou: { name: 'ガンゾウ', module: ganzou, markup: ganzou.ganzouMarkup, sheet: ganzou.buildGanzouSheet,
+    limbs: { sleeve: '#50504f', hand: '#efb16c', pants: '#514b42', boot: '#624633' } },
 });
+
+// 原本のパレット。DEFAULT_PALETTE を書き出していない作画コード（スズハ・ガンゾウ）は、シートの svg の style
+// （--ink:#…;--skin:#… の並び）から読む。値は同じ。
+function paletteOf(id) {
+  const c = CAST[id];
+  if (c.module.DEFAULT_PALETTE) return c.module.DEFAULT_PALETTE;
+  const style = c.sheet({ part: 'combined' }).match(/^<svg[^>]*\sstyle="([^"]+)"/)?.[1];
+  if (!style) throw new Error(`${id}: no palette`);
+  return Object.fromEntries([...style.matchAll(/--([A-Za-z]+):\s*(#[0-9a-fA-F]{3,8})/g)].map(m => [m[1], m[2]]));
+}
 
 function resolveColors(svg, palette, id) {
   return svg.replace(/var\(--([A-Za-z]+)\)/g, (_, name) => {
@@ -150,7 +170,7 @@ export function castParts(request) {
   for (const [id, directions] of Object.entries(request)) {
     const c = CAST[id];
     if (!c) throw new Error(`unknown character: ${id}`);
-    const palette = c.module.DEFAULT_PALETTE, anchors = measure(id), views = {};
+    const palette = paletteOf(id), anchors = measure(id), views = {};
     for (const direction of directions) {
       if (!DIRECTIONS.includes(direction)) throw new Error(`unknown direction: ${direction}`);
       views[direction] = {
