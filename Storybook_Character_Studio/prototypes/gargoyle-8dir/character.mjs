@@ -49,7 +49,7 @@ function face(view) {
 }
 
 // 肩から腰までの石の面と腕脚の節は共通。x は左右、h は高さ、z は前方。
-function draw(view,frame,flying) {
+function draw(view,frame,flying,heavy=false) {
   const angle=view*Math.PI/4, c=Math.cos(angle), s=Math.sin(angle);
   const project=([x,h,z])=>[63+c*x-s*z,115-h+.23*(s*x+c*z)];
   const P=(x,h,z)=>project([x,h,z]);
@@ -64,8 +64,8 @@ function draw(view,frame,flying) {
   }
   const b=frame==='b';
   function wing(side) {
-    const root=[side*8,62,-7];
-    const w=(x,h,z)=>P(side*x,h,z).join(' ');
+    const root=[side*(heavy?11:8),62,-7];
+    const w=(x,h,z)=>P(side*x*(heavy?1.22:1),h,z).join(' ');
     const base=project(root).join(' ');
     if(!flying) {
       // 各肩に独立した一枚。先端も背骨を越えず同じ側の腰へ下がる。
@@ -86,10 +86,11 @@ function draw(view,frame,flying) {
       +line(`M${base} Q${w(17,72,-8)} ${wrist} Q${w(47,b?68:89,-17)} ${tip}`,'#96939c',2);
   }
   function foot(side) {
-    const step=flying?0:side*(b?1:-1);
-    const hip=[side*8,39,0], knee=[side*13,25,8+step*3];
-    const ankle=[side*10,flying?16:8+(step>0?8:0),flying?-7:step*6];
-    let leg=block(hip,knee,8,7)+block(knee,ankle,6,4.5);
+    // 重装型の試作は両足を接地した静止姿勢。歩行・攻撃は後で制作する。
+    const step=flying||heavy?0:side*(b?1:-1);
+    const hip=[side*(heavy?11:8),39,0], knee=[side*(heavy?17:13),25,8+step*3];
+    const ankle=[side*(heavy?15:10),flying?16:8+(step>0?8:0),flying?-7:step*6];
+    let leg=block(hip,knee,heavy?10:8,heavy?8.5:7)+block(knee,ankle,heavy?7.5:6,heavy?5.5:4.5);
     for(const toe of [-1,0,1]) leg+=poly([[ankle[0]+toe*3,ankle[1],ankle[2]],
       [ankle[0]+toe*4+2,ankle[1]-3,ankle[2]+3],
       [ankle[0]+toe*5,ankle[1]-(flying?7:5),ankle[2]+9-Math.abs(toe)],
@@ -97,6 +98,18 @@ function draw(view,frame,flying) {
     return leg;
   }
   function arm(side) {
+    if(heavy) {
+      const shoulder=[side*20,64,1], elbow=[side*29,47,7], hand=[side*28,33,17];
+      const v=(x,h,z)=>[side*x,h,z];
+      // 肩と前腕の張り出しで壁破壊役の輪郭を作る。手は低く構えた岩の拳。
+      return block(shoulder,elbow,11,8)+block(elbow,hand,12,10)
+        +poly([v(12,65,3),v(18,72,1),v(27,69,0),v(30,61,3),v(23,57,8),v(15,59,7)],'var(--stone)')
+        +poly([v(12,65,3),v(18,72,1),v(27,69,0),v(23,65,7),v(16,63,8)],'var(--light)')
+        +poly([v(21,48,12),v(30,51,9),v(37,43,12),v(35,34,20),v(25,32,23),v(20,38,21)],'var(--stone)')
+        +poly([v(21,48,12),v(30,51,9),v(34,46,14),v(27,43,18),v(20,38,21)],'var(--light)')
+        +poly([v(35,34,20),v(33,28,24),v(25,27,25),v(21,32,23),v(25,37,21)],'var(--shadow)')
+        +[-1,0,1].map(f=>poly([v(28+f*3,33,23),v(30+f*3,31,24),v(29+f*3,26,26),v(27+f*3,29,25)],'#aaa6a9')).join('');
+    }
     const shoulder=[side*13,62,2], elbow=[side*19,48,8], hand=[side*20,43,18];
     let arm=block(shoulder,elbow,7.6,5.7)+block(elbow,hand,7.3,5.7);
     for(const finger of [-1,0,1]) {
@@ -105,12 +118,19 @@ function draw(view,frame,flying) {
     }
     return arm;
   }
-  const body=block([0,65,0],[0,38,-1],14,10)
+  const body=heavy ? block([0,65,0],[0,36,-1],21,13)
+    +(view>=3
+      ? poly([[-16,63,-6],[-9,68,-8],[0,66,-12],[10,68,-8],[16,63,-6],[11,47,-9],[0,42,-12],[-11,47,-9]],'var(--shadow)')
+        +poly([[-13,62,-8],[-8,66,-9],[-2,63,-13],[-2,47,-13],[-10,50,-10]],'var(--stone)')
+      : poly([[-19,62,3],[-12,68,6],[0,64,14],[0,53,14],[-13,55,10]],'var(--light)')
+        +poly([[0,64,14],[12,68,6],[19,62,3],[13,55,10],[0,53,14]],'var(--stone)')
+        +poly([[-11,51,10],[0,53,13],[11,51,10],[8,41,8],[0,37,10],[-8,41,8]],'var(--stone)'))
+    : block([0,65,0],[0,38,-1],14,10)
     +poly([[-12,62,2],[-7,66,5],[0,63,9],[0,54,9],[-9,56,5]],'#898993')
     +poly([[0,63,9],[8,65,5],[12,62,2],[8,56,5],[0,54,9]],'#70717e');
   const tailPts=[[0,40,-5],[1,29,-16],[3,25,-27],[5,28,-33],[5,32,-32]].map(project);
   const tail=slab(tube(tailPts,[4,3.5,2.8,1.8,.5]),'#777580');
-  const [hx,hy]=P(0,71,7);
+  const [hx,hy]=P(0,heavy?74:71,heavy?10:7);
   const head=group(hx,hy,`<g transform="scale(.84)">${face(view)}</g>`);
   const rear=view>=3;
   const trunk=foot(-1)+arm(-1)+foot(1)+body;
@@ -122,3 +142,5 @@ function draw(view,frame,flying) {
 
 export const buildFlightSheet = options => monsterSheet(options,palette,'',(view,frame)=>draw(view,frame,true));
 export const buildGroundSheet = options => monsterSheet(options,palette,'',(view,frame)=>draw(view,frame,false));
+// 静止試作。表示リグ用のA/Bは同じ造形で、角・耳・顔は通常型を共有する。
+export const buildHeavyGroundSheet = options => monsterSheet(options,palette,'',view=>draw(view,'a',false,true));

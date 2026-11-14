@@ -7,7 +7,7 @@ import { createRequire } from 'node:module';
 import { buildWillOWispSheet } from '../../prototypes/will-o-wisp-8dir/character.mjs';
 import { buildArmoredScorpionSheet } from '../../prototypes/armored-scorpion-8dir/character.mjs';
 import { buildVolcanoLizardSheet } from '../../prototypes/volcano-lizard-8dir/character.mjs';
-import { buildFlightSheet, buildGroundSheet } from '../../prototypes/gargoyle-8dir/character.mjs';
+import { buildFlightSheet, buildGroundSheet, buildHeavyGroundSheet } from '../../prototypes/gargoyle-8dir/character.mjs';
 import { buildCrabSheet } from '../../prototypes/small-rock-crab-8dir/character.mjs';
 import { buildGromHeadSheet, buildGromBodySheet } from '../../prototypes/grom-8dir/character.mjs';
 
@@ -18,6 +18,7 @@ const MONSTERS = {
   armored_scorpion: ['armored-scorpion-8dir', buildArmoredScorpionSheet],
   gargoyle_flight: ['gargoyle-8dir', buildFlightSheet],
   gargoyle_ground: ['gargoyle-8dir', buildGroundSheet],
+  gargoyle_heavy_ground: ['gargoyle-8dir', buildHeavyGroundSheet, {staticPose:true}],
   small_rock_crab: ['small-rock-crab-8dir', buildCrabSheet],
   volcano_lizard: ['volcano-lizard-8dir', buildVolcanoLizardSheet],
 };
@@ -31,7 +32,7 @@ test('monster SVGs reproduce exactly from their authoring code', async () => {
 });
 
 test('monster sheets keep every pixel, a fixed bottom and a centred body in all 16 cells', async () => {
-  for (const [id, [folder]] of Object.entries(MONSTERS)) {
+  for (const [id, [folder,,config]] of Object.entries(MONSTERS)) {
     const sheets = {};
     for (const frame of ['a', 'b']) {
       const png = PNG.sync.read(await readFile(output(folder, `${id}_code_idle_${frame}_8dir.png`)));
@@ -54,7 +55,8 @@ test('monster sheets keep every pixel, a fixed bottom and a centred body in all 
       }
       sheets[frame] = png;
     }
-    assert.notDeepEqual(sheets.a.data, sheets.b.data, `${id}: poses A and B differ`);
+    if(config?.staticPose) assert.deepEqual(sheets.a.data, sheets.b.data, `${id}: 静止試作のA/Bは同じ姿勢`);
+    else assert.notDeepEqual(sheets.a.data, sheets.b.data, `${id}: poses A and B differ`);
   }
 });
 

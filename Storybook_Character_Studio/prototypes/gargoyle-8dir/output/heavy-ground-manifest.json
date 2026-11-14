@@ -1,0 +1,212 @@
+{
+  "id": "gargoyle_heavy_ground",
+  "name": "岩砕きのガーゴイル",
+  "role": "静止造形・試作01",
+  "version": 1,
+  "status": "prototype",
+  "source": "../character.mjs",
+  "format": "game-monster-billboard",
+  "cellSize": 128,
+  "columns": 4,
+  "rows": 2,
+  "directions": [
+    "front",
+    "front_left",
+    "left",
+    "back_left",
+    "back",
+    "back_right",
+    "right",
+    "front_right"
+  ],
+  "labels": [
+    "正面",
+    "左斜め前",
+    "左",
+    "左斜め後",
+    "背面",
+    "右斜め後",
+    "右",
+    "右斜め前"
+  ],
+  "anchor": {
+    "centerU": 0.494,
+    "bottomFromTop": 0.945
+  },
+  "frames": [
+    {
+      "frame": "a",
+      "output": "gargoyle_heavy_ground_code_idle_a_8dir.png",
+      "normalization": [
+        {
+          "row": 0,
+          "col": 0,
+          "dx": 0,
+          "dy": 7,
+          "bbox": "21-104/17-114",
+          "before": "0.488",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "dx": 6,
+          "dy": 5,
+          "bbox": "21-92/16-116",
+          "before": "0.441",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "dx": -2,
+          "dy": 5,
+          "bbox": "31-98/14-116",
+          "before": "0.504",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 3,
+          "dx": 6,
+          "dy": 7,
+          "bbox": "21-92/13-114",
+          "before": "0.441",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 0,
+          "dx": 0,
+          "dy": 11,
+          "bbox": "21-104/12-110",
+          "before": "0.488",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 1,
+          "dx": -6,
+          "dy": 7,
+          "bbox": "33-104/13-114",
+          "before": "0.535",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "dx": 2,
+          "dy": 5,
+          "bbox": "27-94/14-116",
+          "before": "0.473",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 3,
+          "dx": -6,
+          "dy": 5,
+          "bbox": "33-104/16-116",
+          "before": "0.535",
+          "after": "0.492"
+        }
+      ]
+    },
+    {
+      "frame": "b",
+      "output": "gargoyle_heavy_ground_code_idle_b_8dir.png",
+      "normalization": [
+        {
+          "row": 0,
+          "col": 0,
+          "dx": 0,
+          "dy": 7,
+          "bbox": "21-104/17-114",
+          "before": "0.488",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "dx": 6,
+          "dy": 5,
+          "bbox": "21-92/16-116",
+          "before": "0.441",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "dx": -2,
+          "dy": 5,
+          "bbox": "31-98/14-116",
+          "before": "0.504",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 3,
+          "dx": 6,
+          "dy": 7,
+          "bbox": "21-92/13-114",
+          "before": "0.441",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 0,
+          "dx": 0,
+          "dy": 11,
+          "bbox": "21-104/12-110",
+          "before": "0.488",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 1,
+          "dx": -6,
+          "dy": 7,
+          "bbox": "33-104/13-114",
+          "before": "0.535",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "dx": 2,
+          "dy": 5,
+          "bbox": "27-94/14-116",
+          "before": "0.473",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 3,
+          "dx": -6,
+          "dy": 5,
+          "bbox": "33-104/16-116",
+          "before": "0.535",
+          "after": "0.492"
+        }
+      ]
+    }
+  ],
+  "runtime": {
+    "class": "MonsterSprite",
+    "interval": 0.38,
+    "uv": {
+      "uMin": 0.02,
+      "uMax": 0.98,
+      "vMin": 0.02,
+      "vMax": 0.98
+    },
+    "scale": 1,
+    "tint": 16777215,
+    "yOffset": 0
+  },
+  "references": [
+    "references/gargoyle-landed-v2.png",
+    "references/gargoyle-landed-v2.png"
+  ],
+  "targets": []
+}

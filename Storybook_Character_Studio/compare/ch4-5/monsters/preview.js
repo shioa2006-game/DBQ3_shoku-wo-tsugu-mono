@@ -33,6 +33,11 @@ const MONSTERS = {
     output: new URL('../../../prototypes/gargoyle-8dir/output/', import.meta.url),
     note: '第7章の神殿防衛。飛行は翼を広げて羽ばたき、地上は翼を背中に畳んで歩きます。',
     variants: [['飛行',1,0xffffff,true], ['地上',1,0xffffff,false]] },
+  gargoyle_heavy: { name:'岩砕きのガーゴイル', chapter:'ダーマ再興編', art:'gargoyle_heavy_ground',
+    output:new URL('../../../prototypes/gargoyle-8dir/output/',import.meta.url),
+    referenceArt:'gargoyle_ground', staticPose:true,
+    note:'壁を壊す大型ガーゴイルの静止造形。幅広い胸、厚い肩と前腕、低く構えた岩の拳。左の通常型と同じ倍率で比較できます。',
+    variants:[['静止造形（同倍率で比較）',1,0xffffff,false]] },
 };
 const ids = Object.keys(MONSTERS);
 const params = new URLSearchParams(location.search);
@@ -52,7 +57,7 @@ for (const other of ids) {
 m.variants.forEach(([label], i) => { const o = document.createElement('option'); o.value = i; o.textContent = label; $('variant').append(o); });
 const designSheet = m.design && await fourViewReference(m.design,{regions:m.regions});
 const studioSheets = art => ['a','b'].map(f => new URL(`${art}_code_idle_${f}_8dir.png`,m.output).href);
-const ref = designSheet ? [designSheet, designSheet] : sheets(m.art, false);
+const ref = m.referenceArt ? [studioSheets(m.referenceArt)[0],studioSheets(m.referenceArt)[0]] : designSheet ? [designSheet, designSheet] : sheets(m.art, false);
 const code = m.output ? studioSheets(m.art) : sheets(m.art, true);
 const landedSheet = m.landed && await fourViewReference(m.landed,{singleView:true});
 const ground = landedSheet && [[landedSheet,landedSheet],studioSheets('gargoyle_ground')];
@@ -66,13 +71,28 @@ if (m.design) {
   }
   $('production-note').textContent = '第6章に向けてStudioで制作中。左は通常姿勢の参照画、右はコードで描いた8方向・2姿勢です。';
 }
+if(m.staticPose) {
+  document.querySelector('.eyebrow').textContent = `MONSTER STUDY / ${m.chapter}`;
+  $('reference-label').textContent = '通常ガーゴイル（同倍率）';
+  $('pose').replaceChildren(new Option('静止姿勢','a'));
+  $('pose').disabled = true;
+  $('scene').setAttribute('aria-label','通常ガーゴイルと岩砕きのガーゴイルの静止造形を同倍率で比較');
+  $('ref-a').previousElementSibling.textContent = '通常ガーゴイル・地上A';
+  $('code-a').previousElementSibling.textContent = '岩砕きのガーゴイル・静止姿勢';
+  $('ref-a').alt = '通常ガーゴイルの8方向';
+  $('code-a').alt = '岩砕きのガーゴイルの静止8方向';
+  for(const el of ['ref-b','code-b']) $(el).parentElement.hidden = true;
+  document.querySelector('section h2').textContent = '静止造形の8方向シート';
+  document.querySelector('section > p').textContent = '4列 × 2行、1セル128px、透明背景。今回は静止姿勢のみです。';
+  $('production-note').textContent = '第7章向けの静止試作です。飛行・歩行・振りかぶり・振り下ろしは今後制作します。';
+}
 
 const renderer = new THREE.WebGLRenderer({ canvas: $('scene'), antialias: true, alpha: true, preserveDrawingBuffer: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.outputColorSpace = THREE.SRGBColorSpace;
 const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(32, 1, .1, 60);
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.MeshBasicMaterial({ color: 0xdce4de })); floor.rotation.x = -Math.PI / 2; scene.add(floor);
 const grid = new THREE.GridHelper(16, 64, 0xc1cfc4, 0xcbd6cc); grid.position.y = .001; scene.add(grid);
-const state = { direction: 'front', pose: 'auto', variant: 0, auto: false, water: false, paused: false };
+const state = { direction: 'front', pose: m.staticPose?'a':'auto', variant: 0, auto: false, water: false, paused: false };
 let rigs = [], shadows = [], elapsed = 0, turn = 0, last = 0;
 function build() {
   for (const r of rigs) scene.remove(r.group);
@@ -116,6 +136,7 @@ function draw() {
 function setState(next) {
   const rebuild = next.variant !== undefined && +next.variant !== state.variant;
   Object.assign(state, next, next.variant !== undefined ? { variant: +next.variant } : {});
+  if(m.staticPose) state.pose='a';
   if (rebuild || !rigs.length) build();
   const i = directions.indexOf(state.direction);
   const [, , tint] = m.variants[state.variant];
@@ -136,7 +157,7 @@ function frame(now) {
   const dt = state.paused ? 0 : Math.min(.05, last ? (now - last) / 1000 : 0); last = now; elapsed += dt;
   if (state.auto && (turn += dt) > 1.1) { turn = 0; setState({ direction: directions[(directions.indexOf(state.direction) + 1) % 8] }); }
   pose(elapsed);
-  $('status').textContent = ready() ? `${labels[directions.indexOf(state.direction)]} / ポーズ${rigs[0].usingA ? 'A' : 'B'} · ${m.variants[state.variant][0]} · 本編と同じ倍率・色・表示方式` : '読み込み中…';
+  $('status').textContent = ready() ? (m.staticPose ? `${labels[directions.indexOf(state.direction)]} / 静止姿勢 · 通常型と同倍率 · Studio試作` : `${labels[directions.indexOf(state.direction)]} / ポーズ${rigs[0].usingA ? 'A' : 'B'} · ${m.variants[state.variant][0]} · 本編と同じ倍率・色・表示方式`) : '読み込み中…';
   requestAnimationFrame(frame);
 }
 // Only exposed by this dedicated prototype page for visual checks.

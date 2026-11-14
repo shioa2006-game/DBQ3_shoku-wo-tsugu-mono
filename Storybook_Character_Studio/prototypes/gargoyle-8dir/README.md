@@ -5,3 +5,13 @@
 Studioで `npm.cmd run export:gargoyle` を実行すると、`output/` に飛行・地上それぞれのA/BのSVG・原画PNG・正規化PNG、比較画像、マニフェストを生成する。各シートは128pxセルを4列×2行で配置する。飛行の高さは表示時のオフセット0.4で表現する。
 
 [比較画面](../../compare/ch4-5/monsters/?c=gargoyle)で飛行・地上、8方向、ポーズを選べる。地上の参照画は左斜め前の1枚を固定表示する。
+
+## 岩砕きのガーゴイル：静止造形・試作01
+
+通常型と共通の作画コードに `buildHeavyGroundSheet` を追加。顔・左右の耳・2本の角・尾を引き継ぎ、胸と肩、前腕を厚くした。両足を開いて接地し、岩の拳を低く構える。畳んだ翼は左右それぞれの肩から腰へ配置する。単純な全身拡大ではなく、同じ表示倍率でも上半身の量感が変わる造形。
+
+[通常型との比較](../../compare/ch4-5/monsters/?c=gargoyle_heavy)では、左が通常型の地上A、右が重装型の静止姿勢。8方向を同倍率で比べる。ポーズの自動切り替えは使わない。飛行・歩行・振りかぶり・振り下ろしは未制作で、本番の拡大率も未確定。
+
+`npm.cmd run export:gargoyle` で通常型と一緒に再生成する。出力は `output/gargoyle_heavy_ground_code_idle_{a,b}_8dir.{svg,src.png,png}` と `heavy-ground-manifest.json`・`heavy-ground-comparison.png`。既存の `MonsterSprite` 用にA/Bを出力するが、静止試作のため両方は同じ画像。比較ボードの参照は通常型の着地設定画であり、重装型の専用設定画ではない。ゲームへは移植しない。
+
+確認: `npm.cmd test` と `npm.cmd run test:compare -- gargoyle gargoyle-heavy`。
