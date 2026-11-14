@@ -48,7 +48,8 @@ export async function exportDragon({ id, name, role, sheets, summary, runtime, s
       parts.push({ part, output: `${fileName}.png`, normalization: report, png, reference: await readFile(referenceUrl(reference)) });
     }
     const uri = bytes => `data:image/png;base64,${bytes.toString('base64')}`;
-    const board = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1200" viewBox="0 0 1080 1200"><rect width="1080" height="1200" fill="#eee9df"/>
+    const boardHeight = 96 + parts.length * 552;
+    const board = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="${boardHeight}" viewBox="0 0 1080 ${boardHeight}"><rect width="1080" height="${boardHeight}" fill="#eee9df"/>
       <text x="28" y="38" font-family="sans-serif" font-size="22" font-weight="700" fill="#203344">${id.toUpperCase()} / ${role} / 8 DIRECTIONS · HEAD + BODY</text>
       <text x="28" y="62" font-family="sans-serif" font-size="14" fill="#60717b">${summary}</text>
       ${parts.flatMap((p, row) => [p.reference, p.png].map((bytes, col) => `<g transform="translate(28 ${84 + (row * 2 + col) * 276})"><rect width="1024" height="268" fill="#d8e1df"/><text x="10" y="16" font-family="sans-serif" font-size="13" fill="#203344">${col ? 'CODE' : 'REFERENCE'} / ${p.part.toUpperCase()}</text><image href="${uri(bytes)}" x="0" y="12" width="1024" height="256" style="image-rendering:pixelated"/></g>`)).join('')}

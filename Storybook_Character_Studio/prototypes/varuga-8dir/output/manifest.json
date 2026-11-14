@@ -189,6 +189,84 @@
           "after": "0.492"
         }
       ]
+    },
+    {
+      "part": "head_open",
+      "output": "varuga_code_head_open_8dir.png",
+      "normalization": [
+        {
+          "row": 0,
+          "col": 0,
+          "dx": 1,
+          "dy": 1,
+          "bbox": "9-115/7-120",
+          "before": "0.484",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 1,
+          "dx": 0,
+          "dy": 2,
+          "bbox": "11-115/9-119",
+          "before": "0.492",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 2,
+          "dx": 0,
+          "dy": 1,
+          "bbox": "9-116/17-120",
+          "before": "0.488",
+          "after": "0.492"
+        },
+        {
+          "row": 0,
+          "col": 3,
+          "dx": 3,
+          "dy": 0,
+          "bbox": "8-112/23-121",
+          "before": "0.469",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 0,
+          "dx": 0,
+          "dy": 0,
+          "bbox": "9-116/23-121",
+          "before": "0.488",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 1,
+          "dx": -2,
+          "dy": 0,
+          "bbox": "13-117/23-121",
+          "before": "0.508",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 2,
+          "dx": 0,
+          "dy": 1,
+          "bbox": "9-116/17-120",
+          "before": "0.488",
+          "after": "0.492"
+        },
+        {
+          "row": 1,
+          "col": 3,
+          "dx": 1,
+          "dy": 2,
+          "bbox": "10-114/9-119",
+          "before": "0.484",
+          "after": "0.492"
+        }
+      ]
     }
   ],
   "runtime": {
@@ -245,11 +323,38 @@
     ],
     "rig": "../rig.js",
     "config": "../rig-profile.mjs",
+    "motions": {
+      "flight": {
+        "label": "飛行",
+        "duration": 0
+      },
+      "landing": {
+        "label": "着地する",
+        "duration": 2.6
+      },
+      "ground": {
+        "label": "地上待機",
+        "duration": 0
+      },
+      "bite": {
+        "label": "三頭の噛みつき",
+        "duration": 4.6
+      },
+      "flame": {
+        "label": "三頭の火炎",
+        "duration": 4.5
+      },
+      "air_flame": {
+        "label": "飛行中の火炎",
+        "duration": 4.5
+      }
+    },
     "paletteStatus": "provisional"
   },
   "references": [
     "references/dragons/grom_head_8dir.png",
-    "references/dragons/grom_body_8dir.png"
+    "references/dragons/grom_body_8dir.png",
+    "references/dragons/grom_head_8dir.png"
   ],
   "targets": []
 }

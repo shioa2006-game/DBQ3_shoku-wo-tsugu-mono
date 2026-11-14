@@ -15,4 +15,5 @@ export const VARUGA_CONFIG = {
   ...VARUGA_PROFILE,
   headUrl: new URL('./output/varuga_code_head_8dir.png', import.meta.url).href,
   bodyUrl: new URL('./output/varuga_code_body_8dir.png', import.meta.url).href,
+  openHeadUrl: new URL('./output/varuga_code_head_open_8dir.png', import.meta.url).href,
 };

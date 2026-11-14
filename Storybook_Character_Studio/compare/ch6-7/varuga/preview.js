@@ -4,6 +4,7 @@ import { DragonRig } from '../../../games/ch4-5/src/entities/dragon.js';
 import { GROM_CONFIG } from '../../../games/ch4-5/src/entities/dragon-configs.js';
 
 import { VARUGA_CONFIG } from '../../../prototypes/varuga-8dir/rig-profile.mjs';
+import { MOTIONS } from '../../../prototypes/varuga-8dir/motion.mjs';
 import { VarugaRig } from '../../../prototypes/varuga-8dir/rig.js';
 const gromAsset = file => new URL(`../../../prototypes/grom-8dir/output/${file}`, import.meta.url).href;
 const configs = [
@@ -29,21 +30,35 @@ const rigs = configs.map((c, i) => { const r = i === 0 ? new DragonRig(c) : new 
 const origin = new THREE.Vector3(0, GROM_CONFIG.hover, 0);
 // The gameplay camera's angle (8.2 / 11.5), pulled back to fit the wings.
 const d = 18.5; camera.position.set(0, 4 + d * 8.2 / 11.5, d); camera.lookAt(0, 4, 0);
-const state = { direction: 'front', auto: false, paused: true };
+const state = { direction: 'front', auto: false, paused: true, mode: 'flight' };
 let turn = 0, last = 0;
 function setState(next) {
+  if (next.mode && next.mode !== state.mode) {
+    rigs[1].setMotion(next.mode);
+    rigs.forEach(r => { r.time = 0; });
+  }
   Object.assign(state, next);
+  $('mode').value = state.mode;
+  const duration = MOTIONS[state.mode].duration;
+  $('timeline').hidden = !duration;
+  $('time').max = duration || 1;
   const [x, z] = facing[directions.indexOf(state.direction)];
   for (const r of rigs) r.facing.set(x, z);
   document.querySelectorAll('[data-direction]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.direction === state.direction)));
   $('motion').setAttribute('aria-pressed', String(!state.paused));
-  $('motion').textContent = state.paused ? '浮遊を再生' : '静止する';
+  $('motion').textContent = state.paused ? (state.mode === 'flight' ? '浮遊を再生' : '再生する') : '静止する';
   $('rotate').setAttribute('aria-pressed', String(state.auto));
 }
 directions.forEach((dir, i) => { const b = document.createElement('button'); b.textContent = labels[i]; b.dataset.direction = dir; b.onclick = () => setState({ direction: dir, auto: false }); $('directions').append(b); });
-$('motion').onclick = () => setState({ paused: !state.paused });
+$('mode').onchange = () => { setState({ mode: $('mode').value, paused: $('mode').value === 'ground' }); step(0); };
+$('restart').onclick = () => { pose(0); setState({ paused: false }); };
+$('time').oninput = () => { setState({ paused: true }); pose(Number($('time').value)); };
+$('motion').onclick = () => {
+  if (state.paused && rigs[1].poseState.done) pose(0);
+  setState({ paused: !state.paused });
+};
 $('rotate').onclick = () => setState({ auto: !state.auto });
-const ready = () => rigs.every(r => [r.body, ...r.heads.map(h => h.sprite)].every(s => s.texA.image?.width));
+const ready = () => rigs.every(r => [r.body, ...r.heads.map(h => h.sprite)].every(s => s.texA.image?.width)) && !!rigs[1].openHeadTexture.image?.width;
 function draw() {
   const { width, height } = renderer.getSize(new THREE.Vector2());
   renderer.setScissorTest(true);
@@ -55,7 +70,15 @@ function draw() {
   renderer.setScissorTest(false);
 }
 // Advance both rigs by the same time so the neck sway stays in step on both sides.
-function step(dt) { for (const r of rigs) r.update(dt, origin, 0, false); draw(); }
+function step(dt) {
+  const duration = MOTIONS[state.mode].duration;
+  const delta = duration ? Math.min(dt, Math.max(0, duration - rigs[1].motionTime)) : dt;
+  for (const r of rigs) r.update(delta, origin, 0, false);
+  if (duration && rigs[1].motionTime >= duration && !state.paused) setState({ paused: true });
+  $('time').value = Math.min(rigs[1].motionTime, duration || 0);
+  $('time-label').textContent = `${rigs[1].motionTime.toFixed(2)}秒`;
+  draw();
+}
 function resize() {
   const c = $('scene'); renderer.setSize(c.clientWidth, c.clientHeight, false);
   camera.aspect = c.clientWidth / 2 / c.clientHeight; camera.zoom = Math.min(1, camera.aspect / .95); camera.updateProjectionMatrix(); step(0);
@@ -65,10 +88,10 @@ function frame(now) {
   const dt = state.paused ? 0 : elapsed;
   if (state.auto && (turn += elapsed) > 1.4) { turn = 0; setState({ direction: directions[(directions.indexOf(state.direction) + 1) % 8] }); }
   step(dt);
-  $('status').textContent = ready() ? `${labels[directions.indexOf(state.direction)]} · グロムと三頭のヴァルガ · 同じ倍率 · 配色は試作` : '読み込み中…';
+  $('status').textContent = ready() ? `${labels[directions.indexOf(state.direction)]} · ${MOTIONS[state.mode].label} · ${rigs[1].poseState.phase} · 同じ倍率` : '読み込み中…';
   requestAnimationFrame(frame);
 }
-function pose(time = 0) { rigs.forEach(r => { r.time = time; }); step(0); }
+function pose(time = 0) { rigs.forEach(r => { r.time = time; }); rigs[1].motionTime = time; step(0); }
 pose();
 // Only exposed by this dedicated prototype page for visual checks.
 window.__dragonPreview = { rigs, scene, camera, renderer, state, ready, setState, step, draw, pose };
