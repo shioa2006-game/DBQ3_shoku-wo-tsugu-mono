@@ -1,0 +1,16 @@
+ガンゾウ 8方向元画像 v1
+生成方式: 組み込み image_gen（画像生成）
+設定の参照: docs/story/planned/chapter6-7-scenario.md「ダーマの人物」
+スタイル・配置の参照: references/asagi-8dir-v2.png
+用途: CH6〜7のSVG制作に先立つデザイン案。外見・衣装は今回の提案であり、ゲームには未実装。
+形式: 4列×2行、透明背景、頭からベルト下の腰まで。腕・脚なし。
+方向: 正面、左斜め前、左、左斜め後／背面、右斜め後、右、右斜め前。
+状態: ユーザー確認前。SVG化・ゲームへの組み込みは未実施。
+
+生成プロンプト
+Create a new eight-direction character reference sheet for GANZOU, an elderly taciturn human stonecutter in a warm Japanese storybook fantasy RPG. The reference image is ONLY a style and layout template: replace its character entirely with Ganzou, preserving the armless/legless bust format, consistent proportions and eight-view arrangement. Do not copy the reference man's face, spectacles or long hair.
+Ganzou design: sturdy broad torso, older man about 60–65, weathered warm tan skin, broad square face, thick gray eyebrows, calm narrow attentive dark eyes, a simple modest angular nose rendered with one bridge line and a short tip line, short salt-and-pepper cropped hair with gray temples, a short neat gray moustache and close-cropped square chin beard (not a long dwarf beard), quiet kind but serious expression. Human, no exaggerated dwarf proportions. Simple dark brown narrow cloth forehead band with a small tied knot at the nape; hair crown clearly visible. Muted slate-gray work tunic, oatmeal collar, worn russet-brown leather stoneworker's bib apron with shoulder straps, sturdy brown waist belt with simple dull brass buckle, a small secured chisel and stone wedges in a belt loop at his anatomical LEFT hip. Apron extends below belt to upper hips. Modest stone dust at apron hem. No large carried tools.
+Art style: compact charming hand-drawn 2D fantasy game NPC matching reference's crisp dark brown outlines, restrained cel shading, softly painted hair/clothes, clean readable silhouettes, large stylized head but adult face. No realistic 3D render, no dramatic portrait lighting, no elaborate gradients or anatomically sculpted nose. Consistent facial identity, clothes and scale across all eight directions.
+Sheet: landscape 2:1 aspect, exactly four equal square columns by two equal square rows, one connected head-neck-torso bust in each cell, crown and hip-hem aligned with other cells, generous identical transparent margins. Every bust ends at hips below waist belt. NO arms, NO hands, NO protruding sleeve tubes or shoulder stumps, NO legs or feet. Head and torso rotate together, orthographic eye-level views.
+Mandatory view order, left to right: TOP: front; front-left three-quarter (nose toward image left, both eyes); true left profile (nose left, one eye); back-left three-quarter (back of head predominates, no eyes/nose/mouth). BOTTOM: straight back (no face); back-right three-quarter (no face); true right profile (nose right, one eye); front-right three-quarter (nose right, both eyes). Preserve anatomical left hip tool loop rather than mirroring it onto other hip.
+Transparent alpha background, no ground, no cast shadows, no checkerboard, no labels, no lettering, no decorative border. Exactly eight views of Ganzou and nothing else.

@@ -1,0 +1,17 @@
+スズハ 8方向元画像 v1
+生成方式: 組み込み image_gen（画像生成）
+設定の参照: docs/story/planned/chapter6-7-scenario.md「ダーマの人物」
+スタイル・配置の参照: references/asagi-8dir-v2.png
+用途: CH6〜7のSVG制作に先立つデザイン案。外見・衣装は今回の提案であり、ゲームには未実装。
+形式: 4列×2行、透明背景、頭からベルト下の腰まで。腕・脚なし。
+方向: 正面、左斜め前、左、左斜め後／背面、右斜め後、右、右斜め前。
+状態: ユーザー確認前。SVG化・ゲームへの組み込みは未実施。
+
+生成プロンプト
+Create a new eight-direction character reference sheet for SUZUHA, a caring middle-aged woman in a warm Japanese storybook fantasy RPG. The reference image is ONLY a style and layout template: replace its character entirely with Suzuha, preserving the armless/legless bust format, consistent proportions and eight-view arrangement. Do not copy reference man's features, spectacles, hair or clothes.
+Suzuha's story: a practical local woman who used to carry water up the mountain to a temple, knows the paths and welcomes people. She will later learn temple duties, but THIS is her everyday civilian working outfit, not an ordained priest costume.
+Design: woman about 45–55, grounded warm maternal presence, comfortably sturdy torso rather than glamorous figure. Warm medium-light skin, softly broad oval face, subtle smile lines at eyes, friendly dark brown almond eyes of modest size (not huge teenage anime eyes), small relaxed smile, simple understated nose indicated by short warm line and tiny tip shadow, no elaborate realistic nose. Dark chestnut hair swept into a compact low bun at nape, a few silver strands at temples, short softly curved side locks, tied with a plain muted ochre cloth ribbon; bun and ribbon consistent from sides and back. No hat, spectacles, jewelry or facial hair. Dusty plum wrap-style work tunic with a simple cream overlapping collar, natural ivory practical bib apron with thin shoulder straps, muted blue-gray cloth waist sash tied in a small flat knot at back. Belt/sash at waist and apron/tunic visible below it to upper hips. A small folded plain linen work cloth tucked into sash, no bucket carried.
+Art style: compact charming hand-drawn 2D fantasy game NPC matching reference's crisp dark brown outlines, restrained cel shading, softly painted hair/clothes, clean readable silhouettes, large stylized head but mature human face. Same level of detail as the accompanying Ganzou/Asagi NPC sheets. No realistic 3D, no glossy glamour, no dramatic lighting.
+Sheet: landscape 2:1 aspect, exactly four equal square columns by two equal square rows, one connected head-neck-torso bust in each cell, crown and hip-hem aligned, generous identical transparent margins. Every bust ends at hips below waist sash. NO arms, NO hands, NO protruding sleeve tubes or shoulder stumps, NO legs or feet. Head and torso rotate together, orthographic eye-level views.
+Mandatory view order, left to right: TOP: front; front-left three-quarter (nose toward image left, both eyes); true left profile (nose left, one eye); back-left three-quarter (back of head predominates, no eyes/nose/mouth). BOTTOM: straight back (no face); back-right three-quarter (no face); true right profile (nose right, one eye); front-right three-quarter (nose right, both eyes).
+Transparent alpha background, no ground, no cast shadows, no checkerboard, no labels, no lettering, no decorative border. Exactly eight views of Suzuha and nothing else.
