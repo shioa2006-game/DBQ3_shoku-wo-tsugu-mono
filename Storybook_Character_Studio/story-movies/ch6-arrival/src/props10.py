@@ -7,7 +7,7 @@
 
 座標は viewBox="0 0 1600 900"。乱数は呼び出し側の固定シード。
 """
-from helpers import n, mountain, smooth_d
+from helpers import n, poly_d, subdivide, smooth_d
 from temple import INK, DAY, FAR, temple_remains, place_remains  # 神殿跡は共通部品（../../shared/temple.py）
 
 WOOD = "#b49a74"          # 潮で白っぽくなった板
@@ -15,19 +15,38 @@ WOOD_DARK = "#6f5a40"
 WOOD_INK = "#3b2a1c"
 
 
-def isle(p, R, x0, sea_y, ranges, shore_cls=""):
+def isle(p, R, x0, sea_y, ranges, shore_cls="", clip_id=None):
     """ダーマの島：左（x0 付近）で海に接し、右の奥へ山が重なって続く。
-    ranges: [(稜線のキーポイント, 色, 稜線の明るい縁の色, 縁の不透明度)] を奥から手前へ。返り値は描画。"""
-    o = []
+    ranges: [(稜線のキーポイント, 色, 稜線の明るい縁の色, 縁の不透明度)] を奥から手前へ。
+    返り値は (描画, 手前の山の稜線の点)。稜線の点は ridge_y() で、道や神殿跡を山の斜面の内側に置くのに使う。
+    clip_id を渡すと、手前の山の形の切り抜き（clipPath）も描画に入れる（道がはみ出さないように）。"""
+    o, front = [], None
     for keys, color, rim, rim_op in ranges:
-        body, ridge = mountain(keys, sea_y + 2, R, depth=3, rough=.12)
+        ridge = subdivide(keys, R, 3, .12)          # helpers.mountain と同じ作り方（点も使うので展開）
+        body = poly_d([(ridge[0][0], sea_y + 2)] + ridge + [(ridge[-1][0], sea_y + 2)])
+        front = (body, ridge)
         o.append(f'<path d="{body}" fill="{color}"/>')
         if rim:
-            o.append(f'<path d="{ridge}" fill="none" stroke="{rim}" stroke-width="2.4" opacity="{rim_op}" stroke-linejoin="round"/>')
+            o.append(f'<path d="{poly_d(ridge, close=False)}" fill="none" stroke="{rim}" stroke-width="2.4" opacity="{rim_op}" stroke-linejoin="round"/>')
+    if clip_id:
+        o.append(f'<defs><clipPath id="{clip_id}"><path d="{front[0]}"/></clipPath></defs>')
     # 波打ち際（左の浜）
     o.append(f'<path class="{shore_cls}" d="M{n(x0 - 20)},{n(sea_y + 1)} Q{n(x0 + 80)},{n(sea_y - 3)} {n(x0 + 200)},{n(sea_y + 1)}" '
              f'fill="none" stroke="#fff8e6" stroke-width="3" opacity=".75"/>')
-    return "".join(o)
+    return "".join(o), front[1]
+
+
+def ridge_y(ridge, x):
+    """稜線の点（左から右）の、x での高さ（直線でつないだもの）。"""
+    for (x0, y0), (x1, y1) in zip(ridge, ridge[1:]):
+        if x0 <= x <= x1:
+            return y0 + (y1 - y0) * (x - x0) / (x1 - x0 or 1)
+    return ridge[0][1] if x < ridge[0][0] else ridge[-1][1]
+
+
+def base_below_ridge(ridge, x, half, margin):
+    """幅 2*half の基壇を x に置くとき、基壇の下端の高さ。基壇の幅全体で稜線より margin だけ下になるようにする。"""
+    return max(ridge_y(ridge, x + half * (i / 4 - 1)) for i in range(9)) + margin
 
 
 def old_pier(R, x_shore, x_end, y, depth=28, posts=6, missing=(2, 5)):

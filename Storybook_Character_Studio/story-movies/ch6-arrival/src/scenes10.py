@@ -75,8 +75,12 @@ def far_ranges(dx=0.0, dy=0.0, k=1.0):
     ]
 
 
-# 神殿跡を島の山腹に置く位置（場面3の座標。場面5は同じ並びを大きく置く）
-ISLE_RUIN = (952, 404)
+# 神殿跡と坂道を島の山腹に置く位置（場面3の座標。場面5は同じ並びを大きく置く）。
+# 坂道は (x, 稜線からの深さ)。高さは手前の山の稜線から下へ測り、山の斜面の内側に収める（空に道が出ないように）。
+# 神殿跡は x と、基壇の幅全体で稜線より下に置くときの余白（基壇が斜面から浮かないように）。
+ISLE_RUIN = (952, 12)
+ISLE_PATH = ((612, 40), (760, 60), (700, 26), (842, 46), (792, 26))   # 最後は神殿跡の基壇の左下の角へつなぐ
+ISLE_RUIN_SCALE = .085
 
 
 # ---------------------------------------------------------------------------
@@ -262,11 +266,16 @@ def scene3():
     o.append('<circle cx="1480" cy="90" r="260" fill="url(#s3-sunglow)"/>')
     o.append(M4.clouds(R, [(-40, 150, 520, 18), (560, 110, 420, 14)], cls="s3-cl"))
     # 島：左で海に接し、右の奥へ山が続く。山腹に神殿跡（遠景の色）と、そこへ上る坂道
-    isle = Q.isle("s3-", R, 500, 520, far_ranges(), shore_cls="s3-shore")
-    path = Q.stair_path(R, [(560, 512), (700, 488), (640, 470), (790, 444), (740, 428), (880, 414), (912, 404)], w=2.6, pal=Q.FAR,
-                        steps=False, edge="#5f7f70")
-    ruin = Q.place_remains(Q.temple_remains(random.Random(1010), Q.FAR, grass=False), ISLE_RUIN, .085)
-    light = f'<ellipse class="s3-ruinlight" cx="{ISLE_RUIN[0]}" cy="{ISLE_RUIN[1] - 9}" rx="34" ry="13" fill="#fff6d8"/>'
+    isle, ridge = Q.isle("s3-", R, 500, 520, far_ranges(), shore_cls="s3-shore", clip_id="s3-isleclip")
+    on = lambda x, d: (x, min(516, Q.ridge_y(ridge, x) + d))     # 稜線から d だけ下（浜より下には出さない）
+    half = 530 * ISLE_RUIN_SCALE                                 # 基壇の幅の半分（プロローグの座標の 1060 の半分）
+    rx = ISLE_RUIN[0]
+    ry = Q.base_below_ridge(ridge, rx, half, ISLE_RUIN[1])
+    foot = (rx - half + 3, ry - 1)                               # 基壇の左下の角（プロローグの座標の (270, 592)）
+    path = (f'<g clip-path="url(#s3-isleclip)">'
+            + Q.stair_path(R, [on(x, d) for x, d in ISLE_PATH] + [foot], w=2.6, pal=Q.FAR, steps=False, edge="#5f7f70") + "</g>")
+    ruin = Q.place_remains(Q.temple_remains(random.Random(1010), Q.FAR, grass=False), (rx, ry), ISLE_RUIN_SCALE)
+    light = f'<ellipse class="s3-ruinlight" cx="{n(rx)}" cy="{n(ry - 9)}" rx="34" ry="13" fill="#fff6d8"/>'
     o.append(f'<g class="s3-isle mv">{isle}{path}{light}{ruin}</g>')
     o.append('<g class="s3-haze mv" opacity=".35"><path d="' + " ".join(kasumi(x, y, w, h) for x, y, w, h in
              ((300, 500, 420, 10), (1180, 506, 400, 8))) + '" fill="#f4f7f8"/></g>')
@@ -304,7 +313,8 @@ S4_CSS = """
 @keyframes s4-flap{from{transform:scaleY(1)}to{transform:scaleY(.4)}}
 @keyframes s4-cl{from{transform:translateX(30px)}to{transform:translateX(-40px)}}
 """
-S4_RUIN_AT, S4_RUIN_SCALE = (820, 432), .78
+S4_RUIN_AT, S4_RUIN_SCALE = (836, 443.8), .8     # 基壇の中央の下端と倍率
+S4_TERRACE_TOP = 430                               # 石積みの台の上端（基壇の下端より少し上から描き、基壇で隠す）
 
 
 def scene4():
@@ -335,7 +345,7 @@ def scene4():
                        (1480, 540, 100, 40), (1300, 600, 84, 34)):
         o.append(P.pine(R, x, y, w, h, color="#4f7f57"))
     # 神殿跡：山腹から張り出す古い石積みの台の上に、三段の基壇
-    o.append(Q.terrace(random.Random(1011), 400, 1240, S4_RUIN_AT[1] - 2, 536))
+    o.append(Q.terrace(random.Random(1011), 400, 1240, S4_TERRACE_TOP, 536))
     o.append(f'<g id="s4-ruin">{Q.place_remains(Q.temple_remains(random.Random(1010), Q.DAY), S4_RUIN_AT, S4_RUIN_SCALE)}</g>')
     # 朝日の筋（右上から）
     rays = "".join(f'<path d="M1640,-40 L{n(x)},900 L{n(x + w)},900Z" fill="url(#s4-rayg)"/>' for x, w in ((520, 90), (760, 130), (1040, 80)))
@@ -413,13 +423,16 @@ def scene5():
     o.append(M4.clouds(R, [(60, 120, 420, 16), (700, 70, 360, 12)], cls="s5-cl"))
     # 島（場面3の並びを大きく）：坂道と神殿跡
     k = S5_K
-    rx, ry = ISLE_RUIN[0] * k + S5_DX, ISLE_RUIN[1] * k + S5_DY
-    isle = Q.isle("s5-", R, 500 * k + S5_DX, S5_SEA, far_ranges(S5_DX, S5_DY, k), shore_cls="s5-shore")
-    path = Q.stair_path(R, [(560 * k + S5_DX, 512 * k + S5_DY), (700 * k + S5_DX, 488 * k + S5_DY), (640 * k + S5_DX, 470 * k + S5_DY),
-                            (790 * k + S5_DX, 444 * k + S5_DY), (740 * k + S5_DX, 428 * k + S5_DY), (880 * k + S5_DX, 414 * k + S5_DY),
-                            (rx - 18, ry)], w=4, pal=Q.FAR, steps=False, edge="#5f7f70")
-    ruin = Q.place_remains(Q.temple_remains(random.Random(1010), Q.FAR, grass=False), (rx, ry), .085 * k)
-    light = f'<ellipse class="s5-ruinlight" cx="{n(rx)}" cy="{n(ry - 12)}" rx="50" ry="19" fill="#fff6d8"/>'
+    isle, ridge = Q.isle("s5-", R, 500 * k + S5_DX, S5_SEA, far_ranges(S5_DX, S5_DY, k), shore_cls="s5-shore", clip_id="s5-isleclip")
+    on = lambda x, d: (x * k + S5_DX, min(S5_SEA - 4, Q.ridge_y(ridge, x * k + S5_DX) + d * k))
+    half = 530 * ISLE_RUIN_SCALE * k
+    rx = ISLE_RUIN[0] * k + S5_DX
+    ry = Q.base_below_ridge(ridge, rx, half, ISLE_RUIN[1] * k)
+    foot = (rx - half + 4, ry - 1)
+    path = (f'<g clip-path="url(#s5-isleclip)">'
+            + Q.stair_path(R, [on(x, d) for x, d in ISLE_PATH] + [foot], w=4, pal=Q.FAR, steps=False, edge="#5f7f70") + "</g>")
+    ruin = Q.place_remains(Q.temple_remains(random.Random(1010), Q.FAR, grass=False), (rx, ry), ISLE_RUIN_SCALE * k)
+    light = f'<ellipse class="s5-ruinlight" cx="{n(rx)}" cy="{n(ry - 22)}" rx="50" ry="16" fill="#fff6d8"/>'
     o.append(isle + path + light + ruin)
     # 海と、右の浜
     o.append(f'<rect x="0" y="{S5_SEA - 2}" width="1600" height="{900 - S5_SEA + 2}" fill="url(#s5-sea)"/>')

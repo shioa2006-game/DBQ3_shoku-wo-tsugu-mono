@@ -124,7 +124,8 @@ def temple_remains(R, pal=DAY, grass=True, bedrock=False):
 def place_remains(markup, at, scale):
     """神殿跡（プロローグの座標）を、基壇の中央の下端 (800, 592) が at に来るように縮めて置く。"""
     x, y = at
-    return f'<g transform="translate({n(x - 800 * scale)} {n(y - 592 * scale)}) scale({n(scale)})">{markup}</g>'
+    # 倍率は丸めない（n() は小数第1位までなので、0.085 が 0.1 になり、位置と大きさがずれる）
+    return f'<g transform="translate({n(x - 800 * scale)} {n(y - 592 * scale)}) scale({round(scale, 4):g})">{markup}</g>'
 
 
 def remains_silhouette(R, color="#1a2138", rim="#8fa3cf", rim_op=.45, bedrock=True):
