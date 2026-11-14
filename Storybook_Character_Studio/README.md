@@ -2,7 +2,9 @@
 
 ガンゾウ・スズハの8方向SVG試作を追加しました。[ガンゾウの比較](compare/ch4-5/characters/?c=ganzou)・[スズハの比較](compare/ch4-5/characters/?c=suzuha)から元画像との比較、頭・胴の分離表示、手足つきの動作を確認できます。制作原本と成果物は `prototypes/ganzou-8dir/`・`prototypes/suzuha-8dir/` にあります。
 
-「職をつぐ者」の8方向キャラクターをコードで制作するフォルダです。現在は人型7人（主人公・ミナ・ピノ・イナホ・ゴンタ・ジンベエ・ワタリ）とスライム・おおこうもり・おおねずみ・どろたぼう・イカを管理しています。人型は頭・胴の画像と3D手足、モンスターは全身画像2枚の切り替えで確認します。
+「職をつぐ者」の8方向キャラクターをコードで制作するフォルダです。第1～5章の制作原本に加え、第6～7章のスズハ・アサギ・ガンゾウ、岩角ヤギ・小岩ガニ・ガーゴイルを管理しています。人型は頭・胴の画像と3D手足、通常モンスターは全身シートの切り替え、グロムは頭・胴の画像と3Dの首・翼・尾で確認します。
+
+第6～7章の[制作状況と残り](prototypes/README.md#ch6-7)を一覧にしました（2026-11-14）。主な造形制作の残りは岩砕きのガーゴイルと三頭魔竜ヴァルガです。山ねずみ・洞窟こうもりの色替えと、大岩ガニの大型版調整も行います。第6～7章への移植はゲーム制作時に行います。
 
 - [制作一覧と移植対象](prototypes/README.md)
 - [制作ガイド：これまでの指摘と再発防止](docs/CHARACTER_AUTHORING.md)
@@ -39,7 +41,7 @@ npm.cmd run export:squid
 npm.cmd run export:all
 ```
 
-`export-characters.bat` でも人型7人とモンスター5体を再生成できます。既存の最新生成物は上書きされます。コードが原本です。
+`export-characters.bat` でも登録済みのキャラクターを再生成できます。対象はバッチと `package.json` の各書き出しコマンドで確認してください。既存の最新生成物は上書きされます。コードが原本です。
 
 ゲームの専用比較画像も更新する場合だけ、次を使います。旧参照画像やNPC設定は上書きしません。ただし、移植後の本編はこのコマンドが更新する `_code_` 画像を使用します。リグ設定を変更したときは、ゲームの `src/content/rig-profiles/` にも同期してください。
 
@@ -89,7 +91,7 @@ npm.cmd run sync:games -- mina    # 指定したキャラクターだけ
 | `story-movies/<名前>/` | 採用した7本のムービー（プロローグ・第1～3章の結び・火山島編の始まりと終わり・書の復活）。2026-11-08に両編へ組み込み済み |
 | `story-movies/game-targets.mjs` | ムービーの書き出し先のゲーム（`npm.cmd run sync:movies` が各編の `assets/movies/` へ写す） |
 | `docs/` | 制作上の知見と整理記録 |
-| `index.html` | 人型7人とモンスター5体の制作入口 |
+| `index.html` | 各章の人物・モンスターの制作入口 |
 | `tools/` | 起動とローカル静的配信 |
 | `tests/node/` | 起動、作画維持、リンク・参照の検査 |
 
@@ -117,7 +119,7 @@ PNGの再生成後は、`npm.cmd run test:compare` で比較ページのブラ�
 
 スライムは `npm.cmd run test:compare -- slime` で8方向・2ポーズの境界と切り替え・水中色・狭い画面を確認します。詳しくは [スライムの制作手順](prototypes/slime-8dir/README.md) を参照してください。
 
-おおこうもりは [制作手順](prototypes/night-bat-8dir/README.md) と [比較ページ](compare/ch1-3/night-bat/) を参照。`npm.cmd run test:compare -- night-bat` で8方向と飛行用の配置、羽ばたきを確認します。今後はCH1～3の制作・調整を優先し、残りの対象は [制作一覧](prototypes/README.md) で管理します。
+おおこうもりは [制作手順](prototypes/night-bat-8dir/README.md) と [比較ページ](compare/ch1-3/night-bat/) を参照。`npm.cmd run test:compare -- night-bat` で8方向と飛行用の配置、羽ばたきを確認します。第6章の洞窟こうもりにはこの造形を色替えして使います。残る制作対象は [制作一覧](prototypes/README.md#ch6-7) で管理します。
 
 おおねずみは [制作手順](prototypes/field-rat-8dir/README.md) と [比較ページ](compare/ch1-3/field-rat/) を参照。`npm.cmd run test:compare -- field-rat` で8方向・2ポーズ・部品接続・接地位置を確認します。
 
