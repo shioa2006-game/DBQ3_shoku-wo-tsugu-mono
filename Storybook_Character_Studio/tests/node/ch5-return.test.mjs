@@ -41,15 +41,19 @@ test('captions are the lines of the chapter 5 ending, in order, and the title is
   for (const old of ['ビルダーの書', '原初の書', 'ギアガ', 'ヴァルガ']) assert.ok(!html.includes(old), old);
 });
 
-test('the ruined temple has the shape of the temple in the prologue', async () => {
+test('the temple at the end is the ruin of the prologue temple, as in M10: no roof, two columns standing', async () => {
   const prologue = await readFile(path.join(movies, 'prologue/src/scenes_b.py'), 'utf8');
-  const props7 = await readFile(path.join(dir, 'src/props7.py'), 'utf8');
-  const roof = prologue.match(/roof = \("([^"]+)"\s*"([^"]+)"\)/);
-  assert.ok(roof, 'prologue roof path');
-  const tower = prologue.match(/'<path d="(M735,172[^"]+)"/)[1];
-  assert.ok(props7.includes(roof[1]) && props7.includes(roof[2]), 'same roof outline');
-  assert.ok(props7.includes(tower), 'same broken tower');
-  assert.ok(scenes[3].includes(tower), 'scene 4 draws the temple silhouette');
+  const temple = await readFile(path.join(movies, 'shared/temple.py'), 'utf8');
+  // プロローグの神殿と同じ三段の基壇と、同じ間隔の柱の並び（共通部品 shared/temple.py。M10も同じものを使う）
+  for (const rect of ['x="270" y="566" width="1060" height="26"', 'x="300" y="542" width="1000" height="24"', 'x="330" y="516" width="940" height="26"'])
+    assert.ok(prologue.includes(rect), `prologue platform: ${rect}`);
+  assert.ok(prologue.includes('380 + 105 * i') && temple.includes('380 + 105 * i'), 'same column spacing');
+  const platform = 'M270,592 L1330,592 L1330,566 L1300,566 L1300,542 L1270,542 L1270,516 L330,516 L330,542 L300,542 L300,566 L270,566Z';
+  assert.ok(scenes[3].includes(platform), 'scene 4 draws the ruin on the platform');
+  // 柱頭まで残るのは中央の左右の2本だけ。屋根と塔の影は描かない（M10・第6章の「屋根を失った二本の柱」と同じ）
+  const capitals = [...scenes[3].matchAll(/M(\d+),298 L(\d+),298/g)].map(m => (Number(m[1]) + Number(m[2])) / 2);
+  assert.deepEqual(capitals, [695, 905]);
+  assert.ok(!scenes[3].includes('M735,172') && !scenes[3].includes('M296,252'), 'no tower and no roof');
 });
 
 test('the townsfolk and the four on the ship are drawn from the formal designs', () => {

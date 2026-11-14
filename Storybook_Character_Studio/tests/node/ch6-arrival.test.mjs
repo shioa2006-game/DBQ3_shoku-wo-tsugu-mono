@@ -55,10 +55,10 @@ test('the memory frames reuse the prologue, M4 and M7 scenes', () => {
   assert.ok(scenes[0].includes('.s1-pa-shotb{display:none}') && scenes[0].includes('.is-active .s1-fa .s1-pa-shota{animation:none}'));
 });
 
-test('the ruin has the platform of the prologue and M7 temple, with only two columns standing', async () => {
-  const m7 = await readFile(path.join(movies, 'ch5-return/src/props7.py'), 'utf8');
+test('the ruin has the platform of the prologue temple and the shape of the M7 shadow, with only two columns standing', async () => {
+  const m7 = await readFile(path.join(movies, 'ch5-return/index.html'), 'utf8');
   const platform = 'M270,592 L1330,592 L1330,566 L1300,566 L1300,542 L1270,542 L1270,516 L330,516 L330,542 L300,542 L300,566 L270,566Z';
-  assert.ok(m7.includes(platform), 'M7 temple platform');
+  assert.ok(templates(m7)[3].includes(platform), 'M7 scene 4 draws the same ruin');
   assert.ok(scenes[3].includes('id="s4-ruin"') && scenes[3].includes(platform), 'scene 4: the same platform');
   for (const i of [2, 4]) assert.ok(scenes[i].includes(platform), `scene ${i + 1}: the ruin on the mountainside`);
   // 柱頭まで残るのは2本だけ（柱頭の外形 "L{c+34},298" を数える）

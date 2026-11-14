@@ -3,7 +3,8 @@
   1. 清めの泉          竹林の社の前の泉に澄んだ水が戻る。水門から導水路が、火の戻った鉱山町へ下る。
   2. 町の人々          鍛冶場の火と導水路の町の前に、ベルク・ナギ・ヨモギと、ロク・カヤ・スミ・テル。名前の順に足元が光る。
   3. 船出              直した桟橋から見送るベルク・ナギ・カヤの後ろ姿と、夕日の海へ出る船の四人。
-  4. 始まりの場所へ    夜の海。小さな船の行く手、水平線の山の上に、プロローグ第3場面と同じ形の崩れた神殿の影。
+  4. 始まりの場所へ    夜の海。小さな船の行く手、水平線の山の上に、屋根を失い二本の柱だけが立つ神殿跡の影
+                       （第6～7章のM10と同じ形。共通部品 ../../shared/temple.py）。
                        タイトル「火山島編・完」。
 
 座標は viewBox="0 0 1600 900"。乱数は場面ごとの固定シード。位置が動くアニメーションには .mv を付け、
@@ -19,6 +20,7 @@ import props as P          # 第3章の結末の船（../../ch3-departure/src/pr
 import scenes as M4        # 第3章の結末の空・海の部品
 import props5 as V         # 火山島編の始まりの火山島（../../ch4-arrival/src/props5.py）
 import props7 as Q
+import temple as T          # 崩れた神殿跡（../../shared/temple.py。M10と共通）
 
 HEAD = M4.HEAD
 CAST = Cast(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "parts", "cast.json"))
@@ -249,7 +251,7 @@ def scene3():
 
 
 # ---------------------------------------------------------------------------
-# 場面4：始まりの場所へ（夜の海と崩れた神殿の影、タイトル）
+# 場面4：始まりの場所へ（夜の海と神殿跡の影、タイトル）
 # ---------------------------------------------------------------------------
 S4_CSS = """
 .is-active .s4-sail{animation:s4-sail 8.2s cubic-bezier(.3,0,.7,1) both}
@@ -270,13 +272,13 @@ S4_CSS = """
 @keyframes s4-ruin{to{opacity:1}}
 @keyframes s4-mist{from{transform:translateX(50px)}to{transform:translateX(-50px)}}
 """
-RUIN_SCALE = .24
-RUIN_AT = (1170, 452)      # 神殿の基壇の中央（プロローグの座標の (800, 592)）を置く位置
+RUIN_SCALE = .22
+RUIN_AT = (1176, 456)      # 神殿の基壇の中央（プロローグの座標の (800, 592)）を置く位置。手前の山の肩
 
 
 def scene4():
     R = random.Random(704)
-    o = [HEAD.format(label="月の夜の海を、小さな船が進む。行く手の水平線の山の上に、崩れたダーマ神殿の影。タイトル「火山島編・完」")]
+    o = [HEAD.format(label="月の夜の海を、小さな船が進む。行く手の水平線の山の上に、屋根を失い二本の柱だけが立つダーマ神殿跡の影。タイトル「火山島編・完」")]
     o.append(f"<style>{S4_CSS}</style>")
     o.append('<defs><linearGradient id="s4-sky" x1="0" y1="0" x2="0" y2="560" gradientUnits="userSpaceOnUse">'
              '<stop offset="0" stop-color="#070b1c"/><stop offset=".7" stop-color="#1b2748"/><stop offset="1" stop-color="#3a4870"/></linearGradient>'
@@ -292,15 +294,17 @@ def scene4():
                      f'fill="#f2f4ff" style="animation-delay:-{n(R.uniform(0, 3))}s"/>' for _ in range(110)))
     o.append('<circle cx="330" cy="170" r="150" fill="url(#s4-mglow)"/><circle cx="330" cy="170" r="40" fill="#f4f6ff"/>'
              '<circle cx="344" cy="162" r="36" fill="#1b2748" opacity=".25"/>')
-    # 水平線の山と、その上の崩れた神殿の影（プロローグ第3場面と同じ形）
-    o.append('<path d="M820,562 C910,548 990,530 1040,512 C1080,498 1110,470 1140,458 C1160,452 1190,452 1210,460 C1250,478 1290,508 1340,526 '
-             'C1410,548 1480,556 1580,562Z" fill="#151b31"/>'
-             '<path d="M1040,512 C1080,498 1110,470 1140,458 C1160,452 1190,452 1210,460 C1250,478 1290,508 1340,526" fill="none" '
-             'stroke="#7d8fbc" stroke-width="2" opacity=".45"/>')
+    # 水平線の島（M10と同じ並び：左で海に接し、右の奥へ山が続く）と、山の肩の神殿跡の影
+    o.append('<path d="M1060,562 C1160,520 1250,470 1330,440 C1390,418 1440,404 1500,398 C1550,394 1580,398 1640,404 L1640,562Z" fill="#202a48"/>'
+             '<path d="M1060,562 C1160,520 1250,470 1330,440 C1390,418 1440,404 1500,398 C1550,394 1580,398 1640,404" fill="none" '
+             'stroke="#6f82b0" stroke-width="2" opacity=".35"/>')
+    o.append('<path d="M840,562 C920,548 990,526 1040,500 C1070,484 1090,466 1106,458 L1250,454 C1280,452 1310,440 1350,426 '
+             'C1400,410 1450,418 1500,432 C1550,446 1590,452 1640,456 L1640,562Z" fill="#151b31"/>'
+             '<path d="M840,562 C920,548 990,526 1040,500 C1070,484 1090,466 1106,458 L1250,454 C1280,452 1310,440 1350,426 '
+             'C1400,410 1450,418 1500,432" fill="none" stroke="#7d8fbc" stroke-width="2" opacity=".45"/>')
     tx, ty = RUIN_AT[0] - 800 * RUIN_SCALE, RUIN_AT[1] - 592 * RUIN_SCALE
-    o.append(f'<g class="s4-ruin"><g transform="translate({n(tx)} {n(ty)}) scale({RUIN_SCALE})" clip-path="url(#s4-ruinclip)">'
-             f'{Q.temple_ruin(color="#1a2138", rim="#8fa3cf", rim_op=.45)}</g></g>')
-    o.insert(3, f'<defs><clipPath id="s4-ruinclip"><rect x="0" y="0" width="1600" height="{n(592 + (560 - RUIN_AT[1]) / RUIN_SCALE)}"/></clipPath></defs>')
+    o.append(f'<g class="s4-ruin"><g transform="translate({n(tx)} {n(ty)}) scale({RUIN_SCALE})">'
+             f'{T.remains_silhouette(random.Random(1010), color="#151b31", rim="#9fb2d8", rim_op=.55, bedrock=False)}</g></g>')
     o.append('<g class="s4-mist mv" opacity=".45"><path d="' + " ".join(kasumi(x, y, w, h) for x, y, w, h in
              ((700, 540, 560, 14), (1180, 552, 520, 12))) + '" fill="#5d6b94"/></g>')
     o.append('<rect x="0" y="558" width="1600" height="342" fill="url(#s4-sea)"/>')

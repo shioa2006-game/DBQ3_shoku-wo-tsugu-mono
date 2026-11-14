@@ -62,6 +62,7 @@ def vignette_defs(pfx):
 # ---------------------------------------------------------------------------
 S1_CSS = """
 .s1-pa-shotb{display:none}
+.is-active .s1-fade .s1-pa-shota{animation:none}
 .s1-fade{opacity:0}
 .is-active .s1-fade{animation:s1-in 1s .15s ease-out both}
 .s1-mote{opacity:0}
@@ -88,6 +89,7 @@ def scene1():
     x, y, w = 270, 124, 1060
     recalled = Q.recall(PB.scene4(), "s4-", "s1-pa-", x, y, w)
     # 額は動かさない（中の場面が毎コマ描き直しになり重くなるため。動きはカメラと額の中に任せる）
+    # 額には前半（山道を駆け下りる全身）だけを入れる。後半を出さず、前半が4.7秒で消える動きも止める（S1_CSS）
     o.append(f'<g class="s1-fade"><g transform="rotate(-1.5 800 410)">{card("s1-", recalled, x, y, w)}</g></g>')
     o.append("</svg>")
     return "".join(o)

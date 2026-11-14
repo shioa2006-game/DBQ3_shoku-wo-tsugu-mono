@@ -16,7 +16,7 @@ import os
 import sys
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _MOVIES = os.path.join(_HERE, "..", "..")
-sys.path.insert(0, os.path.join(_MOVIES, "shared"))                 # 共通部品（engine.py・helpers.py・figures.py）
+sys.path.insert(0, os.path.join(_MOVIES, "shared"))                 # 共通部品（engine.py・helpers.py・figures.py・temple.py）
 sys.path.insert(0, os.path.join(_MOVIES, "ch4-arrival", "src"))     # 火山島（props5.py）
 sys.path.insert(0, os.path.join(_MOVIES, "ch3-departure", "src"))   # 船と空・海の部品（props.py・scenes.py）
 sys.path.insert(0, _HERE)
