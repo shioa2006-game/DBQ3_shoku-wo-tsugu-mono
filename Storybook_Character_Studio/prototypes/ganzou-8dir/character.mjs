@@ -1,6 +1,7 @@
 import { path, ellipse, line, defs, eye, ear, rivet, buckle, buildSheet, clipped, DIRECTIONS, LABELS } from '../shared/ch67-art.mjs';
 export { DIRECTIONS, LABELS };
 const palette={ink:'#393029',skinLight:'#ffcc85',skin:'#efb16c',skinDark:'#be7d41',hairLight:'#dbd5ca',hair:'#b4afa7',hairDark:'#777674',clothLight:'#6b6b68',cloth:'#50504f',clothDark:'#353b3c',apronLight:'#b37a4e',apron:'#97603c',apronDark:'#70462e',ivoryLight:'#f5e7cd',ivory:'#d7c3a3',ivoryDark:'#b69e7c'};
+const eyes=(x,y,view='front',nose=1,width=1)=>eye(x,y,{view,nose,width,size:.76,squash:.86});
 const skin='url(#skin)',hair='url(#hair)',cloth='url(#cloth)',apron='url(#apron)',ivory='url(#ivory)';
 // 5方向の原画。右側は反転し、左右非対称の工具だけは身体の左腰に限定する。
 const faces=[
@@ -68,16 +69,16 @@ function head(v,d){
   out+=path(`M${x-2} ${y+1}q-5 6 -7 14l5 3 5-11 5 11 5-3q-2-10-8-15Z`,'#634735','#362c26',1)+path(`M${x-2} ${y}q3-2 5 0l-1 6-5 0Z`,'#76563e','#392f28',1);
   return `<g data-part="head">${out}</g>`;
  }
- if(v===0){out+=eye(51,46,1.03,1.04)+eye(75,46,1.03,1.04);
+ if(v===0){out+=eyes(51,46)+eyes(75,46,'front',-1);
   out+=path('M43 37 L44 33 Q52 33 58 37 L58 40 Q50 38 43 38Z',hair,'#777168',.7)+path('M68 37 Q76 32 82 33 L83 38 Q75 37 68 40Z',hair,'#777168',.7);
   out+=line('M62 53 Q63 54 65 53','#ba814a',.8)+line('M44 52 L47 53 M79 53 L82 52','#c58b54',.7);
   out+=path('M40 56 Q45 63 52 63 L54 66 L59 64 L63 66 L67 64 L71 66 L74 63 Q82 62 86 55 L84 62 Q76 69 63 69 Q48 68 42 62Z',hair,'#81796d',.7);
   out+=path('M51 57 Q55 54 63 56 Q70 54 75 58 L76 61 Q70 60 64 59 L62 59 Q56 61 50 61Z',hair,'#938a7c',.65)+line('M59 63 Q63 64 67 63','#805737',.85);
- }else if(v===1){out+=eye(41,46,.7,1.02)+eye(61,46,1.02,1.03);
+ }else if(v===1){out+=eyes(41,46,'far',1,.7)+eyes(61,46,'near',-1);
   out+=path('M35 35 Q41 34 46 38 L46 40 L35 38Z',hair,'#777168',.7)+path('M52 37 Q61 33 68 34 L69 38 Q61 38 52 40Z',hair,'#777168',.7);
   out+=line('M46 51 L44 54 L47 55','#ad7543',.85)+line('M68 53 L71 52','#c58b54',.7);
   out+=path('M35 57 Q39 64 46 64 L49 66 L53 64 L57 65 Q70 63 78 57 L76 62 Q66 68 52 69 Q40 69 36 63Z',hair,'#81796d',.7)+path('M39 57 Q43 54 48 56 Q56 55 61 58 L62 61 Q55 60 49 59 Q42 61 38 61Z',hair,'#938a7c',.65)+line('M45 63 Q49 64 53 63','#805737',.85);
- }else{out+=eye(40,46,.66,1)+path('M35 36 Q40 33 48 34 L49 38 Q41 37 35 40Z',hair,'#777168',.7);
+ }else{out+=eyes(40,46,'side',-1,.74)+path('M35 36 Q40 33 48 34 L49 38 Q41 37 35 40Z',hair,'#777168',.7);
   out+=path('M36 59 Q39 64 45 64 L49 63 L51 64 L61 60 L60 63 L51 67 L42 68 Q37 67 36 63Z',hair,'#81796d',.7)+path('M34 55 Q41 54 46 57 L47 60 L42 59 L35 59Z',hair,'#938a7c',.7)+line('M38 62 L42 62','#805737',.8);
  }
  return `<g data-part="head">${out}</g>`;

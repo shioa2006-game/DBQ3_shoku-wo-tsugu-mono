@@ -1,19 +1,20 @@
 // 第6〜7章の設定画用。輪郭と衣装は各 character.mjs に置き、小さな描画部品のみ共有する。
 import { path, ellipse, line } from './svg.mjs';
+import { EYE_OPENINGS, eye as establishedEye } from './face-parts.mjs';
 export { path, ellipse, line };
 export { DIRECTIONS, LABELS } from './sheet-format.mjs';
 export { buildSheet, clipped } from './humanoid-kit.mjs';
 export const defs = `<defs>
- <clipPath id="ch67-eye-opening"><path d="M-6 0 Q-5 -6.2 0 -6 Q5 -6 6 -.4 Q4.6 5.7 0 5.7 Q-4.5 5.5 -6 0Z"/></clipPath>
+ ${Object.entries(EYE_OPENINGS).map(([view,d])=>`<clipPath id="eye-${view}"><path d="${d}"/></clipPath>`).join('')}
+ <linearGradient id="iris" x2="0" y2="1"><stop stop-color="#6e5540"/><stop offset=".5" stop-color="#3d2d22"/><stop offset="1" stop-color="#201a15"/></linearGradient>
  <radialGradient id="skin" cx="38%" cy="25%" r="85%"><stop stop-color="var(--skinLight)"/><stop offset=".7" stop-color="var(--skin)"/><stop offset="1" stop-color="var(--skinDark)"/></radialGradient>
  ${['hair','cloth','apron','ivory'].map(id=>`<linearGradient id="${id}" x2=".8" y2="1"><stop stop-color="var(--${id}Light)"/><stop offset=".55" stop-color="var(--${id})"/><stop offset="1" stop-color="var(--${id}Dark)"/></linearGradient>`).join('')}
 </defs>`;
-export function eye(x,y,sx=1,sy=1){
- return `<g transform="translate(${x} ${y}) scale(${sx} ${sy})">`
-  +path('M-6 0 Q-5 -6.2 0 -6 Q5 -6 6 -.4 Q4.6 5.7 0 5.7 Q-4.5 5.5 -6 0Z','#fff6df','none')
-  +'<g clip-path="url(#ch67-eye-opening)">'+ellipse(.5,.1,3.65,5.3,'#403027','none')+ellipse(.7,-.1,1.9,3.5,'#211e1c','none')
-  +ellipse(1.5,-2.6,1.2,1.65,'#fffaf0','none')+ellipse(-.7,2.9,.7,.55,'#ac7850','none')
-  +'</g>'+line('M-6 0 Q-5 -6.2 0 -6 Q4.8 -6 6 -.4','#3a2b25',1.35)+'</g>';
+// ロク・カヤと同じまぶた、縦長の虹彩・瞳孔、小さい反射光を使う。
+// 左右の鼻側を指定し、正面で両目が同じ斜め方向へ寄らないようにする。
+export function eye(x,y,{squash=1,...options}={}){
+ return `<g transform="translate(0 ${y}) scale(1 ${squash}) translate(0 ${-y})">`
+  +establishedEye(x,y,{irisStroke:'#3c2c20',pupil:'#211b16',glint:'#a58a62',...options})+'</g>';
 }
 export function ear(x,y,sx=1){return `<g transform="translate(${x} ${y}) scale(${sx} 1)">`
  +path('M0 -6 C-6 -9 -7 5 -1 7 C4 8 5 -2 0 -6Z','url(#skin)','#67452e',.85)

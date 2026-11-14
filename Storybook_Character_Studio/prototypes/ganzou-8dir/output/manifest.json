@@ -2,7 +2,7 @@
   "id": "ganzou",
   "name": "ガンゾウ",
   "role": "石切り職人",
-  "version": 1,
+  "version": 2,
   "status": "prototype",
   "source": "../character.mjs",
   "reference": "references/ganzou-8dir-v2.png",

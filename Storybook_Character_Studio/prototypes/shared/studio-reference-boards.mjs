@@ -8,13 +8,23 @@ function referenceCell(reference,i,x=0,y=0,k=1,scale=.277){
  const cell=443.5,size=cell*scale;
  return `<svg x="${x+(63.232-size/2)*k}" y="${y+4*k}" width="${size*k}" height="${size*k}" viewBox="${i%4*cell} ${Math.floor(i/4)*cell} ${cell} ${cell}" overflow="hidden"><image href="${uri(reference)}" width="1774" height="887"/></svg>`;
 }
-export function studioBoards({name,build,referenceScale=.277},{reference,normalized,layers}){
+export function studioBoards({name,build,referenceScale=.277,version=1,eyeReference},{reference,normalized,layers}){
  const vector=`data:image/svg+xml;base64,${Buffer.from(build({cellSize:512})).toString('base64')}`;
  const comparison=`<svg xmlns="http://www.w3.org/2000/svg" width="2144" height="676"><rect width="100%" height="100%" fill="#eee9df"/>
- <text x="24" y="34" font-family="sans-serif" font-size="24" fill="#203344">${name} / 8方向SVG・試作01</text>
+ <text x="24" y="34" font-family="sans-serif" font-size="24" fill="#203344">${name} / 8方向SVG・試作${String(version).padStart(2,'0')}</text>
  <text x="24" y="60" font-family="sans-serif" font-size="16" fill="#60717b">各方向の左：承認済み元画像v2　右：SVG。同じ倍率・原点で比較。</text>
  ${LABELS.map((label,i)=>{const x=16+i%4*528,y=80+Math.floor(i/4)*298;return `<rect x="${x}" y="${y}" width="512" height="256" rx="10" fill="#dce4df"/>${referenceCell(reference,i,x,y,2,referenceScale)}<svg x="${x+256}" y="${y}" width="256" height="256" viewBox="${i%4*128} ${Math.floor(i/4)*128} 128 128"><image href="${vector}" width="512" height="256"/></svg><text x="${x+10}" y="${y+281}" font-family="sans-serif" font-size="16" fill="#203344">${label}　元画像 ／ SVG</text>`;}).join('')}</svg>`;
  const rows=[['頭：髪・顔・耳',layers.head],['胴：首・襟・服・腰の小物',layers.torso],['合成（比較用）',normalized]];
  const layerBoard=`<svg xmlns="http://www.w3.org/2000/svg" width="1072" height="1740"><rect width="100%" height="100%" fill="#eee9df"/>${rows.map(([label,bytes],i)=>`<text x="24" y="${35+i*578}" font-family="sans-serif" font-size="21" fill="#203344">${label}</text><rect x="24" y="${48+i*578}" width="1024" height="512" fill="#dce4df"/><image href="${uri(bytes)}" x="24" y="${48+i*578}" width="1024" height="512"/>`).join('')}</svg>`;
- return {'comparison.png':comparison,'layers.png':layerBoard,'preview.png':build({cellSize:384}),'reference-normalized.png':referenceSheet(reference,referenceScale)};
+ const eyeBoard=eyeReference?eyeStyleBoard([[eyeReference.name,eyeReference.build],[name,build]]):null;
+ return {'comparison.png':comparison,'layers.png':layerBoard,'preview.png':build({cellSize:384}),'reference-normalized.png':referenceSheet(reference,referenceScale),...(eyeBoard?{'eye-style-comparison.png':eyeBoard}:{})};
+}
+
+// 既存キャラクターと同じ倍率で目元を比較。顔ごとの拡大率補正はしない。
+function eyeStyleBoard(rows){
+ const directions=[0,1,2,7];
+ return `<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="500"><rect width="100%" height="100%" fill="#eee9df"/>
+ <text x="24" y="32" font-family="sans-serif" font-size="22" fill="#203344">目元のテイスト比較 / 上：参考キャラクター　下：修正後</text>
+ ${directions.map((i,col)=>`<text x="${160+col*248}" y="64" font-family="sans-serif" font-size="17" fill="#203344">${LABELS[i]}</text>`).join('')}
+ ${rows.map(([name,build],row)=>{const vector=`data:image/svg+xml;base64,${Buffer.from(build({cellSize:512})).toString('base64')}`;return `<text x="24" y="${170+row*204}" font-family="sans-serif" font-size="20" fill="#203344">${name}</text>`+directions.map((i,col)=>`<rect x="${144+col*248}" y="${80+row*204}" width="240" height="192" rx="8" fill="#dce4df"/><svg x="${144+col*248}" y="${80+row*204}" width="240" height="192" viewBox="${i%4*128+24} ${Math.floor(i/4)*128+20} 80 64"><image href="${vector}" width="512" height="256"/></svg>`).join('');}).join('')}</svg>`;
 }

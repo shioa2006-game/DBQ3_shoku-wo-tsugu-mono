@@ -1,6 +1,7 @@
 import { path, ellipse, line, defs, eye, ear, buildSheet, clipped, DIRECTIONS, LABELS } from '../shared/ch67-art.mjs';
 export { DIRECTIONS, LABELS };
 const palette={ink:'#453129',skinLight:'#ffdfad',skin:'#f5c796',skinDark:'#d49d6d',hairLight:'#936c58',hair:'#735041',hairDark:'#4c362e',clothLight:'#ab7e82',cloth:'#8e656c',clothDark:'#684951',apronLight:'#f8ebd2',apron:'#ead7b9',apronDark:'#cbb495',ivoryLight:'#fff2dc',ivory:'#eddcc2',ivoryDark:'#cbb598'};
+const eyes=(x,y,view='front',nose=1,width=1)=>eye(x,y,{view,nose,width,size:.8,squash:1});
 const skin='url(#skin)',hair='url(#hair)',cloth='url(#cloth)',apron='url(#apron)',ivory='url(#ivory)';
 const faces=[
  'M38 29 Q43 18 63 21 Q84 20 89 33 L87 52 Q83 65 63 69 Q43 66 39 54Z',
@@ -71,10 +72,10 @@ function head(v,d){
  if(v===3)out+=ear(46,53,1)+path('M45 46 L49 46 L47 56 L45 57Z',hair,'#564034',.8);
  if(v>=2)out+=bun(v===4?63:82,v===4?68:64,v===4?.92:.9);
  if(v>=1)out+=bow(v===4?63:87,v===4?59:57,v===4?1:.8);
- if(v===0){out+=eye(52,49,1.08,1.08)+eye(75,49,1.08,1.08);
+ if(v===0){out+=eyes(52,49)+eyes(75,49,'front',-1);
   out+=line('M45 37 Q51 34 57 37 M69 37 Q76 34 81 37','#665041',1)+ellipse(63,56,.65,.8,'#d39766','none')+line('M58 61 Q63 65 69 61','#85563a',.9)+line('M56 60 L55 62 M71 60 L72 62','#c68c61',.7);
- }else if(v===1){out+=eye(41,48,.7,1.06)+eye(61,49,1.05,1.07)+line('M36 37 Q40 35 45 37 M54 37 Q61 34 67 38','#665041',1)+ellipse(46,56,.55,.8,'#d39766','none')+line('M43 61 Q48 65 54 61','#85563a',.9)+line('M55 60 L56 62','#c68c61',.7);
- }else if(v===2){out+=eye(41,49,.7,1.05)+line('M36 37 Q41 35 46 38','#665041',1)+line('M36 61 Q39 62 41 60','#85563a',.8)+line('M42 59 L43 60','#c68c61',.6);}
+ }else if(v===1){out+=eyes(41,48,'far',1,.7)+eyes(61,49,'near',-1)+line('M36 37 Q40 35 45 37 M54 37 Q61 34 67 38','#665041',1)+ellipse(46,56,.55,.8,'#d39766','none')+line('M43 61 Q48 65 54 61','#85563a',.9)+line('M55 60 L56 62','#c68c61',.7);
+ }else if(v===2){out+=eyes(41,49,'side',-1,.74)+line('M36 37 Q41 35 46 38','#665041',1)+line('M36 61 Q39 62 41 60','#85563a',.8)+line('M42 59 L43 60','#c68c61',.6);}
  return `<g data-part="head">${out}</g>`;
 }
 function handcloth(x){return `<g data-accessory="left-hip-handcloth" transform="translate(${x} 0)">`+path('M0 102 Q6 99 9 103 L12 117 Q7 120 0 118 L-1 109Z',ivory,'#6f5944',.95)+line('M3 103 Q5 109 4 116 M8 106 L9 114','#c5ad8d',.85)+'</g>';}

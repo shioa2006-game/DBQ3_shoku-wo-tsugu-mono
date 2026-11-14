@@ -2,7 +2,7 @@
   "id": "suzuha",
   "name": "スズハ",
   "role": "元水汲み役・神殿の世話役候補",
-  "version": 1,
+  "version": 2,
   "status": "prototype",
   "source": "../character.mjs",
   "reference": "references/suzuha-8dir-v2.png",
