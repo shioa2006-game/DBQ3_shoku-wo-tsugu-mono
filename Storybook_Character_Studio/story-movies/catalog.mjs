@@ -1,5 +1,6 @@
 // SVGストーリームービーの一覧データ。Studioの /story-movies/ （index.html）がこれを読んで表示する。
-// 物語の内容・入る場所・長さ・優先度・作る順番の正本は、親リポジトリの docs/story/planned/story-movies.md。
+// 物語の内容・入る場所・長さ・優先度・作る順番の正本は、親リポジトリの計画資料（PLAN_DOCS）：
+// 第1～5章は docs/story/planned/story-movies.md、第6～7章は docs/story/planned/chapter6-7-movies.md。
 // 計画を変えたらここも直す（tests/node/story-movies.test.mjs が計画資料の表・作る順番と照合する）。
 // 新しいムービーを作ったら、story-movies/<slug>/index.html を置き、status を 'prototype' にして thumb を指定する。
 // ゲームへ組み込んだら（game-targets.mjs に書き出し先を足し、npm.cmd run sync:movies で写す）status を 'game' にする。
@@ -15,16 +16,29 @@ export const STATUS = {
 export const SAGAS = [
   { id: 'zipangu', title: 'ジパング復興編', note: '第1～3章（dqb3-tsugumono-ch1-3）' },
   { id: 'volcano', title: '火山島編', note: '第4～5章（dqb3-tsugumono-ch4-5）' },
+  { id: 'dharma', title: 'ダーマ再興編', note: '第6～7章（dqb3-tsugumono-ch6-7。ゲームは未実装で、ムービーを先に作る）' },
   { id: 'common', title: '両編で繰り返し使うもの', note: '型を1つ作り、差し替えて使う' },
 ];
 
-/** 作る順番（計画資料の「作る順番の提案」と同じ）。0 はすでに試作済み。 */
+/** 作る順番（計画資料の「作る順番の提案」と同じ）。0 はすでに試作済み。第6～7章の計画の 1～3 番は、ここでは 5～7。 */
 export const BUILD_STEPS = [
   { step: 0, label: '試作済み' },
   { step: 1, label: '編の終わりと始まりを対で', note: 'ジパング復興編の終わりと火山島編の始まり。2つのゲームをつなぐ' },
   { step: 2, label: '火山島編の終わり', note: 'プロローグの神殿と呼応させる' },
   { step: 3, label: '書の復活の型', note: '1つ作れば5回使える。先に5冊の書の意匠を決める' },
   { step: 4, label: 'ジパング復興編の章の結び', note: '中くらいの長さの2本を続けて作る' },
+  { step: 5, label: 'ダーマ再興編の始まりと終わり', note: '第6～7章。島・神殿跡・再建した神殿・船をここでそろえる' },
+  { step: 6, label: 'ダーマ再興編の第6章の結び', note: 'M10の島とM14の神殿を使い回す。三つ首の影は輪郭だけ' },
+  { step: 7, label: 'ヴァルガが登場する2本', note: 'Studioでヴァルガの作画ができてから作る' },
+];
+
+/**
+ * 計画資料（親リポジトリ内の場所）と、そこに載っている区分。stepOffset は計画の作る順の番号に足す数。
+ * 見送ったもの（DECLINED）は第1～5章の計画だけにある。
+ */
+export const PLAN_DOCS = [
+  { doc: 'docs/story/planned/story-movies.md', sagas: ['zipangu', 'volcano', 'common'], stepOffset: 0 },
+  { doc: 'docs/story/planned/chapter6-7-movies.md', sagas: ['dharma'], stepOffset: 4 },
 ];
 
 /**
@@ -99,6 +113,51 @@ export const MOVIES = [
     links: [{ label: '制作メモ', href: 'ch5-return/README.md' }, { label: '絵コンテ', href: 'ch5-return/reference/storyboard.md' }],
   },
   {
+    id: 'M10', slug: 'ch6-arrival', title: 'ダーマ再興編の始まり「始まりの場所」', saga: 'dharma', status: 'prototype', buildStep: 5,
+    when: '第6章・開始', place: '「はじめから」の後、第6章の導入会話（着岸・スズハとの出会い）の前', length: '大・25～30秒', priority: 'A',
+    summary: '別のゲームとして始まるダーマ再興編の入口。三枚の思い出の額でこれまでの旅を振り返り、M7の夜の海の続きの夜明けから、旧ダーマ神殿の島への着岸までを見せる。',
+    scenes: ['これまでの旅：神殿からの脱出・ジパングの復興・清めの泉（三枚の思い出の額）', '夜明けの海。日が昇り、船の上の四人',
+      '船首の四人の後ろ姿と、海から山へ続く島', '山腹の神殿跡。屋根を失い、二本の柱だけが立つ', '古い桟橋への着岸。タイトル「ダーマ再興編」'],
+    cast: ['シオン', 'ミナ', 'ゴンタ', 'ワタリ'],
+    tone: ['#3a5a7a', '#f2c98a'],
+    thumb: { scene: 4, t: 4200 },
+    links: [{ label: '制作メモ', href: 'ch6-arrival/README.md' }, { label: '絵コンテ', href: 'ch6-arrival/reference/storyboard.md' }],
+  },
+  {
+    id: 'M11', slug: 'ch6-roof-light', title: '第6章の結び「大屋根の灯」', saga: 'dharma', status: 'planned', buildStep: 6,
+    when: '第6章・章末', place: '神殿の完成と最初の授職を祝った後、第7章へ移る前', length: '中・15～20秒', priority: 'B',
+    summary: '神殿の完成と最初の授職の喜びで第6章を締めくくり、最後に海の向こうから来る三つ首の影とガーゴイルの群れを、輪郭だけで短く見せる。',
+    scenes: ['授職の灯がともる祭壇と、アサギの大工の印を刻んだ選択の柱', '共同台所の前の祝いの夜', '海岸から望む、灯のともった大屋根',
+      '遠い咆哮。月の沖を横切る三つ首の影とガーゴイルの群れ（輪郭だけ）', 'タイトル「第6章・完」'],
+    cast: ['シオン', 'ミナ', 'ゴンタ', 'ワタリ', 'ピノ', 'スズハ', 'アサギ', 'ガンゾウ'],
+    tone: ['#1e2a4a', '#f0b862'],
+  },
+  {
+    id: 'M12', slug: 'ch7-three-heads', title: '三頭魔竜の襲来「三つ首の影」', saga: 'dharma', status: 'planned', buildStep: 7,
+    when: '第7章・中盤', place: 'ガーゴイル軍の3波を退けた後、初襲来の戦闘の直前', length: '小・6～8秒', priority: 'B',
+    summary: '軍勢を率いる竜が自ら海を越えて現れ、ダーマを焼いたのは自分だと名乗る。戦いの結果は見せない。',
+    scenes: ['海の向こうの空が暗くなり、水平線から三つ首の竜が飛んでくる', '三つの頭が大屋根を見下ろし、火を噴く構えをとる', '竜が自ら名を告げる'],
+    cast: ['ヴァルガ'],
+    tone: ['#2a1d2e', '#c8462e'],
+  },
+  {
+    id: 'M13', slug: 'ch7-flame-holds', title: '最終決戦の決着「灯は消えず」', saga: 'dharma', status: 'planned', buildStep: 7,
+    when: '第7章・終盤', place: '三つ目の頭を倒した直後、戦後の修復の前', length: '中・10～20秒', priority: 'B',
+    summary: '三つの頭を倒した決着と、傷ついた神殿の奥で祭壇の灯がともり続けていることを見せる。',
+    scenes: ['三つ目の頭が倒れ、竜の巨体が崩れ落ちる', '煙が晴れ、傷ついた屋根と壁の奥で祭壇の灯がともり続ける', '朝の光の中の対空ボウガンの射台と選択の柱、集まる仲間と住民'],
+    cast: ['シオン', 'ミナ', 'ゴンタ', 'ワタリ', 'ピノ', 'ベルク', 'スズハ', 'アサギ', 'ガンゾウ', 'ヴァルガ'],
+    tone: ['#3a3440', '#f6d38a'],
+  },
+  {
+    id: 'M14', slug: 'ch7-unseen-books', title: 'ダーマ再興編・完「まだ見ぬ書へ」', saga: 'dharma', status: 'planned', buildStep: 5,
+    when: '第7章・結末', place: 'スズハへの継承の後、ピノとベルクも乗せた最後の出航', length: '大・30～35秒', priority: 'A',
+    summary: 'ダーマ再興編とこれまでの旅を締めくくる。ピノをジパング、ベルクを火山島へ送り届け、世界中の職業の書を探す旅へ。',
+    scenes: ['再開した神殿と、桟橋から出る船', 'ジパングでピノが降りる', '火山島でベルクが降りる', '四人と職業の書だけを乗せて、その先の海へ',
+      '水平線。タイトル「ダーマ再興編・完」と「職をつぐ者」「完」'],
+    cast: ['シオン', 'ミナ', 'ゴンタ', 'ワタリ', 'ピノ', 'ベルク', 'スズハ', 'アサギ', 'ガンゾウ', 'イナホ', 'ジンベエ', 'ナギ', 'ロク', 'カヤ', 'ヨモギ'],
+    tone: ['#5b9cc8', '#ffe7a8'],
+  },
+  {
     id: 'M2', slug: 'book-revival', title: '書の復活（共通の型）', saga: 'common', status: 'game', buildStep: 3,
     when: '第1～5章（5回）', place: '農民・料理人・船乗り・鍛冶屋・僧侶の書が復活するとき（復活の小窓を置き換え）', length: '小・6～8秒', priority: 'B',
     summary: '職が戻る瞬間を、毎回同じ型で見せる。書の色・紋章・道具の絵だけを差し替える。5冊の書の意匠（表紙の色・紋章）はこの試作で案を作った（shared/books.py）。',
@@ -117,5 +176,5 @@ export const DECLINED = [
   { id: 'M8', title: '章の幕開け（章タイトル）', note: '第2・3・5章の開始' },
 ];
 
-/** 計画資料（親リポジトリ内の場所。Studioのサーバーでは開けない）。 */
-export const PLAN_DOC = 'docs/story/planned/story-movies.md';
+/** 第1～5章の計画資料（親リポジトリ内の場所。Studioのサーバーでは開けない）。第6～7章も含めた一覧は PLAN_DOCS。 */
+export const PLAN_DOC = PLAN_DOCS[0].doc;

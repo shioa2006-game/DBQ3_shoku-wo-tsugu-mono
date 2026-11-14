@@ -67,8 +67,9 @@ try {
         await page.waitForTimeout(200);
         await page.screenshot({ path: `${shots}scene-${i + 1}-${t}.png` });
       }
-      // 字幕の出る時刻には、その字幕が表示される
+      // 字幕の出る時刻には、その字幕が表示される（字幕のない場面、例えばタイトルだけの場面は飛ばす）
       const c = scene.captions[0];
+      if (!c) continue;
       await still(page, i + 1, c.in + 100);
       assert.ok((await page.locator('.caption-line.is-shown').allInnerTexts()).includes(c.text), `${scene.id}: caption "${c.text}"`);
     }

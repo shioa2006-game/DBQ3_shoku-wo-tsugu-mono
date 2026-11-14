@@ -1,49 +1,68 @@
 // SVGストーリームービーの一覧（story-movies/index.html・catalog.mjs）の検査。
-// 一覧データが計画資料（親リポジトリの docs/story/planned/story-movies.md）の表・作る順番と一致し、
-// 試作済みのムービーのフォルダと対応していることを確かめる。ブラウザーでの表示は npm.cmd run test:movie-list。
+// 一覧データが計画資料（親リポジトリの docs/story/planned/story-movies.md と chapter6-7-movies.md。catalog.mjs の PLAN_DOCS）の
+// 表・作る順番と一致し、試作済みのムービーのフォルダと対応していることを確かめる。ブラウザーでの表示は npm.cmd run test:movie-list。
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MOVIES, SAGAS, STATUS, BUILD_STEPS, DECLINED, PLAN_DOC } from '../../story-movies/catalog.mjs';
+import { MOVIES, SAGAS, STATUS, BUILD_STEPS, DECLINED, PLAN_DOCS } from '../../story-movies/catalog.mjs';
 
 const studio = fileURLToPath(new URL('../../', import.meta.url));
 const movies = path.join(studio, 'story-movies');
 const exists = file => stat(file).then(() => true, () => false);
-const plan = await readFile(path.join(studio, '..', PLAN_DOC), 'utf8');
+const plans = await Promise.all(PLAN_DOCS.map(async p => ({ ...p, text: (await readFile(path.join(studio, '..', p.doc), 'utf8')).replace(/\r\n/g, '\n') })));
 
-// 計画資料の「## 見出し」から次の「## 」までを取り出す
-function section(heading) {
-  const start = plan.indexOf(`\n## ${heading}`);
-  assert.ok(start >= 0, `${PLAN_DOC}: 「${heading}」の節`);
-  const end = plan.indexOf('\n## ', start + 1);
-  return plan.slice(start, end < 0 ? undefined : end);
+// 計画資料の「## 見出し」から次の「## 」までを取り出す（required でないときは、なければ null）
+function section(plan, heading, required = true) {
+  const start = plan.text.indexOf(`\n## ${heading}`);
+  if (start < 0 && !required) return null;
+  assert.ok(start >= 0, `${plan.doc}: 「${heading}」の節`);
+  const end = plan.text.indexOf('\n## ', start + 1);
+  return plan.text.slice(start, end < 0 ? undefined : end);
 }
-const rows = text => text.split('\n').filter(l => /^\| M\d+ \|/.test(l)).map(l => l.split('|').slice(1, -1).map(c => c.trim().replace(/\*\*/g, '')));
+const cells = l => l.split('|').slice(1, -1).map(c => c.trim().replace(/\*\*/g, ''));
+const rows = text => text.split('\n').filter(l => /^\| M\d+ \|/.test(l)).map(cells);
+// 表の見出し行から列の位置を名前で引く（第1～5章と第6～7章で列の並びが違うため）
+function table(text) {
+  const head = cells(text.split('\n').find(l => /^\| # \|/.test(l)));
+  const col = name => head.findIndex(h => h.includes(name));
+  return rows(text).map(r => ({ id: r[0], title: r[col('ムービー')], length: r[col('長さ')], priority: r[col('優先度')] }));
+}
+// 作る順番：「1. **M4とM5**: …」または「1. M10とM14（…）。…」の、見出し部分にある番号だけを読む
+const steps = text => [...text.matchAll(/^(\d+)\. (?:\*\*(.+?)\*\*|([^（:：。\n]+))/gm)]
+  .map(m => [Number(m[1]), (m[2] ?? m[3]).match(/M\d+/g) ?? []]);
 
-test('the catalog lists every adopted movie of the plan with the same title, length and priority', () => {
-  const adopted = rows(section('採用した'));
-  assert.equal(adopted.length, MOVIES.length, 'adopted movies');
-  for (const [id, title, , , length, , priority] of adopted) {
-    const movie = MOVIES.find(m => m.id === id);
-    assert.ok(movie, `${id} is in catalog.mjs`);
-    assert.equal(movie.title, title, `${id} title`);
-    assert.equal(movie.length, length, `${id} length`);
-    if (/^[A-C]$/.test(priority)) assert.equal(movie.priority, priority, `${id} priority`);
-    else assert.ok(movie.priority === null && movie.status !== 'planned', `${id}: ${priority}`);
+test('the catalog lists every adopted movie of each plan with the same title, length and priority', () => {
+  let total = 0;
+  for (const plan of plans) {
+    const adopted = table(section(plan, '採用した'));
+    const listed = MOVIES.filter(m => plan.sagas.includes(m.saga));
+    assert.equal(adopted.length, listed.length, `${plan.doc}: adopted movies`);
+    total += adopted.length;
+    for (const { id, title, length, priority } of adopted) {
+      const movie = listed.find(m => m.id === id);
+      assert.ok(movie, `${id} is in catalog.mjs (${plan.sagas.join('/')})`);
+      assert.equal(movie.title, title, `${id} title`);
+      assert.equal(movie.length, length, `${id} length`);
+      if (/^[A-C]$/.test(priority)) assert.equal(movie.priority, priority, `${id} priority`);
+      else assert.ok(movie.priority === null && movie.status !== 'planned', `${id}: ${priority}`);
+    }
   }
+  assert.equal(total, MOVIES.length, 'every movie in catalog.mjs belongs to a plan');
 });
 
-test('the build order follows the plan, and declined ideas are kept out of the list', () => {
-  const steps = [...section('作る順番の提案').matchAll(/^(\d+)\. \*\*(.+?)\*\*/gm)].map(m => [Number(m[1]), m[2].match(/M\d+/g)]);
-  assert.ok(steps.length >= 1);
-  for (const [step, ids] of steps) for (const id of ids)
-    assert.equal(MOVIES.find(m => m.id === id)?.buildStep, step, `${id} is step ${step}`);
-  for (const m of MOVIES.filter(m => m.status === 'planned'))
-    assert.ok(steps.some(([step, ids]) => step === m.buildStep && ids.includes(m.id)), `${m.id} has a step in the plan`);
-  const declined = rows(section('見送ったもの'));
-  assert.deepEqual(declined.map(([id, title]) => [id, title]), DECLINED.map(d => [d.id, d.title]));
+test('the build order follows each plan, and declined ideas are kept out of the list', () => {
+  for (const plan of plans) {
+    const order = steps(section(plan, '作る順番の提案'));
+    assert.ok(order.length >= 1, plan.doc);
+    for (const [step, ids] of order) for (const id of ids)
+      assert.equal(MOVIES.find(m => m.id === id)?.buildStep, step + plan.stepOffset, `${id} is step ${step} of ${plan.doc}`);
+    for (const m of MOVIES.filter(m => m.status === 'planned' && plan.sagas.includes(m.saga)))
+      assert.ok(order.some(([step, ids]) => step + plan.stepOffset === m.buildStep && ids.includes(m.id)), `${m.id} has a step in the plan`);
+  }
+  const declined = plans.map(p => section(p, '見送ったもの', false)).filter(Boolean).join('\n');
+  assert.deepEqual(rows(declined).map(([id, title]) => [id, title]), DECLINED.map(d => [d.id, d.title]));
   for (const d of DECLINED) assert.ok(!MOVIES.some(m => m.id === d.id), `${d.id} is not adopted`);
 });
 
@@ -60,6 +79,7 @@ test('catalog entries are well formed', () => {
     for (const key of ['title', 'when', 'place', 'length', 'summary']) assert.ok(m[key], `${m.id} ${key}`);
     assert.ok(m.scenes.length >= 3, `${m.id} scenes`);
   }
+  for (const plan of PLAN_DOCS) for (const saga of plan.sagas) assert.ok(SAGAS.some(s => s.id === saga), `${plan.doc}: ${saga}`);
   // 旧設定の名前を使わない
   const text = JSON.stringify({ MOVIES, DECLINED });
   for (const old of ['ビルダーの書', '原初の書', 'ギアガ']) assert.ok(!text.includes(old), old);

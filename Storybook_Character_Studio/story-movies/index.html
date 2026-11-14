@@ -84,7 +84,7 @@ details ol{margin:8px 0 0;padding-left:1.6em;line-height:1.7}
 <noscript><p class="error">一覧はJavaScriptで表示します。<a href="prologue/">プロローグ（試作）</a>は直接開けます。</p></noscript>
 </main>
 <script type="module">
-import { MOVIES, SAGAS, STATUS, BUILD_STEPS, DECLINED, PLAN_DOC } from './catalog.mjs';
+import { MOVIES, SAGAS, STATUS, BUILD_STEPS, DECLINED, PLAN_DOCS } from './catalog.mjs';
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const made = m => m.status !== 'planned';
@@ -148,7 +148,7 @@ document.getElementById('aside').innerHTML = `
   <section class="note"><h2>見送った案</h2><p>今の会話・演出のままとします。</p>
     <ul>${DECLINED.map(d => `<li>${d.id} ${esc(d.title)}（${esc(d.note)}）</li>`).join('')}</ul></section>
   <section class="note"><h2>計画とこの一覧の更新</h2>
-    <p>内容・入る場所・順番の正本は、親リポジトリの <code>${PLAN_DOC}</code> です。計画を変えたら <code>story-movies/catalog.mjs</code> も直します（Studioのテストが照合します）。</p>
+    <p>内容・入る場所・順番の正本は、親リポジトリの ${PLAN_DOCS.map(p => `<code>${p.doc}</code>`).join(' と ')} です（第6～7章は後者）。計画を変えたら <code>story-movies/catalog.mjs</code> も直します（Studioのテストが照合します）。</p>
     <p>新しいムービーは <code>story-movies/&lt;フォルダ&gt;/index.html</code> に作り、<code>catalog.mjs</code> の状態を「試作済み」にして静止画の場面を指定すると、ここに絵が出ます。</p></section>`;
 
 const params = new URLSearchParams(location.search);

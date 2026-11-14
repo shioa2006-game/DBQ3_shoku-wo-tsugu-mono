@@ -23,7 +23,7 @@
 - 2026-11-03に主人公・ミナ・ゴンタ・ワタリ・おおこうもり・どろたぼうを第4～5章へも移植。両編が書き出し先のキャラクターは、書き出し後に `npm.cmd run sync:games` で `game-targets.mjs` の全ゲームへ写す。
 
 - `story-movies/index.html` はSVGムービーの一覧で、データは `story-movies/catalog.mjs`（内容の正本は `docs/story/planned/story-movies.md`）。ムービーを作ったり計画を変えたりしたら `catalog.mjs` も直す。
-- 2本目以降のムービーは `story-movies/shared/`（再生エンジン `engine.py`、人物の部品 `cast.mjs`・手足 `figures.py`）を使い、`npm.cmd run build:movie -- <フォルダ名>` で生成、`npm.cmd run test:movie -- <フォルダ名>` で再生確認。各フォルダの `index.html`・`parts/` は生成物。人物の作画を変えたら、登場するムービーを生成し直す。M5（`ch4-arrival/`）は思い出の額にプロローグとM4（`ch3-departure/`）の場面をそのまま使うので、それらを変えたらM5も生成し直す。M7（`ch5-return/`）はM4の船とM5の火山島の小道具を使うので、それらを変えたらM7も生成し直す。M2（`book-revival/`）は5冊の書の意匠（`story-movies/shared/books.py`）から5ページを書き出す。
+- 2本目以降のムービーは `story-movies/shared/`（再生エンジン `engine.py`、人物の部品 `cast.mjs`・手足 `figures.py`）を使い、`npm.cmd run build:movie -- <フォルダ名>` で生成、`npm.cmd run test:movie -- <フォルダ名>` で再生確認。各フォルダの `index.html`・`parts/` は生成物。人物の作画を変えたら、登場するムービーを生成し直す。M5（`ch4-arrival/`）は思い出の額にプロローグとM4（`ch3-departure/`）の場面をそのまま使うので、それらを変えたらM5も生成し直す。M7（`ch5-return/`）はM4の船とM5の火山島の小道具を使うので、それらを変えたらM7も生成し直す。M2（`book-revival/`）は5冊の書の意匠（`story-movies/shared/books.py`）から5ページを書き出す。第6～7章のM10（`ch6-arrival/`。ゲーム未実装）は思い出の額にプロローグ・M4・M7の場面を使うので、それらを変えたらM10も生成し直す。第6～7章の5本の計画の正本は `docs/story/planned/chapter6-7-movies.md`。
 - `story-movies/prologue/` はプロローグのSVGムービー。`index.html`・`parts/` は生成物なので `src/` を直して `npm.cmd run build:prologue`。主人公の作画（hero2）を変えたら生成し直す。
 - 2026-11-08に7本すべてを両編へ組み込んだ（`catalog.mjs` の状態は `game`）。ムービーを生成し直したら `npm.cmd run sync:movies` で各編の `assets/movies/` へ写す（書き出し先は `story-movies/game-targets.mjs`。`npm.cmd test` が一致を確かめる）。写した後は、そのゲームの `test:ci`（`movies.test.mjs` を含む）も実行する。
 
